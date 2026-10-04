@@ -16,3 +16,5 @@ Thumbs.db
 peserta*.csv
 *.peserta.csv
 data-peserta/
+# Kata sandi awal peserta (rahasia)
+sandi-awal*.csv

@@ -363,3 +363,11 @@ Tahap 2 (Supabase) harus merancang tabel log sejak awal, karena data yang tidak 
 - **Masuk hanya lewat tautan email** (magic link), tanpa kode yang diketik. Mata kuliah yang dipilih diingat dan dibuka setelah masuk.
 - **Risiko yang dicatat:** pemindai keamanan email (mis. Safe Links) bisa membuka tautan sekali pakai lebih dulu sehingga peserta melihat "kedaluwarsa". Perlu diuji dengan email kampus yang dipakai peserta; cadangannya adalah mengembalikan kode angka.
 - **Hemat unduhan:** mesin Python (sekitar 10 MB) hanya dimuat untuk peserta yang sudah masuk.
+
+## 18. Masuk dengan email dan kata sandi (diputuskan 4 Oktober 2026)
+
+- **Menggantikan masuk lewat tautan email.** Alasan dari pemilik: layar masuk tidak boleh langsung meminta email (terasa seperti mendaftar). Pilihan yang dipakai: email dan kata sandi, dengan layar Daftar terpisah.
+- **Keuntungan kapasitas:** masuk dengan kata sandi tidak mengirim email, sehingga batas pengiriman email (2 per jam bawaan Supabase, 30 per jam dengan SMTP sendiri) tidak membatasi 80 peserta yang masuk. Email hanya untuk konfirmasi pendaftaran mandiri dan lupa kata sandi.
+- **Batas yang tersisa:** masuk dan daftar 30 per 5 menit per alamat IP (Wi-Fi bersama), dapat diatur di Supabase. Rencana: bagi kelompok atau masuk sebelum pertemuan.
+- **Kelas tertutup:** dosen mendaftarkan peserta lewat CSV dengan kata sandi awal (acak atau dari CSV); peserta wajib menggantinya pada masuk pertama; kata sandi awal hanya ditulis ke berkas lokal.
+- **Risiko baru:** mengelola kata sandi (lupa, reset). Cadangan: Lupa kata sandi lewat email, atau dosen mengatur ulang dengan `--reset-sandi`.

@@ -96,9 +96,23 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 - [ ] **SMTP sendiri di Supabase (wajib):** pengirim bawaan hanya 2 email/jam per proyek dan hanya ke anggota tim; batas setelah SMTP sendiri 30/jam, naikkan di Authentication > Rate Limits sebelum hari pertama kelas
 - [x] Pesan galat email dibedakan: jeda per alamat ("Tunggu N detik") dan batas proyek ("Batas pengiriman email sedang tercapai"); diuji (`tools/uji_pesan.mjs`, di CI)
 
+## Tahap P: Masuk dengan email dan kata sandi (4 Okt 2026)
+
+Mengganti masuk lewat tautan email. Alasan: layar masuk tidak lagi langsung meminta email seperti pendaftaran, dan masuk tidak mengirim email sehingga 80 peserta tidak terbentur batas email.
+
+- [x] Layar **Masuk**: email dan kata sandi, tombol tampilkan kata sandi, tautan Lupa kata sandi, tautan ke Daftar (atau catatan "akun dibuat dosen" pada kelas tertutup)
+- [x] Layar **Daftar** (pendaftaran mandiri): email, kata sandi, ulangi; aturan minimal 8 karakter dengan huruf dan angka; email konfirmasi dengan kirim ulang; email yang sudah terdaftar terdeteksi; masuk sebelum konfirmasi ditolak dengan tombol kirim ulang
+- [x] **Lupa kata sandi**: tautan email, layar atur kata sandi baru; tautan kedaluwarsa memberi pesan jelas
+- [x] **Kata sandi awal dari dosen** bertanda wajib ganti: layar "Buat kata sandi baru" menahan semua halaman sampai diganti; kata sandi baru harus berbeda dari yang lama
+- [x] `tools/impor_peserta.mjs`: kata sandi awal acak atau dari kolom `sandi`, ditulis ke berkas (tidak ke layar), `--reset-sandi`, tidak mengubah kata sandi akun yang ada saat diulang. Diuji dengan server tiruan (35 uji, peka terhadap perusakan)
+- [x] Pesan galat baru (kata sandi salah, belum dikonfirmasi, sudah terdaftar, lemah, sama dengan lama, pendaftaran ditutup); diuji
+- [x] Server uji meniru semua alur, dengan akun contoh
+- [ ] **Belum diuji dengan Supabase sungguhan:** `signInWithPassword`, `signUp`, `resetPasswordForEmail`, `updateUser`, `resend` dan endpoint admin, semuanya baru terhadap klien dan server tiruan
+- [ ] Aktifkan kata sandi minimal 8 dan periksa pengaturan Confirm email di Supabase (oleh pemilik)
+
 ## Tahap K: Kelas tertutup, peserta didaftarkan dosen (4 Okt 2026)
 
-- [x] Mode `PENDAFTARAN=tutup` (variabel lingkungan, dibuat ke `config.js` oleh `tools/buat_config.mjs`; diuji): tautan masuk tidak membuat akun baru; email yang belum terdaftar mendapat pesan "belum terdaftar di kelas"
+- [x] Mode `PENDAFTARAN=tutup` (variabel lingkungan, dibuat ke `config.js` oleh `tools/buat_config.mjs`; diuji): tombol Daftar disembunyikan, halaman Daftar menjawab "Pendaftaran ditutup"
 - [x] `tools/impor_peserta.mjs`: dari CSV (koma atau titik koma, BOM, nama berkutip) membuat akun (email terverifikasi) dan mengisi profil; simulasi bawaan, `--jalankan` untuk mengirim; aman diulang; peran tidak diubah; menolak kunci publik dan URL tidak aman; kunci tidak dicetak. Diuji dengan server Supabase tiruan (20 uji, peka terhadap perusakan), di CI
 - [x] `docs/DAFTARKAN-PESERTA.md` dan `docs/contoh-peserta.csv`; `.gitignore` menolak `peserta*.csv`
 - [x] Server uji meniru kelas tertutup (dua peserta terdaftar dengan profil terisi; email lain ditolak; `?terbuka=1` untuk mandiri)
@@ -265,3 +279,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (15): Galat "Terlalu banyak permintaan email".** Penyebab: batas pengirim email bawaan Supabase (2/jam per proyek, hanya ke anggota tim), bukan galat kode. Panduan SMTP diperjelas dengan angka dari dokumentasi resmi; pesan di situs dibedakan antara jeda per alamat dan batas proyek.
 - **4 Okt 2026 (16): Kapasitas kelas besar.** Dari dokumentasi Supabase: klik tautan dan masuk dibatasi 30 per 5 menit per alamat IP, sehingga banyak peserta di satu Wi-Fi kampus bisa terhambat; email proyek 30 per jam setelah SMTP sendiri. Ditambah bagian "Kelas besar" di panduan, pesan untuk batas per IP, dan rencana daftar sebelum pertemuan.
 - **4 Okt 2026 (17): Kelas tertutup.** Peserta bisa didaftarkan dosen lewat CSV sehingga mereka tidak mendaftar dan datanya sudah terisi; pendaftaran mandiri bisa ditutup. Skrip impor memakai kunci service_role di komputer pemilik (tidak pernah di chat atau repositori). Diuji dengan server tiruan; endpoint asli belum diuji.
+- **4 Okt 2026 (18): Masuk dengan email dan kata sandi.** Atas permintaan pemilik (layar masuk tidak boleh langsung meminta email) masuk lewat tautan diganti email dan kata sandi: Masuk, Daftar, Lupa kata sandi, kata sandi awal wajib ganti untuk akun dari dosen. Keuntungan kapasitas: masuk tidak mengirim email. Batas yang masih berlaku: masuk 30 per 5 menit per IP. Diuji di browser dengan klien tiruan (semua alur) dan di skrip impor dengan server tiruan; belum dengan Supabase sungguhan.

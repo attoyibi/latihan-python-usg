@@ -1,8 +1,10 @@
-// Masuk dan data awal peserta lewat Supabase.
+// Masuk dengan email dan kata sandi lewat Supabase, plus data awal peserta.
 // Peserta wajib masuk. Bila SUPABASE_URL dan SUPABASE_ANON_KEY di config.js kosong, situs menampilkan
 // layar pemasangan, kecuali MODE_LOKAL: true (tanpa akun, progres hanya di browser; untuk uji tampilan).
 
 const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+
+export const MIN_SANDI = 8;
 
 const cfg = () => window.APP_CONFIG || {};
 
@@ -19,12 +21,14 @@ export const localMode = () => !enabled() && cfg().MODE_LOKAL === true;
 // Belum tersambung ke Supabase dan bukan mode lokal: pengunjung tidak boleh membuka bab.
 export const needsSetup = () => !enabled() && !localMode();
 // Pendaftaran mandiri: "buka" (bawaan) atau "tutup". Pada kelas tertutup, dosen mendaftarkan peserta
-// lebih dulu (tools/impor_peserta.mjs) dan hanya email yang sudah terdaftar yang bisa meminta tautan masuk.
+// lebih dulu (tools/impor_peserta.mjs) dan peserta hanya masuk.
 export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "buka") !== "tutup";
 export const getSession = () => session;
 export const getProfile = () => profile;
 export const getUserId = () => (session && session.user ? session.user.id : null);
 export const getEmail = () => (session && session.user ? session.user.email : null);
+// Akun yang didaftarkan dosen membawa tanda ganti_sandi: peserta wajib membuat kata sandi baru saat pertama masuk.
+export const perluGantiSandi = () => !!(session && session.user && session.user.user_metadata && session.user.user_metadata.ganti_sandi);
 export const onChange = (cb) => listeners.push(cb);
 const emit = () => listeners.forEach((cb) => cb());
 
@@ -42,18 +46,23 @@ function loadScript(src) {
 export function friendly(error) {
   const msg = String((error && error.message) || error || "");
   const code = error && error.code;
-  if (/signups? not allowed|otp_disabled|user_not_found|user not found/i.test(msg + " " + (code || ""))) return "Email ini belum terdaftar di kelas. Pakai email yang didaftarkan dosen, atau hubungi dosen.";
+  const semua = msg + " " + (code || "");
+  if (/invalid login credentials|invalid_credentials/i.test(semua)) return "Email atau kata sandi salah.";
+  if (/email not confirmed|email_not_confirmed/i.test(semua)) return "Email belum dikonfirmasi. Buka email konfirmasi yang dikirim saat mendaftar, atau minta kirim ulang.";
+  if (/user already registered|user_already_exists/i.test(semua)) return "Email ini sudah terdaftar. Silakan masuk.";
+  if (/signups? (are )?(not allowed|disabled)|signup_disabled/i.test(semua)) return "Pendaftaran mandiri ditutup. Pakai email yang didaftarkan dosen, atau hubungi dosen.";
+  if (/weak_password|password should be at least|password is too weak|should contain at least/i.test(semua)) return "Kata sandi terlalu lemah. Pakai minimal " + MIN_SANDI + " karakter dengan campuran huruf dan angka.";
+  if (/same_password|different from the old password/i.test(semua)) return "Kata sandi baru harus berbeda dari yang lama.";
   if (code === "23505") return "NIM ini sudah dipakai akun lain. Periksa lagi, atau hubungi dosen.";
   if (code === "23514") return "Isian belum sesuai aturan. Periksa panjang nama, NIM, dan kelas.";
   if (code === "42P01" || /relation .* does not exist/i.test(msg)) return "Database belum disiapkan. Hubungi dosen.";
   // Batas permintaan per alamat IP (mis. banyak peserta di satu Wi-Fi kampus).
-  if (/over_request_rate_limit|request rate limit reached/i.test(msg + " " + (code || ""))) return "Terlalu banyak orang mencoba masuk dari jaringan yang sama pada saat ini. Tunggu beberapa menit lalu coba lagi, atau pakai data seluler.";
+  if (/over_request_rate_limit|request rate limit reached/i.test(semua)) return "Terlalu banyak orang mencoba masuk dari jaringan yang sama pada saat ini. Tunggu beberapa menit lalu coba lagi, atau pakai data seluler.";
   // Jeda per alamat email: "you can only request this after 43 seconds"
   const detik = /after (\d+) seconds?/i.exec(msg);
-  if (detik) return "Tunggu " + detik[1] + " detik sebelum meminta tautan lagi.";
+  if (detik) return "Tunggu " + detik[1] + " detik sebelum meminta lagi.";
   // Batas pengiriman email untuk seluruh proyek sudah tercapai.
-  if (/rate limit|too many|over_email_send_rate_limit/i.test(msg)) return "Batas pengiriman email sedang tercapai, jadi tautan belum bisa dikirim. Coba lagi sekitar satu jam lagi, atau hubungi dosen.";
-  if (/expired|invalid/i.test(msg) && /token|otp|code/i.test(msg)) return "Kode salah atau sudah kedaluwarsa. Minta kode baru.";
+  if (/rate limit|too many|over_email_send_rate_limit/i.test(msg)) return "Batas pengiriman email sedang tercapai, jadi email belum bisa dikirim. Coba lagi sekitar satu jam lagi, atau hubungi dosen.";
   if (/invalid.*email|email.*invalid|unable to validate email/i.test(msg)) return "Alamat email tidak valid.";
   if (/failed to fetch|network|load failed/i.test(msg)) return "Tidak bisa terhubung ke server. Periksa koneksi internet.";
   return "Terjadi masalah: " + msg;
@@ -77,7 +86,8 @@ export async function init() {
     client = c.client;
   } else {
     await loadScript(SUPABASE_JS);
-    // Alur "implicit" dipilih supaya tautan di email bisa dibuka di peramban lain (mis. aplikasi email di ponsel).
+    // Alur "implicit" dipilih supaya tautan di email (konfirmasi, atur ulang kata sandi) bisa dibuka di
+    // peramban lain, mis. aplikasi email di ponsel.
     client = window.supabase.createClient(c.SUPABASE_URL, c.SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" },
     });
@@ -103,28 +113,78 @@ export async function init() {
   });
 }
 
-// Mengirim tautan masuk ke email. Peserta cukup membuka tautannya; tidak ada kode yang diketik.
-export async function sendLink(email) {
-  const { error } = await client.auth.signInWithOtp({
-    email: email.trim(),
-    options: { shouldCreateUser: pendaftaranTerbuka(), emailRedirectTo: location.origin + location.pathname },
-  });
+// ---------- validasi sisi klien ----------
+
+export function validasiEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email || "").trim()) ? "" : "Tulis alamat email yang benar.";
+}
+
+// ulang: bila diberikan (bukan undefined), harus sama dengan sandi.
+export function validasiSandi(sandi, ulang) {
+  if (!sandi || sandi.length < MIN_SANDI) return "Kata sandi minimal " + MIN_SANDI + " karakter.";
+  if (!/[A-Za-z]/.test(sandi) || !/[0-9]/.test(sandi)) return "Kata sandi harus memuat huruf dan angka.";
+  if (ulang !== undefined && sandi !== ulang) return "Kata sandi dan pengulangannya belum sama.";
+  return "";
+}
+
+// ---------- tindakan ----------
+
+const balik = () => location.origin + location.pathname;
+
+export async function signIn(email, sandi) {
+  const { error } = await client.auth.signInWithPassword({ email: email.trim(), password: sandi });
   if (error) throw new Error(friendly(error));
 }
 
-// Membaca galat yang dibawa tautan email (mis. tautan kedaluwarsa atau sudah dipakai).
-// Harus dipanggil SEBELUM init(), karena pustaka Supabase menghapus bagian setelah # dari alamat.
+// Mengembalikan { perluKonfirmasi }. true = email konfirmasi dikirim dan peserta harus mengklik tautannya.
+export async function signUp(email, sandi) {
+  const { data, error } = await client.auth.signUp({ email: email.trim(), password: sandi, options: { emailRedirectTo: balik() } });
+  if (error) throw new Error(friendly(error));
+  // Supabase menjawab "berhasil" untuk email yang sudah terdaftar (tanpa identitas) demi privasi.
+  if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error("Email ini sudah terdaftar. Silakan masuk, atau pakai \"Lupa kata sandi\" bila perlu.");
+  }
+  return { perluKonfirmasi: !(data && data.session) };
+}
+
+export async function resendConfirmation(email) {
+  const { error } = await client.auth.resend({ type: "signup", email: email.trim(), options: { emailRedirectTo: balik() } });
+  if (error) throw new Error(friendly(error));
+}
+
+// Meminta email atur ulang kata sandi. Jawabannya sengaja sama untuk email terdaftar maupun tidak.
+export async function resetPassword(email) {
+  const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: balik() });
+  if (error) throw new Error(friendly(error));
+}
+
+// Mengganti kata sandi akun yang sedang masuk. Bila akun bertanda ganti_sandi, tanda itu dicabut.
+export async function updatePassword(sandi) {
+  const attrs = { password: sandi };
+  if (perluGantiSandi()) attrs.data = { ganti_sandi: false };
+  const { data, error } = await client.auth.updateUser(attrs);
+  if (error) throw new Error(friendly(error));
+  if (data && data.user && session) session = Object.assign({}, session, { user: data.user });
+}
+
+// Galat yang dibawa tautan email (mis. kedaluwarsa atau sudah dipakai). Panggil SEBELUM init(),
+// karena pustaka Supabase menghapus bagian setelah # dari alamat.
 export function galatDariUrl() {
   const h = location.hash || "";
   if (!/(^#|&)(error|error_code)=/.test(h)) return null;
   const p = new URLSearchParams(h.replace(/^#/, ""));
   const teks = (p.get("error_code") || "") + " " + (p.get("error_description") || "") + " " + (p.get("error") || "");
-  if (/expired|otp_expired/i.test(teks)) return "Tautan masuk sudah kedaluwarsa atau sudah dipakai. Minta tautan baru.";
-  return "Tautan masuk tidak valid. Minta tautan baru.";
+  if (/expired|otp_expired/i.test(teks)) return "Tautan di email sudah kedaluwarsa atau sudah dipakai. Minta tautan baru (Lupa kata sandi) atau masuk dengan kata sandimu.";
+  return "Tautan di email tidak valid. Minta tautan baru.";
 }
 
-// Benar bila alamat saat ini adalah hasil klik tautan email (membawa token masuk).
+// Benar bila alamat saat ini adalah hasil klik tautan email (membawa token).
 export const dariTautanEmail = () => /(^#|&)access_token=/.test(location.hash || "");
+// Jenis tautan email: "recovery" (atur ulang kata sandi), "signup" (konfirmasi), dan lainnya.
+export function jenisTautan() {
+  const m = /(^#|&)type=([a-z_]+)/.exec(location.hash || "");
+  return m ? m[2] : null;
+}
 
 export async function saveProfile(p) {
   const uid = getUserId();
@@ -144,7 +204,7 @@ export async function reloadProfile() {
   await fetchProfile();
 }
 
-// Validasi sisi klien (sama dengan batasan di database).
+// Validasi data diri (sama dengan batasan di database).
 export function validateProfile(p) {
   const nama = (p.nama || "").trim();
   const nim = (p.nim || "").trim();

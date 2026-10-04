@@ -191,7 +191,7 @@ a.course-card:hover{transform:translateY(-2px);border-color:var(--brand)}
 .prog-row a:hover{color:var(--brand)}
 
 /* Landing publik dan masuk lewat tautan */
-body.gate #loginBtn{display:none}
+body.gate #loginBtn,body.gate #daftarBtn{display:none}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .step{display:flex;flex-direction:column;gap:6px;padding:16px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--card)}
 .step strong{font-size:16px}
@@ -199,3 +199,10 @@ body.gate #loginBtn{display:none}
 .steps-list{margin:10px 0;padding-left:20px}
 .steps-list li{margin:4px 0}
 .gate-card .field-err{margin:8px 0}
+
+/* Masuk dengan kata sandi */
+.pw-wrap{position:relative}
+.pw-wrap .input{padding-right:108px}
+.pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:13px;font-weight:600;color:var(--brand);background:transparent;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
+.pw-toggle:hover{background:var(--brand-soft)}
+.alt-link{margin:12px 0 0;font-size:14px}

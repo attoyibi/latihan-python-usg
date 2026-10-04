@@ -11,7 +11,7 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 1. **Fork** repositori ini di GitHub (tombol *Fork*).
 2. **Supabase:** buat proyek, tempel tiga berkas SQL, atur email (bagian A).
 3. **Vercel:** *Add New Project* > pilih fork Anda > isi dua variabel > *Deploy* (bagian B).
-4. Kembali ke Supabase, isi *Site URL* dengan alamat dari Vercel (bagian A, langkah 7).
+4. Kembali ke Supabase, isi *Site URL* dengan alamat dari Vercel (bagian A, langkah 8).
 5. Masuk ke situs, isi data awal, lalu jadikan diri Anda instruktur (bagian C).
 
 ## A. Supabase
@@ -20,27 +20,25 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 2. **SQL Editor** > *New query* > tempel isi `supabase/migrations/0001_skema.sql` > **Run**.
 3. *New query* lagi > tempel isi `supabase/migrations/0002_keamanan.sql` > **Run**. Ini mengaktifkan aturan keamanan (Row Level Security) dan bucket privat `tugas`.
 4. *New query* lagi > tempel isi `supabase/migrations/0003_matakuliah.sql` > **Run**. Ini menambah dukungan banyak mata kuliah (Algoritma Python dan PBO Java sudah terdaftar). Sudah menjalankan 0001 dan 0002 sebelumnya? Cukup jalankan 0003; data yang sudah ada otomatis dimasukkan ke mata kuliah `algoritma-python`.
-5. **Authentication > Providers:** pastikan *Email* aktif. Peserta masuk lewat **tautan yang dikirim ke emailnya** (tanpa kata sandi dan tanpa mengetik kode): klik tautan, lalu otomatis kembali ke situs dalam keadaan masuk.
-6. **Periksa templat email.** Di **Authentication > Email Templates**, templat *Confirm signup* (pengguna baru) dan *Magic Link* (pengguna lama) harus memuat tautan `{{ .ConfirmationURL }}`. Templat bawaan sudah memuatnya. Bila ingin menyesuaikan kalimatnya, contoh minimal:
+5. **Authentication > Sign In / Providers > Email:** pastikan *Email* aktif (peserta masuk dengan **email dan kata sandi**). Atur panjang kata sandi minimum (*Minimum password length*) ke **8**, sama dengan aturan di situs.
+6. **Konfirmasi email.** Untuk **kelas tertutup** (peserta didaftarkan dosen, lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)) pendaftaran mandiri dimatikan, jadi pengaturan ini tidak berpengaruh. Untuk **pendaftaran mandiri**, biarkan *Confirm email* aktif supaya tiap pendaftar membuktikan emailnya (satu email per pendaftar). Bila dimatikan, siapa pun bisa membuat akun dengan email orang lain.
+7. **Periksa templat email** di **Authentication > Email Templates**: *Confirm signup* dan *Reset Password* harus memuat tautan `{{ .ConfirmationURL }}`. Templat bawaan sudah memuatnya. Contoh minimal bila ingin menyesuaikan kalimat:
 
    ```html
-   <h2>Masuk ke Latihan Pemrograman</h2>
-   <p><a href="{{ .ConfirmationURL }}">Klik di sini untuk masuk</a>. Tautan hanya berlaku satu kali.</p>
+   <h2>Latihan Pemrograman</h2>
+   <p><a href="{{ .ConfirmationURL }}">Klik di sini</a> untuk melanjutkan. Tautan hanya berlaku satu kali.</p>
    ```
 
-7. **Authentication > URL Configuration (wajib, karena masuk lewat tautan):** isi *Site URL* dengan alamat situs setelah tayang, dan tambahkan alamat yang sama ke *Redirect URLs*. Bila tidak, tautan di email membawa peserta ke alamat yang salah (mis. `localhost`). Untuk menguji dari komputer sendiri, tambahkan juga `http://localhost:8000`.
-8. **Pasang SMTP sendiri (wajib, bukan opsional).** Menurut dokumentasi Supabase, pengirim email bawaan:
+8. **Authentication > URL Configuration (wajib):** isi *Site URL* dengan alamat situs setelah tayang, dan tambahkan alamat yang sama ke *Redirect URLs*. Tautan di email konfirmasi dan atur ulang kata sandi membawa peserta kembali ke situs; bila tidak diisi, tautannya mengarah ke alamat yang salah (mis. `localhost`). Untuk menguji dari komputer sendiri, tambahkan juga `http://localhost:8000`.
+9. **Pasang SMTP sendiri (sangat disarankan).** Masuk dengan kata sandi **tidak** mengirim email, tetapi *konfirmasi pendaftaran* dan *Lupa kata sandi* mengirim email. Menurut dokumentasi Supabase, pengirim email bawaan:
    - dibatasi **2 email per jam untuk seluruh proyek** (bukan per peserta), dan angkanya bisa berubah tanpa pemberitahuan;
-   - **hanya mengirim ke anggota tim proyek**. Peserta yang bukan anggota tidak akan menerima tautan masuk sama sekali;
+   - **hanya mengirim ke anggota tim proyek**. Peserta yang bukan anggota tidak akan menerima email apa pun;
    - tidak dijamin ketersediaannya dan hanya untuk uji coba.
 
-   Akibatnya, tanpa SMTP sendiri peserta tidak bisa masuk. Pesan di situs untuk kasus ini: "Batas pengiriman email sedang tercapai...".
+   Pada kelas tertutup dengan akun dari dosen, SMTP hanya dibutuhkan bila ada peserta yang lupa kata sandi. Pada pendaftaran mandiri, SMTP wajib karena setiap pendaftar butuh email konfirmasi.
 
-   Caranya: **Project Settings > Authentication > SMTP Settings**, aktifkan *Enable Custom SMTP*, lalu isi `host`, `port`, `user`, `password`, alamat pengirim, dan nama pengirim dari layanan email pilihan Anda. Layanan yang disebut dokumentasi Supabase: Resend, AWS SES, Postmark, SendGrid, ZeptoMail, dan Brevo. Periksa sendiri batas paket gratis dan syarat verifikasi domain/pengirim di layanan itu.
-
-   Setelah SMTP sendiri aktif, Supabase memberi batas bawaan **30 email per jam**. Untuk hari pertama kelas (banyak peserta masuk bersamaan) naikkan di **Authentication > Rate Limits**. Ada juga jeda 60 detik per alamat email (bawaan) sebelum tautan baru bisa diminta.
-
-9. Catat dua nilai dari **Project Settings > API**: **Project URL** dan kunci **anon** (atau *publishable*).
+   Caranya: **Project Settings > Authentication > SMTP Settings**, aktifkan *Enable Custom SMTP*, lalu isi `host`, `port`, `user`, `password`, alamat pengirim, dan nama pengirim dari layanan email pilihan Anda. Layanan yang disebut dokumentasi Supabase: Resend, AWS SES, Postmark, SendGrid, ZeptoMail, dan Brevo. Periksa sendiri batas paket gratis dan syarat verifikasi domain atau pengirim di layanan itu. Setelah SMTP sendiri aktif, batas bawaan Supabase menjadi **30 email per jam**; naikkan di **Authentication > Rate Limits** bila perlu.
+10. Catat dua nilai dari **Project Settings > API**: **Project URL** dan kunci **anon** (atau *publishable*).
 
 > **Jangan pernah** memakai kunci `service_role` atau `sb_secret_...`. Kunci itu melewati semua aturan keamanan database. Skrip pembangun akan **menolak** kunci itu dan membatalkan penayangan.
 
@@ -107,47 +105,48 @@ Buka `http://127.0.0.1:8124`. Server ini menyajikan `site/` dengan login **tirua
 ## Cara kerja masuk
 
 - **Halaman depan terbuka untuk siapa saja.** Pengunjung pertama melihat landing page statis: daftar mata kuliah yang tersedia, cara kerja, dan panduan. Tidak ada yang meminta masuk di sini.
-- **Masuk baru diminta saat memilih mata kuliah.** Peserta memasukkan email, lalu mengklik **tautan masuk** yang dikirim ke emailnya (tanpa kata sandi). Mata kuliah yang tadi dipilih diingat, jadi setelah masuk peserta langsung diarahkan ke sana.
-- **Kelas tertutup (opsional):** bila Anda mendaftarkan peserta sendiri lewat `tools/impor_peserta.mjs` dan menutup pendaftaran mandiri, peserta tidak mendaftar dan tidak mengisi data; mereka langsung masuk lewat tautan email. Panduan: [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md).
-- **Pertama kali masuk:** peserta mengisi **nama, NIM, dan kelas** satu kali, lalu langsung ke mata kuliah pilihannya. Data itu tersimpan di tabel `profiles`, NIM tidak boleh kembar, dan bisa diubah di halaman **Profil**.
+- **Masuk baru diminta saat memilih mata kuliah.** Layar **Masuk** memakai **email dan kata sandi** (dengan tombol tampilkan kata sandi). Mata kuliah yang tadi dipilih diingat, jadi setelah masuk peserta langsung diarahkan ke sana.
+- **Daftar (pendaftaran mandiri):** email dan kata sandi, lalu email konfirmasi yang harus diklik. Setelah itu peserta mengisi **nama, NIM, dan kelas** satu kali. Data tersimpan di tabel `profiles`, NIM tidak boleh kembar, dan bisa diubah di halaman **Profil**.
+- **Lupa kata sandi:** peserta meminta tautan atur ulang lewat email, mengkliknya, lalu membuat kata sandi baru.
+- **Kelas tertutup (opsional, disarankan untuk kelas besar):** dosen mendaftarkan peserta lewat `tools/impor_peserta.mjs` dengan **kata sandi awal**, dan pendaftaran mandiri ditutup (`PENDAFTARAN=tutup`). Peserta tidak mendaftar dan datanya sudah terisi; saat pertama masuk mereka **wajib membuat kata sandi baru**. Panduan: [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md).
 - **Keluar** mengembalikan peserta ke halaman depan.
 - Halaman bab dan Profil tertutup sampai peserta masuk, juga bila alamatnya diketik langsung.
 - Bila `SUPABASE_URL` dan `SUPABASE_ANON_KEY` kosong, halaman depan tetap tampil, tetapi memilih mata kuliah menampilkan layar "belum tersambung ke Supabase". `MODE_LOKAL=true` (variabel opsional) menjalankan situs tanpa akun, hanya untuk uji tampilan; jangan dipakai saat tayang.
 - Progres di browser dipisah per akun, jadi komputer bersama (warnet, lab) tidak bercampur.
 - Mesin Python di browser (sekitar 10 MB) hanya dimuat setelah peserta masuk, bukan untuk pengunjung halaman depan.
 
-### Hal yang perlu diperhatikan pada masuk lewat tautan
+### Hal yang perlu diperhatikan
 
-- **Tautan berlaku satu kali.** Beberapa layanan email (terutama email kampus atau kantor dengan pemindai keamanan, mis. Safe Links) membuka tautan lebih dulu untuk memeriksanya, sehingga tautan sudah terpakai saat peserta mengkliknya dan muncul pesan "kedaluwarsa atau sudah dipakai". **Uji dengan email kampus yang benar-benar dipakai peserta sebelum semester dimulai.** Bila sering terjadi, beri tahu pengembang: ada cadangan berupa kode angka yang diketik.
-- Tautan membuka browser mana pun yang dipakai peserta untuk membuka email (mis. browser di dalam aplikasi email). Sesi masuk berada di browser tempat tautan dibuka. Bila itu bukan browser yang dipakai belajar, peserta cukup melanjutkan di browser tempat tautan terbuka.
-- Pengiriman email bawaan Supabase hanya 2 per jam dan hanya ke anggota tim proyek; **SMTP sendiri wajib** (langkah 8).
+- Tautan di email (konfirmasi dan atur ulang kata sandi) berlaku **satu kali**. Email kampus yang memakai pemindai keamanan (mis. Safe Links) dapat membuka tautan lebih dulu sehingga muncul pesan "kedaluwarsa atau sudah dipakai". Untuk pendaftaran mandiri, uji dengan email kampus yang dipakai peserta. Untuk akun dari dosen hal ini hampir tidak relevan, karena masuk tidak memakai tautan.
+- Kata sandi disimpan oleh Supabase (di-hash), tidak pernah oleh situs ini. Situs hanya meneruskannya sekali ke Supabase.
+- Peserta yang lupa kata sandi dan emailnya tidak menerima apa pun dapat dibantu dosen: jalankan `tools/impor_peserta.mjs ... --reset-sandi` untuk mengatur ulang kata sandinya.
 
 ## Kelas besar: hari pertama dengan banyak peserta (80 orang atau lebih)
 
-Masuk lewat tautan email berarti setiap peserta memicu email dan klik tautan. Kalau semua melakukannya serentak dari jaringan yang sama, ada empat batas yang bisa terlampaui. Angka di bawah dari dokumentasi Supabase dan situs layanan masing-masing pada 4 Oktober 2026; periksa lagi sebelum memakainya, karena bisa berubah.
+Keuntungan masuk dengan kata sandi: **masuk tidak mengirim email**. Pada kelas tertutup dengan akun dari dosen, hampir tidak ada email sama sekali (hanya bila ada yang lupa kata sandi). Angka di bawah dari dokumentasi Supabase dan situs layanan masing-masing pada 4 Oktober 2026; periksa lagi sebelum memakainya, karena bisa berubah.
 
 | Batas | Nilai bawaan | Berlaku untuk | Dampak bila 80 orang serentak |
 |---|---|---|---|
-| Email yang dikirim (pengirim bawaan Supabase) | 2 per jam, hanya ke anggota tim | seluruh proyek | Peserta tidak menerima apa pun. **Wajib SMTP sendiri** |
-| Email yang dikirim (SMTP sendiri) | 30 per jam | seluruh proyek | 80 peserta butuh sedikitnya 80 email; sisanya gagal. **Naikkan** |
-| Klik tautan masuk (verifikasi token) | 30 per 5 menit | **per alamat IP** | Peserta di satu Wi-Fi kampus berbagi satu IP, jadi sekitar 50 dari 80 klik pertama ditolak |
-| Masuk dan daftar | 30 per 5 menit | **per alamat IP** | Sama; belum pasti apakah permintaan tautan ikut dihitung |
-| Kuota harian layanan SMTP | contoh: Resend gratis 100 per hari, 3.000 per bulan | akun layanan email | 80 masuk ditambah kirim ulang mudah melewati 100 per hari |
+| Masuk dan daftar | 30 per 5 menit | **per alamat IP** | Peserta di satu Wi-Fi kampus berbagi satu IP: hanya 30 masuk per 5 menit, sisanya ditolak sementara |
+| Email (pengirim bawaan Supabase) | 2 per jam, hanya ke anggota tim | seluruh proyek | Konfirmasi dan atur ulang kata sandi tidak terkirim ke peserta |
+| Email (SMTP sendiri) | 30 per jam | seluruh proyek | Berlaku bila banyak yang mendaftar mandiri atau lupa kata sandi bersamaan |
+| Kuota harian layanan SMTP | contoh: Resend gratis 100 per hari | akun layanan email | Relevan untuk pendaftaran mandiri 80 orang |
 
-Batas email, masuk dan daftar, serta verifikasi token tercantum "dapat diatur" di dokumentasi Supabase (**Authentication > Rate Limits**). Saya belum memastikan apakah paket gratis mengizinkan mengubahnya; periksa di dashboard Anda.
+Batas masuk dan daftar tercantum "dapat diatur" di dokumentasi Supabase (**Authentication > Rate Limits**). Saya belum memastikan apakah paket gratis mengizinkan mengubahnya; periksa di dashboard Anda.
 
 ### Rencana yang disarankan
 
-1. **Jangan daftar serentak di kelas.** Minta peserta masuk dan mengisi data awal **sebelum** pertemuan, beberapa hari sebelumnya, dari ponsel dengan data seluler masing-masing (alamat IP berbeda). Sesi masuk tersimpan di browser, jadi di kelas mereka sudah masuk dan tidak ada lonjakan.
-2. **Pasang SMTP sendiri** dengan kuota harian yang cukup. Hitung kasar: jumlah peserta dikali 1,5 (kirim ulang dan tautan yang terpakai).
-3. **Naikkan batas di Authentication > Rate Limits:** email per jam, serta masuk dan verifikasi token per IP, sampai kira-kira jumlah peserta atau lebih. Turunkan lagi setelah semua terdaftar bila perlu.
-4. **Bila terpaksa masuk di kelas:** bagi menjadi kelompok kecil (maksimal sekitar 25 orang per 5 menit dari satu Wi-Fi), atau minta peserta memakai data seluler.
-5. **Latihan dulu.** Satu minggu sebelum semester, ajak 5 sampai 10 peserta masuk sungguhan dengan **email kampus** mereka. Ini juga menguji apakah pemindai keamanan email menghabiskan tautan sekali pakai.
+1. **Pakai kelas tertutup:** daftarkan peserta lewat CSV ([DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)). Tidak ada email konfirmasi, tidak ada tahap isi data, dan hari pertama hanya berupa masuk dengan kata sandi.
+2. **Hindari masuk serentak dari satu Wi-Fi.** Karena batas 30 per 5 menit per IP, bagi peserta menjadi kelompok sekitar 25 orang yang masuk bergantian, atau minta mereka **masuk sebelum pertemuan** dari ponsel dengan data seluler (IP berbeda). Sesi tersimpan di browser, jadi masuk hanya sekali.
+3. **Pasang SMTP sendiri** untuk jaga-jaga: peserta yang lupa kata sandi butuh email atur ulang.
+4. **Siapkan cadangan:** simpan berkas kata sandi awal (aman) untuk membantu peserta yang lupa, atau atur ulang dengan `--reset-sandi`.
+5. **Latihan dulu.** Seminggu sebelum semester, ajak 5 sampai 10 peserta masuk sungguhan, termasuk pergantian kata sandi awal.
 
 ### Yang akan peserta lihat
-- Batas email proyek: "Batas pengiriman email sedang tercapai... Coba lagi sekitar satu jam lagi, atau hubungi dosen."
-- Batas per alamat email: "Tunggu N detik sebelum meminta tautan lagi."
+- Kata sandi atau email salah: "Email atau kata sandi salah."
 - Batas per alamat IP: "Terlalu banyak orang mencoba masuk dari jaringan yang sama pada saat ini. Tunggu beberapa menit lalu coba lagi, atau pakai data seluler."
+- Batas email proyek: "Batas pengiriman email sedang tercapai, jadi email belum bisa dikirim. Coba lagi sekitar satu jam lagi, atau hubungi dosen."
+- Jeda per alamat email: "Tunggu N detik sebelum meminta lagi."
 
 ## Akhir semester
 

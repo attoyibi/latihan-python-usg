@@ -16,8 +16,12 @@ uji("jeda 1 detik (tunggal)", { message: "you can only request this after 1 seco
 uji("batas pengiriman proyek", { message: "email rate limit exceeded", code: "over_email_send_rate_limit" }, "Batas pengiriman email");
 uji("batas permintaan umum", { message: "Too many requests" }, "Batas pengiriman email");
 uji("batas per alamat IP (Wi-Fi bersama)", { message: "Request rate limit reached", code: "over_request_rate_limit" }, "jaringan yang sama");
-uji("email belum didaftarkan dosen", { message: "Signups not allowed for otp" }, "belum terdaftar di kelas");
-uji("email belum didaftarkan (kode)", { code: "otp_disabled", message: "x" }, "belum terdaftar di kelas");
+uji("kata sandi atau email salah", { message: "Invalid login credentials", code: "invalid_credentials" }, "Email atau kata sandi salah");
+uji("email belum dikonfirmasi", { message: "Email not confirmed", code: "email_not_confirmed" }, "belum dikonfirmasi");
+uji("email sudah terdaftar", { message: "User already registered", code: "user_already_exists" }, "sudah terdaftar");
+uji("pendaftaran mandiri ditutup", { message: "Signups not allowed for this instance", code: "signup_disabled" }, "Pendaftaran mandiri ditutup");
+uji("kata sandi terlalu lemah", { message: "Password should be at least 6 characters.", code: "weak_password" }, "terlalu lemah");
+uji("kata sandi baru sama dengan lama", { message: "New password should be different from the old password.", code: "same_password" }, "harus berbeda");
 uji("NIM kembar", { code: "23505", message: "duplicate key" }, "NIM ini sudah dipakai");
 uji("isian melanggar aturan", { code: "23514", message: "check constraint" }, "belum sesuai aturan");
 uji("tabel belum ada", { code: "42P01", message: 'relation "public.profiles" does not exist' }, "Database belum disiapkan");
