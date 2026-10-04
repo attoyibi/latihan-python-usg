@@ -34,6 +34,24 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 
 > **Jangan pernah** memakai kunci `service_role` atau `sb_secret_...`. Kunci itu melewati semua aturan keamanan database. Skrip pembangun akan **menolak** kunci itu dan membatalkan penayangan.
 
+## Sudah punya proyek Supabase? Perbarui, jangan mulai dari nol
+
+Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersifat menambah dan aman untuk data yang sudah ada.
+
+1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan tiga kolom:
+
+   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | Yang perlu dijalankan |
+   |---|---|---|---|
+   | false | false | false | `0001`, lalu `0002`, lalu `0003` |
+   | true | true | false | **hanya `0003`** |
+   | true | true | true | tidak ada, sudah mutakhir |
+
+2. Jalankan hanya migrasi yang masih `false`, **berurutan** (0001, 0002, 0003), masing-masing di query baru.
+3. Menjalankan ulang migrasi yang sudah terpasang juga aman (sudah diuji, termasuk menjalankan ulang `0001` dan `0002` setelah `0003`), tetapi tidak perlu.
+4. Pastikan setelahnya `supabase/periksa_migrasi.sql` menunjukkan ketiganya `true`.
+
+Data yang sudah ada (profil peserta, dan progres atau laporan bila sudah ada) tidak hilang. Data lama dari sebelum `0003` otomatis dianggap milik mata kuliah `algoritma-python`.
+
 ## B. Vercel (atau Cloudflare Pages / Netlify)
 
 Repositori sudah membawa setelan yang dibutuhkan (`vercel.json`, `netlify.toml`, `site/_headers`).

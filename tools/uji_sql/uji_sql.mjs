@@ -246,5 +246,17 @@ console.log("\n== Tahap D: perintah yang benar-benar dikirim situs (upsert profi
   cek("profil instruktur tidak berubah", (await q("select nama from public.profiles where id = $1", [IN])).rows[0].nama === "Dosen");
 }
 
+console.log("\n== Tahap E: menjalankan ulang migrasi pada proyek yang sudah lengkap ==");
+{
+  const kolom = async () => (await q("select count(*)::int as n from information_schema.columns where table_schema = 'public' and table_name = 'rekap_progres' and column_name = 'matakuliah_id'")).rows[0].n;
+  cek("sebelum diulang: rekap_progres punya kolom matakuliah_id", (await kolom()) === 1);
+  cek("0001 diulang setelah 0003 tanpa galat", await jalankan("jalankan ulang 0001", migrasi("0001_skema.sql")));
+  cek("0002 diulang setelah 0003 tanpa galat", await jalankan("jalankan ulang 0002", migrasi("0002_keamanan.sql")));
+  cek("tampilan rekap tidak dikembalikan ke versi lama", (await kolom()) === 1);
+  cek("0001, 0002, 0003 berurutan diulang tanpa galat", await jalankan("ulang semuanya berurutan", migrasi("0001_skema.sql") + migrasi("0002_keamanan.sql") + migrasi("0003_matakuliah.sql")));
+  cek("setelah diulang, peserta tetap hanya melihat dirinya di rekap", (await sisip(U1, "select distinct user_id from public.rekap_progres")).rows.every((r) => r.user_id === U1));
+  cek("setelah diulang, data peserta tidak hilang", (await q("select count(*)::int as n from public.progres")).rows[0].n >= 3);
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

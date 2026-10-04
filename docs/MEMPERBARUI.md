@@ -36,7 +36,7 @@ git push
 Bentrok hanya terjadi bila Anda dan repositori utama mengubah berkas yang sama, paling sering `site/data/matakuliah.json`, `site/data/kuliah/<id>/materi.json`, atau soal yang sama. Selesaikan dengan mempertahankan isi Anda dan menerima perubahan kode dari utama. Mintalah bantuan lewat *issue* bila ragu.
 
 ## Pembaruan database
-Bila rilis baru menambah berkas di `supabase/migrations/` (mis. `0004_...sql`), jalankan **hanya berkas baru** itu di SQL Editor, berurutan. Jangan menjalankan ulang berkas lama. Catatan rilis menyebutkan bila ada berkas baru.
+Bila rilis baru menambah berkas di `supabase/migrations/` (mis. `0004_...sql`), jalankan **hanya berkas baru** itu di SQL Editor, berurutan. Tidak perlu mengulang berkas lama (mengulangnya aman, tetapi tidak perlu). Tidak yakin migrasi mana yang sudah terpasang? Jalankan `supabase/periksa_migrasi.sql`; kolom yang bernilai `false` menunjukkan yang belum dijalankan.
 
 ## Tes sebelum memperbarui produksi
 Vercel dan Cloudflare membuat alamat pratinjau untuk setiap cabang. Tarik pembaruan ke cabang `dev` dulu, cek alamat pratinjaunya, baru gabungkan ke `main`.

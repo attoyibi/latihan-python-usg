@@ -123,28 +123,36 @@ create index if not exists unggahan_user_bab_idx on public.unggahan (user_id, ba
 -- Tampilan rekap untuk dashboard. security_invoker membuat tampilan ini
 -- tunduk pada aturan keamanan tabel asal: peserta hanya melihat datanya sendiri,
 -- instruktur melihat semuanya.
-create or replace view public.rekap_progres
-with (security_invoker = true) as
-select
-  p.id as user_id,
-  p.nama,
-  p.nim,
-  p.kelas,
-  g.bab,
-  g.status,
-  g.jumlah_jalankan,
-  g.jumlah_kirim,
-  g.pertama_dibuka,
-  g.lulus_pada,
-  g.durasi_aktif_detik,
-  g.jalur,
-  l.status as status_laporan,
-  l.percobaan_tempel,
-  n.skor_konsep,
-  n.skor_bahasa,
-  n.skor_refleksi,
-  n.skor_kode
-from public.profiles p
-join public.progres g on g.user_id = p.id
-left join public.laporan l on l.user_id = p.id and l.bab = g.bab
-left join public.penilaian_laporan n on n.laporan_id = l.id;
+-- Dibuat hanya bila belum ada. Migrasi 0003 membuat ulang tampilan ini dengan kolom mata kuliah;
+-- menjalankan ulang berkas ini sesudahnya tidak boleh mengembalikannya ke versi lama.
+do $$
+begin
+  if not exists (select 1 from pg_views where schemaname = 'public' and viewname = 'rekap_progres') then
+    create view public.rekap_progres
+    with (security_invoker = true) as
+    select
+      p.id as user_id,
+      p.nama,
+      p.nim,
+      p.kelas,
+      g.bab,
+      g.status,
+      g.jumlah_jalankan,
+      g.jumlah_kirim,
+      g.pertama_dibuka,
+      g.lulus_pada,
+      g.durasi_aktif_detik,
+      g.jalur,
+      l.status as status_laporan,
+      l.percobaan_tempel,
+      n.skor_konsep,
+      n.skor_bahasa,
+      n.skor_refleksi,
+      n.skor_kode
+    from public.profiles p
+    join public.progres g on g.user_id = p.id
+    left join public.laporan l on l.user_id = p.id and l.bab = g.bab
+    left join public.penilaian_laporan n on n.laporan_id = l.id;
+  end if;
+end
+$$;
