@@ -645,7 +645,8 @@ function kirimUlangBtn(kirim, pesanEl, galatEl, label) {
 
 function renderMasuk(konteks) {
   const terbuka = Auth.pendaftaranTerbuka();
-  const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  // div (bukan p): bisa memuat tombol kirim ulang dan paragraf info saat email belum dikonfirmasi.
+  const msg = h("div", { class: "form-msg", role: "status", "aria-live": "polite" });
   const fe = field("email", "Email", { type: "email", autocomplete: "username", inputmode: "email", placeholder: "nama@email.com", required: "" });
   const fs = sandiField("sandi", "Kata sandi", { autocomplete: "current-password", required: "" });
   const btn = h("button", { type: "submit", class: "btn btn-primary" }, "Masuk");
