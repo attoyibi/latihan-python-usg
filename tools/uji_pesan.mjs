@@ -15,6 +15,7 @@ uji("jeda per alamat email", { message: "For security purposes, you can only req
 uji("jeda 1 detik (tunggal)", { message: "you can only request this after 1 second" }, "Tunggu 1 detik");
 uji("batas pengiriman proyek", { message: "email rate limit exceeded", code: "over_email_send_rate_limit" }, "Batas pengiriman email");
 uji("batas permintaan umum", { message: "Too many requests" }, "Batas pengiriman email");
+uji("batas per alamat IP (Wi-Fi bersama)", { message: "Request rate limit reached", code: "over_request_rate_limit" }, "jaringan yang sama");
 uji("NIM kembar", { code: "23505", message: "duplicate key" }, "NIM ini sudah dipakai");
 uji("isian melanggar aturan", { code: "23514", message: "check constraint" }, "belum sesuai aturan");
 uji("tabel belum ada", { code: "42P01", message: 'relation "public.profiles" does not exist' }, "Database belum disiapkan");

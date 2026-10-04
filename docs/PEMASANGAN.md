@@ -120,6 +120,33 @@ Buka `http://127.0.0.1:8124`. Server ini menyajikan `site/` dengan login **tirua
 - Tautan membuka browser mana pun yang dipakai peserta untuk membuka email (mis. browser di dalam aplikasi email). Sesi masuk berada di browser tempat tautan dibuka. Bila itu bukan browser yang dipakai belajar, peserta cukup melanjutkan di browser tempat tautan terbuka.
 - Pengiriman email bawaan Supabase hanya 2 per jam dan hanya ke anggota tim proyek; **SMTP sendiri wajib** (langkah 8).
 
+## Kelas besar: hari pertama dengan banyak peserta (80 orang atau lebih)
+
+Masuk lewat tautan email berarti setiap peserta memicu email dan klik tautan. Kalau semua melakukannya serentak dari jaringan yang sama, ada empat batas yang bisa terlampaui. Angka di bawah dari dokumentasi Supabase dan situs layanan masing-masing pada 4 Oktober 2026; periksa lagi sebelum memakainya, karena bisa berubah.
+
+| Batas | Nilai bawaan | Berlaku untuk | Dampak bila 80 orang serentak |
+|---|---|---|---|
+| Email yang dikirim (pengirim bawaan Supabase) | 2 per jam, hanya ke anggota tim | seluruh proyek | Peserta tidak menerima apa pun. **Wajib SMTP sendiri** |
+| Email yang dikirim (SMTP sendiri) | 30 per jam | seluruh proyek | 80 peserta butuh sedikitnya 80 email; sisanya gagal. **Naikkan** |
+| Klik tautan masuk (verifikasi token) | 30 per 5 menit | **per alamat IP** | Peserta di satu Wi-Fi kampus berbagi satu IP, jadi sekitar 50 dari 80 klik pertama ditolak |
+| Masuk dan daftar | 30 per 5 menit | **per alamat IP** | Sama; belum pasti apakah permintaan tautan ikut dihitung |
+| Kuota harian layanan SMTP | contoh: Resend gratis 100 per hari, 3.000 per bulan | akun layanan email | 80 masuk ditambah kirim ulang mudah melewati 100 per hari |
+
+Batas email, masuk dan daftar, serta verifikasi token tercantum "dapat diatur" di dokumentasi Supabase (**Authentication > Rate Limits**). Saya belum memastikan apakah paket gratis mengizinkan mengubahnya; periksa di dashboard Anda.
+
+### Rencana yang disarankan
+
+1. **Jangan daftar serentak di kelas.** Minta peserta masuk dan mengisi data awal **sebelum** pertemuan, beberapa hari sebelumnya, dari ponsel dengan data seluler masing-masing (alamat IP berbeda). Sesi masuk tersimpan di browser, jadi di kelas mereka sudah masuk dan tidak ada lonjakan.
+2. **Pasang SMTP sendiri** dengan kuota harian yang cukup. Hitung kasar: jumlah peserta dikali 1,5 (kirim ulang dan tautan yang terpakai).
+3. **Naikkan batas di Authentication > Rate Limits:** email per jam, serta masuk dan verifikasi token per IP, sampai kira-kira jumlah peserta atau lebih. Turunkan lagi setelah semua terdaftar bila perlu.
+4. **Bila terpaksa masuk di kelas:** bagi menjadi kelompok kecil (maksimal sekitar 25 orang per 5 menit dari satu Wi-Fi), atau minta peserta memakai data seluler.
+5. **Latihan dulu.** Satu minggu sebelum semester, ajak 5 sampai 10 peserta masuk sungguhan dengan **email kampus** mereka. Ini juga menguji apakah pemindai keamanan email menghabiskan tautan sekali pakai.
+
+### Yang akan peserta lihat
+- Batas email proyek: "Batas pengiriman email sedang tercapai... Coba lagi sekitar satu jam lagi, atau hubungi dosen."
+- Batas per alamat email: "Tunggu N detik sebelum meminta tautan lagi."
+- Batas per alamat IP: "Terlalu banyak orang mencoba masuk dari jaringan yang sama pada saat ini. Tunggu beberapa menit lalu coba lagi, atau pakai data seluler."
+
 ## Akhir semester
 
 Kebijakan: data peserta disimpan sampai akhir semester lalu diarsipkan. Ikuti urutan di `supabase/arsip_akhir_semester.sql` (unduh dulu, hapus belakangan).

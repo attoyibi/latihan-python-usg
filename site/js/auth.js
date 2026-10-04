@@ -42,6 +42,8 @@ export function friendly(error) {
   if (code === "23505") return "NIM ini sudah dipakai akun lain. Periksa lagi, atau hubungi dosen.";
   if (code === "23514") return "Isian belum sesuai aturan. Periksa panjang nama, NIM, dan kelas.";
   if (code === "42P01" || /relation .* does not exist/i.test(msg)) return "Database belum disiapkan. Hubungi dosen.";
+  // Batas permintaan per alamat IP (mis. banyak peserta di satu Wi-Fi kampus).
+  if (/over_request_rate_limit|request rate limit reached/i.test(msg + " " + (code || ""))) return "Terlalu banyak orang mencoba masuk dari jaringan yang sama pada saat ini. Tunggu beberapa menit lalu coba lagi, atau pakai data seluler.";
   // Jeda per alamat email: "you can only request this after 43 seconds"
   const detik = /after (\d+) seconds?/i.exec(msg);
   if (detik) return "Tunggu " + detik[1] + " detik sebelum meminta tautan lagi.";
