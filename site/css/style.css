@@ -181,3 +181,11 @@ a.course-card:hover{transform:translateY(-2px);border-color:var(--brand)}
 .pbar{height:8px;background:var(--soft);border-radius:var(--r-pill);overflow:hidden;margin-top:6px}
 .pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:var(--r-pill)}
 .eyebrow a{color:inherit}
+
+/* Dashboard dan profil per mata kuliah */
+.greet{font-size:15px;font-weight:600;color:var(--brand-strong);margin:16px 0 -6px}
+.prof-progress{margin:18px 0 6px}
+.prog-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.prog-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.prog-row a{font-weight:600;color:var(--ink);text-decoration:none}
+.prog-row a:hover{color:var(--brand)}

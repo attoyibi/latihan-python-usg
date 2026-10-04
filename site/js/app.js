@@ -160,7 +160,7 @@ function renderSidebar() {
     ol.append(h("li", {}, a));
   }
   const n = MATERI.filter((m) => isDone(m.bab)).length;
-  $("#progressText").textContent = "Selesai " + n + " dari " + MATERI.length;
+  $("#progressText").textContent = "Bab selesai " + n + " dari " + MATERI.length;
 }
 
 function videoCard(m) {
@@ -393,6 +393,11 @@ function nextBab() {
   return m ? m.bab : MATERI[0].bab;
 }
 
+function progressBar(done, total, label) {
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  return h("div", { class: "pbar", role: "progressbar", "aria-valuenow": String(done), "aria-valuemin": "0", "aria-valuemax": String(total), "aria-label": label }, h("i", { style: "width:" + pct + "%" }));
+}
+
 function courseCard(c) {
   const { total, done } = courseProgress(c);
   const ready = c.aktif && total > 0;
@@ -403,10 +408,8 @@ function courseCard(c) {
     h("span", { class: "num" }, ready ? total + " BAB" : "SEGERA HADIR"),
     h("strong", {}, c.nama),
     h("span", { class: "muted" }, c.deskripsi || ""),
-    h("div", { class: "course-meta" }, h("span", { class: "badge" }, bahasa), ready ? h("span", { class: "muted" }, done + " dari " + total + " selesai") : h("span", { class: "badge lain" }, "Sedang disiapkan")),
-    ready
-      ? h("div", { class: "pbar", role: "progressbar", "aria-valuenow": String(done), "aria-valuemin": "0", "aria-valuemax": String(total), "aria-label": "Progres " + c.nama }, h("i", { style: "width:" + Math.round((done / total) * 100) + "%" }))
-      : null
+    h("div", { class: "course-meta" }, h("span", { class: "badge" }, bahasa), ready ? h("span", { class: "muted" }, done + " dari " + total + " bab selesai") : h("span", { class: "badge lain" }, "Sedang disiapkan")),
+    ready ? progressBar(done, total, "Bab selesai di " + c.nama) : null
   );
   if (!ready) return h("div", { class: "course-card disabled", "aria-disabled": "true" }, body);
   return h("a", { class: "course-card", href: "#k/" + c.id }, body);
@@ -420,7 +423,8 @@ function courseGrid() {
 function renderBeranda() {
   const cs = Object.values(COURSE_CACHE);
   const aktif = cs.filter((c) => c.aktif && c.materi.length).length;
-  const { done } = allProgress();
+  const { done, total } = allProgress();
+  const nama = Auth.enabled() && Auth.getProfile() ? Auth.getProfile().nama.trim().split(/\s+/)[0] : "";
   const last = COURSES.find((c) => c.id === store.get("terakhir", null) && c.aktif);
   const code = h("pre", {});
   code.innerHTML = [
@@ -439,6 +443,7 @@ function renderBeranda() {
         "div",
         {},
         h("span", { class: "pill" }, h("i", {}), "Gratis dan tanpa instal", h("b", {}, "Bisa dari ponsel")),
+        nama ? h("p", { class: "greet" }, "Halo, " + nama + ".") : null,
         h("h1", {}, "Belajar langsung,", h("br"), h("span", { class: "grad" }, "sampai bisa ngoding")),
         h("p", { class: "lead" }, "Pilih mata kuliahmu, tulis kode langsung di browser dan lihat hasilnya saat itu juga, lalu kerjakan laporan singkat. Urutan bab bebas."),
         h(
@@ -447,7 +452,7 @@ function renderBeranda() {
           last ? h("a", { class: "btn btn-primary", href: "#k/" + last.id }, "Lanjutkan: " + last.nama) : h("a", { class: "btn btn-primary", href: "#kuliah" }, "Pilih mata kuliah"),
           last ? h("a", { class: "btn", href: "#kuliah" }, "Semua mata kuliah") : null
         ),
-        h("div", { class: "stats" }, h("div", {}, h("small", {}, "Mata kuliah"), h("strong", {}, String(aktif))), h("div", {}, h("small", {}, "Kamu selesai"), h("strong", {}, done + " bab")), h("div", {}, h("small", {}, "Urutan"), h("strong", {}, "Bebas")))
+        h("div", { class: "stats" }, h("div", {}, h("small", {}, "Mata kuliah"), h("strong", {}, String(aktif))), h("div", {}, h("small", {}, "Bab selesai"), h("strong", {}, done + " dari " + total)), h("div", {}, h("small", {}, "Urutan"), h("strong", {}, "Bebas")))
       ),
       h(
         "div",
@@ -458,8 +463,8 @@ function renderBeranda() {
         h("div", { class: "float-card fc3" }, h("span", { class: "ic" }, "5s"), h("div", {}, h("b", {}, "Aman dicoba"), h("small", {}, "Program macet berhenti sendiri")))
       )
     ),
-    h("div", { class: "section-title" }, h("h2", {}, "Mata kuliah")),
-    h("p", { class: "free-note" }, "Pilih mata kuliah, lalu bab mana saja. Tidak ada yang terkunci."),
+    h("div", { class: "section-title" }, h("h2", {}, "Pilih mata kuliah")),
+    h("p", { class: "free-note" }, "Pilih mata kuliah, lalu bab mana saja. Tidak ada yang terkunci. Bilah di tiap kartu menunjukkan bab yang sudah kamu selesaikan di mata kuliah itu."),
     courseGrid()
   );
 }
@@ -483,7 +488,8 @@ function renderCourse(c) {
       h("h2", {}, c.nama),
       h("p", {}, c.deskripsi || ""),
       h("p", { class: "muted" }, ready ? done + " dari " + total + " bab selesai." : "Mata kuliah ini sedang disiapkan oleh pengajar. Kembali lagi nanti."),
-      ready ? h("div", { class: "cta" }, h("a", { class: "btn btn-primary", href: "#k/" + c.id + "/bab-" + nextBab() }, done ? "Lanjutkan" : "Mulai belajar")) : null
+      ready ? progressBar(done, total, "Bab selesai di " + c.nama) : null,
+      ready ? h("div", { class: "cta", style: "margin-top:12px" }, h("a", { class: "btn btn-primary", href: "#k/" + c.id + "/bab-" + nextBab() }, done ? "Lanjutkan" : "Mulai belajar")) : null
     ),
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
@@ -502,7 +508,7 @@ function renderPanduan() {
       "section",
       { class: "card" },
       h("h2", {}, "Cara memakai"),
-      h("ol", {}, li("Pilih mata kuliah, lalu pilih bab dari daftar. Urutannya bebas, tidak ada yang terkunci."), li("Baca ringkasan, lalu tonton video bantuan kalau perlu. Video tidak wajib."), li("Kerjakan tantangan di editor. Tombol Jalankan mencoba kodemu; tombol Kirim jawaban menilai dengan beberapa kasus uji."), li("Kalau semua kasus cocok, bab ditandai selesai dan laporan terbuka."), li("Kalau macet, buka petunjuk satu per satu: soal, bagian buku, lalu video.")),
+      h("ol", {}, li("Pilih mata kuliah, lalu pilih bab dari daftar. Urutannya bebas, tidak ada yang terkunci."), li("Baca ringkasan, lalu tonton video bantuan kalau perlu. Video tidak wajib."), li("Bab selesai dihitung terpisah untuk tiap mata kuliah. Kamu bisa berpindah mata kuliah kapan saja lewat menu Mata kuliah."), li("Kerjakan tantangan di editor. Tombol Jalankan mencoba kodemu; tombol Kirim jawaban menilai dengan beberapa kasus uji."), li("Kalau semua kasus cocok, bab ditandai selesai dan laporan terbuka."), li("Kalau macet, buka petunjuk satu per satu: soal, bagian buku, lalu video.")),
       h("h3", { style: "margin-top:16px" }, "Arti penanda"),
       h("div", { class: "legend", style: "border:0;margin:0;padding:0" }, h("div", {}, h("span", { class: "st" }), "Belum dikerjakan"), h("div", {}, h("span", { class: "st sedang" }), "Sedang dikerjakan: sudah mengetik atau menjalankan, belum lulus"), h("div", {}, h("span", { class: "st selesai" }), "Selesai: tantangan lulus")),
       h("h3", { style: "margin-top:16px" }, "Catatan"),
@@ -690,13 +696,14 @@ function renderProfil() {
     h("span", { class: "avatar", "aria-hidden": "true" }, initials(p.nama)),
     h("div", {}, h("strong", { id: "profName" }, p.nama || ""), h("div", { class: "muted" }, Auth.getEmail() || ""), p.peran === "instruktur" ? h("span", { class: "badge" }, "Instruktur") : null)
   );
-  const { done, total } = allProgress();
-  const stats = h(
-    "div",
-    { class: "stats prof-stats" },
-    h("div", {}, h("small", {}, "Bab selesai"), h("strong", {}, done + " dari " + total)),
-    h("div", {}, h("small", {}, "Kelas"), h("strong", { id: "profKelas" }, p.kelas || "-"))
-  );
+  const stats = h("div", { class: "stats prof-stats" }, h("div", {}, h("small", {}, "Kelas"), h("strong", { id: "profKelas" }, p.kelas || "-")));
+  const baris = COURSES.map((c) => COURSE_CACHE[c.id])
+    .filter((c) => c && c.aktif && c.materi.length)
+    .map((c) => {
+      const pr = courseProgress(c);
+      return h("li", {}, h("div", { class: "prog-row" }, h("a", { href: "#k/" + c.id }, c.nama), h("span", { class: "muted" }, pr.done + " dari " + pr.total + " bab selesai")), progressBar(pr.done, pr.total, "Bab selesai di " + c.nama));
+    });
+  const progres = h("div", { class: "prof-progress" }, h("h3", {}, "Bab selesai per mata kuliah"), baris.length ? h("ul", { class: "prog-list" }, baris) : h("p", { class: "muted" }, "Belum ada mata kuliah yang aktif."));
   const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, outBtn), msg);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
@@ -725,7 +732,7 @@ function renderProfil() {
     }
   });
   $("#main").replaceChildren(
-    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."))
+    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, progres, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."))
   );
 }
 
