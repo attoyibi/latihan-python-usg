@@ -1,3 +1,7 @@
+// CATATAN UNTUK PEMAKAI FORK: jangan edit berkas ini. Saat penayangan, tools/buat_config.mjs
+// menimpanya dari environment variable SUPABASE_URL dan SUPABASE_ANON_KEY (lihat docs/PEMASANGAN.md).
+// Edit manual hanya untuk uji di komputer sendiri, dan jangan di-commit.
+//
 // Konfigurasi sambungan ke Supabase.
 // Kunci "anon" memang dirancang publik (dibatasi oleh aturan keamanan di database),
 // jadi aman ditaruh di sini. JANGAN PERNAH menaruh kunci "service_role" di berkas ini.

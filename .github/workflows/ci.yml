@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: Periksa isi (materi dan challenge)
         run: python tools/validasi_konten.py
+      - name: Uji pembuat konfigurasi (menolak kunci service_role)
+        run: node tools/uji_buat_config.mjs
       - name: Periksa sintaks JavaScript
         run: |
           node --check site/js/pyworker.js

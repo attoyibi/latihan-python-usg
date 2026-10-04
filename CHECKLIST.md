@@ -70,6 +70,16 @@ Dikerjakan paralel dengan tahap lain. Skema database ikut disiapkan di sini supa
 
 Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan kunci. Cara aman: simpan `kunci/` di luar repositori publik (atau repositori privat terpisah), dan anggap test case tersembunyi hanya sebagai penghalang ringan. Penilaian yang tidak boleh dicurangi (ujian) butuh server, bukan situs statis.
 
+### Tambahan Tahap G: fork dan penayangan (4 Okt 2026)
+
+- [x] `tools/buat_config.mjs`: membuat `site/config.js` dari `SUPABASE_URL` dan `SUPABASE_ANON_KEY`; menolak `service_role` dan `sb_secret_`, URL tidak valid, dan karakter berbahaya
+- [x] `tools/uji_buat_config.mjs`: 14 uji lulus; dijalankan di CI
+- [x] `vercel.json`, `netlify.toml`, `site/_headers` (build, folder keluaran, header keamanan, tanpa cache lama)
+- [x] README: bagian "Memakai untuk kelasmu" dan tombol Deploy with Vercel
+- [x] `docs/PEMASANGAN.md` ditulis ulang (fork sampai tayang) dan `docs/MEMPERBARUI.md`
+- [ ] Penayangan sungguhan di Vercel/Cloudflare belum dicoba (pengaturan oleh pemilik); setelan `vercel.json` belum diuji di Vercel
+- [ ] Cabang `dev` untuk pratinjau (belum dibuat)
+
 ## Tahap 1: Kerangka dan prototipe Bab 4
 
 Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis kode, jalankan, kirim, dapat hasil). Belum ada login atau database. Status sementara disimpan di browser.
@@ -194,3 +204,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (6):** Repositori terbit di https://github.com/attoyibi/latihan-python-usg (publik, MIT). CI lulus pada commit pertama.
 - **4 Okt 2026 (7): Masuk dan data awal.** Ditambahkan `site/js/auth.js` dan layar masuk/data awal di `app.js`. Tanpa konfigurasi Supabase situs tetap berjalan mode lokal. Diuji dengan klien tiruan (`tools/klien-tiruan.js`): belum masuk -> masuk -> kode salah/benar -> wajib isi data -> validasi -> NIM kembar -> simpan -> keluar -> pengguna kedua tidak melihat progres pengguna pertama. Peringatan penting untuk Anda: SMTP bawaan Supabase terlalu terbatas untuk 80 peserta, pasang SMTP sendiri; dan edit dua templat email agar memuat `{{ .Token }}`. Berikutnya: sinkron progres ke Supabase (Tahap 3 lanjutan) atau Tahap 2 (laporan).
 - **4 Okt 2026 (8): Wajib login dan halaman Profil.** Login kini wajib juga saat Supabase belum dikonfigurasi (layar pemasangan; jalan pintas hanya `MODE_LOKAL: true`). Ditambah menu Profil dengan avatar inisial, email, ringkasan, dan formulir ubah nama/NIM/kelas. Diuji: akses bab lewat alamat langsung sebelum data awal ditolak; ubah ketiga data tersimpan; validasi NIM. Catatan uji: peramban menyimpan cache berkas statis, jadi muat ulang paksa setelah mengubah kode.
+- **4 Okt 2026 (9): Fork dan penayangan.** Konfigurasi Supabase kini diisi lewat environment variable saat build, bukan mengedit berkas, sehingga fork tidak bentrok saat Sync. Skrip menolak kunci `service_role` (diuji 14 kasus). Belum diuji di Vercel sungguhan.

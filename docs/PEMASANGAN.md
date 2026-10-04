@@ -1,82 +1,95 @@
-# Pemasangan dari nol
+# Pemasangan dari nol (fork sampai tayang)
 
-Situs ini statis (HTML, CSS, JavaScript). Tanpa server sendiri dan tanpa langkah build. Ada tiga bagian yang bisa dipasang terpisah:
+Situs ini statis (HTML, CSS, JavaScript). Tanpa server sendiri. Anda hanya butuh tiga akun gratis: **GitHub**, **Supabase**, dan **Vercel** (atau Cloudflare Pages / Netlify).
 
-1. **Situs** (wajib).
-2. **Akun dan penyimpanan data** lewat Supabase (opsional; tanpa ini progres hanya tersimpan di browser peserta).
-3. **Penayangan** lewat Cloudflare Pages, Vercel, atau GitHub Pages.
+Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci Supabase diisi sebagai *environment variable* di layanan penayangan, lalu dipasang otomatis saat build. Dengan begitu tombol *Sync fork* tidak pernah bentrok (lihat [MEMPERBARUI.md](MEMPERBARUI.md)).
 
-> Status: situs, skema database, **masuk dan data awal (nama, NIM, kelas)** sudah ada. Alur masuk sudah diuji dengan klien tiruan, **belum dengan Supabase sungguhan**. Simpan progres ke database, laporan, dan dashboard belum ditulis; lihat [CHECKLIST.md](../CHECKLIST.md).
+> Status: situs, masuk, data awal, dan profil sudah ada. Alur masuk sudah diuji dengan klien tiruan, **belum dengan Supabase sungguhan**. Simpan progres ke database, laporan, dan dashboard belum ditulis; lihat [CHECKLIST.md](../CHECKLIST.md).
 
-## 1. Menjalankan di komputer sendiri
+## Ringkasan 15 menit
 
-```bash
-git clone https://github.com/attoyibi/latihan-python-usg.git
-cd latihan-python-usg/site
-python -m http.server 8000
-```
+1. **Fork** repositori ini di GitHub (tombol *Fork*).
+2. **Supabase:** buat proyek, tempel dua berkas SQL, atur email (bagian A).
+3. **Vercel:** *Add New Project* > pilih fork Anda > isi dua variabel > *Deploy* (bagian B).
+4. Kembali ke Supabase, isi *Site URL* dengan alamat dari Vercel (bagian A, langkah 6).
+5. Masuk ke situs, isi data awal, lalu jadikan diri Anda instruktur (bagian C).
 
-Buka `http://localhost:8000`. Butuh internet karena editor, Python di browser (Pyodide), huruf, dan video dimuat dari CDN.
-
-## 2. Menyiapkan Supabase
+## A. Supabase
 
 1. Buat proyek di supabase.com (paket gratis cukup untuk sekitar 80 peserta). Pakai proyek **khusus** untuk situs ini.
-2. Buka **SQL Editor**, buat query baru, tempel isi `supabase/migrations/0001_skema.sql`, klik **Run**.
-3. Buat query baru lagi, tempel isi `supabase/migrations/0002_keamanan.sql`, lalu **Run**. Berkas ini mengaktifkan aturan keamanan (Row Level Security) dan bucket penyimpanan privat `tugas`.
-4. **Authentication > Providers**: pastikan *Email* aktif. Peserta masuk dengan **kode 6 digit yang dikirim ke email** (tanpa kata sandi); tautan di email juga berfungsi.
-   - **Ubah templat email** supaya memuat kode. Di **Authentication > Email Templates**, edit **dua** templat: *Confirm signup* (dipakai pengguna baru) dan *Magic Link* (pengguna lama). Isi minimal:
+2. **SQL Editor** > *New query* > tempel isi `supabase/migrations/0001_skema.sql` > **Run**.
+3. *New query* lagi > tempel isi `supabase/migrations/0002_keamanan.sql` > **Run**. Ini mengaktifkan aturan keamanan (Row Level Security) dan bucket privat `tugas`.
+4. **Authentication > Providers:** pastikan *Email* aktif. Peserta masuk dengan **kode 6 digit yang dikirim ke email** (tanpa kata sandi).
+5. **Ubah templat email** supaya memuat kode. Di **Authentication > Email Templates**, edit **dua** templat: *Confirm signup* (pengguna baru) dan *Magic Link* (pengguna lama):
 
-     ```html
-     <h2>Kode masuk</h2>
-     <p>Kodemu: <strong>{{ .Token }}</strong></p>
-     <p>Atau <a href="{{ .ConfirmationURL }}">masuk lewat tautan ini</a>.</p>
-     ```
-
-   - **Atur SMTP sendiri (penting).** Pengirim email bawaan Supabase sangat dibatasi dan hanya untuk uji coba; 80 peserta masuk bersamaan akan terkena batas dan kodenya tidak terkirim. Di **Project Settings > Authentication > SMTP Settings** hubungkan layanan email (misalnya Resend atau Brevo, keduanya punya paket gratis).
-   - **Authentication > URL Configuration**: isi *Site URL* dengan alamat situs setelah tayang, dan tambahkan alamat itu (serta `http://localhost:8000`) ke *Redirect URLs*.
-5. Salin **Project URL** dan **anon public key** dari **Project Settings > API**, lalu isi di `site/config.js`:
-
-   ```js
-   window.APP_CONFIG = { SUPABASE_URL: "https://xxxx.supabase.co", SUPABASE_ANON_KEY: "..." };
+   ```html
+   <h2>Kode masuk</h2>
+   <p>Kodemu: <strong>{{ .Token }}</strong></p>
+   <p>Atau <a href="{{ .ConfirmationURL }}">masuk lewat tautan ini</a>.</p>
    ```
 
-   Kunci `anon` memang publik. **Jangan pernah** memasukkan kunci `service_role` ke repositori atau ke `config.js`.
-6. Jadikan diri Anda instruktur: masuk ke situs sekali dan isi data awal, lalu jalankan `supabase/jadikan_instruktur.sql` (ganti NIM-nya). Peran instruktur sengaja tidak bisa diubah dari situs.
+6. **Authentication > URL Configuration:** isi *Site URL* dengan alamat situs setelah tayang, dan tambahkan alamat itu (serta `http://127.0.0.1:8124` bila ingin menguji lokal) ke *Redirect URLs*.
+7. **Atur SMTP sendiri (penting).** Pengirim email bawaan Supabase sangat dibatasi dan hanya untuk uji coba; banyak peserta masuk bersamaan akan terkena batas dan kodenya tidak terkirim. Di **Project Settings > Authentication > SMTP Settings** hubungkan layanan email (misalnya Resend atau Brevo, keduanya punya paket gratis).
+8. Catat dua nilai dari **Project Settings > API**: **Project URL** dan kunci **anon** (atau *publishable*).
 
-Catatan: SQL sudah diperiksa sintaksnya dengan parser PostgreSQL (`python tools/periksa_sql.py`), tetapi **belum dijalankan di proyek Supabase sungguhan**. Jalankan di proyek kosong dulu dan laporkan bila ada galat.
+> **Jangan pernah** memakai kunci `service_role` atau `sb_secret_...`. Kunci itu melewati semua aturan keamanan database. Skrip pembangun akan **menolak** kunci itu dan membatalkan penayangan.
 
-### Cara kerja masuk
+## B. Vercel (atau Cloudflare Pages / Netlify)
 
-- **Peserta wajib masuk dulu.** Tanpa login, semua halaman (termasuk bab) tertutup.
-- Sesudah masuk, peserta yang belum punya data harus **mengisi nama, NIM, dan kelas** satu kali. Sebelum itu bab tetap tertutup, juga bila alamat bab diketik langsung.
-- Data itu tersimpan di tabel `profiles`. NIM tidak boleh kembar. Peserta bisa mengubah nama, NIM, dan kelas kapan saja di halaman **Profil** (menu atas, atau klik nama di pojok kanan atas).
-- Bila `SUPABASE_URL` dan `SUPABASE_ANON_KEY` di `site/config.js` **kosong**, situs menampilkan layar "belum tersambung ke Supabase" dan bab tetap tertutup. Untuk melihat tampilan tanpa akun, ubah `MODE_LOKAL` menjadi `true` (hanya untuk uji; jangan dipakai saat tayang).
-- Progres di browser dipisah per akun, jadi komputer bersama (warnet, lab) tidak bercampur.
+Repositori sudah membawa setelan yang dibutuhkan (`vercel.json`, `netlify.toml`, `site/_headers`).
 
-### Menguji tanpa Supabase
+### Vercel
+1. **Add New > Project**, pilih fork Anda.
+2. Biarkan setelan bawaan (dibaca dari `vercel.json`: build `node tools/buat_config.mjs`, keluaran `site`).
+3. Di **Environment Variables**, isi:
+
+   | Nama | Nilai |
+   |---|---|
+   | `SUPABASE_URL` | Project URL, mis. `https://abcdxyz.supabase.co` |
+   | `SUPABASE_ANON_KEY` | kunci anon / publishable |
+
+4. **Deploy.** Bila kunci yang dipakai ternyata `service_role`, build dibatalkan dengan pesan yang menjelaskan sebabnya. Bila variabel dikosongkan, situs menampilkan layar "belum tersambung ke Supabase".
+
+### Cloudflare Pages
+*Create project > Connect to Git* > pilih fork. **Build command:** `node tools/buat_config.mjs`. **Build output directory:** `site`. Tambahkan dua variabel yang sama di *Settings > Variables and Secrets* (untuk *Production* dan *Preview*).
+
+### Netlify
+*Add new site > Import from Git* > pilih fork. Setelan dibaca dari `netlify.toml`. Tambahkan dua variabel yang sama di *Site configuration > Environment variables*.
+
+### Tombol sekali klik
+Tombol *Deploy with Vercel* di README membuat **salinan** repositori (bukan fork) dan langsung meminta kedua variabel. Praktis, tetapi salinan itu tidak terhubung ke repositori asal sehingga tidak ada *Sync fork*. Untuk yang ingin menerima pembaruan, pakai fork.
+
+## C. Setelah tayang
+
+1. Buka situs, masuk dengan email Anda, dan isi nama, NIM, dan kelas.
+2. Jadikan diri Anda instruktur: jalankan `supabase/jadikan_instruktur.sql` di SQL Editor (ganti NIM-nya). Peran instruktur sengaja tidak bisa diubah dari situs.
+3. Ganti isi sesuai kelas Anda di `site/data/` (nama situs di `config.json`, daftar bab di `materi.json`, soal di `challenges/`). Panduannya di [MENAMBAH-BAB.md](MENAMBAH-BAB.md). **Jangan ubah** `site/js` dan `site/css` bila ingin pembaruan tetap mulus.
+
+## Menjalankan dan menguji di komputer sendiri
 
 ```bash
+git clone https://github.com/NAMA-ANDA/latihan-python-usg.git
+cd latihan-python-usg
 python tools/server_uji.py
 ```
 
-Buka `http://127.0.0.1:8124`. Server ini menyajikan folder `site/` dengan login **tiruan** (`tools/klien-tiruan.js`), tanpa mengubah `config.js`. Kode login yang diterima adalah `123456`; alamat email yang mengandung kata `limit` memicu galat batas email. Data tiruan hanya ada di browser.
+Buka `http://127.0.0.1:8124`. Server ini menyajikan `site/` dengan login **tiruan** (kode `123456`), tanpa Supabase. Data tiruan hanya ada di browser. Butuh internet karena editor, Python di browser (Pyodide), huruf, dan video dimuat dari CDN.
 
-## 3. Menayangkan
+## Cara kerja masuk
 
-Setelan sama untuk semua layanan: **tanpa perintah build**, **folder keluaran `site`**.
+- **Peserta wajib masuk dulu.** Tanpa login, semua halaman (termasuk bab) tertutup, juga bila alamat bab diketik langsung.
+- Sesudah masuk, peserta yang belum punya data harus mengisi **nama, NIM, dan kelas** satu kali. Data tersimpan di tabel `profiles`, NIM tidak boleh kembar, dan bisa diubah di halaman **Profil**.
+- Bila `SUPABASE_URL` dan `SUPABASE_ANON_KEY` kosong, situs menampilkan layar "belum tersambung ke Supabase" dan bab tetap tertutup. `MODE_LOKAL=true` (variabel opsional) menjalankan situs tanpa akun, hanya untuk uji tampilan; jangan dipakai saat tayang.
+- Progres di browser dipisah per akun, jadi komputer bersama (warnet, lab) tidak bercampur.
 
-- **Cloudflare Pages:** *Create project > Connect to Git* > pilih repositori. Framework preset *None*, build command kosong, build output directory `site`.
-- **Vercel:** *Add New Project* > pilih repositori. Framework *Other*, Build Command kosong, Output Directory `site`.
-- **GitHub Pages:** *Settings > Pages*, sumber *GitHub Actions*, atau salin isi `site/` ke cabang `gh-pages`.
-
-Setelah tayang, isi *Site URL* Supabase (langkah 4 di atas) dengan alamat barunya.
-
-## 4. Akhir semester
+## Akhir semester
 
 Kebijakan: data peserta disimpan sampai akhir semester lalu diarsipkan. Ikuti urutan di `supabase/arsip_akhir_semester.sql` (unduh dulu, hapus belakangan).
 
-## Keamanan singkat
+## Hal yang perlu diperhatikan
 
+- **Proyek Supabase gratis dijeda bila lama tidak aktif** (tidak ada permintaan selama sekitar seminggu). Buka dashboard dan aktifkan kembali sebelum semester dimulai.
 - Penilaian jawaban terjadi di browser, jadi peserta yang mahir secara teori bisa memalsukannya. Cukup untuk latihan, **tidak untuk ujian**.
-- Soal dan test case ada di repositori publik. Kunci jawaban ada di `kunci/` dan tidak diterbitkan.
+- Soal dan test case ada di repositori publik. Kunci jawaban sebaiknya disimpan di `kunci/` yang tidak diterbitkan.
 - Data mahasiswa (nama, NIM, kelas, kode, laporan) bersifat pribadi. Beri tahu peserta data apa yang dicatat dan untuk apa.
+- SQL sudah diperiksa sintaksnya (`python tools/periksa_sql.py`) tetapi **belum dijalankan di proyek Supabase sungguhan**. Jalankan di proyek kosong dulu dan laporkan bila ada galat.
