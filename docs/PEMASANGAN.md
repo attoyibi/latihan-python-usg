@@ -62,7 +62,7 @@ Tombol *Deploy with Vercel* di README membuat **salinan** repositori (bukan fork
 ## C. Setelah tayang
 
 1. Buka situs, masuk dengan email Anda, dan isi nama, NIM, dan kelas.
-2. Jadikan diri Anda instruktur: jalankan `supabase/jadikan_instruktur.sql` di SQL Editor (ganti NIM-nya). Peran instruktur sengaja tidak bisa diubah dari situs.
+2. **Jadikan diri Anda (dan dosen lain) instruktur.** Pendaftaran instruktur dilakukan manual di Supabase, bukan dari situs: orang itu masuk ke situs dan mengisi data awal dulu, lalu Anda menjalankan `supabase/jadikan_instruktur.sql` di SQL Editor (ganti `GANTI_DENGAN_EMAIL_ANDA` dengan emailnya), atau cukup ubah kolom `peran` menjadi `instruktur` di Table Editor > `profiles`. Berkas yang sama memuat cara memeriksa dan mencabutnya. Hanya ada dua peran: `peserta` dan `instruktur`.
 3. Ganti isi sesuai kelas Anda di `site/data/`: nama situs di `config.json`, daftar mata kuliah di `matakuliah.json`, dan bab serta soal di `kuliah/<id>/`. Panduan: [MENAMBAH-MATAKULIAH.md](MENAMBAH-MATAKULIAH.md) dan [MENAMBAH-BAB.md](MENAMBAH-BAB.md). **Jangan ubah** `site/js` dan `site/css` bila ingin pembaruan tetap mulus.
 
 ## Menjalankan dan menguji di komputer sendiri

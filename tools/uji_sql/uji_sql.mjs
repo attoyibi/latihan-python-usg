@@ -197,5 +197,34 @@ cek("rekap: peserta hanya melihat dirinya", rekapU1.rows.every((r) => r.user_id 
 cek("rekap: instruktur melihat dua peserta", (await sisip(IN, "select distinct user_id from public.rekap_progres")).rows.length === 2);
 cek("peserta 2 tidak melihat progres pbo-java peserta 1", (await sisip(U2, "select * from public.progres where matakuliah_id = 'pbo-java'")).rows.length === 0);
 
+console.log("\n== Tahap C: berkas jadikan_instruktur.sql ==");
+{
+  const ADMIN = "44444444-4444-4444-4444-444444444444";
+  await db.query("insert into auth.users (id, email) values ($1, 'Dosen.Baru@Kampus.ac.id')", [ADMIN]);
+  await sisip(ADMIN, "insert into public.profiles (id, nama, nim, kelas) values ($1, 'Dosen Baru', 'D777', 'Dosen')", ADMIN);
+  const sebelum = (await q("select peran from public.profiles where id = $1", [ADMIN])).rows[0].peran;
+  cek("akun baru awalnya peserta", sebelum === "peserta");
+  cek("sebagai peserta, tidak melihat profil orang lain", (await sisip(ADMIN, "select * from public.profiles")).rows.length === 1);
+
+  const berkas = readFileSync(join(root, "supabase", "jadikan_instruktur.sql"), "utf8");
+  cek("cara A (email) berjalan; huruf besar kecil email tidak jadi masalah", await jalankan("jalankan jadikan_instruktur.sql dengan email", berkas.replace("GANTI_DENGAN_EMAIL_ANDA", "dosen.baru@kampus.ac.id")));
+  cek("peran berubah jadi instruktur", (await q("select peran from public.profiles where id = $1", [ADMIN])).rows[0].peran === "instruktur");
+  cek("instruktur baru melihat semua profil", (await sisip(ADMIN, "select * from public.profiles")).rows.length >= 4);
+  cek("instruktur baru dapat menambah mata kuliah", !(await sisip(ADMIN, "insert into public.matakuliah (id, nama) values ('uji-admin', 'Uji Admin')")).error);
+
+  const sebelumLain = (await q("select count(*)::int as n from public.profiles where peran = 'instruktur'")).rows[0].n;
+  await jalankan("email yang tidak ada tidak mengubah siapa pun", berkas.replace("GANTI_DENGAN_EMAIL_ANDA", "tidak.ada@kampus.ac.id"));
+  cek("jumlah instruktur tetap", (await q("select count(*)::int as n from public.profiles where peran = 'instruktur'")).rows[0].n === sebelumLain);
+
+  const cara = berkas.replace("-- update public.profiles set peran = 'instruktur' where nim = 'GANTI_DENGAN_NIM';", "update public.profiles set peran = 'instruktur' where nim = '2024110099';").replace("GANTI_DENGAN_EMAIL_ANDA", "tidak.ada@kampus.ac.id");
+  await jalankan("cara B (NIM) berjalan", cara);
+  cek("cara B menjadikan peserta dengan NIM itu instruktur", (await q("select peran from public.profiles where nim = '2024110099'")).rows[0].peran === "instruktur");
+
+  const cabut = berkas.replace(/-- update public\.profiles\n-- set peran = 'peserta'\n-- where id = \(select id from auth\.users where lower\(email\) = lower\('GANTI_DENGAN_EMAIL'\)\);/, "update public.profiles set peran = 'peserta' where id = (select id from auth.users where lower(email) = lower('dosen.baru@kampus.ac.id'));").replace("GANTI_DENGAN_EMAIL_ANDA", "tidak.ada@kampus.ac.id");
+  await jalankan("mencabut peran instruktur", cabut);
+  cek("peran berhasil dicabut", (await q("select peran from public.profiles where id = $1", [ADMIN])).rows[0].peran === "peserta");
+  cek("setelah dicabut, kembali tidak melihat profil orang lain", (await sisip(ADMIN, "select * from public.profiles")).rows.length === 1);
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);
