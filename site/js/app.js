@@ -486,8 +486,8 @@ function renderLogin() {
   f.input.focus();
 }
 
-// Formulir data awal. mode "awal": wajib diisi sebelum mengerjakan. mode "ubah": memperbaiki data.
-function renderProfilForm(mode) {
+// Formulir data awal: wajib diisi sebelum mengerjakan.
+function renderProfilForm() {
   const p = Auth.getProfile() || {};
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { inputmode: "text", autocomplete: "off", maxlength: "30", required: "" }, "Tulis seperti di kartu mahasiswa.");
@@ -496,10 +496,10 @@ function renderProfilForm(mode) {
   fi.input.value = p.nim || "";
   fk.input.value = p.kelas || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
-  const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, mode === "awal" ? "Simpan dan mulai" : "Simpan perubahan");
+  const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan dan mulai");
   const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
   outBtn.addEventListener("click", () => Auth.signOut());
-  const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, mode === "awal" ? outBtn : h("a", { class: "btn btn-ghost", href: "#beranda" }, "Batal")), msg);
+  const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, outBtn), msg);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.input.value };
@@ -512,20 +512,98 @@ function renderProfilForm(mode) {
     msg.textContent = "Menyimpan";
     try {
       await Auth.saveProfile(val);
-      msg.textContent = "Tersimpan.";
-      afterAuthChange(mode === "awal" ? "#beranda" : null);
+      afterAuthChange("#beranda");
     } catch (e) {
       msg.textContent = "";
-      fi.err.textContent = /NIM/.test(e.message) ? e.message : "";
-      if (!/NIM/.test(e.message)) msg.textContent = e.message;
+      if (/NIM/.test(e.message)) fi.err.textContent = e.message;
+      else msg.textContent = e.message;
     } finally {
       saveBtn.disabled = false;
     }
   });
-  const title = mode === "awal" ? "Isi data dirimu dulu" : "Data dirimu";
-  const lead = mode === "awal" ? "Data ini dipakai untuk laporan dan penilaian. Isi sekali saja; bisa diubah nanti." : "Masuk sebagai " + (Auth.getEmail() || "");
-  $("#main").replaceChildren(gateCard(title, lead, form));
+  $("#main").replaceChildren(gateCard("Isi data dirimu dulu", "Sebelum mulai, lengkapi data ini. Dipakai untuk laporan dan penilaian. Isi sekali saja; bisa diubah nanti di halaman Profil.", form));
   fn.input.focus();
+}
+
+function initials(name) {
+  const w = (name || "?").trim().split(/\s+/).filter(Boolean);
+  return ((w[0] || "?")[0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase();
+}
+
+// Halaman Profil: lihat dan ubah nama, NIM, kelas.
+function renderProfil() {
+  const p = Auth.getProfile() || {};
+  const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
+  const fi = field("nim", "NIM", { autocomplete: "off", maxlength: "30", required: "" });
+  const fk = field("kelas", "Kelas", { autocomplete: "off", maxlength: "30", placeholder: "SI-1A", required: "" });
+  fn.input.value = p.nama || "";
+  fi.input.value = p.nim || "";
+  fk.input.value = p.kelas || "";
+  const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan perubahan");
+  const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
+  outBtn.addEventListener("click", () => Auth.signOut());
+  const head = h(
+    "div",
+    { class: "prof-head" },
+    h("span", { class: "avatar", "aria-hidden": "true" }, initials(p.nama)),
+    h("div", {}, h("strong", { id: "profName" }, p.nama || ""), h("div", { class: "muted" }, Auth.getEmail() || ""), p.peran === "instruktur" ? h("span", { class: "badge" }, "Instruktur") : null)
+  );
+  const done = MATERI.filter((m) => isDone(m.bab)).length;
+  const stats = h(
+    "div",
+    { class: "stats prof-stats" },
+    h("div", {}, h("small", {}, "Bab selesai"), h("strong", {}, done + " dari " + MATERI.length)),
+    h("div", {}, h("small", {}, "Kelas"), h("strong", { id: "profKelas" }, p.kelas || "-"))
+  );
+  const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, outBtn), msg);
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    msg.textContent = "";
+    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.input.value };
+    const errs = Auth.validateProfile(val);
+    fn.err.textContent = errs.nama || "";
+    fi.err.textContent = errs.nim || "";
+    fk.err.textContent = errs.kelas || "";
+    if (Object.keys(errs).length) return;
+    saveBtn.disabled = true;
+    msg.textContent = "Menyimpan";
+    try {
+      const saved = await Auth.saveProfile(val);
+      updateUserBar();
+      $("#profName").textContent = saved.nama;
+      $("#profKelas").textContent = saved.kelas;
+      document.querySelector(".avatar").textContent = initials(saved.nama);
+      msg.textContent = "Perubahan tersimpan.";
+    } catch (e) {
+      msg.textContent = "";
+      if (/NIM/.test(e.message)) fi.err.textContent = e.message;
+      else msg.textContent = e.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+  $("#main").replaceChildren(
+    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."))
+  );
+}
+
+// Ditampilkan bila situs belum tersambung ke Supabase dan mode lokal tidak dinyalakan.
+function renderSetup() {
+  const li = (t) => h("li", {}, t);
+  $("#main").replaceChildren(
+    gateCard(
+      "Situs belum tersambung ke Supabase",
+      "Peserta wajib masuk sebelum membuka bab, jadi situs butuh Supabase. Pemilik situs perlu mengisi URL dan kunci anon.",
+      h(
+        "ol",
+        {},
+        li("Ikuti langkah di docs/PEMASANGAN.md, lalu isi SUPABASE_URL dan SUPABASE_ANON_KEY di site/config.js."),
+        li("Untuk mencoba tanpa Supabase: jalankan python tools/server_uji.py (login tiruan, kode 123456)."),
+        li("Untuk melihat tampilan tanpa akun sama sekali: ubah MODE_LOKAL menjadi true di site/config.js.")
+      )
+    )
+  );
 }
 
 function renderGateError(message) {
@@ -538,6 +616,7 @@ function updateUserBar() {
   const on = Auth.enabled() && !!Auth.getUserId() && !!Auth.getProfile();
   $("#userChip").hidden = !on;
   $("#logoutBtn").hidden = !on;
+  $("#navProfil").hidden = !on;
   if (on) $("#userChip").textContent = Auth.getProfile().nama;
 }
 
@@ -554,11 +633,18 @@ function setPage(kind) {
   $("#navHome").classList.toggle("on", kind === "beranda");
   $("#navMateri").classList.toggle("on", kind === "materi" || kind === "bab");
   $("#navPanduan").classList.toggle("on", kind === "panduan");
+  $("#navProfil").classList.toggle("on", kind === "profil");
   $("#sidebar").classList.remove("open");
   $("#menuBtn").setAttribute("aria-expanded", "false");
 }
 
 function route() {
+  if (Auth.needsSetup()) {
+    setPage("gate");
+    updateUserBar();
+    renderSetup();
+    return;
+  }
   if (Auth.enabled()) {
     if (!Auth.getUserId()) {
       setPage("gate");
@@ -569,7 +655,7 @@ function route() {
     if (!Auth.getProfile()) {
       setPage("gate");
       updateUserBar();
-      renderProfilForm("awal");
+      renderProfilForm();
       return;
     }
     NS = Auth.getUserId();
@@ -587,7 +673,7 @@ function route() {
   window.scrollTo(0, 0);
   if (hash === "#materi") { setPage("materi"); renderMateri(); }
   else if (hash === "#panduan") { setPage("panduan"); renderPanduan(); }
-  else if (hash === "#profil" && Auth.enabled()) { setPage("profil"); renderProfilForm("ubah"); }
+  else if (hash === "#profil" && Auth.enabled()) { setPage("profil"); renderProfil(); }
   else { setPage("beranda"); renderBeranda(); }
 }
 

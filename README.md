@@ -15,11 +15,11 @@ Proyek sedang dibangun bertahap. Daftar lengkapnya ada di [CHECKLIST.md](CHECKLI
 | Python di browser (Pyodide), batas waktu 5 detik | |
 | Penilaian otomatis dengan kasus uji tersembunyi | Penyimpanan progres di Supabase (progres masih di browser) |
 | Tiga penanda status bab, tanpa kunci | Log aktivitas, dashboard instruktur, unggah tugas Bab 3 |
-| Masuk dengan kode email dan data awal (nama, NIM, kelas) wajib sebelum mengerjakan; diuji dengan klien tiruan, belum dengan Supabase sungguhan | |
+| Wajib masuk (kode email) dan isi data awal sebelum bab; halaman Profil untuk mengubah nama, NIM, kelas. Diuji dengan klien tiruan, belum dengan Supabase sungguhan | |
 | Video bantuan per bab (YouTube) | |
 | Skema database Supabase dan aturan keamanannya (belum dijalankan di proyek sungguhan) | |
 
-Tanpa Supabase (konfigurasi kosong) situs berjalan **mode lokal**: tanpa akun, progres di browser. Dengan Supabase, peserta harus masuk dan mengisi data awal dulu.
+Peserta **wajib masuk** dulu dan mengisi data awal (nama, NIM, kelas) sebelum membuka bab; data bisa diubah di halaman Profil. Bila Supabase belum dikonfigurasi, situs menampilkan layar pemasangan.
 
 ## Menjalankan
 
@@ -30,7 +30,7 @@ cd site
 python -m http.server 8000
 ```
 
-Buka `http://localhost:8000`.
+Buka `http://localhost:8000`. Tanpa Supabase situs akan meminta pemasangan; untuk mencoba alur masuk dengan login tiruan jalankan `python tools/server_uji.py` (dari akar repositori) lalu buka `http://127.0.0.1:8124`, kode login `123456`.
 
 ## Struktur
 

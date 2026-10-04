@@ -1,6 +1,6 @@
 // Masuk dan data awal peserta lewat Supabase.
-// Bila SUPABASE_URL dan SUPABASE_ANON_KEY di config.js kosong, situs berjalan "mode lokal":
-// tanpa akun, progres hanya di browser.
+// Peserta wajib masuk. Bila SUPABASE_URL dan SUPABASE_ANON_KEY di config.js kosong, situs menampilkan
+// layar pemasangan, kecuali MODE_LOKAL: true (tanpa akun, progres hanya di browser; untuk uji tampilan).
 
 const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
 
@@ -14,6 +14,10 @@ const listeners = [];
 
 // `cfg().client` hanya untuk pengujian (klien tiruan). Pemakaian biasa cukup URL dan kunci anon.
 export const enabled = () => !!(cfg().client || (cfg().SUPABASE_URL && cfg().SUPABASE_ANON_KEY));
+// Mode lokal (tanpa akun) hanya menyala bila diminta eksplisit lewat MODE_LOKAL: true di config.js.
+export const localMode = () => !enabled() && cfg().MODE_LOKAL === true;
+// Belum tersambung ke Supabase dan bukan mode lokal: pengunjung tidak boleh membuka bab.
+export const needsSetup = () => !enabled() && !localMode();
 export const getSession = () => session;
 export const getProfile = () => profile;
 export const getUserId = () => (session && session.user ? session.user.id : null);

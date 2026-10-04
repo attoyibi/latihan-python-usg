@@ -156,3 +156,9 @@ body.gate .nav,body.gate #progressText,body.gate #menuBtn{display:none}
 .form-msg{margin:6px 0 0;font-size:13.5px;color:var(--muted)}
 .chip.user{text-decoration:none;color:var(--brand-strong);background:var(--brand-soft);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 [hidden]{display:none!important}
+.prof-card{max-width:520px}
+.prof-head{display:flex;align-items:center;gap:14px;margin:12px 0 4px}
+.prof-head strong{font-size:18px}
+.avatar{width:52px;height:52px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+.prof-stats{margin:16px 0 4px;padding-top:14px;max-width:none}
+.nav a[hidden]{display:none}

@@ -123,6 +123,9 @@ Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis k
 - [ ] Laporan tersimpan di Supabase
 - [ ] Uji dua akun berbeda tidak saling melihat data
 - [ ] Uji login sungguhan: templat email memuat kode, SMTP sendiri, Redirect URL (lihat `docs/PEMASANGAN.md`)
+- [x] Halaman Profil (menu atas dan klik nama): ubah nama, NIM, kelas; NIM kembar ditolak; ringkasan bab selesai. Diuji dengan klien tiruan
+- [x] Bab tertutup sebelum masuk dan sebelum data awal, termasuk lewat alamat langsung; tanpa konfigurasi tampil layar pemasangan (`MODE_LOKAL` hanya untuk uji)
+- [x] `tools/server_uji.py`: server uji dengan login tiruan
 - [ ] Instruktur: tautan ke dashboard muncul bila `peran = 'instruktur'`
 
 ## Tahap 4: Log aktivitas
@@ -190,3 +193,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (5): Repositori.** Keputusan: publik, `latihan-python-usg`, MIT; Supabase dan Cloudflare/Vercel disambungkan sendiri oleh pemilik. Ditambahkan: README, LICENSE, panduan di `docs/`, skema SQL di `supabase/`, alat di `tools/`, CI. Pemeriksaan sebelum terbit: tidak ada kunci atau data pribadi (dipindai), `kunci/` diabaikan git. **Belum ada di aplikasi:** semua kode yang memakai Supabase (Tahap 3 dan seterusnya). Berikutnya: Tahap 2 (laporan dan PDF), lalu Tahap 3.
 - **4 Okt 2026 (6):** Repositori terbit di https://github.com/attoyibi/latihan-python-usg (publik, MIT). CI lulus pada commit pertama.
 - **4 Okt 2026 (7): Masuk dan data awal.** Ditambahkan `site/js/auth.js` dan layar masuk/data awal di `app.js`. Tanpa konfigurasi Supabase situs tetap berjalan mode lokal. Diuji dengan klien tiruan (`tools/klien-tiruan.js`): belum masuk -> masuk -> kode salah/benar -> wajib isi data -> validasi -> NIM kembar -> simpan -> keluar -> pengguna kedua tidak melihat progres pengguna pertama. Peringatan penting untuk Anda: SMTP bawaan Supabase terlalu terbatas untuk 80 peserta, pasang SMTP sendiri; dan edit dua templat email agar memuat `{{ .Token }}`. Berikutnya: sinkron progres ke Supabase (Tahap 3 lanjutan) atau Tahap 2 (laporan).
+- **4 Okt 2026 (8): Wajib login dan halaman Profil.** Login kini wajib juga saat Supabase belum dikonfigurasi (layar pemasangan; jalan pintas hanya `MODE_LOKAL: true`). Ditambah menu Profil dengan avatar inisial, email, ringkasan, dan formulir ubah nama/NIM/kelas. Diuji: akses bab lewat alamat langsung sebelum data awal ditolak; ubah ketiga data tersimpan; validasi NIM. Catatan uji: peramban menyimpan cache berkas statis, jadi muat ulang paksa setelah mengubah kode.

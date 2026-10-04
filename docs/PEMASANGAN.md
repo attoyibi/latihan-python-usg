@@ -47,13 +47,19 @@ Catatan: SQL sudah diperiksa sintaksnya dengan parser PostgreSQL (`python tools/
 
 ### Cara kerja masuk
 
-- Bila `SUPABASE_URL` dan `SUPABASE_ANON_KEY` di `site/config.js` **kosong**, situs berjalan **mode lokal**: tanpa akun dan tanpa gerbang, progres hanya di browser.
-- Bila terisi, pengunjung harus **masuk dulu**, lalu **mengisi nama, NIM, dan kelas** satu kali. Sebelum itu semua halaman (termasuk bab) tertutup. Data itu tersimpan di tabel `profiles`, NIM tidak boleh kembar, dan bisa diubah lewat tautan nama di pojok kanan atas.
+- **Peserta wajib masuk dulu.** Tanpa login, semua halaman (termasuk bab) tertutup.
+- Sesudah masuk, peserta yang belum punya data harus **mengisi nama, NIM, dan kelas** satu kali. Sebelum itu bab tetap tertutup, juga bila alamat bab diketik langsung.
+- Data itu tersimpan di tabel `profiles`. NIM tidak boleh kembar. Peserta bisa mengubah nama, NIM, dan kelas kapan saja di halaman **Profil** (menu atas, atau klik nama di pojok kanan atas).
+- Bila `SUPABASE_URL` dan `SUPABASE_ANON_KEY` di `site/config.js` **kosong**, situs menampilkan layar "belum tersambung ke Supabase" dan bab tetap tertutup. Untuk melihat tampilan tanpa akun, ubah `MODE_LOKAL` menjadi `true` (hanya untuk uji; jangan dipakai saat tayang).
 - Progres di browser dipisah per akun, jadi komputer bersama (warnet, lab) tidak bercampur.
 
 ### Menguji tanpa Supabase
 
-`tools/klien-tiruan.js` berisi klien tiruan di memori. Salin situs ke folder sementara, ganti `config.js` dengan berkas itu, lalu jalankan server statis. Kode login yang diterima adalah `123456`, dan alamat email yang mengandung kata `limit` memicu galat batas email.
+```bash
+python tools/server_uji.py
+```
+
+Buka `http://127.0.0.1:8124`. Server ini menyajikan folder `site/` dengan login **tiruan** (`tools/klien-tiruan.js`), tanpa mengubah `config.js`. Kode login yang diterima adalah `123456`; alamat email yang mengandung kata `limit` memicu galat batas email. Data tiruan hanya ada di browser.
 
 ## 3. Menayangkan
 
