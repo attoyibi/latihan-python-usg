@@ -226,5 +226,25 @@ console.log("\n== Tahap C: berkas jadikan_instruktur.sql ==");
   cek("setelah dicabut, kembali tidak melihat profil orang lain", (await sisip(ADMIN, "select * from public.profiles")).rows.length === 1);
 }
 
+console.log("\n== Tahap D: perintah yang benar-benar dikirim situs (upsert profil) ==");
+{
+  // supabase-js .upsert() menjadi INSERT ... ON CONFLICT (id) DO UPDATE untuk kolom yang dikirim saja.
+  const U5 = "55555555-5555-5555-5555-555555555555";
+  await db.query("insert into auth.users (id, email) values ($1, 'peserta5@x.id')", [U5]);
+  const UPSERT = "insert into public.profiles (id, nama, nim, kelas) values ($1, $2, $3, $4) on conflict (id) do update set nama = excluded.nama, nim = excluded.nim, kelas = excluded.kelas returning nama, nim, kelas, peran";
+  const r1 = await sisip(U5, UPSERT, U5, "Rina Wulandari", "2024110500", "SI-1C");
+  cek("upsert pertama kali membuat profil (peran bawaan peserta)", !r1.error && r1.rows[0].peran === "peserta", r1.error);
+  const r2 = await sisip(U5, UPSERT, U5, "Rina W. Putri", "2024110501", "SI-1D");
+  cek("upsert kedua mengubah nama, NIM, kelas", !r2.error && r2.rows[0].nama === "Rina W. Putri" && r2.rows[0].kelas === "SI-1D", r2.error);
+  const r3 = await sisip(U5, UPSERT, U5, "Rina", "2024110012", "SI-1D");
+  cek("upsert dengan NIM milik orang lain ditolak", ditolak(r3, "23505"));
+  const r4 = await sisip(U5, "insert into public.profiles (id, nama, nim, kelas, peran) values ($1,'Rina','2024110502','SI-1D','instruktur') on conflict (id) do update set peran = excluded.peran", U5);
+  cek("upsert yang menyelipkan peran instruktur ditolak", ditolak(r4, RLS));
+  cek("peran tetap peserta setelah semua percobaan", (await q("select peran from public.profiles where id = $1", [U5])).rows[0].peran === "peserta");
+  const r5 = await sisip(U5, "insert into public.profiles (id, nama, nim, kelas) values ($1,'Palsu','2024110998','SI-1D') on conflict (id) do update set nama = excluded.nama returning nama", IN);
+  cek("upsert atas nama orang lain (id instruktur) ditolak", ditolak(r5, RLS));
+  cek("profil instruktur tidak berubah", (await q("select nama from public.profiles where id = $1", [IN])).rows[0].nama === "Dosen");
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);
