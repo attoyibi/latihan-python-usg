@@ -20,9 +20,9 @@ export const enabled = () => !!(cfg().client || (cfg().SUPABASE_URL && cfg().SUP
 export const localMode = () => !enabled() && cfg().MODE_LOKAL === true;
 // Belum tersambung ke Supabase dan bukan mode lokal: pengunjung tidak boleh membuka bab.
 export const needsSetup = () => !enabled() && !localMode();
-// Pendaftaran mandiri: "buka" (bawaan) atau "tutup". Pada kelas tertutup, dosen mendaftarkan peserta
+// Pendaftaran mandiri: "tutup" (bawaan, fitur Daftar disembunyikan) atau "buka". Pada kelas tertutup, dosen mendaftarkan peserta
 // lebih dulu (tools/impor_peserta.mjs) dan peserta hanya masuk.
-export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "buka") !== "tutup";
+export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "tutup") === "buka";
 export const getSession = () => session;
 export const getProfile = () => profile;
 export const getUserId = () => (session && session.user ? session.user.id : null);

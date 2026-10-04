@@ -371,3 +371,4 @@ Tahap 2 (Supabase) harus merancang tabel log sejak awal, karena data yang tidak 
 - **Batas yang tersisa:** masuk dan daftar 30 per 5 menit per alamat IP (Wi-Fi bersama), dapat diatur di Supabase. Rencana: bagi kelompok atau masuk sebelum pertemuan.
 - **Kelas tertutup:** dosen mendaftarkan peserta lewat CSV dengan kata sandi awal (acak atau dari CSV); peserta wajib menggantinya pada masuk pertama; kata sandi awal hanya ditulis ke berkas lokal.
 - **Risiko baru:** mengelola kata sandi (lupa, reset). Cadangan: Lupa kata sandi lewat email, atau dosen mengatur ulang dengan `--reset-sandi`.
+- **Pembaruan:** pendaftaran mandiri disembunyikan (bawaan `PENDAFTARAN=tutup`) dan tidak dikembangkan dulu; fokus ke masuk. Penutup yang sebenarnya: matikan "Allow new users to sign up" di Supabase, karena menyembunyikan tombol saja tidak menghalangi panggilan langsung ke API.

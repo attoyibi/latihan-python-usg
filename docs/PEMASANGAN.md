@@ -73,7 +73,7 @@ Repositori sudah membawa setelan yang dibutuhkan (`vercel.json`, `netlify.toml`,
    |---|---|
    | `SUPABASE_URL` | Project URL, mis. `https://abcdxyz.supabase.co` |
    | `SUPABASE_ANON_KEY` | kunci anon / publishable |
-   | `PENDAFTARAN` (opsional) | `tutup` bila peserta didaftarkan dosen (lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)); bawaan `buka` |
+   | `PENDAFTARAN` (opsional) | bawaan `tutup`: tombol Daftar **disembunyikan** dan peserta didaftarkan dosen (lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)). `buka` menampilkan Daftar, tetapi fitur itu belum dikembangkan dan belum diuji dengan Supabase sungguhan |
 
 4. **Deploy.** Bila kunci yang dipakai ternyata `service_role`, build dibatalkan dengan pesan yang menjelaskan sebabnya. Bila variabel dikosongkan, situs menampilkan layar "belum tersambung ke Supabase".
 

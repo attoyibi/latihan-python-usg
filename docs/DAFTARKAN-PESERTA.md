@@ -34,7 +34,7 @@ Skrip memeriksa setiap baris dan menyebut nomor baris yang bermasalah: nama terl
 ### 3. Tutup pendaftaran mandiri
 Supaya hanya peserta terdaftar yang bisa masuk:
 - Di Supabase: **Authentication > Sign In / Providers**, matikan **Allow new users to sign up**. Menurut dokumentasi Supabase, dengan ini hanya pengguna yang sudah ada yang bisa masuk.
-- Di Vercel (atau layanan penayangan): tambahkan variabel `PENDAFTARAN` bernilai `tutup`, lalu *Redeploy*. Situs lalu menyembunyikan tombol Daftar dan menyebut "akun dari dosen". Tanpa variabel ini nilainya `buka`.
+- Di situs: `PENDAFTARAN` kini **bawaan `tutup`**, jadi tombol Daftar sudah tersembunyi dan situs menyebut "akun dari dosen". Tidak ada yang perlu Anda atur di Vercel. (`PENDAFTARAN=buka` akan menampilkan Daftar kembali, tetapi fitur itu belum dikembangkan.)
 
 ### 4. Daftarkan
 Di komputer Anda (bukan di repositori), atur dua variabel lingkungan dengan nilai dari **Project Settings > API**, lalu jalankan.

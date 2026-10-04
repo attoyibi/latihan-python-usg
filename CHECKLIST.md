@@ -98,6 +98,8 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 
 ## Tahap P: Masuk dengan email dan kata sandi (4 Okt 2026)
 
+> **Daftar mandiri disembunyikan dan tidak dikembangkan dulu** (keputusan pemilik). Butir Daftar di bawah menunjukkan yang sudah ada dan diuji dengan klien tiruan, bukan pekerjaan lanjutan.
+
 Mengganti masuk lewat tautan email. Alasan: layar masuk tidak lagi langsung meminta email seperti pendaftaran, dan masuk tidak mengirim email sehingga 80 peserta tidak terbentur batas email.
 
 - [x] Layar **Masuk**: email dan kata sandi, tombol tampilkan kata sandi, tautan Lupa kata sandi, tautan ke Daftar (atau catatan "akun dibuat dosen" pada kelas tertutup)
@@ -280,3 +282,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (16): Kapasitas kelas besar.** Dari dokumentasi Supabase: klik tautan dan masuk dibatasi 30 per 5 menit per alamat IP, sehingga banyak peserta di satu Wi-Fi kampus bisa terhambat; email proyek 30 per jam setelah SMTP sendiri. Ditambah bagian "Kelas besar" di panduan, pesan untuk batas per IP, dan rencana daftar sebelum pertemuan.
 - **4 Okt 2026 (17): Kelas tertutup.** Peserta bisa didaftarkan dosen lewat CSV sehingga mereka tidak mendaftar dan datanya sudah terisi; pendaftaran mandiri bisa ditutup. Skrip impor memakai kunci service_role di komputer pemilik (tidak pernah di chat atau repositori). Diuji dengan server tiruan; endpoint asli belum diuji.
 - **4 Okt 2026 (18): Masuk dengan email dan kata sandi.** Atas permintaan pemilik (layar masuk tidak boleh langsung meminta email) masuk lewat tautan diganti email dan kata sandi: Masuk, Daftar, Lupa kata sandi, kata sandi awal wajib ganti untuk akun dari dosen. Keuntungan kapasitas: masuk tidak mengirim email. Batas yang masih berlaku: masuk 30 per 5 menit per IP. Diuji di browser dengan klien tiruan (semua alur) dan di skrip impor dengan server tiruan; belum dengan Supabase sungguhan.
+- **4 Okt 2026 (19): Daftar disembunyikan.** Atas permintaan pemilik, fokus ke masuk saja: `PENDAFTARAN` kini bawaan `tutup` (tombol dan halaman Daftar tersembunyi, teks menyebut akun dari dosen). Kode fitur Daftar tidak diubah dan tidak dikembangkan; tetap bisa dinyalakan dengan `PENDAFTARAN=buka`. Penutup sungguhan tetap di Supabase: matikan Allow new users to sign up.
