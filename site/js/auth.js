@@ -18,6 +18,9 @@ export const enabled = () => !!(cfg().client || (cfg().SUPABASE_URL && cfg().SUP
 export const localMode = () => !enabled() && cfg().MODE_LOKAL === true;
 // Belum tersambung ke Supabase dan bukan mode lokal: pengunjung tidak boleh membuka bab.
 export const needsSetup = () => !enabled() && !localMode();
+// Pendaftaran mandiri: "buka" (bawaan) atau "tutup". Pada kelas tertutup, dosen mendaftarkan peserta
+// lebih dulu (tools/impor_peserta.mjs) dan hanya email yang sudah terdaftar yang bisa meminta tautan masuk.
+export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "buka") !== "tutup";
 export const getSession = () => session;
 export const getProfile = () => profile;
 export const getUserId = () => (session && session.user ? session.user.id : null);
@@ -39,6 +42,7 @@ function loadScript(src) {
 export function friendly(error) {
   const msg = String((error && error.message) || error || "");
   const code = error && error.code;
+  if (/signups? not allowed|otp_disabled|user_not_found|user not found/i.test(msg + " " + (code || ""))) return "Email ini belum terdaftar di kelas. Pakai email yang didaftarkan dosen, atau hubungi dosen.";
   if (code === "23505") return "NIM ini sudah dipakai akun lain. Periksa lagi, atau hubungi dosen.";
   if (code === "23514") return "Isian belum sesuai aturan. Periksa panjang nama, NIM, dan kelas.";
   if (code === "42P01" || /relation .* does not exist/i.test(msg)) return "Database belum disiapkan. Hubungi dosen.";
@@ -103,7 +107,7 @@ export async function init() {
 export async function sendLink(email) {
   const { error } = await client.auth.signInWithOtp({
     email: email.trim(),
-    options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname },
+    options: { shouldCreateUser: pendaftaranTerbuka(), emailRedirectTo: location.origin + location.pathname },
   });
   if (error) throw new Error(friendly(error));
 }

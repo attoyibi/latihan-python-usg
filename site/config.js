@@ -11,4 +11,6 @@ window.APP_CONFIG = {
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
   MODE_LOKAL: false,
+  // "buka": siapa pun bisa mendaftar sendiri. "tutup": hanya email yang sudah didaftarkan dosen.
+  PENDAFTARAN: "buka",
 };

@@ -69,6 +69,7 @@ kunci/                Kunci jawaban (TIDAK diterbitkan, ada di .gitignore)
 ## Dokumentasi
 
 - [Pemasangan dari nol](docs/PEMASANGAN.md) (fork, Supabase, penayangan)
+- [Mendaftarkan peserta sendiri (kelas tertutup)](docs/DAFTARKAN-PESERTA.md)
 - [Memperbarui fork](docs/MEMPERBARUI.md)
 - [Menambah mata kuliah](docs/MENAMBAH-MATAKULIAH.md)
 - [Menambah atau mengubah bab](docs/MENAMBAH-BAB.md)

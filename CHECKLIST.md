@@ -96,6 +96,16 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 - [ ] **SMTP sendiri di Supabase (wajib):** pengirim bawaan hanya 2 email/jam per proyek dan hanya ke anggota tim; batas setelah SMTP sendiri 30/jam, naikkan di Authentication > Rate Limits sebelum hari pertama kelas
 - [x] Pesan galat email dibedakan: jeda per alamat ("Tunggu N detik") dan batas proyek ("Batas pengiriman email sedang tercapai"); diuji (`tools/uji_pesan.mjs`, di CI)
 
+## Tahap K: Kelas tertutup, peserta didaftarkan dosen (4 Okt 2026)
+
+- [x] Mode `PENDAFTARAN=tutup` (variabel lingkungan, dibuat ke `config.js` oleh `tools/buat_config.mjs`; diuji): tautan masuk tidak membuat akun baru; email yang belum terdaftar mendapat pesan "belum terdaftar di kelas"
+- [x] `tools/impor_peserta.mjs`: dari CSV (koma atau titik koma, BOM, nama berkutip) membuat akun (email terverifikasi) dan mengisi profil; simulasi bawaan, `--jalankan` untuk mengirim; aman diulang; peran tidak diubah; menolak kunci publik dan URL tidak aman; kunci tidak dicetak. Diuji dengan server Supabase tiruan (20 uji, peka terhadap perusakan), di CI
+- [x] `docs/DAFTARKAN-PESERTA.md` dan `docs/contoh-peserta.csv`; `.gitignore` menolak `peserta*.csv`
+- [x] Server uji meniru kelas tertutup (dua peserta terdaftar dengan profil terisi; email lain ditolak; `?terbuka=1` untuk mandiri)
+- [ ] **Belum diuji dengan Supabase sungguhan:** endpoint admin (`POST /auth/v1/admin/users`, `GET /auth/v1/admin/users`) dan PostgREST disusun dari dokumentasi resmi, tetapi baru diuji terhadap server tiruan buatan sendiri
+- [ ] Matikan "Allow new users to sign up" di Supabase dan set `PENDAFTARAN=tutup` (oleh pemilik)
+- [ ] Siapkan CSV 80 peserta dan jalankan `--jalankan` (oleh pemilik; jangan dikirim ke chat atau repositori)
+
 ## Tahap M: Banyak mata kuliah (4 Okt 2026)
 
 Satu situs memuat banyak mata kuliah (kode maupun tanpa kode). Sekarang ada dua: Algoritma Python (aktif) dan PBO Java (tempat dan database siap, materi belum).
@@ -254,3 +264,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (14): Memperbarui Supabase yang sudah ada.** Ditemukan lewat uji: menjalankan ulang `0001` setelah `0003` gagal karena `0001` membuat ulang tampilan `rekap_progres` ke versi lama. Diperbaiki (tampilan hanya dibuat bila belum ada). Ditambah `supabase/periksa_migrasi.sql` agar pemilik bisa memeriksa migrasi mana yang sudah terpasang, dan bagian "Sudah punya proyek Supabase?" di panduan. Berkas `0001` dan `0002` TIDAK berubah isinya yang berdampak pada proyek yang sudah menjalankannya (hanya cara membuat tampilan saat diulang).
 - **4 Okt 2026 (15): Galat "Terlalu banyak permintaan email".** Penyebab: batas pengirim email bawaan Supabase (2/jam per proyek, hanya ke anggota tim), bukan galat kode. Panduan SMTP diperjelas dengan angka dari dokumentasi resmi; pesan di situs dibedakan antara jeda per alamat dan batas proyek.
 - **4 Okt 2026 (16): Kapasitas kelas besar.** Dari dokumentasi Supabase: klik tautan dan masuk dibatasi 30 per 5 menit per alamat IP, sehingga banyak peserta di satu Wi-Fi kampus bisa terhambat; email proyek 30 per jam setelah SMTP sendiri. Ditambah bagian "Kelas besar" di panduan, pesan untuk batas per IP, dan rencana daftar sebelum pertemuan.
+- **4 Okt 2026 (17): Kelas tertutup.** Peserta bisa didaftarkan dosen lewat CSV sehingga mereka tidak mendaftar dan datanya sudah terisi; pendaftaran mandiri bisa ditutup. Skrip impor memakai kunci service_role di komputer pemilik (tidak pernah di chat atau repositori). Diuji dengan server tiruan; endpoint asli belum diuji.

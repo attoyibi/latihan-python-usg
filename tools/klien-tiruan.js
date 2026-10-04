@@ -1,6 +1,10 @@
 // KLIEN TIRUAN untuk menguji alur masuk lewat tautan email (bukan Supabase sungguhan).
 // Dipakai oleh tools/server_uji.py yang menggantikan site/config.js dengan berkas ini.
 //
+// Mode: TERTUTUP (bawaan, meniru kelas yang pesertanya didaftarkan dosen): hanya siti@kampus.ac.id dan
+// budi@kampus.ac.id yang terdaftar (profil sudah terisi), dan kedaluwarsa@kampus.ac.id untuk tautan kedaluwarsa.
+// Tambahkan ?terbuka=1 di alamat untuk mode pendaftaran mandiri (email apa pun boleh, profil diisi sendiri).
+//
 // Cara kerja: saat peserta meminta tautan masuk, kotak "Email tiruan" muncul di pojok kanan bawah.
 // Tombol di dalamnya meniru klik tautan di email: sesi disimpan lalu halaman dimuat ulang ke alamat
 // dasar tanpa #, persis seperti kembali dari tautan Supabase asli.
@@ -12,6 +16,20 @@
   const save = () => localStorage.setItem(KEY, JSON.stringify(db));
   const listeners = [];
   const mkSession = (email) => ({ user: { id: "u-" + email.replace(/\W/g, "_"), email } });
+  const TERBUKA = /[?&]terbuka=1/.test(location.search);
+  if (!db.users) {
+    const SEED = [
+      { email: "siti@kampus.ac.id", nama: "Siti Aminah", nim: "2024110012", kelas: "SI-1A" },
+      { email: "budi@kampus.ac.id", nama: "Budi Santoso", nim: "2024110099", kelas: "SI-1A" },
+    ];
+    db.users = ["kedaluwarsa@kampus.ac.id"];
+    SEED.forEach((x) => {
+      const id = mkSession(x.email).user.id;
+      db.users.push(x.email);
+      db.profiles[id] = { id, nama: x.nama, nim: x.nim, kelas: x.kelas, peran: "peserta" };
+    });
+    localStorage.setItem(KEY, JSON.stringify(db));
+  }
   const setSession = (s, ev) => {
     db.session = s;
     save();
@@ -88,6 +106,7 @@
   };
 
   window.APP_CONFIG = {
+    PENDAFTARAN: TERBUKA ? "buka" : "tutup",
     client: {
       auth: {
         getSession: async () => ({ data: { session: db.session } }),
@@ -95,8 +114,13 @@
           listeners.push(cb);
           return { data: { subscription: {} } };
         },
-        signInWithOtp: async ({ email }) => {
+        signInWithOtp: async ({ email, options }) => {
           if (email.indexOf("limit") >= 0) return { error: { message: "email rate limit exceeded" } };
+          const bolehDaftar = !options || options.shouldCreateUser !== false;
+          if (!db.users.includes(email)) {
+            if (!bolehDaftar) return { error: { message: "Signups not allowed for otp", code: "otp_disabled" } };
+            db.users.push(email);
+          }
           db.pending = email;
           save();
           tampilkanKotakEmail();

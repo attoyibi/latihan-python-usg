@@ -469,7 +469,9 @@ function renderLanding() {
       "div",
       { class: "steps" },
       langkah("1", "Pilih mata kuliah", "Lihat daftar di atas. Bab bebas dikerjakan dalam urutan apa pun."),
-      langkah("2", "Masuk lewat email", "Kami kirim tautan masuk ke emailmu. Tanpa kata sandi. Isi nama, NIM, dan kelas satu kali."),
+      Auth.pendaftaranTerbuka()
+        ? langkah("2", "Masuk lewat email", "Kami kirim tautan masuk ke emailmu. Tanpa kata sandi. Isi nama, NIM, dan kelas satu kali.")
+        : langkah("2", "Masuk lewat email", "Dosen sudah mendaftarkan emailmu. Kami kirim tautan masuk; tanpa kata sandi dan tanpa mendaftar. Datamu sudah terisi."),
       langkah("3", "Kerjakan dan laporkan", "Tulis kode, jalankan, kirim jawaban, lalu tulis laporan singkat dengan bahasamu sendiri.")
     )
   );
@@ -600,7 +602,9 @@ function renderLogin(konteks) {
   const form = h("form", { novalidate: "" }, f.node, h("div", { class: "actions" }, sendBtn, kembali), msg);
 
   const judul = konteks ? "Masuk untuk membuka " + konteks : "Masuk";
-  const lead = "Masukkan emailmu. Kami mengirim tautan masuk; klik tautannya untuk masuk. Tidak perlu kata sandi dan tidak ada kode yang diketik.";
+  const lead = Auth.pendaftaranTerbuka()
+    ? "Masukkan emailmu. Kami mengirim tautan masuk; klik tautannya untuk masuk. Tidak perlu kata sandi dan tidak ada kode yang diketik."
+    : "Masuk dengan email yang didaftarkan dosen. Kami mengirim tautan masuk ke emailmu; klik tautannya untuk masuk. Tidak perlu kata sandi dan tidak perlu mendaftar.";
   const galat = PESAN_LOGIN;
   PESAN_LOGIN = "";
   const card = gateCard(judul, lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form);

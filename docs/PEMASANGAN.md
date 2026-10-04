@@ -75,6 +75,7 @@ Repositori sudah membawa setelan yang dibutuhkan (`vercel.json`, `netlify.toml`,
    |---|---|
    | `SUPABASE_URL` | Project URL, mis. `https://abcdxyz.supabase.co` |
    | `SUPABASE_ANON_KEY` | kunci anon / publishable |
+   | `PENDAFTARAN` (opsional) | `tutup` bila peserta didaftarkan dosen (lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)); bawaan `buka` |
 
 4. **Deploy.** Bila kunci yang dipakai ternyata `service_role`, build dibatalkan dengan pesan yang menjelaskan sebabnya. Bila variabel dikosongkan, situs menampilkan layar "belum tersambung ke Supabase".
 
@@ -107,6 +108,7 @@ Buka `http://127.0.0.1:8124`. Server ini menyajikan `site/` dengan login **tirua
 
 - **Halaman depan terbuka untuk siapa saja.** Pengunjung pertama melihat landing page statis: daftar mata kuliah yang tersedia, cara kerja, dan panduan. Tidak ada yang meminta masuk di sini.
 - **Masuk baru diminta saat memilih mata kuliah.** Peserta memasukkan email, lalu mengklik **tautan masuk** yang dikirim ke emailnya (tanpa kata sandi). Mata kuliah yang tadi dipilih diingat, jadi setelah masuk peserta langsung diarahkan ke sana.
+- **Kelas tertutup (opsional):** bila Anda mendaftarkan peserta sendiri lewat `tools/impor_peserta.mjs` dan menutup pendaftaran mandiri, peserta tidak mendaftar dan tidak mengisi data; mereka langsung masuk lewat tautan email. Panduan: [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md).
 - **Pertama kali masuk:** peserta mengisi **nama, NIM, dan kelas** satu kali, lalu langsung ke mata kuliah pilihannya. Data itu tersimpan di tabel `profiles`, NIM tidak boleh kembar, dan bisa diubah di halaman **Profil**.
 - **Keluar** mengembalikan peserta ke halaman depan.
 - Halaman bab dan Profil tertutup sampai peserta masuk, juga bila alamatnya diketik langsung.

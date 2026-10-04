@@ -11,3 +11,8 @@ Thumbs.db
 .env.*
 *.local
 .claude/
+
+# Data pribadi peserta (nama, NIM, email): jangan diterbitkan
+peserta*.csv
+*.peserta.csv
+data-peserta/

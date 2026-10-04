@@ -20,6 +20,8 @@ jobs:
         run: python tools/validasi_konten.py
       - name: Uji pembuat konfigurasi (menolak kunci service_role)
         run: node tools/uji_buat_config.mjs
+      - name: Uji skrip pendaftaran peserta (server Supabase tiruan)
+        run: node tools/uji_impor.mjs
       - name: Uji pesan galat untuk peserta
         run: node tools/uji_pesan.mjs
       - name: Periksa sintaks JavaScript

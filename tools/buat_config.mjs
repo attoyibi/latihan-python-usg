@@ -7,6 +7,7 @@
 //   SUPABASE_URL        alamat proyek, mis. https://abcdxyz.supabase.co
 //   SUPABASE_ANON_KEY   kunci "anon" (atau "publishable") dari Project Settings > API
 //   MODE_LOKAL          opsional, "true" hanya untuk uji tampilan tanpa akun
+//   PENDAFTARAN         opsional, "buka" (bawaan) atau "tutup" (hanya email yang didaftarkan dosen)
 //
 // Bila kedua variabel kosong, config.js dibiarkan apa adanya dan situs menampilkan
 // layar "Situs belum tersambung ke Supabase".
@@ -27,11 +28,14 @@ const out = i > -1 && process.argv[i + 1] ? resolve(process.argv[i + 1]) : join(
 const url = (process.env.SUPABASE_URL || "").trim();
 const key = (process.env.SUPABASE_ANON_KEY || "").trim();
 const lokal = (process.env.MODE_LOKAL || "").trim().toLowerCase() === "true";
+const pendaftaran = (process.env.PENDAFTARAN || "buka").trim().toLowerCase();
 
 function gagal(pesan) {
   console.error("[buat_config] GAGAL: " + pesan);
   process.exit(1);
 }
+
+if (pendaftaran !== "buka" && pendaftaran !== "tutup") gagal('PENDAFTARAN harus "buka" atau "tutup".');
 
 if (!url && !key && !lokal) {
   console.warn("[buat_config] SUPABASE_URL dan SUPABASE_ANON_KEY belum diisi. config.js tidak diubah; situs akan menampilkan layar pemasangan.");
@@ -77,9 +81,10 @@ const isi = {
   SUPABASE_URL: cleanUrl,
   SUPABASE_ANON_KEY: cleanKey,
   MODE_LOKAL: lokal,
+  PENDAFTARAN: pendaftaran,
 };
 const teks =
   "// Dibuat otomatis oleh tools/buat_config.mjs saat penayangan. Jangan diedit dan jangan di-commit.\n" +
   "window.APP_CONFIG = " + JSON.stringify(isi, null, 2) + ";\n";
 writeFileSync(out, teks, "utf8");
-console.log("[buat_config] config.js dibuat" + (cleanUrl ? " untuk " + cleanUrl : "") + (lokal ? " (MODE_LOKAL aktif)" : "") + ".");
+console.log("[buat_config] config.js dibuat" + (cleanUrl ? " untuk " + cleanUrl : "") + (lokal ? " (MODE_LOKAL aktif)" : "") + (pendaftaran === "tutup" ? " (pendaftaran ditutup)" : "") + ".");
