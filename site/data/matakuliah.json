@@ -1,0 +1,20 @@
+[
+  {
+    "id": "algoritma-python",
+    "nama": "Algoritma dan Pemrograman",
+    "deskripsi": "Fondasi berpikir komputasional dengan Python. Tulis kode langsung di browser dan lihat hasilnya saat itu juga.",
+    "bahasa": "python",
+    "jenis": "kode",
+    "aktif": true,
+    "urutan": 10
+  },
+  {
+    "id": "pbo-java",
+    "nama": "Pemrograman Berorientasi Objek",
+    "deskripsi": "Konsep kelas, objek, pewarisan, dan polimorfisme dengan Java.",
+    "bahasa": "java",
+    "jenis": "kode",
+    "aktif": false,
+    "urutan": 20
+  }
+]

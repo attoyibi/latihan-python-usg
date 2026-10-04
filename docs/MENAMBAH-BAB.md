@@ -1,8 +1,8 @@
 # Menambah atau mengubah bab
 
-Semua isi ada di `site/data/`, terpisah dari kode. Anda tidak perlu menyentuh JavaScript untuk menambah bab.
+Semua isi ada di `site/data/`, terpisah dari kode. Anda tidak perlu menyentuh JavaScript untuk menambah bab. Tiap mata kuliah punya foldernya sendiri: `site/data/kuliah/<id>/` (membuat mata kuliah baru: [MENAMBAH-MATAKULIAH.md](MENAMBAH-MATAKULIAH.md)). Contoh di bawah memakai `algoritma-python`.
 
-## 1. Daftar bab: `site/data/materi.json`
+## 1. Daftar bab: `site/data/kuliah/<id>/materi.json`
 
 Satu objek per bab, urut dari 1:
 
@@ -23,9 +23,10 @@ Satu objek per bab, urut dari 1:
 - `id` video adalah 11 karakter setelah `v=` pada tautan YouTube.
 - `sumber`: `playlist` untuk video utama, `lain` untuk sumber pengganti (diberi label berbeda).
 - `jenis`: `kode` (ada editor) atau `unggah` (tugas berupa berkas, misalnya flowchart).
-- `challenge`: `true` bila ada berkas soal di `site/data/challenges/`.
+- `challenge`: `true` bila ada berkas soal di `challenges/` milik mata kuliah itu.
+- `buku` bersifat opsional (rujukan halaman buku). Boleh dihilangkan untuk mata kuliah tanpa buku.
 
-## 2. Soal: `site/data/challenges/bab-NN.json`
+## 2. Soal: `site/data/kuliah/<id>/challenges/bab-NN.json`
 
 ```json
 {
@@ -54,7 +55,7 @@ Satu objek per bab, urut dari 1:
 
 ## 3. Kunci jawaban dan uji
 
-Tulis kunci di `kunci/bab-NN.py` (folder ini **tidak ikut diterbitkan**), lalu:
+Tulis kunci di `kunci/<id>/bab-NN.py` (folder ini **tidak ikut diterbitkan**), lalu:
 
 ```bash
 python tools/uji_kunci.py        # kunci harus menghasilkan setiap expected
@@ -70,4 +71,4 @@ cd site
 python -m http.server 8000
 ```
 
-Buka `http://localhost:8000/#bab-4`.
+Buka `http://localhost:8000/#k/algoritma-python/bab-4`.

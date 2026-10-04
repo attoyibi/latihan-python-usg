@@ -348,3 +348,11 @@ Tahap 2 (Supabase) harus merancang tabel log sejak awal, karena data yang tidak 
 - **Konektor Supabase dan Cloudflare** ditunda. Urutan: GitHub dulu, lalu fitur, lalu sambungan layanan.
 - **Risiko repositori publik:** soal, test case, dan kunci terbaca semua orang; isi ringkasan berasal dari buku yang berhak cipta. Perlu keputusan lisensi dan pemisahan kunci jawaban.
 
+## 16. Banyak mata kuliah (diputuskan 4 Oktober 2026)
+
+- **Satu situs, banyak mata kuliah**, berbasis kode maupun tidak. Awal: Algoritma dan Pemrograman (Python) dan Pemrograman Berorientasi Objek (Java).
+- **Isi dipisah per mata kuliah** di `site/data/kuliah/<id>/`; daftar mata kuliah di `site/data/matakuliah.json`. Menambah mata kuliah tidak menyentuh kode.
+- **Progres terpisah per mata kuliah**, baik di browser maupun di database (kolom `matakuliah_id`).
+- **Database:** tabel `matakuliah`; migrasi `0003` bersifat aditif dan memindahkan data lama ke `algoritma-python`. Menambah mata kuliah = satu baris `insert` (dicetak oleh `tools/kuliah_baru.py`).
+- **Java:** tempat sudah ada; yang belum ada adalah mesin yang menjalankan kode Java. Python dijalankan di browser lewat Pyodide, Java butuh pilihan lain (JVM di browser, server eksekusi sendiri, atau layanan berbayar). Keputusan ditunda dan perlu riset ulang pada saat itu.
+- **Belum diputuskan:** kelas per mata kuliah (sekarang satu data diri), instruktur per mata kuliah (sekarang satu peran global), dan unggah berkas untuk mata kuliah tanpa kode.

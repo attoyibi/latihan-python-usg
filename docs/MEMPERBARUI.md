@@ -6,7 +6,7 @@ Bila Anda memasang lewat fork, pembaruan dari repositori utama bisa ditarik tanp
 
 | Boleh Anda ubah | Jangan diubah |
 |---|---|
-| `site/data/` (nama situs, daftar bab, soal, video) | `site/js/`, `site/css/`, `site/index.html` |
+| `site/data/` (nama situs, daftar mata kuliah, bab, soal, video) | `site/js/`, `site/css/`, `site/index.html` |
 | Environment variable di Vercel/Cloudflare/Netlify | `site/config.js` (diisi otomatis saat build) |
 | `kunci/` (lokal, tidak diterbitkan) | `supabase/migrations/` yang sudah dijalankan |
 
@@ -33,10 +33,10 @@ git push
 ```
 
 ## Bila ada bentrok
-Bentrok hanya terjadi bila Anda dan repositori utama mengubah berkas yang sama, paling sering `site/data/materi.json` atau soal yang sama. Selesaikan dengan mempertahankan isi Anda dan menerima perubahan kode dari utama. Mintalah bantuan lewat *issue* bila ragu.
+Bentrok hanya terjadi bila Anda dan repositori utama mengubah berkas yang sama, paling sering `site/data/matakuliah.json`, `site/data/kuliah/<id>/materi.json`, atau soal yang sama. Selesaikan dengan mempertahankan isi Anda dan menerima perubahan kode dari utama. Mintalah bantuan lewat *issue* bila ragu.
 
 ## Pembaruan database
-Bila rilis baru menambah berkas di `supabase/migrations/` (mis. `0003_...sql`), jalankan **hanya berkas baru** itu di SQL Editor, berurutan. Jangan menjalankan ulang berkas lama. Catatan rilis menyebutkan bila ada berkas baru.
+Bila rilis baru menambah berkas di `supabase/migrations/` (mis. `0004_...sql`), jalankan **hanya berkas baru** itu di SQL Editor, berurutan. Jangan menjalankan ulang berkas lama. Catatan rilis menyebutkan bila ada berkas baru.
 
 ## Tes sebelum memperbarui produksi
 Vercel dan Cloudflare membuat alamat pratinjau untuk setiap cabang. Tarik pembaruan ke cabang `dev` dulu, cek alamat pratinjaunya, baru gabungkan ke `main`.

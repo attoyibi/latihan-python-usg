@@ -1,0 +1,12 @@
+{
+  "name": "uji-sql",
+  "private": true,
+  "type": "module",
+  "description": "Menguji migrasi SQL dan aturan keamanan di PostgreSQL sungguhan (PGlite), tanpa Docker.",
+  "scripts": {
+    "uji": "node uji_sql.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  }
+}

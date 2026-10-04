@@ -30,3 +30,8 @@ jobs:
         run: |
           pip install pglast
           python tools/periksa_sql.py
+      - name: Uji migrasi dan aturan keamanan di PostgreSQL sungguhan (PGlite)
+        working-directory: tools/uji_sql
+        run: |
+          npm ci
+          npm run uji

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Memeriksa berkas isi (data/materi.json dan data/challenges/*.json) sebelum diterbitkan.
+"""Memeriksa berkas isi sebelum diterbitkan:
+  site/data/matakuliah.json                       daftar mata kuliah
+  site/data/kuliah/<id>/materi.json               daftar bab per mata kuliah
+  site/data/kuliah/<id>/challenges/bab-NN.json    soal per bab
 
 Jalankan dari akar repositori:  python tools/validasi_konten.py
 Keluar dengan kode 1 bila ada kesalahan, sehingga cocok dipakai di CI.
@@ -11,6 +14,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "site" / "data"
+KULIAH = DATA / "kuliah"
+ID_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 errors = []
 
 
@@ -18,32 +23,88 @@ def err(msg):
     errors.append(msg)
 
 
+def rel(path):
+    return str(path.relative_to(ROOT)).replace("\\", "/")
+
+
 def load(path):
     try:
         return json.loads(path.read_text(encoding="utf8"))
+    except FileNotFoundError:
+        err(f"{rel(path)}: berkas tidak ada")
     except Exception as e:  # noqa: BLE001
-        err(f"{path.relative_to(ROOT)}: bukan JSON valid ({e})")
-        return None
+        err(f"{rel(path)}: bukan JSON valid ({e})")
+    return None
 
 
-def cek_materi():
-    materi = load(DATA / "materi.json")
+def cek_daftar_matakuliah():
+    daftar = load(DATA / "matakuliah.json")
+    if daftar is None:
+        return []
+    if not isinstance(daftar, list) or not daftar:
+        err("matakuliah.json harus berupa daftar yang tidak kosong")
+        return []
+    ids = set()
+    ok = []
+    for i, c in enumerate(daftar):
+        w = f"matakuliah.json[{i}]"
+        cid = c.get("id", "")
+        if not isinstance(cid, str) or not ID_RE.match(cid) or len(cid) > 60:
+            err(f"{w}: id harus huruf kecil, angka, dan strip (mis. 'pbo-java'), maksimal 60 karakter (ada {cid!r})")
+            continue
+        if cid in ids:
+            err(f"{w}: id ganda: {cid}")
+        ids.add(cid)
+        w = f"matakuliah.json[{cid}]"
+        nama = c.get("nama")
+        if not isinstance(nama, str) or not (2 <= len(nama) <= 120):
+            err(f"{w}: nama harus 2 sampai 120 karakter")
+        d = c.get("deskripsi")
+        if d is not None and (not isinstance(d, str) or len(d) > 600):
+            err(f"{w}: deskripsi maksimal 600 karakter")
+        if c.get("jenis") not in ("kode", "teks", "campuran"):
+            err(f"{w}: jenis harus 'kode', 'teks', atau 'campuran'")
+        b = c.get("bahasa")
+        if b is not None and (not isinstance(b, str) or not (1 <= len(b) <= 30)):
+            err(f"{w}: bahasa harus teks 1 sampai 30 karakter, atau null")
+        if c.get("jenis") in ("kode", "campuran") and not b:
+            err(f"{w}: jenis '{c.get('jenis')}' memerlukan bahasa")
+        if not isinstance(c.get("aktif"), bool):
+            err(f"{w}: aktif harus true atau false")
+        if not isinstance(c.get("urutan"), int):
+            err(f"{w}: urutan harus angka bulat")
+        ok.append(c)
+    if KULIAH.exists():
+        for d in sorted(p for p in KULIAH.iterdir() if p.is_dir()):
+            if d.name not in ids:
+                err(f"folder {rel(d)} tidak ada di matakuliah.json")
+    return ok
+
+
+def cek_materi(c):
+    cid = c["id"]
+    materi = load(KULIAH / cid / "materi.json")
     if materi is None:
-        return set()
-    if not isinstance(materi, list) or not materi:
-        err("materi.json harus berupa daftar yang tidak kosong")
-        return set()
+        return
+    pre = f"kuliah/{cid}/materi.json"
+    if not isinstance(materi, list):
+        err(f"{pre}: harus berupa daftar")
+        return
+    if c.get("aktif") and not materi:
+        err(f"{pre}: mata kuliah aktif harus punya minimal satu bab (atau set aktif ke false)")
     babs = []
     for i, m in enumerate(materi):
-        w = f"materi.json[{i}]"
-        for k in ("bab", "judul", "ringkasan", "buku", "video", "jenis"):
+        w = f"{pre}[{i}]"
+        for k in ("bab", "judul", "ringkasan", "video", "jenis"):
             if k not in m:
                 err(f"{w}: kolom '{k}' tidak ada")
         if m.get("jenis") not in ("kode", "unggah"):
             err(f"{w}: 'jenis' harus 'kode' atau 'unggah'")
+        if m.get("jenis") == "kode" and not c.get("bahasa"):
+            err(f"{w}: bab berjenis kode, tetapi mata kuliah tidak punya bahasa")
         babs.append(m.get("bab"))
-        b = m.get("buku", {})
-        if not isinstance(b.get("halaman"), int):
+        b = m.get("buku")
+        if b is not None and "halaman" in b and not isinstance(b["halaman"], int):
             err(f"{w}: buku.halaman harus angka")
         if not m.get("video"):
             err(f"{w}: minimal satu video")
@@ -52,20 +113,22 @@ def cek_materi():
                 err(f"{w}: id video YouTube tidak valid: {v.get('id')!r}")
             if v.get("sumber") not in ("playlist", "lain"):
                 err(f"{w}: video.sumber harus 'playlist' atau 'lain'")
-    if babs != list(range(1, len(babs) + 1)):
-        err(f"nomor bab harus berurutan 1..N, ditemukan {babs}")
-    return {m["bab"] for m in materi if m.get("challenge")}
+    if babs and babs != list(range(1, len(babs) + 1)):
+        err(f"{pre}: nomor bab harus berurutan 1..N, ditemukan {babs}")
+    for m in materi:
+        if m.get("challenge"):
+            cek_challenge(cid, m["bab"])
 
 
-def cek_challenge(bab):
-    path = DATA / "challenges" / f"bab-{bab:02d}.json"
+def cek_challenge(cid, bab):
+    path = KULIAH / cid / "challenges" / f"bab-{bab:02d}.json"
     if not path.exists():
-        err(f"bab {bab} bertanda challenge tetapi {path.name} tidak ada")
+        err(f"kuliah/{cid}: bab {bab} bertanda challenge tetapi {path.name} tidak ada")
         return
     ch = load(path)
     if ch is None:
         return
-    w = path.name
+    w = f"kuliah/{cid}/challenges/{path.name}"
     if ch.get("bab") != bab:
         err(f"{w}: kolom 'bab' harus {bab}")
     for k in ("judul", "soal", "starter", "petunjuk", "tests"):
@@ -87,8 +150,8 @@ def cek_challenge(bab):
 
 
 def main():
-    for bab in sorted(cek_materi()):
-        cek_challenge(bab)
+    for c in cek_daftar_matakuliah():
+        cek_materi(c)
     if errors:
         print("Ditemukan masalah pada isi:")
         for e in errors:

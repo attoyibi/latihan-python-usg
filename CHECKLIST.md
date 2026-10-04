@@ -80,6 +80,27 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 - [ ] Penayangan sungguhan di Vercel/Cloudflare belum dicoba (pengaturan oleh pemilik); setelan `vercel.json` belum diuji di Vercel
 - [ ] Cabang `dev` untuk pratinjau (belum dibuat)
 
+## Tahap M: Banyak mata kuliah (4 Okt 2026)
+
+Satu situs memuat banyak mata kuliah (kode maupun tanpa kode). Sekarang ada dua: Algoritma Python (aktif) dan PBO Java (tempat dan database siap, materi belum).
+
+- [x] Data per mata kuliah: `site/data/matakuliah.json` dan `site/data/kuliah/<id>/{materi.json, challenges/}`
+- [x] Pemilih mata kuliah (beranda dan menu Mata kuliah): kartu dengan progres, "Segera hadir" untuk yang belum aktif
+- [x] Alamat per mata kuliah: `#k/<id>` dan `#k/<id>/bab-N`; tautan lama `#bab-N` dan `#materi` dialihkan
+- [x] Progres terpisah per mata kuliah (kunci `done:<id>:<bab>`), "mata kuliah terakhir" diingat per akun
+- [x] Sidebar menampilkan mata kuliah aktif dan tautan "Ganti mata kuliah"
+- [x] Bahasa per mata kuliah: sorotan sintaks (Python, Java), starter bebas per bahasa, penjalan hanya bila didukung (Java: tombol dinonaktifkan dengan keterangan)
+- [x] Migrasi `0003_matakuliah.sql`: tabel `matakuliah`, kolom `matakuliah_id` di lima tabel, kunci unik per mata kuliah, tampilan `rekap_progres` diperbarui, data lama dipindah ke `algoritma-python`
+- [x] `tools/uji_sql`: 0001 sampai 0003 dijalankan di PostgreSQL sungguhan (PGlite) beserta 68 uji keamanan; terbukti peka (7 uji gagal saat aturan sengaja dirusak); masuk CI
+- [x] `tools/kuliah_baru.py`: membuat kerangka mata kuliah dan mencetak SQL pendaftarannya
+- [x] `tools/validasi_konten.py` dan `tools/uji_kunci.py` memahami banyak mata kuliah
+- [x] `docs/MENAMBAH-MATAKULIAH.md`; dokumen lain diperbarui
+- [ ] **Mesin penjalan Java belum dipilih** (CheerpJ, server eksekusi sendiri, atau layanan berbayar). Riset ulang saat tahap ini dimulai karena kebijakan layanan gratis sering berubah
+- [ ] Isi PBO Java: bab, video, soal, kunci (oleh pemilik; alat dan panduan sudah ada)
+- [ ] Putuskan: kelas per mata kuliah (sekarang satu data diri untuk semua) dan instruktur per mata kuliah (sekarang satu peran instruktur global)
+- [ ] Mata kuliah tanpa kode: unggah berkas (bergantung Tahap 7)
+- [ ] Jalankan `0003` di proyek Supabase sungguhan
+
 ## Tahap 1: Kerangka dan prototipe Bab 4
 
 Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis kode, jalankan, kirim, dapat hasil). Belum ada login atau database. Status sementara disimpan di browser.
@@ -125,8 +146,8 @@ Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis k
 ## Tahap 3: Data awal dan Supabase
 
 - [ ] Proyek Supabase dibuat oleh Anda (lihat daftar tunggu)
-- [~] Skema tabel ditulis (`supabase/migrations`), belum dijalankan di Supabase sungguhan
-- [~] Row Level Security ditulis, belum diuji di database sungguhan
+- [~] Skema tabel ditulis (`supabase/migrations`) dan diuji di PostgreSQL sungguhan (PGlite); belum dijalankan di Supabase sungguhan
+- [~] Row Level Security ditulis dan diuji di PostgreSQL sungguhan (peserta, peserta lain, instruktur, pengunjung); belum diuji di Supabase sungguhan
 - [x] Halaman data awal: nama, NIM, kelas (wajib diisi sebelum mengerjakan; validasi; NIM kembar ditolak; bisa diubah di #profil). Diuji dengan klien tiruan
 - [x] Masuk dengan kode 6 digit lewat email (atau tautan), tanpa kata sandi; kirim ulang dengan jeda 60 detik; sesi bertahan setelah muat ulang. Diuji dengan klien tiruan; **belum dengan Supabase sungguhan**
 - [ ] Progres dipindah dari browser ke Supabase (sementara: browser, dipisah per akun)
@@ -205,3 +226,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (7): Masuk dan data awal.** Ditambahkan `site/js/auth.js` dan layar masuk/data awal di `app.js`. Tanpa konfigurasi Supabase situs tetap berjalan mode lokal. Diuji dengan klien tiruan (`tools/klien-tiruan.js`): belum masuk -> masuk -> kode salah/benar -> wajib isi data -> validasi -> NIM kembar -> simpan -> keluar -> pengguna kedua tidak melihat progres pengguna pertama. Peringatan penting untuk Anda: SMTP bawaan Supabase terlalu terbatas untuk 80 peserta, pasang SMTP sendiri; dan edit dua templat email agar memuat `{{ .Token }}`. Berikutnya: sinkron progres ke Supabase (Tahap 3 lanjutan) atau Tahap 2 (laporan).
 - **4 Okt 2026 (8): Wajib login dan halaman Profil.** Login kini wajib juga saat Supabase belum dikonfigurasi (layar pemasangan; jalan pintas hanya `MODE_LOKAL: true`). Ditambah menu Profil dengan avatar inisial, email, ringkasan, dan formulir ubah nama/NIM/kelas. Diuji: akses bab lewat alamat langsung sebelum data awal ditolak; ubah ketiga data tersimpan; validasi NIM. Catatan uji: peramban menyimpan cache berkas statis, jadi muat ulang paksa setelah mengubah kode.
 - **4 Okt 2026 (9): Fork dan penayangan.** Konfigurasi Supabase kini diisi lewat environment variable saat build, bukan mengedit berkas, sehingga fork tidak bentrok saat Sync. Skrip menolak kunci `service_role` (diuji 14 kasus). Belum diuji di Vercel sungguhan.
+- **4 Okt 2026 (10): Banyak mata kuliah.** Situs kini memuat banyak mata kuliah; progres, rute, dan database terpisah per mata kuliah. Algoritma Python aktif; PBO Java hanya tempat (tombol jalankan nonaktif; mesin Java belum dipilih). SQL diuji di PGlite (68 uji, termasuk uji sengaja-rusak). Diuji di browser dengan login tiruan: pemilih, rute, tautan lama, bab tak dikenal, progres terpisah, dan mode Java dengan data uji sementara (sudah dikembalikan). Yang belum: Supabase sungguhan, mesin Java, isi Java. Catatan: pesan 404 Vercel dari sesi sebelumnya belum terjawab (menunggu alamat atau setelan dari pemilik).

@@ -33,8 +33,14 @@ export function start() {
   if (!worker) spawn();
 }
 
+// Bahasa yang sudah punya penjalan. Bahasa lain (mis. Java) ditambahkan di sini bila mesinnya sudah dipilih.
+export const supports = (lang) => lang === "python";
+
 // Menjalankan kode. echo=true menampilkan teks prompt dan masukan di keluaran (mode coba bebas).
-export async function run(code, inputs, echo) {
+export async function run(code, inputs, echo, lang = "python") {
+  if (!supports(lang)) {
+    return { timeout: false, stdout: "", error: "Penjalan kode untuk bahasa " + lang + " belum tersedia." };
+  }
   start();
   await readyPromise;
   const w = worker;
