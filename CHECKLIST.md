@@ -35,7 +35,7 @@ Penanda: `[x]` selesai dan sudah diuji, `[~]` sedang dikerjakan atau sebagian, `
 
 ## Menunggu keputusan atau tindakan Anda
 
-- [x] Cara masuk peserta: kode email (6 digit) lewat Supabase, dengan tautan sebagai cadangan
+- [x] Cara masuk peserta: **tautan email** lewat Supabase (tanpa kode yang diketik). Diganti dari kode 6 digit pada 4 Okt 2026 atas permintaan pemilik
 - [ ] Membuat proyek Supabase dan memberi saya URL serta anon key. Kunci anon memang dirancang publik, tetapi jangan kirim `service_role` key. (Tahap 3)
 - [ ] Memutuskan tempat hosting: Netlify, Vercel, atau GitHub Pages. (Tahap 8)
 - [ ] Meninjau soal, test case, dan pertanyaan konsep tiap bab. (Tahap 6)
@@ -79,6 +79,19 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 - [x] `docs/PEMASANGAN.md` ditulis ulang (fork sampai tayang) dan `docs/MEMPERBARUI.md`
 - [ ] Penayangan sungguhan di Vercel/Cloudflare belum dicoba (pengaturan oleh pemilik); setelan `vercel.json` belum diuji di Vercel
 - [ ] Cabang `dev` untuk pratinjau (belum dibuat)
+
+## Tahap L: Landing publik dan masuk lewat tautan (4 Okt 2026)
+
+- [x] Halaman depan publik statis: hero, daftar mata kuliah yang tersedia, cara kerja; tanpa login; Pyodide tidak dimuat untuk pengunjung
+- [x] Masuk baru diminta saat memilih mata kuliah (atau menekan Masuk); mata kuliah pilihan diingat dan dibuka setelah masuk (juga setelah kembali dari tautan email yang membuka alamat tanpa #)
+- [x] Masuk hanya lewat tautan email: layar "Cek emailmu" dengan kirim ulang (jeda 60 detik) dan ganti email; lanjut sendiri bila tautan dibuka di browser yang sama
+- [x] Tautan kedaluwarsa atau sudah dipakai: pesan yang jelas, bukan layar kosong
+- [x] Pengguna baru: tautan, data awal (nama, NIM, kelas), langsung ke mata kuliah pilihan. Pengguna lama: langsung ke Dashboard
+- [x] Keluar kembali ke halaman depan; halaman bab dan Profil tertutup tanpa login (juga lewat alamat langsung)
+- [x] Panduan, Mata kuliah, dan landing terbuka tanpa login; tombol Masuk di header untuk pengunjung
+- [x] Server uji (`tools/server_uji.py`) kini meniru email: kotak "Email tiruan" dengan tombol klik tautan (termasuk simulasi tautan kedaluwarsa dan batas email)
+- [ ] **Uji dengan email kampus sungguhan**: pemindai keamanan email dapat menghabiskan tautan sekali pakai sebelum peserta mengkliknya. Bila terjadi, aktifkan kembali cadangan kode angka
+- [ ] Redirect URL dan Site URL di Supabase harus diisi alamat situs (kini wajib)
 
 ## Tahap M: Banyak mata kuliah (4 Okt 2026)
 
@@ -151,7 +164,7 @@ Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis k
 - [~] Skema tabel ditulis (`supabase/migrations`) dan diuji di PostgreSQL sungguhan (PGlite); belum dijalankan di Supabase sungguhan
 - [~] Row Level Security ditulis dan diuji di PostgreSQL sungguhan (peserta, peserta lain, instruktur, pengunjung); belum diuji di Supabase sungguhan
 - [x] Halaman data awal: nama, NIM, kelas (wajib diisi sebelum mengerjakan; validasi; NIM kembar ditolak; bisa diubah di #profil). Diuji dengan klien tiruan
-- [x] Masuk dengan kode 6 digit lewat email (atau tautan), tanpa kata sandi; kirim ulang dengan jeda 60 detik; sesi bertahan setelah muat ulang. Diuji dengan klien tiruan; **belum dengan Supabase sungguhan**
+- [x] Masuk lewat tautan email, tanpa kata sandi; kirim ulang dengan jeda 60 detik; sesi bertahan setelah muat ulang. Diuji dengan klien tiruan; **belum dengan Supabase sungguhan**
 - [ ] Progres dipindah dari browser ke Supabase (sementara: browser, dipisah per akun)
 - [ ] Laporan tersimpan di Supabase
 - [ ] Uji dua akun berbeda tidak saling melihat data
@@ -230,3 +243,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (9): Fork dan penayangan.** Konfigurasi Supabase kini diisi lewat environment variable saat build, bukan mengedit berkas, sehingga fork tidak bentrok saat Sync. Skrip menolak kunci `service_role` (diuji 14 kasus). Belum diuji di Vercel sungguhan.
 - **4 Okt 2026 (10): Banyak mata kuliah.** Situs kini memuat banyak mata kuliah; progres, rute, dan database terpisah per mata kuliah. Algoritma Python aktif; PBO Java hanya tempat (tombol jalankan nonaktif; mesin Java belum dipilih). SQL diuji di PGlite (68 uji, termasuk uji sengaja-rusak). Diuji di browser dengan login tiruan: pemilih, rute, tautan lama, bab tak dikenal, progres terpisah, dan mode Java dengan data uji sementara (sudah dikembalikan). Yang belum: Supabase sungguhan, mesin Java, isi Java. Catatan: pesan 404 Vercel dari sesi sebelumnya belum terjawab (menunggu alamat atau setelan dari pemilik).
 - **4 Okt 2026 (11): Dashboard per mata kuliah.** Dashboard menampilkan pilihan mata kuliah dengan progres per mata kuliah; semua keterangan "bab selesai" disesuaikan (kartu, halaman mata kuliah, sidebar, Profil, Panduan). Tafsiran dari permintaan: "dashboard bab" = layar utama yang tadinya daftar bab. Bila yang dimaksud sidebar di halaman bab, itu belum diubah (sidebar tetap daftar bab dari mata kuliah yang sedang dibuka, dengan tautan Ganti mata kuliah).
+- **4 Okt 2026 (12): Landing publik dan masuk lewat tautan.** Pengunjung pertama kini melihat halaman depan statis (bukan form login); masuk diminta saat memilih mata kuliah; masuk hanya lewat tautan email (kode angka dihapus); mata kuliah pilihan diingat sepanjang alur. Diuji di browser dengan klien tiruan: kunjungan pertama, pilih mata kuliah, tautan, data awal, langsung ke mata kuliah (dengan alamat kosong seperti tautan asli), keluar, pengguna lama, #masuk saat login, tautan kedaluwarsa, halaman privat tanpa login, dan situs tanpa konfigurasi. Belum diuji dengan Supabase sungguhan dan email sungguhan.

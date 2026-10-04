@@ -21,11 +21,11 @@ Proyek sedang dibangun bertahap. Daftar lengkapnya ada di [CHECKLIST.md](CHECKLI
 | Python di browser (Pyodide), batas waktu 5 detik | |
 | Penilaian otomatis dengan kasus uji tersembunyi | Penyimpanan progres di Supabase (progres masih di browser) |
 | Tiga penanda status bab, tanpa kunci | Log aktivitas, dashboard instruktur, unggah tugas Bab 3 |
-| Wajib masuk (kode email) dan isi data awal sebelum bab; halaman Profil untuk mengubah nama, NIM, kelas. Diuji dengan klien tiruan, belum dengan Supabase sungguhan | |
+| Halaman depan publik (landing); masuk lewat tautan email baru diminta saat memilih mata kuliah; data awal (nama, NIM, kelas) sekali; halaman Profil. Diuji dengan klien tiruan, belum dengan Supabase sungguhan | |
 | Video bantuan per bab (YouTube) | |
 | Skema database Supabase dan aturan keamanannya, diuji di PostgreSQL sungguhan lewat PGlite (belum di proyek Supabase sungguhan) | |
 
-Peserta **wajib masuk** dulu dan mengisi data awal (nama, NIM, kelas) sebelum membuka bab; data bisa diubah di halaman Profil. Bila Supabase belum dikonfigurasi, situs menampilkan layar pemasangan.
+Halaman depan terbuka untuk siapa saja. Peserta baru diminta **masuk lewat tautan email** saat memilih mata kuliah, lalu mengisi data awal (nama, NIM, kelas) satu kali; data bisa diubah di halaman Profil. Bila Supabase belum dikonfigurasi, memilih mata kuliah menampilkan layar pemasangan.
 
 ## Memakai untuk kelasmu
 
@@ -50,7 +50,7 @@ cd site
 python -m http.server 8000
 ```
 
-Buka `http://localhost:8000`. Tanpa Supabase situs akan meminta pemasangan; untuk mencoba alur masuk dengan login tiruan jalankan `python tools/server_uji.py` (dari akar repositori) lalu buka `http://127.0.0.1:8124`, kode login `123456`.
+Buka `http://localhost:8000`. Tanpa Supabase situs akan meminta pemasangan; untuk mencoba alur masuk dengan login tiruan jalankan `python tools/server_uji.py` (dari akar repositori) lalu buka `http://127.0.0.1:8124`; tombol di kotak "Email tiruan" meniru klik tautan di email.
 
 ## Struktur
 

@@ -93,7 +93,8 @@ export async function init() {
   });
 }
 
-export async function sendCode(email) {
+// Mengirim tautan masuk ke email. Peserta cukup membuka tautannya; tidak ada kode yang diketik.
+export async function sendLink(email) {
   const { error } = await client.auth.signInWithOtp({
     email: email.trim(),
     options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname },
@@ -101,10 +102,19 @@ export async function sendCode(email) {
   if (error) throw new Error(friendly(error));
 }
 
-export async function verifyCode(email, code) {
-  const { error } = await client.auth.verifyOtp({ email: email.trim(), token: code.replace(/\s+/g, ""), type: "email" });
-  if (error) throw new Error(friendly(error));
+// Membaca galat yang dibawa tautan email (mis. tautan kedaluwarsa atau sudah dipakai).
+// Harus dipanggil SEBELUM init(), karena pustaka Supabase menghapus bagian setelah # dari alamat.
+export function galatDariUrl() {
+  const h = location.hash || "";
+  if (!/(^#|&)(error|error_code)=/.test(h)) return null;
+  const p = new URLSearchParams(h.replace(/^#/, ""));
+  const teks = (p.get("error_code") || "") + " " + (p.get("error_description") || "") + " " + (p.get("error") || "");
+  if (/expired|otp_expired/i.test(teks)) return "Tautan masuk sudah kedaluwarsa atau sudah dipakai. Minta tautan baru.";
+  return "Tautan masuk tidak valid. Minta tautan baru.";
 }
+
+// Benar bila alamat saat ini adalah hasil klik tautan email (membawa token masuk).
+export const dariTautanEmail = () => /(^#|&)access_token=/.test(location.hash || "");
 
 export async function saveProfile(p) {
   const uid = getUserId();

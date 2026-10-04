@@ -356,3 +356,10 @@ Tahap 2 (Supabase) harus merancang tabel log sejak awal, karena data yang tidak 
 - **Database:** tabel `matakuliah`; migrasi `0003` bersifat aditif dan memindahkan data lama ke `algoritma-python`. Menambah mata kuliah = satu baris `insert` (dicetak oleh `tools/kuliah_baru.py`).
 - **Java:** tempat sudah ada; yang belum ada adalah mesin yang menjalankan kode Java. Python dijalankan di browser lewat Pyodide, Java butuh pilihan lain (JVM di browser, server eksekusi sendiri, atau layanan berbayar). Keputusan ditunda dan perlu riset ulang pada saat itu.
 - **Belum diputuskan:** kelas per mata kuliah (sekarang satu data diri), instruktur per mata kuliah (sekarang satu peran global), dan unggah berkas untuk mata kuliah tanpa kode.
+
+## 17. Landing publik dan masuk lewat tautan (diputuskan 4 Oktober 2026)
+
+- **Kunjungan pertama tidak dipaksa masuk.** Halaman depan publik dan statis menampilkan mata kuliah yang tersedia. Masuk baru diminta saat peserta memilih mata kuliah.
+- **Masuk hanya lewat tautan email** (magic link), tanpa kode yang diketik. Mata kuliah yang dipilih diingat dan dibuka setelah masuk.
+- **Risiko yang dicatat:** pemindai keamanan email (mis. Safe Links) bisa membuka tautan sekali pakai lebih dulu sehingga peserta melihat "kedaluwarsa". Perlu diuji dengan email kampus yang dipakai peserta; cadangannya adalah mengembalikan kode angka.
+- **Hemat unduhan:** mesin Python (sekitar 10 MB) hanya dimuat untuk peserta yang sudah masuk.

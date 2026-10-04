@@ -398,7 +398,7 @@ function progressBar(done, total, label) {
   return h("div", { class: "pbar", role: "progressbar", "aria-valuenow": String(done), "aria-valuemin": "0", "aria-valuemax": String(total), "aria-label": label }, h("i", { style: "width:" + pct + "%" }));
 }
 
-function courseCard(c) {
+function courseCard(c, publik) {
   const { total, done } = courseProgress(c);
   const ready = c.aktif && total > 0;
   const bahasa = c.bahasa ? LANG_LABEL[c.bahasa] || c.bahasa : "Tanpa kode";
@@ -408,19 +408,74 @@ function courseCard(c) {
     h("span", { class: "num" }, ready ? total + " BAB" : "SEGERA HADIR"),
     h("strong", {}, c.nama),
     h("span", { class: "muted" }, c.deskripsi || ""),
-    h("div", { class: "course-meta" }, h("span", { class: "badge" }, bahasa), ready ? h("span", { class: "muted" }, done + " dari " + total + " bab selesai") : h("span", { class: "badge lain" }, "Sedang disiapkan")),
-    ready ? progressBar(done, total, "Bab selesai di " + c.nama) : null
+    h("div", { class: "course-meta" }, h("span", { class: "badge" }, bahasa), ready ? h("span", { class: "muted" }, publik ? "Masuk untuk mulai" : done + " dari " + total + " bab selesai") : h("span", { class: "badge lain" }, "Sedang disiapkan")),
+    ready && !publik ? progressBar(done, total, "Bab selesai di " + c.nama) : null
   );
   if (!ready) return h("div", { class: "course-card disabled", "aria-disabled": "true" }, body);
   return h("a", { class: "course-card", href: "#k/" + c.id }, body);
 }
 
-function courseGrid() {
+function courseGrid(publik) {
   const list = COURSES.slice().sort((a, b) => (a.urutan || 100) - (b.urutan || 100));
-  return h("div", { class: "grid courses" }, list.map((c) => courseCard(COURSE_CACHE[c.id] || Object.assign({ materi: [] }, c))));
+  return h("div", { class: "grid courses" }, list.map((c) => courseCard(COURSE_CACHE[c.id] || Object.assign({ materi: [] }, c), publik)));
 }
 
 function renderBeranda() {
+  if (Auth.localMode() || (Auth.enabled() && Auth.getUserId())) renderDashboard();
+  else renderLanding();
+}
+
+// Halaman depan publik: bisa dilihat tanpa masuk. Masuk baru diminta saat memilih mata kuliah.
+function renderLanding() {
+  const aktif = Object.values(COURSE_CACHE).filter((c) => c.aktif && c.materi.length);
+  const totalBab = aktif.reduce((n, c) => n + c.materi.length, 0);
+  const code = h("pre", {});
+  code.innerHTML = [
+    '<span class="c"># Selamat datang</span>',
+    '<span class="k">for</span> kuliah <span class="k">in</span> daftar_kuliah:',
+    '    <span class="k">if</span> kuliah.aktif:',
+    '        print(<span class="s">"Siap dikerjakan:"</span>, kuliah.nama)',
+    '    <span class="k">else</span>:',
+    '        print(<span class="s">"Segera hadir:"</span>, kuliah.nama)',
+  ].join("\n");
+  const langkah = (n, judul, teks) => h("div", { class: "step" }, h("span", { class: "step-no" }, n), h("strong", {}, judul), h("span", { class: "muted" }, teks));
+  $("#main").replaceChildren(
+    h(
+      "section",
+      { class: "hero" },
+      h(
+        "div",
+        {},
+        h("span", { class: "pill" }, h("i", {}), "Gratis dan tanpa instal", h("b", {}, "Bisa dari ponsel")),
+        h("h1", {}, "Belajar langsung,", h("br"), h("span", { class: "grad" }, "sampai bisa ngoding")),
+        h("p", { class: "lead" }, "Pilih mata kuliahmu, tulis kode langsung di browser dan lihat hasilnya saat itu juga, lalu kerjakan laporan singkat. Kamu baru diminta masuk saat mulai mengerjakan."),
+        h("div", { class: "cta" }, h("a", { class: "btn btn-primary", href: "#kuliah" }, "Lihat mata kuliah"), h("a", { class: "btn", href: "#panduan" }, "Cara memakai")),
+        h("div", { class: "stats" }, h("div", {}, h("small", {}, "Mata kuliah"), h("strong", {}, String(aktif.length))), h("div", {}, h("small", {}, "Bab latihan"), h("strong", {}, String(totalBab))), h("div", {}, h("small", {}, "Biaya"), h("strong", {}, "Gratis")))
+      ),
+      h(
+        "div",
+        { class: "stage" },
+        h("div", { class: "codewin", "aria-hidden": "true" }, h("div", { class: "dots" }, h("i", { style: "background:#ff6159" }), h("i", { style: "background:#ffbd2e" }), h("i", { style: "background:#28c840" })), code),
+        h("div", { class: "float-card fc1" }, h("span", { class: "ic" }, String(aktif.length)), h("div", {}, h("b", {}, "Mata kuliah"), h("small", {}, "Pilih yang kamu ambil"))),
+        h("div", { class: "float-card fc2" }, h("span", { class: "ic" }, "PDF"), h("div", {}, h("b", {}, "Laporan praktikum"), h("small", {}, "Ditulis dengan bahasamu sendiri"))),
+        h("div", { class: "float-card fc3" }, h("span", { class: "ic" }, "5s"), h("div", {}, h("b", {}, "Aman dicoba"), h("small", {}, "Program macet berhenti sendiri")))
+      )
+    ),
+    h("div", { class: "section-title", id: "daftar" }, h("h2", {}, "Mata kuliah yang tersedia")),
+    h("p", { class: "free-note" }, "Pilih salah satu untuk mulai. Kamu akan diminta masuk lewat email, lalu langsung diarahkan ke mata kuliah yang kamu pilih."),
+    courseGrid(true),
+    h("div", { class: "section-title" }, h("h2", {}, "Cara kerjanya")),
+    h(
+      "div",
+      { class: "steps" },
+      langkah("1", "Pilih mata kuliah", "Lihat daftar di atas. Bab bebas dikerjakan dalam urutan apa pun."),
+      langkah("2", "Masuk lewat email", "Kami kirim tautan masuk ke emailmu. Tanpa kata sandi. Isi nama, NIM, dan kelas satu kali."),
+      langkah("3", "Kerjakan dan laporkan", "Tulis kode, jalankan, kirim jawaban, lalu tulis laporan singkat dengan bahasamu sendiri.")
+    )
+  );
+}
+
+function renderDashboard() {
   const cs = Object.values(COURSE_CACHE);
   const aktif = cs.filter((c) => c.aktif && c.materi.length).length;
   const { done, total } = allProgress();
@@ -469,11 +524,11 @@ function renderBeranda() {
   );
 }
 
-function renderKuliah() {
+function renderKuliah(publik) {
   $("#main").replaceChildren(
     h("div", { class: "section-title" }, h("h2", {}, "Mata kuliah")),
-    h("p", { class: "free-note" }, "Pilih mata kuliah yang kamu ambil. Progresmu dicatat terpisah untuk tiap mata kuliah."),
-    courseGrid()
+    h("p", { class: "free-note" }, publik ? "Pilih mata kuliah untuk mulai. Kamu akan diminta masuk lewat email." : "Pilih mata kuliah yang kamu ambil. Progresmu dicatat terpisah untuk tiap mata kuliah."),
+    courseGrid(publik)
   );
 }
 
@@ -508,7 +563,7 @@ function renderPanduan() {
       "section",
       { class: "card" },
       h("h2", {}, "Cara memakai"),
-      h("ol", {}, li("Pilih mata kuliah, lalu pilih bab dari daftar. Urutannya bebas, tidak ada yang terkunci."), li("Baca ringkasan, lalu tonton video bantuan kalau perlu. Video tidak wajib."), li("Bab selesai dihitung terpisah untuk tiap mata kuliah. Kamu bisa berpindah mata kuliah kapan saja lewat menu Mata kuliah."), li("Kerjakan tantangan di editor. Tombol Jalankan mencoba kodemu; tombol Kirim jawaban menilai dengan beberapa kasus uji."), li("Kalau semua kasus cocok, bab ditandai selesai dan laporan terbuka."), li("Kalau macet, buka petunjuk satu per satu: soal, bagian buku, lalu video.")),
+      h("ol", {}, li("Pilih mata kuliah. Saat mulai, masuk lewat tautan yang dikirim ke emailmu (tanpa kata sandi), lalu isi nama, NIM, dan kelas satu kali."), li("Pilih bab dari daftar. Urutannya bebas, tidak ada yang terkunci."), li("Baca ringkasan, lalu tonton video bantuan kalau perlu. Video tidak wajib."), li("Bab selesai dihitung terpisah untuk tiap mata kuliah. Kamu bisa berpindah mata kuliah kapan saja lewat menu Mata kuliah."), li("Kerjakan tantangan di editor. Tombol Jalankan mencoba kodemu; tombol Kirim jawaban menilai dengan beberapa kasus uji."), li("Kalau semua kasus cocok, bab ditandai selesai dan laporan terbuka."), li("Kalau macet, buka petunjuk satu per satu: soal, bagian buku, lalu video.")),
       h("h3", { style: "margin-top:16px" }, "Arti penanda"),
       h("div", { class: "legend", style: "border:0;margin:0;padding:0" }, h("div", {}, h("span", { class: "st" }), "Belum dikerjakan"), h("div", {}, h("span", { class: "st sedang" }), "Sedang dikerjakan: sudah mengetik atau menjalankan, belum lulus"), h("div", {}, h("span", { class: "st selesai" }), "Selesai: tantangan lulus")),
       h("h3", { style: "margin-top:16px" }, "Catatan"),
@@ -533,30 +588,36 @@ function renderLoading() {
   $("#main").replaceChildren(gateCard("Memeriksa sesi", "Sebentar."));
 }
 
-function renderLogin() {
+let PESAN_LOGIN = "";
+
+function renderLogin(konteks) {
   let email = "";
   let cooldown = null;
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const f = field("email", "Alamat email", { type: "email", autocomplete: "email", inputmode: "email", placeholder: "nama@email.com", required: "" });
-  const sendBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Kirim kode masuk");
-  const form = h("form", { novalidate: "" }, f.node, h("div", { class: "actions" }, sendBtn), msg);
+  const sendBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Kirim tautan masuk");
+  const kembali = h("a", { class: "btn btn-ghost", href: "#kuliah" }, "Lihat mata kuliah");
+  const form = h("form", { novalidate: "" }, f.node, h("div", { class: "actions" }, sendBtn, kembali), msg);
 
-  const codeF = field("kode", "Kode 6 digit dari email", { inputmode: "numeric", autocomplete: "one-time-code", maxlength: "8", placeholder: "123456" });
-  const verifyBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Masuk");
-  const resendBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Kirim ulang kode");
+  const judul = konteks ? "Masuk untuk membuka " + konteks : "Masuk";
+  const lead = "Masukkan emailmu. Kami mengirim tautan masuk; klik tautannya untuk masuk. Tidak perlu kata sandi dan tidak ada kode yang diketik.";
+  const galat = PESAN_LOGIN;
+  PESAN_LOGIN = "";
+  const card = gateCard(judul, lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form);
+
+  const resendBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Kirim ulang tautan");
   const changeBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Ganti email");
-  const codeMsg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
-  const codeForm = h("form", { novalidate: "" }, codeF.node, h("div", { class: "actions" }, verifyBtn, resendBtn, changeBtn), codeMsg);
-
-  const card = gateCard("Masuk untuk mulai", "Kami mengirim kode masuk ke emailmu. Tidak perlu kata sandi. Kamu juga bisa membuka tautan di email yang sama.", form);
+  const infoMsg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const infoErr = h("p", { class: "field-err", role: "alert" });
 
   function startCooldown() {
     let s = 60;
     resendBtn.disabled = true;
+    resendBtn.textContent = "Kirim ulang (" + s + ")";
     clearInterval(cooldown);
     cooldown = setInterval(() => {
       s--;
-      resendBtn.textContent = s > 0 ? "Kirim ulang (" + s + ")" : "Kirim ulang kode";
+      resendBtn.textContent = s > 0 ? "Kirim ulang (" + s + ")" : "Kirim ulang tautan";
       if (s <= 0) {
         resendBtn.disabled = false;
         clearInterval(cooldown);
@@ -564,69 +625,52 @@ function renderLogin() {
     }, 1000);
   }
 
-  async function send() {
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
     f.err.textContent = "";
     email = f.input.value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       f.err.textContent = "Tulis alamat email yang benar.";
-      return false;
+      return;
     }
     sendBtn.disabled = true;
-    msg.textContent = "Mengirim kode";
+    msg.textContent = "Mengirim tautan";
     try {
-      await Auth.sendCode(email);
-      return true;
+      await Auth.sendLink(email);
+      card.replaceChildren(
+        h("h2", {}, "Cek emailmu"),
+        h("p", {}, "Tautan masuk dikirim ke ", h("strong", {}, email), "."),
+        h("ol", { class: "steps-list" }, h("li", {}, "Buka emailmu dan klik tautan di dalamnya."), h("li", {}, "Kamu langsung masuk dan diarahkan kembali ke sini."), h("li", {}, "Tidak ketemu? Periksa folder spam atau promosi.")),
+        h("p", { class: "muted" }, "Tautan hanya berlaku satu kali. Kalau kamu membukanya di browser yang sama dengan halaman ini, halaman ini lanjut sendiri."),
+        h("div", { class: "actions" }, resendBtn, changeBtn),
+        infoMsg,
+        infoErr
+      );
+      startCooldown();
     } catch (e) {
       msg.textContent = "";
       f.err.textContent = e.message;
-      return false;
     } finally {
       sendBtn.disabled = false;
     }
-  }
-
-  form.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    if (await send()) {
-      card.replaceChildren(h("h2", {}, "Cek emailmu"), h("p", { class: "muted" }, "Kode dikirim ke " + email + ". Masukkan kodenya di bawah, atau buka tautan di email. Kalau tidak ada, periksa folder spam."), codeForm);
-      codeF.input.focus();
-      startCooldown();
-    }
-  });
-  codeForm.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    codeF.err.textContent = "";
-    const code = codeF.input.value.replace(/\s+/g, "");
-    if (code.length < 6) {
-      codeF.err.textContent = "Kode terdiri dari 6 digit atau lebih.";
-      return;
-    }
-    verifyBtn.disabled = true;
-    codeMsg.textContent = "Memeriksa kode";
-    try {
-      await Auth.verifyCode(email, code);
-      codeMsg.textContent = "Berhasil masuk.";
-    } catch (e) {
-      codeMsg.textContent = "";
-      codeF.err.textContent = e.message;
-    } finally {
-      verifyBtn.disabled = false;
-    }
   });
   resendBtn.addEventListener("click", async () => {
-    codeF.err.textContent = "";
+    infoErr.textContent = "";
+    resendBtn.disabled = true;
     try {
-      await Auth.sendCode(email);
-      codeMsg.textContent = "Kode baru dikirim.";
+      await Auth.sendLink(email);
+      infoMsg.textContent = "Tautan baru dikirim. Gunakan tautan terbaru.";
       startCooldown();
     } catch (e) {
-      codeF.err.textContent = e.message;
+      infoMsg.textContent = "";
+      infoErr.textContent = e.message;
+      resendBtn.disabled = false;
     }
   });
   changeBtn.addEventListener("click", () => {
     clearInterval(cooldown);
     msg.textContent = "";
-    card.replaceChildren(h("h2", {}, "Masuk untuk mulai"), h("p", { class: "muted" }, "Kami mengirim kode masuk ke emailmu. Tidak perlu kata sandi."), form);
+    card.replaceChildren(h("h2", {}, judul), h("p", { class: "muted" }, lead), form);
     f.input.focus();
   });
   $("#main").replaceChildren(card);
@@ -645,7 +689,7 @@ function renderProfilForm() {
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan dan mulai");
   const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
-  outBtn.addEventListener("click", () => Auth.signOut());
+  outBtn.addEventListener("click", keluar);
   const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, outBtn), msg);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
@@ -689,7 +733,7 @@ function renderProfil() {
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan perubahan");
   const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
-  outBtn.addEventListener("click", () => Auth.signOut());
+  outBtn.addEventListener("click", keluar);
   const head = h(
     "div",
     { class: "prof-head" },
@@ -747,7 +791,7 @@ function renderSetup() {
         "ol",
         {},
         li("Ikuti langkah di docs/PEMASANGAN.md, lalu isi SUPABASE_URL dan SUPABASE_ANON_KEY di site/config.js."),
-        li("Untuk mencoba tanpa Supabase: jalankan python tools/server_uji.py (login tiruan, kode 123456)."),
+        li("Untuk mencoba tanpa Supabase: jalankan python tools/server_uji.py (login tiruan: kotak Email tiruan dengan tombol Klik tautan di email)."),
         li("Untuk melihat tampilan tanpa akun sama sekali: ubah MODE_LOKAL menjadi true di site/config.js.")
       )
     )
@@ -765,12 +809,14 @@ function updateUserBar() {
   $("#userChip").hidden = !on;
   $("#logoutBtn").hidden = !on;
   $("#navProfil").hidden = !on;
+  $("#loginBtn").hidden = !(Auth.enabled() && !Auth.getUserId());
+  $("#navHome").textContent = Auth.localMode() || on ? "Dashboard" : "Beranda";
   if (on) $("#userChip").textContent = Auth.getProfile().nama;
 }
 
-function afterAuthChange(goto) {
+function afterAuthChange(fallback) {
   NS = Auth.enabled() ? Auth.getUserId() || "lokal" : "lokal";
-  if (goto) location.hash = goto;
+  terapkanTujuan(fallback);
   route();
 }
 
@@ -788,36 +834,84 @@ function setPage(kind) {
 
 let routeTok = 0;
 
+const PUBLIK = ["", "#", "#beranda", "#kuliah", "#panduan"];
+const TUJUAN_KEY = "latihan:tujuan";
+const simpanTujuan = (h) => {
+  try {
+    localStorage.setItem(TUJUAN_KEY, h);
+  } catch (e) {}
+};
+const hapusTujuan = () => {
+  try {
+    localStorage.removeItem(TUJUAN_KEY);
+  } catch (e) {}
+};
+const ambilTujuan = () => {
+  try {
+    return localStorage.getItem(TUJUAN_KEY);
+  } catch (e) {
+    return null;
+  }
+};
+
+// Sesudah masuk (termasuk kembali dari tautan email, yang membuka alamat dasar tanpa #),
+// lanjutkan ke mata kuliah yang tadi dipilih. Tanpa tujuan, pakai `fallback` bila ada.
+function terapkanTujuan(fallback) {
+  if (!(Auth.getUserId() && Auth.getProfile())) return;
+  const h = location.hash;
+  const kosong = h === "" || h === "#" || h === "#masuk";
+  const t = ambilTujuan();
+  if (t) hapusTujuan();
+  const tujuan = t || fallback || null;
+  if (tujuan && kosong) history.replaceState(null, "", tujuan);
+}
+
+function namaTujuan(hash) {
+  const m = /^#k\/([a-z0-9-]+)/.exec(hash || "");
+  const c = m ? COURSES.find((x) => x.id === m[1]) : null;
+  return c ? c.nama : "";
+}
+
+// Keluar: kembali ke halaman depan (publik), bukan ke formulir masuk.
+async function keluar() {
+  await Auth.signOut();
+  hapusTujuan();
+  if (location.hash !== "#beranda") location.hash = "#beranda";
+  else route();
+}
+
 async function route() {
   const tok = ++routeTok;
   const stale = () => tok !== routeTok;
-  if (Auth.needsSetup()) {
+  const hash = location.hash;
+  const login = Auth.enabled() && !!Auth.getUserId();
+  const bisaMasuk = Auth.localMode() || login;
+
+  // Sudah masuk tetapi belum mengisi data diri: wajib diisi dulu, di halaman mana pun.
+  if (login && !Auth.getProfile()) {
     setPage("gate");
     updateUserBar();
-    renderSetup();
+    renderProfilForm();
     return;
   }
-  if (Auth.enabled()) {
-    if (!Auth.getUserId()) {
-      setPage("gate");
-      updateUserBar();
-      renderLogin();
-      return;
-    }
-    if (!Auth.getProfile()) {
-      setPage("gate");
-      updateUserBar();
-      renderProfilForm();
-      return;
-    }
-    NS = Auth.getUserId();
-  }
+  if (login) NS = Auth.getUserId();
   updateUserBar();
-  const hash = location.hash;
-  let m;
   $("#progressText").textContent = "";
-  $("#pyStatus").hidden = false;
+  $("#pyStatus").hidden = true;
 
+  if (hash === "#masuk") {
+    if (bisaMasuk) {
+      location.replace("#beranda");
+      return;
+    }
+    hapusTujuan();
+    setPage("gate");
+    if (Auth.needsSetup()) renderSetup();
+    else renderLogin();
+    return;
+  }
+
+  let m;
   // tautan lama: #bab-N menuju mata kuliah terakhir; #materi menuju daftar mata kuliah
   if ((m = /^#bab-(\d+)$/.exec(hash))) {
     location.replace("#k/" + lastCourseId() + "/bab-" + m[1]);
@@ -825,6 +919,19 @@ async function route() {
   }
   if (hash === "#materi") {
     location.replace("#kuliah");
+    return;
+  }
+
+  // Halaman publik (landing, daftar mata kuliah, panduan) terbuka tanpa masuk.
+  // Selain itu butuh masuk; tujuan diingat supaya setelah masuk langsung ke sana.
+  if (!PUBLIK.includes(hash) && !bisaMasuk) {
+    setPage("gate");
+    if (Auth.needsSetup()) {
+      renderSetup();
+      return;
+    }
+    simpanTujuan(hash);
+    renderLogin(namaTujuan(hash));
     return;
   }
 
@@ -866,7 +973,7 @@ async function route() {
   window.scrollTo(0, 0);
   if (hash === "#kuliah") {
     setPage("kuliah");
-    renderKuliah();
+    renderKuliah(!bisaMasuk);
   } else if (hash === "#panduan") {
     setPage("panduan");
     renderPanduan();
@@ -889,7 +996,7 @@ async function init() {
     document.title = CFG.namaSitus || "Latihan";
   } catch (e) {}
   window.addEventListener("hashchange", route);
-  $("#logoutBtn").addEventListener("click", () => Auth.signOut());
+  $("#logoutBtn").addEventListener("click", keluar);
   $("#menuBtn").addEventListener("click", () => {
     const open = $("#sidebar").classList.toggle("open");
     $("#menuBtn").setAttribute("aria-expanded", String(open));
@@ -900,6 +1007,9 @@ async function init() {
     c.classList.toggle("ready", ok);
   });
   if (Auth.enabled()) {
+    // Baca dulu apa yang dibawa tautan email; pustaka Supabase akan menghapusnya dari alamat.
+    const galatTautan = Auth.galatDariUrl();
+    const dariTautan = Auth.dariTautanEmail();
     setPage("gate");
     renderLoading();
     try {
@@ -909,11 +1019,18 @@ async function init() {
       renderGateError(Auth.friendly(e));
       return;
     }
+    if (dariTautan || galatTautan) history.replaceState(null, "", location.pathname + location.search + (galatTautan ? "#masuk" : ""));
+    if (galatTautan && !Auth.getUserId()) PESAN_LOGIN = galatTautan;
     Auth.onChange(() => afterAuthChange());
   }
+  NS = Auth.enabled() ? Auth.getUserId() || "lokal" : "lokal";
+  terapkanTujuan();
   await route();
-  const last = COURSES.find((c) => c.id === store.get("terakhir", null));
-  if (!last || last.bahasa === "python") (window.requestIdleCallback || setTimeout)(start);
+  // Pyodide besar (sekitar 10 MB): hanya dimuat lebih awal untuk peserta yang sudah masuk.
+  if (Auth.localMode() || Auth.getUserId()) {
+    const last = COURSES.find((c) => c.id === store.get("terakhir", null));
+    if (!last || last.bahasa === "python") (window.requestIdleCallback || setTimeout)(start);
+  }
 }
 
 init().catch((e) => {

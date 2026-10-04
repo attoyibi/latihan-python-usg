@@ -2,7 +2,7 @@
 """Server uji: menyajikan folder site/ dengan login TIRUAN (tanpa Supabase sungguhan).
 
 Berkas /config.js diganti dengan tools/klien-tiruan.js, jadi alur masuk, data awal, dan profil
-bisa dicoba di komputer sendiri. Kode login yang diterima: 123456.
+bisa dicoba di komputer sendiri. Setelah meminta tautan masuk, kotak "Email tiruan" muncul di pojok kanan bawah; tombolnya meniru klik tautan di email.
 Data tiruan tersimpan di localStorage browser, bukan di server. Folder site/ tidak diubah.
 
 Jalankan dari akar repositori:  python tools/server_uji.py [port]
@@ -41,7 +41,7 @@ class Server(socketserver.TCPServer):
 
 if __name__ == "__main__":
     with Server(("127.0.0.1", PORT), Handler) as httpd:
-        print(f"Server uji (login tiruan) di http://127.0.0.1:{PORT}  | kode login: 123456 | hentikan dengan Ctrl+C")
+        print(f"Server uji (login tiruan) di http://127.0.0.1:{PORT}  | login: tombol di kotak Email tiruan | hentikan dengan Ctrl+C")
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
