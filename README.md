@@ -12,13 +12,14 @@ Proyek sedang dibangun bertahap. Daftar lengkapnya ada di [CHECKLIST.md](CHECKLI
 |---|---|
 | Beranda, Materi, Panduan, halaman bab | Tantangan Bab 1–3 dan 5–14 (baru Bab 4 yang lengkap) |
 | Editor kode Python dengan sorotan sintaks | Laporan praktikum dan ekspor PDF |
-| Python di browser (Pyodide), batas waktu 5 detik | Masuk akun dan data awal (nama, NIM, kelas) |
-| Penilaian otomatis dengan kasus uji tersembunyi | Penyimpanan progres di Supabase |
+| Python di browser (Pyodide), batas waktu 5 detik | |
+| Penilaian otomatis dengan kasus uji tersembunyi | Penyimpanan progres di Supabase (progres masih di browser) |
 | Tiga penanda status bab, tanpa kunci | Log aktivitas, dashboard instruktur, unggah tugas Bab 3 |
+| Masuk dengan kode email dan data awal (nama, NIM, kelas) wajib sebelum mengerjakan; diuji dengan klien tiruan, belum dengan Supabase sungguhan | |
 | Video bantuan per bab (YouTube) | |
 | Skema database Supabase dan aturan keamanannya (belum dijalankan di proyek sungguhan) | |
 
-Progres sementara tersimpan di browser masing-masing sampai bagian Supabase selesai.
+Tanpa Supabase (konfigurasi kosong) situs berjalan **mode lokal**: tanpa akun, progres di browser. Dengan Supabase, peserta harus masuk dan mengisi data awal dulu.
 
 ## Menjalankan
 

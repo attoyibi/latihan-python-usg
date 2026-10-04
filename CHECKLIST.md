@@ -35,7 +35,7 @@ Penanda: `[x]` selesai dan sudah diuji, `[~]` sedang dikerjakan atau sebagian, `
 
 ## Menunggu keputusan atau tindakan Anda
 
-- [ ] Cara masuk peserta: tautan email (magic link) atau NIM saja. NIM saja mudah dipalsukan peserta lain. (Tahap 3)
+- [x] Cara masuk peserta: kode email (6 digit) lewat Supabase, dengan tautan sebagai cadangan
 - [ ] Membuat proyek Supabase dan memberi saya URL serta anon key. Kunci anon memang dirancang publik, tetapi jangan kirim `service_role` key. (Tahap 3)
 - [ ] Memutuskan tempat hosting: Netlify, Vercel, atau GitHub Pages. (Tahap 8)
 - [ ] Meninjau soal, test case, dan pertanyaan konsep tiap bab. (Tahap 6)
@@ -115,13 +115,15 @@ Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis k
 ## Tahap 3: Data awal dan Supabase
 
 - [ ] Proyek Supabase dibuat oleh Anda (lihat daftar tunggu)
-- [ ] Skema tabel: peserta, materi, percobaan, progres, aktivitas, laporan, penilaian_laporan
-- [ ] Row Level Security: peserta hanya data sendiri, instruktur semua
-- [ ] Halaman data awal: nama, NIM, kelas
-- [ ] Masuk (sesuai keputusan)
-- [ ] Progres dipindah dari browser ke Supabase
+- [~] Skema tabel ditulis (`supabase/migrations`), belum dijalankan di Supabase sungguhan
+- [~] Row Level Security ditulis, belum diuji di database sungguhan
+- [x] Halaman data awal: nama, NIM, kelas (wajib diisi sebelum mengerjakan; validasi; NIM kembar ditolak; bisa diubah di #profil). Diuji dengan klien tiruan
+- [x] Masuk dengan kode 6 digit lewat email (atau tautan), tanpa kata sandi; kirim ulang dengan jeda 60 detik; sesi bertahan setelah muat ulang. Diuji dengan klien tiruan; **belum dengan Supabase sungguhan**
+- [ ] Progres dipindah dari browser ke Supabase (sementara: browser, dipisah per akun)
 - [ ] Laporan tersimpan di Supabase
 - [ ] Uji dua akun berbeda tidak saling melihat data
+- [ ] Uji login sungguhan: templat email memuat kode, SMTP sendiri, Redirect URL (lihat `docs/PEMASANGAN.md`)
+- [ ] Instruktur: tautan ke dashboard muncul bila `peran = 'instruktur'`
 
 ## Tahap 4: Log aktivitas
 
@@ -187,3 +189,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (4): Desain dan keputusan baru.** Tanpa kunci antar bab (sudah demikian), ditambah tiga penanda status. Gaya visual mengikuti gambar contoh; token di `site/css/tokens.css`. Situs kini punya beranda, Materi, Panduan, dan halaman bab. Fokus pindah ke GitHub: ditambahkan Tahap G. Konektor Supabase/Cloudflare ditunda. Menunggu keputusan: publik atau privat, nama repositori, lisensi.
 - **4 Okt 2026 (5): Repositori.** Keputusan: publik, `latihan-python-usg`, MIT; Supabase dan Cloudflare/Vercel disambungkan sendiri oleh pemilik. Ditambahkan: README, LICENSE, panduan di `docs/`, skema SQL di `supabase/`, alat di `tools/`, CI. Pemeriksaan sebelum terbit: tidak ada kunci atau data pribadi (dipindai), `kunci/` diabaikan git. **Belum ada di aplikasi:** semua kode yang memakai Supabase (Tahap 3 dan seterusnya). Berikutnya: Tahap 2 (laporan dan PDF), lalu Tahap 3.
 - **4 Okt 2026 (6):** Repositori terbit di https://github.com/attoyibi/latihan-python-usg (publik, MIT). CI lulus pada commit pertama.
+- **4 Okt 2026 (7): Masuk dan data awal.** Ditambahkan `site/js/auth.js` dan layar masuk/data awal di `app.js`. Tanpa konfigurasi Supabase situs tetap berjalan mode lokal. Diuji dengan klien tiruan (`tools/klien-tiruan.js`): belum masuk -> masuk -> kode salah/benar -> wajib isi data -> validasi -> NIM kembar -> simpan -> keluar -> pengguna kedua tidak melihat progres pengguna pertama. Peringatan penting untuk Anda: SMTP bawaan Supabase terlalu terbatas untuk 80 peserta, pasang SMTP sendiri; dan edit dua templat email agar memuat `{{ .Token }}`. Berikutnya: sinkron progres ke Supabase (Tahap 3 lanjutan) atau Tahap 2 (laporan).

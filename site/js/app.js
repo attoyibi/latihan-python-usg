@@ -1,5 +1,6 @@
 import { start, run, onReadyChange } from "./runner.js";
 import { grade } from "./grader.js";
+import * as Auth from "./auth.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -17,11 +18,13 @@ function h(tag, attrs, ...kids) {
   return el;
 }
 
-// Penyimpanan sementara di browser. Dipindah ke Supabase pada Tahap 3.
+// Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
+// Sinkronisasi progres ke Supabase menyusul.
+let NS = "lokal";
 const store = {
   get(key, fallback) {
     try {
-      const v = localStorage.getItem("latihan:" + key);
+      const v = localStorage.getItem("latihan:" + NS + ":" + key);
       return v == null ? fallback : JSON.parse(v);
     } catch (e) {
       return fallback;
@@ -29,7 +32,7 @@ const store = {
   },
   set(key, value) {
     try {
-      localStorage.setItem("latihan:" + key, JSON.stringify(value));
+      localStorage.setItem("latihan:" + NS + ":" + key, JSON.stringify(value));
     } catch (e) {}
   },
 };
@@ -367,7 +370,186 @@ function renderPanduan() {
   );
 }
 
+// ---------- Masuk dan data awal ----------
+
+function field(id, label, attrs, hint) {
+  const input = h("input", Object.assign({ id, class: "input", name: id }, attrs));
+  const err = h("p", { class: "field-err", id: id + "Err", role: "alert" });
+  return { input, err, node: h("div", { class: "field" }, h("label", { for: id }, label), input, hint ? h("p", { class: "muted" }, hint) : null, err) };
+}
+
+function gateCard(title, lead, ...kids) {
+  return h("section", { class: "card gate-card" }, h("h2", {}, title), lead ? h("p", { class: "muted" }, lead) : null, ...kids);
+}
+
+function renderLoading() {
+  $("#main").replaceChildren(gateCard("Memeriksa sesi", "Sebentar."));
+}
+
+function renderLogin() {
+  let email = "";
+  let cooldown = null;
+  const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const f = field("email", "Alamat email", { type: "email", autocomplete: "email", inputmode: "email", placeholder: "nama@email.com", required: "" });
+  const sendBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Kirim kode masuk");
+  const form = h("form", { novalidate: "" }, f.node, h("div", { class: "actions" }, sendBtn), msg);
+
+  const codeF = field("kode", "Kode 6 digit dari email", { inputmode: "numeric", autocomplete: "one-time-code", maxlength: "8", placeholder: "123456" });
+  const verifyBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Masuk");
+  const resendBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Kirim ulang kode");
+  const changeBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Ganti email");
+  const codeMsg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const codeForm = h("form", { novalidate: "" }, codeF.node, h("div", { class: "actions" }, verifyBtn, resendBtn, changeBtn), codeMsg);
+
+  const card = gateCard("Masuk untuk mulai", "Kami mengirim kode masuk ke emailmu. Tidak perlu kata sandi. Kamu juga bisa membuka tautan di email yang sama.", form);
+
+  function startCooldown() {
+    let s = 60;
+    resendBtn.disabled = true;
+    clearInterval(cooldown);
+    cooldown = setInterval(() => {
+      s--;
+      resendBtn.textContent = s > 0 ? "Kirim ulang (" + s + ")" : "Kirim ulang kode";
+      if (s <= 0) {
+        resendBtn.disabled = false;
+        clearInterval(cooldown);
+      }
+    }, 1000);
+  }
+
+  async function send() {
+    f.err.textContent = "";
+    email = f.input.value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      f.err.textContent = "Tulis alamat email yang benar.";
+      return false;
+    }
+    sendBtn.disabled = true;
+    msg.textContent = "Mengirim kode";
+    try {
+      await Auth.sendCode(email);
+      return true;
+    } catch (e) {
+      msg.textContent = "";
+      f.err.textContent = e.message;
+      return false;
+    } finally {
+      sendBtn.disabled = false;
+    }
+  }
+
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    if (await send()) {
+      card.replaceChildren(h("h2", {}, "Cek emailmu"), h("p", { class: "muted" }, "Kode dikirim ke " + email + ". Masukkan kodenya di bawah, atau buka tautan di email. Kalau tidak ada, periksa folder spam."), codeForm);
+      codeF.input.focus();
+      startCooldown();
+    }
+  });
+  codeForm.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    codeF.err.textContent = "";
+    const code = codeF.input.value.replace(/\s+/g, "");
+    if (code.length < 6) {
+      codeF.err.textContent = "Kode terdiri dari 6 digit atau lebih.";
+      return;
+    }
+    verifyBtn.disabled = true;
+    codeMsg.textContent = "Memeriksa kode";
+    try {
+      await Auth.verifyCode(email, code);
+      codeMsg.textContent = "Berhasil masuk.";
+    } catch (e) {
+      codeMsg.textContent = "";
+      codeF.err.textContent = e.message;
+    } finally {
+      verifyBtn.disabled = false;
+    }
+  });
+  resendBtn.addEventListener("click", async () => {
+    codeF.err.textContent = "";
+    try {
+      await Auth.sendCode(email);
+      codeMsg.textContent = "Kode baru dikirim.";
+      startCooldown();
+    } catch (e) {
+      codeF.err.textContent = e.message;
+    }
+  });
+  changeBtn.addEventListener("click", () => {
+    clearInterval(cooldown);
+    msg.textContent = "";
+    card.replaceChildren(h("h2", {}, "Masuk untuk mulai"), h("p", { class: "muted" }, "Kami mengirim kode masuk ke emailmu. Tidak perlu kata sandi."), form);
+    f.input.focus();
+  });
+  $("#main").replaceChildren(card);
+  f.input.focus();
+}
+
+// Formulir data awal. mode "awal": wajib diisi sebelum mengerjakan. mode "ubah": memperbaiki data.
+function renderProfilForm(mode) {
+  const p = Auth.getProfile() || {};
+  const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
+  const fi = field("nim", "NIM", { inputmode: "text", autocomplete: "off", maxlength: "30", required: "" }, "Tulis seperti di kartu mahasiswa.");
+  const fk = field("kelas", "Kelas", { autocomplete: "off", maxlength: "30", placeholder: "SI-1A", required: "" });
+  fn.input.value = p.nama || "";
+  fi.input.value = p.nim || "";
+  fk.input.value = p.kelas || "";
+  const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, mode === "awal" ? "Simpan dan mulai" : "Simpan perubahan");
+  const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
+  outBtn.addEventListener("click", () => Auth.signOut());
+  const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, mode === "awal" ? outBtn : h("a", { class: "btn btn-ghost", href: "#beranda" }, "Batal")), msg);
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.input.value };
+    const errs = Auth.validateProfile(val);
+    fn.err.textContent = errs.nama || "";
+    fi.err.textContent = errs.nim || "";
+    fk.err.textContent = errs.kelas || "";
+    if (Object.keys(errs).length) return;
+    saveBtn.disabled = true;
+    msg.textContent = "Menyimpan";
+    try {
+      await Auth.saveProfile(val);
+      msg.textContent = "Tersimpan.";
+      afterAuthChange(mode === "awal" ? "#beranda" : null);
+    } catch (e) {
+      msg.textContent = "";
+      fi.err.textContent = /NIM/.test(e.message) ? e.message : "";
+      if (!/NIM/.test(e.message)) msg.textContent = e.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+  const title = mode === "awal" ? "Isi data dirimu dulu" : "Data dirimu";
+  const lead = mode === "awal" ? "Data ini dipakai untuk laporan dan penilaian. Isi sekali saja; bisa diubah nanti." : "Masuk sebagai " + (Auth.getEmail() || "");
+  $("#main").replaceChildren(gateCard(title, lead, form));
+  fn.input.focus();
+}
+
+function renderGateError(message) {
+  const retry = h("button", { type: "button", class: "btn btn-primary" }, "Coba lagi");
+  retry.addEventListener("click", () => location.reload());
+  $("#main").replaceChildren(gateCard("Belum bisa dimuat", message, h("div", { class: "actions" }, retry)));
+}
+
+function updateUserBar() {
+  const on = Auth.enabled() && !!Auth.getUserId() && !!Auth.getProfile();
+  $("#userChip").hidden = !on;
+  $("#logoutBtn").hidden = !on;
+  if (on) $("#userChip").textContent = Auth.getProfile().nama;
+}
+
+function afterAuthChange(goto) {
+  NS = Auth.enabled() ? Auth.getUserId() || "lokal" : "lokal";
+  if (goto) location.hash = goto;
+  route();
+}
+
 function setPage(kind) {
+  const gate = kind === "gate";
+  document.body.classList.toggle("gate", gate);
   document.body.classList.toggle("home", kind !== "bab");
   $("#navHome").classList.toggle("on", kind === "beranda");
   $("#navMateri").classList.toggle("on", kind === "materi" || kind === "bab");
@@ -377,6 +559,22 @@ function setPage(kind) {
 }
 
 function route() {
+  if (Auth.enabled()) {
+    if (!Auth.getUserId()) {
+      setPage("gate");
+      updateUserBar();
+      renderLogin();
+      return;
+    }
+    if (!Auth.getProfile()) {
+      setPage("gate");
+      updateUserBar();
+      renderProfilForm("awal");
+      return;
+    }
+    NS = Auth.getUserId();
+  }
+  updateUserBar();
   const hash = location.hash;
   const m = /^#bab-(\d+)$/.exec(hash);
   if (m) {
@@ -389,6 +587,7 @@ function route() {
   window.scrollTo(0, 0);
   if (hash === "#materi") { setPage("materi"); renderMateri(); }
   else if (hash === "#panduan") { setPage("panduan"); renderPanduan(); }
+  else if (hash === "#profil" && Auth.enabled()) { setPage("profil"); renderProfilForm("ubah"); }
   else { setPage("beranda"); renderBeranda(); }
 }
 
@@ -402,6 +601,7 @@ async function init() {
     document.title = (CFG.namaSitus || "Latihan") + " - " + (CFG.mataKuliah || "");
   } catch (e) {}
   window.addEventListener("hashchange", route);
+  $("#logoutBtn").addEventListener("click", () => Auth.signOut());
   $("#menuBtn").addEventListener("click", () => {
     const open = $("#sidebar").classList.toggle("open");
     $("#menuBtn").setAttribute("aria-expanded", String(open));
@@ -411,6 +611,18 @@ async function init() {
     c.textContent = ok ? "Python siap" : "Python: memuat";
     c.classList.toggle("ready", ok);
   });
+  if (Auth.enabled()) {
+    setPage("gate");
+    renderLoading();
+    try {
+      await Auth.init();
+    } catch (e) {
+      setPage("gate");
+      renderGateError(Auth.friendly(e));
+      return;
+    }
+    Auth.onChange(() => afterAuthChange());
+  }
   route();
   (window.requestIdleCallback || setTimeout)(start);
 }
