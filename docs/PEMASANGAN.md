@@ -29,7 +29,17 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
    ```
 
 7. **Authentication > URL Configuration (wajib, karena masuk lewat tautan):** isi *Site URL* dengan alamat situs setelah tayang, dan tambahkan alamat yang sama ke *Redirect URLs*. Bila tidak, tautan di email membawa peserta ke alamat yang salah (mis. `localhost`). Untuk menguji dari komputer sendiri, tambahkan juga `http://localhost:8000`.
-8. **Atur SMTP sendiri (penting).** Pengirim email bawaan Supabase sangat dibatasi dan hanya untuk uji coba; banyak peserta masuk bersamaan akan terkena batas dan kodenya tidak terkirim. Di **Project Settings > Authentication > SMTP Settings** hubungkan layanan email (misalnya Resend atau Brevo, keduanya punya paket gratis).
+8. **Pasang SMTP sendiri (wajib, bukan opsional).** Menurut dokumentasi Supabase, pengirim email bawaan:
+   - dibatasi **2 email per jam untuk seluruh proyek** (bukan per peserta), dan angkanya bisa berubah tanpa pemberitahuan;
+   - **hanya mengirim ke anggota tim proyek**. Peserta yang bukan anggota tidak akan menerima tautan masuk sama sekali;
+   - tidak dijamin ketersediaannya dan hanya untuk uji coba.
+
+   Akibatnya, tanpa SMTP sendiri peserta tidak bisa masuk. Pesan di situs untuk kasus ini: "Batas pengiriman email sedang tercapai...".
+
+   Caranya: **Project Settings > Authentication > SMTP Settings**, aktifkan *Enable Custom SMTP*, lalu isi `host`, `port`, `user`, `password`, alamat pengirim, dan nama pengirim dari layanan email pilihan Anda. Layanan yang disebut dokumentasi Supabase: Resend, AWS SES, Postmark, SendGrid, ZeptoMail, dan Brevo. Periksa sendiri batas paket gratis dan syarat verifikasi domain/pengirim di layanan itu.
+
+   Setelah SMTP sendiri aktif, Supabase memberi batas bawaan **30 email per jam**. Untuk hari pertama kelas (banyak peserta masuk bersamaan) naikkan di **Authentication > Rate Limits**. Ada juga jeda 60 detik per alamat email (bawaan) sebelum tautan baru bisa diminta.
+
 9. Catat dua nilai dari **Project Settings > API**: **Project URL** dan kunci **anon** (atau *publishable*).
 
 > **Jangan pernah** memakai kunci `service_role` atau `sb_secret_...`. Kunci itu melewati semua aturan keamanan database. Skrip pembangun akan **menolak** kunci itu dan membatalkan penayangan.
@@ -108,7 +118,7 @@ Buka `http://127.0.0.1:8124`. Server ini menyajikan `site/` dengan login **tirua
 
 - **Tautan berlaku satu kali.** Beberapa layanan email (terutama email kampus atau kantor dengan pemindai keamanan, mis. Safe Links) membuka tautan lebih dulu untuk memeriksanya, sehingga tautan sudah terpakai saat peserta mengkliknya dan muncul pesan "kedaluwarsa atau sudah dipakai". **Uji dengan email kampus yang benar-benar dipakai peserta sebelum semester dimulai.** Bila sering terjadi, beri tahu pengembang: ada cadangan berupa kode angka yang diketik.
 - Tautan membuka browser mana pun yang dipakai peserta untuk membuka email (mis. browser di dalam aplikasi email). Sesi masuk berada di browser tempat tautan dibuka. Bila itu bukan browser yang dipakai belajar, peserta cukup melanjutkan di browser tempat tautan terbuka.
-- Pengiriman email bawaan Supabase sangat terbatas; pasang SMTP sendiri (langkah 8).
+- Pengiriman email bawaan Supabase hanya 2 per jam dan hanya ke anggota tim proyek; **SMTP sendiri wajib** (langkah 8).
 
 ## Akhir semester
 

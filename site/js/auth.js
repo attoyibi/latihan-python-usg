@@ -42,7 +42,11 @@ export function friendly(error) {
   if (code === "23505") return "NIM ini sudah dipakai akun lain. Periksa lagi, atau hubungi dosen.";
   if (code === "23514") return "Isian belum sesuai aturan. Periksa panjang nama, NIM, dan kelas.";
   if (code === "42P01" || /relation .* does not exist/i.test(msg)) return "Database belum disiapkan. Hubungi dosen.";
-  if (/rate limit|too many|over_email_send_rate_limit/i.test(msg)) return "Terlalu banyak permintaan email. Tunggu beberapa menit, lalu coba lagi.";
+  // Jeda per alamat email: "you can only request this after 43 seconds"
+  const detik = /after (\d+) seconds?/i.exec(msg);
+  if (detik) return "Tunggu " + detik[1] + " detik sebelum meminta tautan lagi.";
+  // Batas pengiriman email untuk seluruh proyek sudah tercapai.
+  if (/rate limit|too many|over_email_send_rate_limit/i.test(msg)) return "Batas pengiriman email sedang tercapai, jadi tautan belum bisa dikirim. Coba lagi sekitar satu jam lagi, atau hubungi dosen.";
   if (/expired|invalid/i.test(msg) && /token|otp|code/i.test(msg)) return "Kode salah atau sudah kedaluwarsa. Minta kode baru.";
   if (/invalid.*email|email.*invalid|unable to validate email/i.test(msg)) return "Alamat email tidak valid.";
   if (/failed to fetch|network|load failed/i.test(msg)) return "Tidak bisa terhubung ke server. Periksa koneksi internet.";
