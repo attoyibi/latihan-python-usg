@@ -1,0 +1,30 @@
+name: Periksa
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  periksa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Periksa isi (materi dan challenge)
+        run: python tools/validasi_konten.py
+      - name: Periksa sintaks JavaScript
+        run: |
+          node --check site/js/pyworker.js
+          for f in site/js/app.js site/js/runner.js site/js/grader.js; do
+            node --input-type=module --check < "$f"
+          done
+      - name: Periksa sintaks SQL
+        run: |
+          pip install pglast
+          python tools/periksa_sql.py

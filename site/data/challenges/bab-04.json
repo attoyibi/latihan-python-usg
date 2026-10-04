@@ -1,0 +1,87 @@
+{
+ "bab": 4,
+ "judul": "Potongan harga bertingkat UD Rasa Gresik",
+ "soal": [
+  "Bu Ida mencatat pesanan toko oleh-oleh. Aturan potongan dari Pak Fauzan:",
+  "100 boks atau lebih mendapat potongan 12 persen. 50 sampai 99 boks mendapat 8 persen. Kurang dari 50 boks tidak ada potongan.",
+  "Lengkapi program supaya menghitung total tagihan sesuai aturan itu. Bagian membaca masukan dan mencetak hasil sudah tersedia."
+ ],
+ "starter": "jumlah_boks = int(input())\nharga_satuan = int(input())\ntotal_kotor = jumlah_boks * harga_satuan\n\n# Tentukan potongan dengan if, elif, else:\n#   100 boks atau lebih -> 0.12\n#   50 sampai 99 boks   -> 0.08\n#   kurang dari 50 boks -> 0.0\npotongan = 0.0\n\ntotal_bayar = total_kotor - (total_kotor * potongan)\nprint(f\"Total tagihan: Rp{total_bayar:,.0f}\")\n",
+ "contohMasukan": "120\n35000",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Mulai dari syarat yang paling besar (100 atau lebih). Kalau urutannya terbalik, pesanan 120 boks bisa salah masuk ke syarat 50 atau lebih."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab 4 bagian D, if tunggal, if-else, if-elif-else: kapan pakai yang mana (hlm. 102)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton IF dan ELSE Statement, lalu ELIF Statement.",
+   "video": [
+    "rF8rh40z_X0",
+    "ICowoqcLp4E"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "10",
+    "40000"
+   ],
+   "expected": "Total tagihan: Rp400,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "49",
+    "40000"
+   ],
+   "expected": "Total tagihan: Rp1,960,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "50",
+    "40000"
+   ],
+   "expected": "Total tagihan: Rp1,840,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "99",
+    "40000"
+   ],
+   "expected": "Total tagihan: Rp3,643,200",
+   "hidden": true
+  },
+  {
+   "input": [
+    "100",
+    "35000"
+   ],
+   "expected": "Total tagihan: Rp3,080,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "120",
+    "35000"
+   ],
+   "expected": "Total tagihan: Rp3,696,000",
+   "hidden": true
+  },
+  {
+   "input": [
+    "1",
+    "45000"
+   ],
+   "expected": "Total tagihan: Rp45,000",
+   "hidden": true
+  }
+ ]
+}

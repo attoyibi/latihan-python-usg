@@ -1,0 +1,346 @@
+[
+ {
+  "bab": 1,
+  "judul": "Fondasi algoritma dan Python",
+  "ringkasan": "Algoritma adalah urutan langkah yang bisa diikuti mesin. Python dipakai karena mudah dibaca dan banyak dipakai di dunia kerja.",
+  "buku": {
+   "teks": "Bab I, bagian C: Lima syarat sebuah algoritma",
+   "halaman": 6
+  },
+  "video": [
+   {
+    "id": "iA8lLwmtKQM",
+    "judul": "Belajar Python 01: Apa itu Python",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 2,
+  "judul": "Variabel, tipe data, operator",
+  "ringkasan": "Variabel adalah kotak bernama yang menyimpan nilai. Angka bulat, pecahan, teks, dan benar-salah punya aturan hitung masing-masing.",
+  "buku": {
+   "teks": "Bab II, bagian B: Variabel, kotak yang diberi nama",
+   "halaman": 44
+  },
+  "video": [
+   {
+    "id": "gxmTFXfrMzk",
+    "judul": "Belajar Python 04: Mengenal Variabel",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "b3X0CH98Y9g",
+    "judul": "Belajar Python 05: Tipe Data",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 3,
+  "judul": "Flowchart, pseudocode, penelusuran",
+  "ringkasan": "Gambar dulu alurnya sebelum mengetik kode. Flowchart memakai simbol baku, pseudocode memakai kalimat terstruktur, penelusuran menjalankan rancangan dengan tangan.",
+  "buku": {
+   "teks": "Bab III, bagian C: Flowchart, simbol baku dan artinya",
+   "halaman": 76
+  },
+  "video": [
+   {
+    "id": "Qf4Npdwar_s",
+    "judul": "Mengenal Pseudocode",
+    "channel": "CodePolitan",
+    "sumber": "lain"
+   },
+   {
+    "id": "ld6F5qCg84o",
+    "judul": "Flowchart Looping dan Contoh Sehari-hari",
+    "channel": "Blank Stuck",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "unggah",
+  "challenge": false
+ },
+ {
+  "bab": 4,
+  "judul": "Percabangan",
+  "ringkasan": "Program memilih jalan dengan if, elif, dan else. Indentasi menentukan baris mana yang ikut dalam blok.",
+  "buku": {
+   "teks": "Bab IV, bagian D: if tunggal, if-else, if-elif-else",
+   "halaman": 102
+  },
+  "video": [
+   {
+    "id": "rF8rh40z_X0",
+    "judul": "Belajar Python 21: IF dan ELSE Statement",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "ICowoqcLp4E",
+    "judul": "Belajar Python 22: ELIF Statement",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 5,
+  "judul": "Perulangan",
+  "ringkasan": "for dipakai saat jumlah ulangan pasti, while saat bergantung pada syarat. Waspadai perulangan yang tidak pernah berhenti.",
+  "buku": {
+   "teks": "Bab V, bagian C: for dan range()",
+   "halaman": 122
+  },
+  "video": [
+   {
+    "id": "Z4qfMhx4XzQ",
+    "judul": "Belajar Python 24: For Loop",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "ZupffvoCChQ",
+    "judul": "Belajar Python 25: While Loop",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 6,
+  "judul": "List satu dimensi",
+  "ringkasan": "List menyimpan banyak nilai sekaligus. Akses lewat indeks, ambil sepotong dengan slicing.",
+  "buku": {
+   "teks": "Bab VI, bagian C: Mengakses elemen dengan indeks",
+   "halaman": 147
+  },
+  "video": [
+   {
+    "id": "tERK7b5Woqs",
+    "judul": "Belajar Python 29: List",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "Xqvui6Bmrj0",
+    "judul": "Belajar Python 30: Manipulasi List",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 7,
+  "judul": "Nested list dan string",
+  "ringkasan": "Tabel di Python adalah list di dalam list. String bisa dipecah, disatukan, dan dirapikan.",
+  "buku": {
+   "teks": "Bab VII, bagian C: String sebagai data yang bisa diolah",
+   "halaman": 170
+  },
+  "video": [
+   {
+    "id": "u3xOkmxzeBE",
+    "judul": "Belajar Python 33: Nested List",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "MPvC9uWATLI",
+    "judul": "Belajar Python 16: Manipulasi String",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 8,
+  "judul": "Fungsi dan pemrograman modular",
+  "ringkasan": "Fungsi memecah program jadi bagian kecil yang bisa dipakai ulang. def, parameter, dan return adalah kuncinya.",
+  "buku": {
+   "teks": "Bab VIII, bagian C: Anatomi fungsi",
+   "halaman": 189
+  },
+  "video": [
+   {
+    "id": "ywE2eqG3-kc",
+    "judul": "Belajar Python 44: Pengenalan Fungsi",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "ADcQu-8R0Ok",
+    "judul": "Belajar Python 46: Fungsi dengan return",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 9,
+  "judul": "Kelas, objek, referensi",
+  "ringkasan": "Kelas menyatukan data dan fungsi yang berhubungan. Objek adalah hasil cetakan kelas; menyalin variabel belum tentu menyalin objeknya.",
+  "buku": {
+   "teks": "Bab IX, bagian C: Anatomi kelas",
+   "halaman": 215
+  },
+  "video": [
+   {
+    "id": "1PjHsUnOkes",
+    "judul": "Belajar Python OOP 01: Pendahuluan",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "w9emRmkbeps",
+    "judul": "Belajar Python OOP 02: Constructor __init__()",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 10,
+  "judul": "Berkas dan File I/O",
+  "ringkasan": "Data di variabel hilang saat program ditutup. Berkas menyimpannya; mode w menimpa, mode a menambah.",
+  "buku": {
+   "teks": "Bab X, bagian E: Mode w menimpa, mode a menambah",
+   "halaman": 245
+  },
+  "video": [
+   {
+    "id": "9xiuFrL0wSw",
+    "judul": "Belajar Python 64: Read external file",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "3FfNwPIAtNw",
+    "judul": "Belajar Python 65: Write external file",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 11,
+  "judul": "CRUD sederhana",
+  "ringkasan": "Create, Read, Update, Delete adalah empat operasi yang ada di hampir semua aplikasi data.",
+  "buku": {
+   "teks": "Bab XI, bagian G: Menyatukan jadi aplikasi konsol",
+   "halaman": 273
+  },
+  "video": [
+   {
+    "id": "PmdQwH_NU3U",
+    "judul": "Belajar Python PROJECT 67: Persiapan",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "TnZCxPbT1I8",
+    "judul": "Belajar Python PROJECT 69: Create",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 12,
+  "judul": "Linear dan binary search",
+  "ringkasan": "Linear search memeriksa satu per satu. Binary search membelah dua, tetapi datanya harus terurut.",
+  "buku": {
+   "teks": "Bab XII, bagian C: Binary search, syarat data harus terurut",
+   "halaman": 290
+  },
+  "video": [
+   {
+    "id": "8K983gxITCI",
+    "judul": "Sequential Search dan Binary Search",
+    "channel": "FYN DEV",
+    "sumber": "lain"
+   },
+   {
+    "id": "Xp68BLKf23w",
+    "judul": "Konsep Logika Binary Search",
+    "channel": "SWS Space",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 13,
+  "judul": "Sorting dan pengantar Big-O",
+  "ringkasan": "Bubble sort menukar tetangga; selection sort memilih yang terkecil. Big-O mengukur bagaimana jumlah langkah tumbuh.",
+  "buku": {
+   "teks": "Bab XIII, bagian B: Bubble sort, algoritma paling intuitif",
+   "halaman": 311
+  },
+  "video": [
+   {
+    "id": "fHQQZ28WFuQ",
+    "judul": "Konsep Logika Bubble Sort",
+    "channel": "SWS Space",
+    "sumber": "lain"
+   },
+   {
+    "id": "GntGHFfHSzk",
+    "judul": "Bubble Sort dengan Python",
+    "channel": "elektro programming",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ },
+ {
+  "bab": 14,
+  "judul": "Rekursi dan proyek akhir",
+  "ringkasan": "Fungsi yang memanggil dirinya sendiri harus punya base case. Bab ini juga menutup proyek kelompok.",
+  "buku": {
+   "teks": "Bab XIV, bagian C: Base case dan recursive case",
+   "halaman": 332
+  },
+  "video": [
+   {
+    "id": "n6s7IpVrECk",
+    "judul": "Fungsi Rekursif Pada Python",
+    "channel": "Wahyono",
+    "sumber": "lain"
+   },
+   {
+    "id": "VtvxvCkKlok",
+    "judul": "Tutorial Fungsi Rekursif Python",
+    "channel": "elektro programming",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": false
+ }
+]

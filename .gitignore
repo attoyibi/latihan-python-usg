@@ -1,0 +1,13 @@
+# Kunci jawaban challenge: jangan diterbitkan
+kunci/
+
+# Lokal
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.env
+.env.*
+*.local
+.claude/

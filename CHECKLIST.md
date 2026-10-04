@@ -1,0 +1,188 @@
+# Checklist Pembangunan Website Latihan Python
+
+*Berkas kerja utama. Dibaca dan diperbarui di awal dan akhir setiap sesi, supaya pekerjaan bisa dilanjutkan kapan saja walaupun sesi sebelumnya terputus.*
+*Rujukan: `docs/ANALISIS-DAN-RENCANA.md` (rencana lengkap) dan `docs/RISET-VIDEO-PENGGANTI.md` (video).*
+
+Penanda: `[x]` selesai dan sudah diuji, `[~]` sedang dikerjakan atau sebagian, `[ ]` belum.
+
+## Cara melanjutkan di sesi baru
+
+1. Baca berkas ini, lalu bagian "Catatan sesi" paling bawah.
+2. Kerjakan tahap pertama yang masih berisi `[ ]` atau `[~]`.
+3. Setelah selesai, centang item, tulis catatan sesi singkat, lalu berhenti di batas tahap.
+4. Kode ada di folder `site/` (tanpa langkah build, buka lewat server statis). Cara menjalankan: `python -m http.server 8000` dari dalam folder `site`, lalu buka `http://localhost:8000`.
+
+## Keputusan yang sudah terkunci
+
+- Bahasa: Python saja. 14 bab (bukan 15).
+- Mesin eksekusi: **Pyodide** (di browser, di Web Worker, batas waktu 5 detik).
+- Editor: **CodeMirror 5** (bukan Monaco, karena Monaco tidak mendukung ponsel dan banyak peserta memakai ponsel).
+- Teknologi situs: HTML, CSS, JavaScript biasa. Tanpa framework dan tanpa langkah build, supaya mudah dirawat.
+- Database dan login: Supabase (free tier).
+- Gerbang: lulus challenge (output cocok setelah spasi di ujung baris dibuang). Bab bebas dilompati, tanpa kunci. Satu challenge wajib per bab.
+- Bab 3: peserta mengumpulkan gambar/PDF (flowchart, pseudocode, tabel penelusuran).
+- Video: playlist Kelas Terbuka (sembilan bab), sumber lain (bab 3, 9, 12, 13, 14). Celah: penelusuran, Big-O, `match-case`.
+- Penjelasan: ringkasan singkat plus tautan ke sub-bab buku.
+- Laporan praktikum: lima kolom diketik sendiri, tempel/salin diblokir, kode dan output terlampir. Peserta ekspor **PDF saja** (diunggah sendiri ke sistem universitas). Teks laporan juga tersimpan di sistem.
+- Penilaian: log sistem (objektif) ditambah laporan yang Anda nilai manual.
+- Rubrik laporan, skala 1 sampai 4: ketepatan konsep, bahasa sendiri, refleksi kendala, kesesuaian dengan kode.
+- Data awal peserta: **nama, NIM, kelas.**
+- Penyimpanan data: sampai akhir semester, lalu diarsipkan.
+- Dashboard instruktur per pertemuan, dengan unduh CSV.
+- **Tanpa kunci antar bab.** Semua bab selalu bisa dibuka dalam urutan bebas. Tiga penanda: belum dikerjakan, sedang dikerjakan, selesai (selalu disertai teks, bukan hanya warna).
+- **Gaya visual** mengikuti gambar contoh (teal dan hijau, judul tebal bergradasi, kartu mengambang, panel kode gelap). Detail di `docs/DESIGN.md`; semua nilai ada di `site/css/tokens.css`.
+- **Semua fitur dibangun di dalam repositori GitHub** supaya orang lain bisa memakainya ulang (kode terpisah dari isi, konfigurasi di berkas, panduan pemasangan). Konektor Supabase dan Cloudflare ditunda; fokus ke GitHub dulu.
+
+## Menunggu keputusan atau tindakan Anda
+
+- [ ] Cara masuk peserta: tautan email (magic link) atau NIM saja. NIM saja mudah dipalsukan peserta lain. (Tahap 3)
+- [ ] Membuat proyek Supabase dan memberi saya URL serta anon key. Kunci anon memang dirancang publik, tetapi jangan kirim `service_role` key. (Tahap 3)
+- [ ] Memutuskan tempat hosting: Netlify, Vercel, atau GitHub Pages. (Tahap 8)
+- [ ] Meninjau soal, test case, dan pertanyaan konsep tiap bab. (Tahap 6)
+- [ ] Menonton pilihan video utama. (Tahap 6)
+
+## Tahap 0: Perencanaan
+
+- [x] Membaca buku, README, dan blueprint
+- [x] Memetakan 73 video
+- [x] Menguji Piston publik (tidak bisa), memilih Pyodide
+- [x] Riset video pengganti untuk lima bab
+- [x] Mockup layout, laporan, dan dashboard
+- [x] Keputusan terkunci (di atas)
+
+## Tahap G: Repositori GitHub dan kemudahan dipakai orang lain
+
+Dikerjakan paralel dengan tahap lain. Skema database ikut disiapkan di sini supaya Anda tinggal menempelnya. Tujuan: orang lain bisa menyalin repositori, mengganti isi, dan menjalankannya sendiri.
+
+- [x] Memutuskan: **publik**, nama `latihan-python-usg`
+- [x] Lisensi **MIT** (kode dan isi repositori); teks lengkap buku tidak ikut diterbitkan
+- [x] `git init`, `.gitignore`, commit pertama
+- [x] Kunci jawaban (`kunci/`) tidak diterbitkan; test case tersembunyi tetap terbaca (diterima untuk latihan)
+- [x] `README.md` (tangkapan layar belum ada)
+- [x] `docs/PEMASANGAN.md`
+- [x] `docs/MENAMBAH-BAB.md`
+- [x] `docs/MENGGANTI-TEMA.md`
+- [x] Konfigurasi di `site/data/config.json` dan `site/config.js` (URL dan kunci anon Supabase, kosong secara bawaan)
+- [~] Skema dan keamanan di `supabase/migrations/0001_skema.sql` dan `0002_keamanan.sql`, plus `jadikan_instruktur.sql` dan `arsip_akhir_semester.sql`. Sintaks diperiksa dengan parser PostgreSQL; **belum dijalankan di database sungguhan**
+- [~] Bab 4 menjadi contoh lengkap; belum ada contoh terpisah dari isi asli
+- [~] GitHub Actions `ci.yml` (validasi isi, sintaks JS dan SQL) ditulis; hasil jalannya di GitHub belum dilihat. Penayangan otomatis ditunda (Anda sambungkan Cloudflare/Vercel sendiri)
+- [x] `CONTRIBUTING.md` (templat issue belum)
+
+Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan kunci. Cara aman: simpan `kunci/` di luar repositori publik (atau repositori privat terpisah), dan anggap test case tersembunyi hanya sebagai penghalang ringan. Penilaian yang tidak boleh dicurangi (ujian) butuh server, bukan situs statis.
+
+## Tahap 1: Kerangka dan prototipe Bab 4
+
+Tujuan: satu bab berjalan penuh di browser (baca ringkasan, lihat video, tulis kode, jalankan, kirim, dapat hasil). Belum ada login atau database. Status sementara disimpan di browser.
+
+- [x] Struktur folder `site/` (index.html, css, js, data)
+- [x] `data/materi.json`: 14 bab (judul, ringkasan, tautan buku, video, sumber video)
+- [x] Tata letak: sidebar bab, ringkasan, video, editor, panel laporan (hanya tempat; isi di Tahap 2)
+- [x] Tata letak responsif untuk ponsel (sidebar menjadi menu geser, panel menjadi tab)
+- [~] Terang dan gelap mengikuti perangkat (gaya sudah ada, tampilan gelap belum dilihat)
+- [x] Penyemat video YouTube per bab
+- [x] Editor CodeMirror 5 dengan sorotan Python
+- [x] Pyodide di Web Worker dengan batas waktu 5 detik (perulangan tak berhenti terhenti sendiri)
+- [x] Dukungan `input()` dari test case dan dari kotak masukan (mode coba bebas)
+- [x] Penilai: banyak test case, sebagian tersembunyi, bandingkan output
+- [x] Pesan hasil yang jelas (lulus, test case gagal, error Python ditampilkan)
+- [x] Challenge Bab 4 (potongan harga) dengan test case yang sudah diverifikasi di Python
+- [x] Petunjuk bertingkat (soal, bagian buku, video)
+- [x] Status selesai per bab tersimpan di browser sementara
+- [x] Uji di browser: lulus, gagal, error sintaks, infinite loop
+- [~] Uji tampilan ponsel (tata letak dan tidak ada geser horizontal sudah diuji di emulasi 375 px; animasi menu geser dan pengetikan di ponsel sungguhan belum diuji)
+
+### Tambahan Tahap 1: desain dan navigasi (4 Okt 2026)
+
+- [x] `DESIGN.md` dan `site/css/tokens.css` (token warna, huruf, radius; terang dan gelap)
+- [x] Halaman beranda bergaya contoh (hero, panel kode, kartu mengambang, statistik)
+- [x] Halaman Materi (kisi 14 bab), Panduan, dan halaman bab
+- [x] Navigasi tanpa kunci; tiga penanda status (belum, sedang, selesai) di sidebar dan kisi
+- [x] `data/config.json` untuk nama situs dan mata kuliah
+- [ ] Logo final (sementara ikon kurung kode)
+- [ ] Tinjau tampilan ponsel sungguhan
+
+## Tahap 2: Laporan dan ekspor PDF
+
+- [ ] Panel laporan lima kolom, terbuka setelah lulus
+- [ ] Pertanyaan konsep khusus bab (14 pertanyaan)
+- [ ] Blokir tempel, salin, potong, seret, klik kanan
+- [ ] Batas minimal karakter dan pesan kesalahan per kolom
+- [ ] Penghitung ketikan per kolom
+- [ ] Lampiran kode dan output terakhir yang lulus
+- [ ] Ekspor PDF (header: nomor materi, materi, nama, NIM, kelas; isi; lampiran; kode verifikasi)
+- [ ] Uji PDF memuat teks Indonesia dan kode dengan benar
+
+## Tahap 3: Data awal dan Supabase
+
+- [ ] Proyek Supabase dibuat oleh Anda (lihat daftar tunggu)
+- [ ] Skema tabel: peserta, materi, percobaan, progres, aktivitas, laporan, penilaian_laporan
+- [ ] Row Level Security: peserta hanya data sendiri, instruktur semua
+- [ ] Halaman data awal: nama, NIM, kelas
+- [ ] Masuk (sesuai keputusan)
+- [ ] Progres dipindah dari browser ke Supabase
+- [ ] Laporan tersimpan di Supabase
+- [ ] Uji dua akun berbeda tidak saling melihat data
+
+## Tahap 4: Log aktivitas
+
+- [ ] Durasi aktif (berhenti saat tab tersembunyi atau diam sekitar 60 detik)
+- [ ] Jalankan dan kirim: waktu, kode, hasil, test case yang gagal
+- [ ] Bantuan: petunjuk, tautan buku, video (lewat YouTube iframe API)
+- [ ] Jalur: lulus langsung atau lewat bantuan
+- [ ] Laporan: durasi, jumlah ketikan, percobaan tempel yang diblokir
+- [ ] Pemberitahuan data apa yang dicatat (halaman masuk)
+
+## Tahap 5: Dashboard dan penilaian
+
+- [ ] Halaman instruktur dilindungi peran
+- [ ] Ringkasan per pertemuan: lulus, sedang dicoba, belum mulai
+- [ ] Waktu median, percobaan, jalur cepat berbanding video
+- [ ] Daftar peserta dengan penanda (macet, tidak aktif, mencurigakan)
+- [ ] Antrean penilaian laporan dengan rubrik 1 sampai 4 dan komentar
+- [ ] Unduh CSV rekap per pertemuan dan per semester
+- [ ] Perbandingan antar pertemuan
+
+## Tahap 6: Isi 14 bab
+
+Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifikasi dengan Python sungguhan), petunjuk bertingkat, pertanyaan konsep.
+
+| Bab | Ringkasan | Video | Challenge | Test case terverifikasi | Pertanyaan konsep | Ditinjau Anda |
+|---|---|---|---|---|---|---|
+| 1 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 2 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 3 (unggah) | [ ] | [ ] | n/a | n/a | [ ] | [ ] |
+| 4 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 5 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 6 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 7 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 8 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 9 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 10 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 11 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 12 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 13 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+| 14 | [ ] | [ ] | [ ] | [ ] | [ ] | [ ] |
+
+## Tahap 7: Unggah tugas Bab 3
+
+- [ ] Unggah foto/PDF ke Supabase Storage dengan kompresi di browser
+- [ ] Daftar centang swa-periksa (sub-bab 3.6)
+- [ ] Status terkumpul, disetujui, perlu revisi
+- [ ] Peserta dan instruktur saja yang dapat melihat berkas
+
+## Tahap 8: Uji coba dan rilis
+
+- [ ] Uji coba 5 sampai 10 mahasiswa (ponsel dan laptop)
+- [ ] Perbaikan hasil uji coba
+- [ ] Hosting dan alamat web
+- [ ] Pemberitahuan privasi dan lama penyimpanan data
+- [ ] Prosedur arsip akhir semester
+- [ ] Panduan singkat untuk peserta dan untuk Anda
+
+## Catatan sesi
+
+- **4 Okt 2026:** Tahap 0 selesai. Keputusan terkunci. Editor diganti dari Monaco ke CodeMirror 5 karena Monaco tidak mendukung ponsel. Challenge Bab 4 mengikuti aturan buku: pesanan 100 boks ke atas dapat potongan 12 persen, 50 sampai 99 boks 8 persen, sisanya 0; keluaran `Total tagihan: Rp{...}` (lihat `kode/bab-04/hitung_potongan.py`).
+- **4 Okt 2026 (2):** Tahap 1 selesai, kecuali dua butir `[~]` di atas. Berkas di `site/`: `index.html`, `css/style.css`, `js/app.js`, `js/runner.js`, `js/pyworker.js`, `js/grader.js`, `data/materi.json` (14 bab), `data/challenges/bab-04.json`. Kunci jawaban ada di `kunci/bab-04.py` (di luar `site/` supaya tidak ikut diterbitkan). Hasil uji: kode awal 3 dari 7 kasus; solusi benar 7 dari 7; `while True` dihentikan setelah 5 detik; error sintaks tampil. Saat dinilai, teks prompt di `input()` tidak dihitung (hanya keluaran `print` yang dibandingkan); saat Jalankan, prompt ditampilkan. Test case tersembunyi masih terbaca di berkas JSON oleh peserta yang teliti; diterima untuk latihan, bukan ujian. **Berikutnya: Tahap 2 (laporan dan PDF).**
+- **4 Okt 2026 (3): Cek penghubung.** GitHub: `gh` sudah masuk sebagai `attoyibi` (izin repo dan workflow), `git` sudah dikonfigurasi, tetapi folder proyek belum menjadi repositori. Supabase: konektor ada di registri tetapi belum terhubung; CLI belum terpasang. Cloudflare: konektor ada di registri tetapi belum terhubung; `wrangler` belum terpasang. Netlify: konektor sudah terhubung (alternatif hosting). Konektor harus diaktifkan oleh Anda dari pengaturan konektor; saya tidak bisa memulai otorisasinya.
+- **4 Okt 2026 (4): Desain dan keputusan baru.** Tanpa kunci antar bab (sudah demikian), ditambah tiga penanda status. Gaya visual mengikuti gambar contoh; token di `site/css/tokens.css`. Situs kini punya beranda, Materi, Panduan, dan halaman bab. Fokus pindah ke GitHub: ditambahkan Tahap G. Konektor Supabase/Cloudflare ditunda. Menunggu keputusan: publik atau privat, nama repositori, lisensi.
+- **4 Okt 2026 (5): Repositori.** Keputusan: publik, `latihan-python-usg`, MIT; Supabase dan Cloudflare/Vercel disambungkan sendiri oleh pemilik. Ditambahkan: README, LICENSE, panduan di `docs/`, skema SQL di `supabase/`, alat di `tools/`, CI. Pemeriksaan sebelum terbit: tidak ada kunci atau data pribadi (dipindai), `kunci/` diabaikan git. **Belum ada di aplikasi:** semua kode yang memakai Supabase (Tahap 3 dan seterusnya). Berikutnya: Tahap 2 (laporan dan PDF), lalu Tahap 3.
