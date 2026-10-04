@@ -372,3 +372,10 @@ Tahap 2 (Supabase) harus merancang tabel log sejak awal, karena data yang tidak 
 - **Kelas tertutup:** dosen mendaftarkan peserta lewat CSV dengan kata sandi awal (acak atau dari CSV); peserta wajib menggantinya pada masuk pertama; kata sandi awal hanya ditulis ke berkas lokal.
 - **Risiko baru:** mengelola kata sandi (lupa, reset). Cadangan: Lupa kata sandi lewat email, atau dosen mengatur ulang dengan `--reset-sandi`.
 - **Pembaruan:** pendaftaran mandiri disembunyikan (bawaan `PENDAFTARAN=tutup`) dan tidak dikembangkan dulu; fokus ke masuk. Penutup yang sebenarnya: matikan "Allow new users to sign up" di Supabase, karena menyembunyikan tombol saja tidak menghalangi panggilan langsung ke API.
+
+## 19. Kelas sebagai pilihan (diputuskan 4 Oktober 2026)
+
+- **Tiga pilihan bertingkat:** Prodi (mulai dari SI), Angkatan (otomatis dari 2024 sampai tahun berjalan), Kelas (A sampai D). Dapat diatur di `site/data/config.json`.
+- **Satu nilai tersimpan**, `SI-2024-A`, ditambah kolom turunan `prodi`, `angkatan`, `rombel` di database yang dihitung dari nilai itu. Dengan begitu tidak ada dua sumber kebenaran, dan memfilter per prodi, angkatan, atau kelas mudah (SQL maupun Table Editor).
+- **Data lama aman:** kelas seperti `SI-1A` tetap tersimpan; peserta diminta memilih ulang. Format tidak dipaksa oleh database agar perintah administrasi tidak gagal.
+- **Belum diputuskan:** kelas per mata kuliah (sekarang satu kelas untuk semua mata kuliah).

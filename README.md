@@ -32,7 +32,7 @@ Halaman depan terbuka untuk siapa saja. Peserta diminta **masuk dengan email dan
 Proyek ini dirancang agar bisa dipakai kampus atau pengajar lain dengan **kunci Supabase mereka sendiri**, tanpa mengedit satu berkas pun:
 
 1. **Fork** repositori ini.
-2. Buat proyek **Supabase** sendiri dan tempel tiga berkas SQL di `supabase/migrations/`.
+2. Buat proyek **Supabase** sendiri dan tempel empat berkas SQL di `supabase/migrations/`.
 3. Sambungkan fork ke **Vercel** (atau Cloudflare Pages / Netlify) dan isi dua *environment variable*: `SUPABASE_URL` dan `SUPABASE_ANON_KEY`.
 
 Saat penayangan, `tools/buat_config.mjs` membuat `site/config.js` dari variabel itu. Kunci `service_role` ditolak otomatis. Karena Anda tidak mengubah berkas apa pun, **Sync fork** di GitHub selalu mulus.

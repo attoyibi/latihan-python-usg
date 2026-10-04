@@ -15,7 +15,8 @@
 //
 // Format CSV (baris pertama = judul kolom; pemisah koma atau titik koma; urutan kolom bebas):
 //   nama,nim,kelas,email            kolom opsional tambahan: sandi (kata sandi awal buatan Anda sendiri)
-//   Siti Aminah,2024110012,SI-1A,siti@kampus.ac.id
+//   Siti Aminah,2024110012,SI-2024-A,siti@kampus.ac.id
+// Kolom kelas wajib berformat PRODI-ANGKATAN-HURUF, mis. SI-2024-A (huruf kecil otomatis dibesarkan).
 // Bila kolom sandi kosong atau tidak ada, skrip membuat kata sandi acak untuk tiap peserta.
 //
 // Untuk --jalankan, atur dua variabel lingkungan di komputer Anda (JANGAN di repositori):
@@ -117,13 +118,13 @@ function validasi(baris) {
   for (const r of isi) {
     const nama = (r.sel[idx.nama] || "").trim();
     const nim = (r.sel[idx.nim] || "").trim();
-    const kelas = (r.sel[idx.kelas] || "").trim();
+    const kelas = (r.sel[idx.kelas] || "").trim().toUpperCase();
     const email = (r.sel[idx.email] || "").trim().toLowerCase();
     const sandi = idx.sandi !== undefined ? (r.sel[idx.sandi] || "").trim() : "";
     const e = [];
     if (nama.length < 2 || nama.length > 100) e.push("nama harus 2 sampai 100 karakter");
     if (nim.length < 3 || nim.length > 30 || !/^[A-Za-z0-9.\-/]+$/.test(nim)) e.push("NIM harus 3 sampai 30 karakter (huruf, angka, titik, strip, garis miring)");
-    if (kelas.length < 1 || kelas.length > 30) e.push("kelas harus 1 sampai 30 karakter");
+    if (!/^[A-Z]{2,6}-[0-9]{4}-[A-Z]$/.test(kelas)) e.push("kelas harus berformat PRODI-ANGKATAN-HURUF, mis. SI-2024-A");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.push("email tidak valid");
     if (sandi && !sandiSah(sandi)) e.push(`sandi minimal ${MIN_SANDI} karakter dan memuat huruf serta angka`);
     if (email && emailDilihat.has(email)) e.push(`email sama dengan baris ${emailDilihat.get(email)}`);

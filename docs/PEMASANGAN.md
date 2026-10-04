@@ -9,7 +9,7 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 ## Ringkasan 15 menit
 
 1. **Fork** repositori ini di GitHub (tombol *Fork*).
-2. **Supabase:** buat proyek, tempel tiga berkas SQL, atur email (bagian A).
+2. **Supabase:** buat proyek, tempel empat berkas SQL, atur email (bagian A).
 3. **Vercel:** *Add New Project* > pilih fork Anda > isi dua variabel > *Deploy* (bagian B).
 4. Kembali ke Supabase, isi *Site URL* dengan alamat dari Vercel (bagian A, langkah 8).
 5. Masuk ke situs, isi data awal, lalu jadikan diri Anda instruktur (bagian C).
@@ -19,7 +19,7 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 1. Buat proyek di supabase.com (paket gratis cukup untuk sekitar 80 peserta). Pakai proyek **khusus** untuk situs ini.
 2. **SQL Editor** > *New query* > tempel isi `supabase/migrations/0001_skema.sql` > **Run**.
 3. *New query* lagi > tempel isi `supabase/migrations/0002_keamanan.sql` > **Run**. Ini mengaktifkan aturan keamanan (Row Level Security) dan bucket privat `tugas`.
-4. *New query* lagi > tempel isi `supabase/migrations/0003_matakuliah.sql` > **Run**. Ini menambah dukungan banyak mata kuliah (Algoritma Python dan PBO Java sudah terdaftar). Sudah menjalankan 0001 dan 0002 sebelumnya? Cukup jalankan 0003; data yang sudah ada otomatis dimasukkan ke mata kuliah `algoritma-python`.
+4. *New query* lagi > tempel isi `supabase/migrations/0003_matakuliah.sql` > **Run**. Ini menambah dukungan banyak mata kuliah (Algoritma Python dan PBO Java sudah terdaftar). Data yang sudah ada otomatis dimasukkan ke mata kuliah `algoritma-python`. Lalu jalankan juga `supabase/migrations/0004_kelas_terstruktur.sql` (query baru) untuk kolom filter kelas: `prodi`, `angkatan`, `rombel` (dihitung otomatis dari kolom `kelas`). Sudah menjalankan sebagian sebelumnya? Lihat bagian "Sudah punya proyek Supabase?" di bawah.
 5. **Authentication > Sign In / Providers > Email:** pastikan *Email* aktif (peserta masuk dengan **email dan kata sandi**). Atur panjang kata sandi minimum (*Minimum password length*) ke **8**, sama dengan aturan di situs.
 6. **Konfirmasi email.** Untuk **kelas tertutup** (peserta didaftarkan dosen, lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)) pendaftaran mandiri dimatikan, jadi pengaturan ini tidak berpengaruh. Untuk **pendaftaran mandiri**, biarkan *Confirm email* aktif supaya tiap pendaftar membuktikan emailnya (satu email per pendaftar). Bila dimatikan, siapa pun bisa membuat akun dengan email orang lain.
 7. **Periksa templat email** di **Authentication > Email Templates**: *Confirm signup* dan *Reset Password* harus memuat tautan `{{ .ConfirmationURL }}`. Templat bawaan sudah memuatnya. Contoh minimal bila ingin menyesuaikan kalimat:
@@ -46,19 +46,29 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 
 Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersifat menambah dan aman untuk data yang sudah ada.
 
-1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan tiga kolom:
+1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan empat kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
 
-   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | Yang perlu dijalankan |
-   |---|---|---|---|
-   | false | false | false | `0001`, lalu `0002`, lalu `0003` |
-   | true | true | false | **hanya `0003`** |
-   | true | true | true | tidak ada, sudah mutakhir |
+   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | Yang perlu dijalankan |
+   |---|---|---|---|---|
+   | false | false | false | false | `0001`, `0002`, `0003`, lalu `0004` |
+   | true | true | true | false | **hanya `0004`** |
+   | true | true | false | false | `0003`, lalu `0004` |
+   | true | true | true | true | tidak ada, sudah mutakhir |
 
-2. Jalankan hanya migrasi yang masih `false`, **berurutan** (0001, 0002, 0003), masing-masing di query baru.
-3. Menjalankan ulang migrasi yang sudah terpasang juga aman (sudah diuji, termasuk menjalankan ulang `0001` dan `0002` setelah `0003`), tetapi tidak perlu.
-4. Pastikan setelahnya `supabase/periksa_migrasi.sql` menunjukkan ketiganya `true`.
+2. Jalankan masing-masing di query baru, **berurutan**.
+3. Menjalankan ulang migrasi yang sudah terpasang juga aman, dalam urutan apa pun (sudah diuji), tetapi tidak perlu.
+4. Pastikan setelahnya `supabase/periksa_migrasi.sql` menunjukkan keempatnya `true`.
 
-Data yang sudah ada (profil peserta, dan progres atau laporan bila sudah ada) tidak hilang. Data lama dari sebelum `0003` otomatis dianggap milik mata kuliah `algoritma-python`.
+Data yang sudah ada (profil peserta, dan progres atau laporan bila sudah ada) tidak hilang. Data lama dari sebelum `0003` otomatis dianggap milik mata kuliah `algoritma-python`. **Kelas lama** seperti `SI-1A` tetap tersimpan apa adanya; peserta diminta memilih kelas baru (prodi, angkatan, huruf) di halaman Profil, dan sampai itu kolom `angkatan` dan `rombel` mereka kosong.
+
+### Memfilter peserta per kelas
+Setelah `0004`, tabel `profiles` dan tampilan `rekap_progres` punya kolom `prodi`, `angkatan`, dan `rombel`. Di SQL Editor:
+
+```sql
+select nama, nim, kelas from public.profiles where prodi = 'SI' and angkatan = 2024 and rombel = 'A';
+```
+
+Di Table Editor, cukup filter kolom `angkatan` atau `rombel`.
 
 ## B. Vercel (atau Cloudflare Pages / Netlify)
 

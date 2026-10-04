@@ -96,6 +96,20 @@ Catatan keamanan isi: bila publik, siapa pun bisa membaca soal, test case, dan k
 - [ ] **SMTP sendiri di Supabase (wajib):** pengirim bawaan hanya 2 email/jam per proyek dan hanya ke anggota tim; batas setelah SMTP sendiri 30/jam, naikkan di Authentication > Rate Limits sebelum hari pertama kelas
 - [x] Pesan galat email dibedakan: jeda per alamat ("Tunggu N detik") dan batas proyek ("Batas pengiriman email sedang tercapai"); diuji (`tools/uji_pesan.mjs`, di CI)
 
+## Tahap Q: Kelas sebagai pilihan (4 Okt 2026)
+
+Kelas bukan lagi teks bebas: dipilih dari Prodi, Angkatan, dan Kelas agar bisa difilter.
+
+- [x] Tiga pilihan di formulir data awal dan halaman Profil: **Prodi** (mulai dari SI), **Angkatan** (otomatis dari 2024 sampai tahun berjalan, terbaru dulu), **Kelas** (A sampai D). Daftarnya di `site/data/config.json` (`prodi`, `angkatanMulai`, `kelas`)
+- [x] Disimpan sebagai `PRODI-ANGKATAN-HURUF`, mis. `SI-2024-A`; wajib lengkap
+- [x] Kelas lama (mis. `SI-1A`) tidak hilang: peserta melihat catatan "Kelas lamamu tercatat ..." dan diminta memilih yang baru
+- [x] Migrasi `0004_kelas_terstruktur.sql`: kolom turunan `prodi`, `angkatan`, `rombel` dihitung otomatis dari `kelas` (tanpa data ganda), diindeks, dan ikut di `rekap_progres`; tanpa aturan CHECK supaya perintah administrasi tidak gagal pada kelas lama
+- [x] `0003` dan `0001` kini aman diulang setelah `0004` (tampilan tidak dikembalikan ke versi lama); diuji (118 uji SQL, termasuk uji sengaja-rusak)
+- [x] Skrip impor menolak format kelas lama dengan petunjuk, dan membesarkan huruf kecil
+- [x] `periksa_migrasi.sql` memeriksa 0004; panduan "Sudah punya proyek Supabase?" diperbarui
+- [ ] Jalankan `0004` di proyek Supabase sungguhan (oleh pemilik) dan pilih ulang kelas di Profil untuk akun yang masih berkelas lama
+- [ ] Kelas per mata kuliah (sekarang satu kelas untuk semua) tetap keputusan terbuka
+
 ## Tahap P: Masuk dengan email dan kata sandi (4 Okt 2026)
 
 > **Daftar mandiri disembunyikan dan tidak dikembangkan dulu** (keputusan pemilik). Butir Daftar di bawah menunjukkan yang sudah ada dan diuji dengan klien tiruan, bukan pekerjaan lanjutan.
@@ -283,3 +297,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - **4 Okt 2026 (17): Kelas tertutup.** Peserta bisa didaftarkan dosen lewat CSV sehingga mereka tidak mendaftar dan datanya sudah terisi; pendaftaran mandiri bisa ditutup. Skrip impor memakai kunci service_role di komputer pemilik (tidak pernah di chat atau repositori). Diuji dengan server tiruan; endpoint asli belum diuji.
 - **4 Okt 2026 (18): Masuk dengan email dan kata sandi.** Atas permintaan pemilik (layar masuk tidak boleh langsung meminta email) masuk lewat tautan diganti email dan kata sandi: Masuk, Daftar, Lupa kata sandi, kata sandi awal wajib ganti untuk akun dari dosen. Keuntungan kapasitas: masuk tidak mengirim email. Batas yang masih berlaku: masuk 30 per 5 menit per IP. Diuji di browser dengan klien tiruan (semua alur) dan di skrip impor dengan server tiruan; belum dengan Supabase sungguhan.
 - **4 Okt 2026 (19): Daftar disembunyikan.** Atas permintaan pemilik, fokus ke masuk saja: `PENDAFTARAN` kini bawaan `tutup` (tombol dan halaman Daftar tersembunyi, teks menyebut akun dari dosen). Kode fitur Daftar tidak diubah dan tidak dikembangkan; tetap bisa dinyalakan dengan `PENDAFTARAN=buka`. Penutup sungguhan tetap di Supabase: matikan Allow new users to sign up.
+- **4 Okt 2026 (20): Kelas sebagai pilihan.** Prodi, Angkatan (otomatis dari 2024), Kelas (A sampai D) menggantikan kolom teks. Disimpan `SI-2024-A`; kolom turunan di database untuk memfilter; kelas lama tetap aman. Diuji di PostgreSQL (118 uji) dan di browser (kelas lama, kelas baru, validasi, onboarding, tahun otomatis).

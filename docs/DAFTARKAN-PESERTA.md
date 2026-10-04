@@ -16,8 +16,10 @@ Buat berkas `peserta.csv` (dari Excel: *Save As > CSV*) dengan judul kolom persi
 
 ```
 nama,nim,kelas,email
-Siti Aminah,2024110012,SI-1A,siti@kampus.ac.id
+Siti Aminah,2024110012,SI-2024-A,siti@kampus.ac.id
 ```
+
+Kolom `kelas` **wajib berformat `PRODI-ANGKATAN-HURUF`**, mis. `SI-2024-A` (SI = prodi, 2024 = angkatan, A = kelas). Huruf kecil otomatis dibesarkan. Format lama seperti `SI-1A` ditolak dengan petunjuk, supaya kelas bisa difilter per prodi, angkatan, dan kelas.
 
 Pemisah koma atau titik koma sama-sama bisa dibaca. Contoh: [contoh-peserta.csv](contoh-peserta.csv).
 
@@ -101,8 +103,8 @@ Peserta yang emailnya salah tidak akan bisa masuk (kata sandi awalnya terkait em
 
 | Email | Kata sandi | Keterangan |
 |---|---|---|
-| `siti@kampus.ac.id` | `Sandi-Awal-1` | kata sandi awal: wajib diganti saat pertama masuk; profil terisi |
-| `budi@kampus.ac.id` | `Rahasia-Budi1` | langsung masuk |
+| `siti@kampus.ac.id` | `Sandi-Awal-1` | kata sandi awal: wajib diganti saat pertama masuk; kelas `SI-2024-A` |
+| `budi@kampus.ac.id` | `Rahasia-Budi1` | kelas **lama** `SI-1A`: di Profil diminta memilih kelas yang baru |
 | `lupa@kampus.ac.id` | `Rahasia-Lupa1` | untuk mencoba Lupa kata sandi (tanpa profil) |
 | `kedaluwarsa@kampus.ac.id` | `Rahasia-Lama1` | tautan atur ulang kata sandinya kedaluwarsa |
 

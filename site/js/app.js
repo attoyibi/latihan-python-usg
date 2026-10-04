@@ -837,15 +837,56 @@ function renderSandiBaru(mode) {
   fs.input.focus();
 }
 
+// ---------- Pilihan kelas: Prodi, Angkatan, Kelas ----------
+
+function kelasOpsi(cur) {
+  const prodi = (Array.isArray(CFG.prodi) && CFG.prodi.length ? CFG.prodi : [{ kode: "SI", nama: "Sistem Informasi" }]).map((p) => [p.kode, p.kode + " - " + p.nama]);
+  const mulai = Number(CFG.angkatanMulai) || 2024;
+  const akhir = Math.max(new Date().getFullYear(), mulai);
+  const tahun = [];
+  for (let y = akhir; y >= mulai; y--) tahun.push(y); // tahun terbaru lebih dulu; bertambah otomatis tiap tahun
+  const rombel = Array.isArray(CFG.kelas) && CFG.kelas.length ? CFG.kelas.slice() : ["A", "B", "C", "D"];
+  // Nilai tersimpan di luar pilihan (mis. angkatan lebih lama) tetap ditampilkan supaya tidak hilang diam-diam.
+  if (cur && !prodi.some((p) => p[0] === cur.prodi)) prodi.push([cur.prodi, cur.prodi]);
+  if (cur && !tahun.includes(cur.angkatan)) tahun.push(cur.angkatan);
+  if (cur && !rombel.includes(cur.rombel)) rombel.push(cur.rombel);
+  return { prodi, tahun: tahun.map((t) => [t, String(t)]), rombel: rombel.map((r) => [r, r]) };
+}
+
+function selectBox(id, label, opsi, nilai, kosong) {
+  const sel = h("select", { id, name: id, class: "input" }, h("option", { value: "" }, kosong), opsi.map((o) => h("option", { value: String(o[0]) }, o[1])));
+  sel.value = nilai === undefined || nilai === null ? "" : String(nilai);
+  return { sel, node: h("div", { class: "field" }, h("label", { for: id }, label), sel) };
+}
+
+function kelasField(nilaiAwal) {
+  const cur = Auth.parseKelas(nilaiAwal);
+  const lama = nilaiAwal && !cur ? nilaiAwal : "";
+  const op = kelasOpsi(cur);
+  const prodiAwal = cur ? cur.prodi : op.prodi.length === 1 ? op.prodi[0][0] : "";
+  const s1 = selectBox("kelas-prodi", "Prodi", op.prodi, prodiAwal, "Pilih prodi");
+  const s2 = selectBox("kelas-angkatan", "Angkatan", op.tahun, cur ? cur.angkatan : "", "Pilih tahun");
+  const s3 = selectBox("kelas-rombel", "Kelas", op.rombel, cur ? cur.rombel : "", "Pilih kelas");
+  const err = h("p", { class: "field-err", id: "kelasErr", role: "alert" });
+  const node = h(
+    "fieldset",
+    { class: "field kelas-field" },
+    h("legend", {}, "Kelas"),
+    lama ? h("p", { class: "muted" }, "Kelas lamamu tercatat \u201c" + lama + "\u201d. Pilih kelas yang baru di bawah ini.") : null,
+    h("div", { class: "kelas-row" }, s1.node, s2.node, s3.node),
+    err
+  );
+  return { node, err, value: () => Auth.formatKelas(s1.sel.value, s2.sel.value, s3.sel.value) };
+}
+
 // Formulir data awal: wajib diisi sebelum mengerjakan.
 function renderProfilForm() {
   const p = Auth.getProfile() || {};
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { inputmode: "text", autocomplete: "off", maxlength: "30", required: "" }, "Tulis seperti di kartu mahasiswa.");
-  const fk = field("kelas", "Kelas", { autocomplete: "off", maxlength: "30", placeholder: "SI-1A", required: "" });
+  const fk = kelasField(p.kelas);
   fn.input.value = p.nama || "";
   fi.input.value = p.nim || "";
-  fk.input.value = p.kelas || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan dan mulai");
   const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
@@ -853,7 +894,7 @@ function renderProfilForm() {
   const form = h("form", { novalidate: "" }, fn.node, fi.node, fk.node, h("div", { class: "actions" }, saveBtn, outBtn), msg);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
-    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.input.value };
+    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.value() };
     const errs = Auth.validateProfile(val);
     fn.err.textContent = errs.nama || "";
     fi.err.textContent = errs.nim || "";
@@ -886,10 +927,9 @@ function renderProfil() {
   const p = Auth.getProfile() || {};
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { autocomplete: "off", maxlength: "30", required: "" });
-  const fk = field("kelas", "Kelas", { autocomplete: "off", maxlength: "30", placeholder: "SI-1A", required: "" });
+  const fk = kelasField(p.kelas);
   fn.input.value = p.nama || "";
   fi.input.value = p.nim || "";
-  fk.input.value = p.kelas || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan perubahan");
   const outBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Keluar");
@@ -912,7 +952,7 @@ function renderProfil() {
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     msg.textContent = "";
-    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.input.value };
+    const val = { nama: fn.input.value, nim: fi.input.value, kelas: fk.value() };
     const errs = Auth.validateProfile(val);
     fn.err.textContent = errs.nama || "";
     fi.err.textContent = errs.nim || "";

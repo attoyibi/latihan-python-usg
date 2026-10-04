@@ -2,8 +2,8 @@
 // Dipakai oleh tools/server_uji.py yang menggantikan site/config.js dengan berkas ini.
 //
 // Mode TERTUTUP (bawaan; meniru kelas yang pesertanya didaftarkan dosen). Akun contoh:
-//   siti@kampus.ac.id   kata sandi awal "Sandi-Awal-1" (wajib diganti saat pertama masuk; profil sudah terisi)
-//   budi@kampus.ac.id   kata sandi "Rahasia-Budi1"      (profil sudah terisi, langsung masuk)
+//   siti@kampus.ac.id   kata sandi awal "Sandi-Awal-1" (wajib diganti saat pertama masuk; kelas SI-2024-A)
+//   budi@kampus.ac.id   kata sandi "Rahasia-Budi1"      (profil terisi dengan kelas LAMA "SI-1A": diminta memilih kelas baru)
 //   lupa@kampus.ac.id   kata sandi "Rahasia-Lupa1"      (tanpa profil; untuk mencoba "Lupa kata sandi")
 //   kedaluwarsa@kampus.ac.id  tautan atur ulang kata sandinya dianggap kedaluwarsa
 // Tambahkan ?terbuka=1 di alamat untuk mode pendaftaran mandiri: Daftar tersedia dan butuh konfirmasi email.
@@ -32,7 +32,7 @@
       "lupa@kampus.ac.id": { id: idDari("lupa@kampus.ac.id"), password: "Rahasia-Lupa1", confirmed: true, meta: {} },
       "kedaluwarsa@kampus.ac.id": { id: idDari("kedaluwarsa@kampus.ac.id"), password: "Rahasia-Lama1", confirmed: true, meta: {} },
     };
-    db.profiles[idDari("siti@kampus.ac.id")] = { id: idDari("siti@kampus.ac.id"), nama: "Siti Aminah", nim: "2024110012", kelas: "SI-1A", peran: "peserta" };
+    db.profiles[idDari("siti@kampus.ac.id")] = { id: idDari("siti@kampus.ac.id"), nama: "Siti Aminah", nim: "2024110012", kelas: "SI-2024-A", peran: "peserta" };
     db.profiles[idDari("budi@kampus.ac.id")] = { id: idDari("budi@kampus.ac.id"), nama: "Budi Santoso", nim: "2024110099", kelas: "SI-1A", peran: "peserta" };
     save();
   }

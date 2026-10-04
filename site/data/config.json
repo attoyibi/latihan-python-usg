@@ -1,4 +1,7 @@
 {
   "namaSitus": "Latihan Pemrograman",
-  "institusi": "Universitas Sunan Gresik"
+  "institusi": "Universitas Sunan Gresik",
+  "prodi": [{ "kode": "SI", "nama": "Sistem Informasi" }],
+  "angkatanMulai": 2024,
+  "kelas": ["A", "B", "C", "D"]
 }

@@ -90,7 +90,7 @@ function cek(nama, kondisi, detail = "") {
   console.log((kondisi ? "OK    " : "GAGAL ") + nama + (!kondisi && detail ? "  -> " + detail : ""));
 }
 const ENV = { SUPABASE_URL: URL_TIRUAN, SUPABASE_SERVICE_ROLE_KEY: KUNCI };
-const BAIK = "nama,nim,kelas,email\nSiti Aminah,2024110012,SI-1A,Siti@Kampus.ac.id\nBudi Santoso,2024110099,SI-1A,budi@kampus.ac.id\nRina Wulandari,2024110105,SI-1B,rina@kampus.ac.id\n";
+const BAIK = "nama,nim,kelas,email\nSiti Aminah,2024110012,SI-2024-A,Siti@Kampus.ac.id\nBudi Santoso,2024110099,SI-2024-A,budi@kampus.ac.id\nRina Wulandari,2024110105,SI-2024-B,rina@kampus.ac.id\n";
 const sandiF = (nama) => join(dir, nama);
 
 // 1 simulasi
@@ -99,7 +99,7 @@ cek("simulasi memeriksa berkas tanpa kunci dan tanpa mengirim apa pun", r.kode =
 cek("simulasi tidak membuat berkas kata sandi", !existsSync(sandiF("a-sandi.csv")));
 
 // 2 berkas bermasalah
-r = await jalan([tulis("b.csv", "nama,nim,kelas,email\nA,12,,salah\nBudi,2024,SI-1A,x@y.id\nBudi Dua,2024,SI-1A,x@y.id\n"), "--jalankan", "--jeda=0", "--sandi=" + sandiF("b-sandi.csv")], ENV);
+r = await jalan([tulis("b.csv", "nama,nim,kelas,email\nA,12,,salah\nBudi,2024,SI-2024-A,x@y.id\nBudi Dua,2024,SI-2024-A,x@y.id\n"), "--jalankan", "--jeda=0", "--sandi=" + sandiF("b-sandi.csv")], ENV);
 cek("berkas bermasalah ditolak sebelum menghubungi server", r.kode === 1 && permintaan.length === 0, r.out);
 cek("galat menyebut nomor baris", /baris 2:/.test(r.out) && /baris 4:.*email sama dengan baris 3/.test(r.out) && /NIM sama dengan baris 3/.test(r.out), r.out);
 cek("berkas bermasalah tidak membuat berkas kata sandi", !existsSync(sandiF("b-sandi.csv")));
@@ -107,8 +107,12 @@ cek("berkas bermasalah tidak membuat berkas kata sandi", !existsSync(sandiF("b-s
 // 3 kolom wajib dan sandi buatan sendiri yang lemah
 r = await jalan([tulis("c.csv", "nama,nim,email\nA B,123,a@b.id\n"), "--jeda=0"], {});
 cek("kolom kelas yang hilang dilaporkan", r.kode === 1 && /'kelas' tidak ada/.test(r.out), r.out);
-r = await jalan([tulis("c2.csv", "nama,nim,kelas,email,sandi\nAndi Wijaya,2024110888,SI-1A,andi@kampus.ac.id,pendek\nCici Lestari,2024110889,SI-1A,cici@kampus.ac.id,hurufsajaa\n"), "--jeda=0"], {});
+r = await jalan([tulis("c2.csv", "nama,nim,kelas,email,sandi\nAndi Wijaya,2024110888,SI-2024-A,andi@kampus.ac.id,pendek\nCici Lestari,2024110889,SI-2024-A,cici@kampus.ac.id,hurufsajaa\n"), "--jeda=0"], {});
 cek("kolom sandi yang terlalu lemah ditolak", r.kode === 1 && /baris 2:.*sandi minimal 8/.test(r.out) && /baris 3:.*sandi minimal 8/.test(r.out), r.out);
+
+// 3b format kelas lama ditolak dengan petunjuk
+r = await jalan([tulis("c3.csv", "nama,nim,kelas,email\nAndi Wijaya,2024110888,SI-1A,andi@kampus.ac.id\nCici Lestari,2024110889,SI-2024-E1,cici@kampus.ac.id\n"), "--jeda=0"], {});
+cek("kelas berformat lama atau salah ditolak dengan petunjuk format", r.kode === 1 && /baris 2:.*PRODI-ANGKATAN-HURUF/.test(r.out) && /baris 3:.*PRODI-ANGKATAN-HURUF/.test(r.out) && /SI-2024-A/.test(r.out), r.out);
 
 // 4 kunci publik ditolak
 permintaan = [];
@@ -130,7 +134,7 @@ r = await jalan([tulis("f.csv", BAIK), "--jalankan", "--jeda=0", "--sandi=" + SA
 cek("pendaftaran berhasil", r.kode === 0 && /Akun baru dibuat\s+: 3/.test(r.out) && /Profil tersimpan\s+: 3 dari 3/.test(r.out), r.out);
 cek("tiga akun dan tiga profil ada di server", users.length === 3 && profiles.size === 3);
 cek("email dinormalkan ke huruf kecil", users[0].email === "siti@kampus.ac.id");
-cek("profil berisi nama, NIM, kelas", [...profiles.values()].some((p) => p.nama === "Siti Aminah" && p.nim === "2024110012" && p.kelas === "SI-1A"));
+cek("profil berisi nama, NIM, kelas", [...profiles.values()].some((p) => p.nama === "Siti Aminah" && p.nim === "2024110012" && p.kelas === "SI-2024-A"));
 cek("tiap akun bertanda wajib ganti kata sandi", users.every((u) => u.meta.ganti_sandi === true));
 cek("kata sandi awal acak: 12 karakter, memuat huruf dan angka, berbeda-beda", users.every((u) => u.password.length === 12 && /[A-Za-z]/.test(u.password) && /[0-9]/.test(u.password)) && new Set(users.map((u) => u.password)).size === 3);
 const baris1 = baca(SANDI1);
@@ -143,11 +147,11 @@ const sandiAwal = users.map((u) => u.password);
 // 7 ulang aman
 permintaan = [];
 const SANDI2 = sandiF("sandi2.csv");
-r = await jalan([tulis("g.csv", BAIK.replace("SI-1B", "SI-1C")), "--jalankan", "--jeda=0", "--sandi=" + SANDI2], ENV);
+r = await jalan([tulis("g.csv", BAIK.replace("SI-2024-B", "SI-2024-C")), "--jalankan", "--jeda=0", "--sandi=" + SANDI2], ENV);
 cek("menjalankan ulang tidak membuat akun ganda", r.kode === 0 && /Akun baru dibuat\s+: 0/.test(r.out) && /Akun sudah ada\s+: 3/.test(r.out) && users.length === 3, r.out);
 cek("menjalankan ulang TIDAK mengubah kata sandi yang ada", users.every((u, i) => u.password === sandiAwal[i]));
 cek("menjalankan ulang tidak menulis berkas kata sandi baru", !existsSync(SANDI2));
-cek("menjalankan ulang memperbarui profil", [...profiles.values()].find((p) => p.nim === "2024110105").kelas === "SI-1C");
+cek("menjalankan ulang memperbarui profil", [...profiles.values()].find((p) => p.nim === "2024110105").kelas === "SI-2024-C");
 cek("tidak ada panggilan pembuatan akun atau ubah sandi saat diulang", !permintaan.includes("POST /auth/v1/admin/users") && !permintaan.some((x) => x.startsWith("PUT ")));
 
 // 8 peran tidak diubah
@@ -167,14 +171,15 @@ cek("tidak menimpa berkas kata sandi yang sudah ada", (await jalan([tulis("i2.cs
 
 // 10 NIM bentrok dengan profil lain
 profiles.set("id-lain", { id: "id-lain", nama: "Orang Lain", nim: "2024110777", kelas: "X", peran: "peserta" });
-r = await jalan([tulis("j.csv", BAIK + "Dewi Sartika,2024110777,SI-1A,dewi@kampus.ac.id\nAndi Wijaya,2024110888,SI-1A,andi@kampus.ac.id\n"), "--jalankan", "--jeda=0", "--sandi=" + sandiF("sandi4.csv")], ENV);
+r = await jalan([tulis("j.csv", BAIK + "Dewi Sartika,2024110777,SI-2024-A,dewi@kampus.ac.id\nAndi Wijaya,2024110888,SI-2024-A,andi@kampus.ac.id\n"), "--jalankan", "--jeda=0", "--sandi=" + sandiF("sandi4.csv")], ENV);
 cek("NIM yang bentrok dilaporkan per baris, dan exit 1", r.kode === 1 && /dewi@kampus.ac.id.*NIM 2024110777 sudah dipakai/.test(r.out), r.out);
 cek("peserta lain tetap terdaftar meski satu baris gagal", users.some((u) => u.email === "andi@kampus.ac.id") && [...profiles.values()].some((p) => p.nim === "2024110888"));
 
 // 11 format Excel dan kata sandi buatan sendiri
 const SANDI5 = sandiF("sandi5.csv");
-r = await jalan([tulis("k.csv", "﻿nim;kelas;email;nama;sandi\r\n2024110301;SI-2A;lia@kampus.ac.id;\"Lia, S.Kom\";Awal-Lia-2026\r\n"), "--jalankan", "--jeda=0", "--sandi=" + SANDI5], ENV);
-cek("CSV titik koma + BOM + nama berkoma terbaca", r.kode === 0 && [...profiles.values()].some((p) => p.nim === "2024110301" && p.nama === "Lia, S.Kom" && p.kelas === "SI-2A"), r.out);
+r = await jalan([tulis("k.csv", "﻿nim;kelas;email;nama;sandi\r\n2024110301;si-2025-a;lia@kampus.ac.id;\"Lia, S.Kom\";Awal-Lia-2026\r\n"), "--jalankan", "--jeda=0", "--sandi=" + SANDI5], ENV);
+cek("CSV titik koma + BOM + nama berkoma terbaca", r.kode === 0 && [...profiles.values()].some((p) => p.nim === "2024110301" && p.nama === "Lia, S.Kom" && p.kelas === "SI-2025-A"), r.out);
+cek("kelas huruf kecil dinormalkan menjadi huruf besar", [...profiles.values()].some((p) => p.nim === "2024110301" && p.kelas === "SI-2025-A"));
 cek("kata sandi buatan sendiri dari kolom sandi dipakai", users.find((u) => u.email === "lia@kampus.ac.id").password === "Awal-Lia-2026");
 
 server.close();

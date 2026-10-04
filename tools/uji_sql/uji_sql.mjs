@@ -197,6 +197,42 @@ cek("rekap: peserta hanya melihat dirinya", rekapU1.rows.every((r) => r.user_id 
 cek("rekap: instruktur melihat dua peserta", (await sisip(IN, "select distinct user_id from public.rekap_progres")).rows.length === 2);
 cek("peserta 2 tidak melihat progres pbo-java peserta 1", (await sisip(U2, "select * from public.progres where matakuliah_id = 'pbo-java'")).rows.length === 0);
 
+console.log("\n== Tahap B2: migrasi 0004 (kelas terstruktur) ==");
+{
+  const legacy = (await q("select kelas from public.profiles where id = $1", [U1])).rows[0];
+  cek("sebelum 0004: profil memakai kelas lama dan belum ada kolom turunan", legacy.kelas === "SI-1B" && !!(await q("select prodi from public.profiles limit 1")).error);
+  if (!(await jalankan("0004_kelas_terstruktur.sql berjalan", migrasi("0004_kelas_terstruktur.sql")))) process.exit(1);
+  await jalankan("0004 aman dijalankan ulang", migrasi("0004_kelas_terstruktur.sql"));
+
+  const lama = (await q("select kelas, prodi, angkatan, rombel from public.profiles where id = $1", [U1])).rows[0];
+  cek("kelas lama (SI-1B) tetap utuh dan prodinya terbaca", lama.kelas === "SI-1B" && lama.prodi === "SI", JSON.stringify(lama));
+  cek("kelas lama: angkatan dan rombel kosong sampai dipilih ulang", lama.angkatan === null && lama.rombel === null, JSON.stringify(lama));
+
+  cek("peserta memilih kelas baru (SI-2024-B)", (await sisip(U1, "update public.profiles set kelas = 'SI-2024-B' where id = $1", U1)).n === 1);
+  const baru = (await q("select kelas, prodi, angkatan, rombel from public.profiles where id = $1", [U1])).rows[0];
+  cek("kolom turunan terhitung otomatis: SI, 2024, B", baru.prodi === "SI" && baru.angkatan === 2024 && baru.rombel === "B", JSON.stringify(baru));
+
+  await sisip(U2, "update public.profiles set kelas = 'si-2025-c' where id = $1", U2);
+  const kecil = (await q("select prodi, angkatan, rombel from public.profiles where id = $1", [U2])).rows[0];
+  cek("huruf kecil dinormalkan di kolom turunan (si-2025-c menjadi SI, 2025, C)", kecil.prodi === "SI" && kecil.angkatan === 2025 && kecil.rombel === "C", JSON.stringify(kecil));
+
+  const dosen = (await q("select prodi, angkatan, rombel from public.profiles where id = $1", [IN])).rows[0];
+  cek("kelas bukan format kelas (Dosen) tidak menghasilkan prodi, angkatan, rombel", dosen.prodi === null && dosen.angkatan === null && dosen.rombel === null, JSON.stringify(dosen));
+
+  cek("kolom turunan tidak bisa diisi langsung oleh peserta", ditolak(await sisip(U1, "update public.profiles set angkatan = 1999 where id = $1", U1)));
+  cek("upsert profil dari situs tetap berjalan setelah 0004", !(await sisip(U1, "insert into public.profiles (id, nama, nim, kelas) values ($1, 'Siti Aminah Putri', '2024110012', 'SI-2024-B') on conflict (id) do update set nama = excluded.nama, nim = excluded.nim, kelas = excluded.kelas returning kelas", U1)).error);
+
+  const filter = (await q("select count(*)::int as n from public.profiles where prodi = 'SI' and angkatan = 2024 and rombel = 'B'")).rows[0].n;
+  cek("filter prodi + angkatan + rombel menemukan peserta yang tepat", filter === 1, String(filter));
+  cek("peserta lain tidak ikut tersaring", (await q("select count(*)::int as n from public.profiles where angkatan = 2025")).rows[0].n === 1);
+
+  const kolomView = (await q("select count(*)::int as n from information_schema.columns where table_schema = 'public' and table_name = 'rekap_progres' and column_name in ('prodi','angkatan','rombel')")).rows[0].n;
+  cek("tampilan rekap memuat prodi, angkatan, rombel", kolomView === 3);
+  const rekap = await sisip(U1, "select distinct user_id, angkatan from public.rekap_progres");
+  cek("rekap tetap hanya menampilkan diri sendiri dan angkatan terisi", rekap.rows.length === 1 && rekap.rows[0].user_id === U1 && rekap.rows[0].angkatan === 2024, JSON.stringify(rekap.rows));
+  cek("instruktur tetap bisa memfilter rekap per angkatan", (await sisip(IN, "select distinct user_id from public.rekap_progres where angkatan = 2024")).rows.length === 1);
+}
+
 console.log("\n== Tahap C: berkas jadikan_instruktur.sql ==");
 {
   const ADMIN = "44444444-4444-4444-4444-444444444444";
@@ -252,8 +288,11 @@ console.log("\n== Tahap E: menjalankan ulang migrasi pada proyek yang sudah leng
   cek("sebelum diulang: rekap_progres punya kolom matakuliah_id", (await kolom()) === 1);
   cek("0001 diulang setelah 0003 tanpa galat", await jalankan("jalankan ulang 0001", migrasi("0001_skema.sql")));
   cek("0002 diulang setelah 0003 tanpa galat", await jalankan("jalankan ulang 0002", migrasi("0002_keamanan.sql")));
-  cek("tampilan rekap tidak dikembalikan ke versi lama", (await kolom()) === 1);
-  cek("0001, 0002, 0003 berurutan diulang tanpa galat", await jalankan("ulang semuanya berurutan", migrasi("0001_skema.sql") + migrasi("0002_keamanan.sql") + migrasi("0003_matakuliah.sql")));
+  const kolomAng = async () => (await q("select count(*)::int as n from information_schema.columns where table_schema = 'public' and table_name = 'rekap_progres' and column_name = 'angkatan'")).rows[0].n;
+  cek("tampilan rekap tidak dikembalikan ke versi lama", (await kolom()) === 1 && (await kolomAng()) === 1);
+  cek("0001 sampai 0004 berurutan diulang tanpa galat", await jalankan("ulang semuanya berurutan", migrasi("0001_skema.sql") + migrasi("0002_keamanan.sql") + migrasi("0003_matakuliah.sql") + migrasi("0004_kelas_terstruktur.sql")));
+  cek("setelah diulang, tampilan rekap masih memuat angkatan", (await kolomAng()) === 1);
+  cek("0003 diulang setelah 0004 tanpa galat dan tanpa menghapus kolom baru", (await jalankan("ulang 0003", migrasi("0003_matakuliah.sql"))) && (await kolomAng()) === 1);
   cek("setelah diulang, peserta tetap hanya melihat dirinya di rekap", (await sisip(U1, "select distinct user_id from public.rekap_progres")).rows.every((r) => r.user_id === U1));
   cek("setelah diulang, data peserta tidak hilang", (await q("select count(*)::int as n from public.progres")).rows[0].n >= 3);
 }

@@ -71,39 +71,49 @@ create index if not exists aktivitas_user_kuliah_bab_idx on public.aktivitas (us
 drop index if exists public.unggahan_user_bab_idx;
 create index if not exists unggahan_user_kuliah_bab_idx on public.unggahan (user_id, matakuliah_id, bab);
 
--- Tampilan rekap dibuat ulang karena kolomnya bertambah.
-drop view if exists public.rekap_progres;
-create view public.rekap_progres
-with (security_invoker = true) as
-select
-  p.id as user_id,
-  p.nama,
-  p.nim,
-  p.kelas,
-  g.matakuliah_id,
-  m.nama as matakuliah,
-  g.bab,
-  g.status,
-  g.jumlah_jalankan,
-  g.jumlah_kirim,
-  g.pertama_dibuka,
-  g.lulus_pada,
-  g.durasi_aktif_detik,
-  g.jalur,
-  l.status as status_laporan,
-  l.percobaan_tempel,
-  n.skor_konsep,
-  n.skor_bahasa,
-  n.skor_refleksi,
-  n.skor_kode
-from public.profiles p
-join public.progres g on g.user_id = p.id
-join public.matakuliah m on m.id = g.matakuliah_id
-left join public.laporan l on l.user_id = p.id and l.matakuliah_id = g.matakuliah_id and l.bab = g.bab
-left join public.penilaian_laporan n on n.laporan_id = l.id;
+-- Tampilan rekap dibuat ulang karena kolomnya bertambah. Hanya bila belum memuat matakuliah_id,
+-- supaya menjalankan ulang berkas ini setelah migrasi berikutnya tidak mengembalikannya ke versi lama.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'rekap_progres' and column_name = 'matakuliah_id'
+  ) then
+    drop view if exists public.rekap_progres;
+    create view public.rekap_progres
+    with (security_invoker = true) as
+    select
+      p.id as user_id,
+      p.nama,
+      p.nim,
+      p.kelas,
+      g.matakuliah_id,
+      m.nama as matakuliah,
+      g.bab,
+      g.status,
+      g.jumlah_jalankan,
+      g.jumlah_kirim,
+      g.pertama_dibuka,
+      g.lulus_pada,
+      g.durasi_aktif_detik,
+      g.jalur,
+      l.status as status_laporan,
+      l.percobaan_tempel,
+      n.skor_konsep,
+      n.skor_bahasa,
+      n.skor_refleksi,
+      n.skor_kode
+    from public.profiles p
+    join public.progres g on g.user_id = p.id
+    join public.matakuliah m on m.id = g.matakuliah_id
+    left join public.laporan l on l.user_id = p.id and l.matakuliah_id = g.matakuliah_id and l.bab = g.bab
+    left join public.penilaian_laporan n on n.laporan_id = l.id;
 
-revoke all on public.rekap_progres from anon;
-grant select on public.rekap_progres to authenticated;
+    revoke all on public.rekap_progres from anon;
+    grant select on public.rekap_progres to authenticated;
+  end if;
+end
+$$;
 
 -- Keamanan tabel matakuliah: semua yang sudah masuk boleh membaca daftar,
 -- hanya instruktur yang boleh menambah, mengubah, atau menghapus.

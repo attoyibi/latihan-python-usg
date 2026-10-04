@@ -206,3 +206,12 @@ body.gate #loginBtn,body.gate #daftarBtn{display:none}
 .pw-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:13px;font-weight:600;color:var(--brand);background:transparent;border:0;padding:6px 10px;border-radius:8px;cursor:pointer}
 .pw-toggle:hover{background:var(--brand-soft)}
 .alt-link{margin:12px 0 0;font-size:14px}
+
+/* Pilihan kelas */
+.kelas-field{border:0;padding:0;margin:14px 0;min-width:0}
+.kelas-field legend{font-weight:600;font-size:14px;margin-bottom:5px;padding:0}
+.kelas-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px}
+.kelas-row .field{margin:0}
+.kelas-row label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px}
+select.input{appearance:auto;padding-right:8px;cursor:pointer}
+@media (max-width:520px){.kelas-row{grid-template-columns:1fr 1fr}.kelas-row .field:first-child{grid-column:1/-1}}

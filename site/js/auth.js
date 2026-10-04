@@ -113,6 +113,20 @@ export async function init() {
   });
 }
 
+// ---------- kelas: PRODI-ANGKATAN-HURUF, mis. SI-2024-A ----------
+
+const POLA_KELAS = /^([A-Za-z]{2,6})-([0-9]{4})-([A-Za-z])$/;
+
+export function formatKelas(prodi, angkatan, rombel) {
+  return prodi && angkatan && rombel ? prodi + "-" + angkatan + "-" + rombel : "";
+}
+
+// Mengurai "SI-2024-A" menjadi { prodi, angkatan, rombel }; null bila bukan format itu (mis. kelas lama "SI-1A").
+export function parseKelas(teks) {
+  const m = POLA_KELAS.exec((teks || "").trim());
+  return m ? { prodi: m[1].toUpperCase(), angkatan: Number(m[2]), rombel: m[3].toUpperCase() } : null;
+}
+
 // ---------- validasi sisi klien ----------
 
 export function validasiEmail(email) {
@@ -215,7 +229,6 @@ export function validateProfile(p) {
   if (nim.length < 3) e.nim = "NIM minimal 3 karakter.";
   else if (nim.length > 30) e.nim = "NIM terlalu panjang (maksimal 30 karakter).";
   else if (!/^[A-Za-z0-9.\-/]+$/.test(nim)) e.nim = "NIM hanya boleh huruf, angka, titik, strip, atau garis miring.";
-  if (kelas.length < 1) e.kelas = "Isi kelas, misalnya SI-1A.";
-  else if (kelas.length > 30) e.kelas = "Kelas terlalu panjang (maksimal 30 karakter).";
+  if (!POLA_KELAS.test(kelas)) e.kelas = "Pilih prodi, angkatan, dan kelas.";
   return e;
 }
