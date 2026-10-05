@@ -1,0 +1,72 @@
+{
+ "bab": 7,
+ "judul": "Mengolah baris pesanan teks",
+ "soal": [
+  "Pesanan masuk lewat pesan singkat dengan format: nama, produk, jumlah satuan. Contoh: Toko Barokah Jaya, Pudak, 10 kotak.",
+  "Baris pertama masukan adalah banyaknya baris pesan. Satuan yang dikenal: kotak (1 kotak = 20 biji), pak (1 pak = 10 biji), dan biji. Huruf besar kecil pada satuan tidak berpengaruh, spasi berlebih harus dibuang.",
+  "Untuk tiap baris cetak: <nama> memesan <produk>: <jumlah> biji. Satuan lain dilewati dengan mencetak: Satuan tidak dikenali: <baris asli>. Di akhir cetak total biji."
+ ],
+ "rujukan": [
+  "Buku Bab VII, bagian C (string sebagai data yang bisa diolah), hlm. 170, dan bagian nested list di bab yang sama.",
+  "Video 33: Nested List dan Video 16: Manipulasi String (Kelas Terbuka).",
+  "Clue: program kp5_olah_pesanan di Bab 7 memakai split, strip, lower, dan continue. Soal ini hanya menambah satuan pak."
+ ],
+ "starter": "banyak = int(input())\ntotal_biji = 0\n\nfor i in range(banyak):\n    teks = input()\n    bagian = [b.strip() for b in teks.split(\",\")]\n    pelanggan = bagian[0]\n    produk = bagian[1]\n    jumlah_satuan = bagian[2]\n\n    # Pisahkan angka dan satuan, ubah satuan jadi huruf kecil,\n    # lalu hitung jumlah_biji. Satuan tak dikenal: cetak pesan dan continue.\n    jumlah_biji = 0\n\n    print(f\"{pelanggan} memesan {produk}: {jumlah_biji} biji\")\n    total_biji = total_biji + jumlah_biji\n\nprint(f\"Total kebutuhan: {total_biji} biji\")\n",
+ "contohMasukan": "3\nToko Barokah Jaya, Pudak, 10 kotak\nBu Siti, Jubung, 25 biji\nToko Makmur, Pudak, 8 PAK",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "split(\",\") memecah baris, strip() membuang spasi, lower() menyamakan huruf. Pisahkan angka dan satuan dengan split(\" \") dan ubah angka dengan int()."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VII, bagian C (hlm. 170) tentang split, strip, dan lower."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 16: Manipulasi String.",
+   "video": [
+    "u3xOkmxzeBE",
+    "MPvC9uWATLI"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "3",
+    "Toko Barokah Jaya, Pudak, 10 kotak",
+    "Bu Siti, Jubung, 25 biji",
+    "Toko Makmur, Pudak, 8 PAK"
+   ],
+   "expected": "Toko Barokah Jaya memesan Pudak: 200 biji\nBu Siti memesan Jubung: 25 biji\nToko Makmur memesan Pudak: 80 biji\nTotal kebutuhan: 305 biji",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1",
+    "Bu Ani,Pudak,3 kotak"
+   ],
+   "expected": "Bu Ani memesan Pudak: 60 biji\nTotal kebutuhan: 60 biji",
+   "hidden": false
+  },
+  {
+   "input": [
+    "2",
+    "Bu Ani, Pudak, 5 lusin",
+    "Pak Budi, Jubung, 12 Biji"
+   ],
+   "expected": "Satuan tidak dikenali: Bu Ani, Pudak, 5 lusin\nPak Budi memesan Jubung: 12 biji\nTotal kebutuhan: 12 biji",
+   "hidden": true
+  },
+  {
+   "input": [
+    "2",
+    "Toko A, Pudak, 1 PAK",
+    "Toko B, Pudak, 2 Kotak"
+   ],
+   "expected": "Toko A memesan Pudak: 10 biji\nToko B memesan Pudak: 40 biji\nTotal kebutuhan: 50 biji",
+   "hidden": true
+  }
+ ]
+}

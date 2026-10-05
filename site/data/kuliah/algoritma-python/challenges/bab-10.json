@@ -1,0 +1,73 @@
+{
+ "bab": 10,
+ "judul": "Menyimpan dan membaca pesanan dari berkas",
+ "soal": [
+  "Masukan: banyaknya pesanan, lalu tiap pesanan satu baris berformat nama,jumlah. Terakhir satu baris pesanan susulan, juga berformat nama,jumlah.",
+  "Tulis semua pesanan awal ke berkas pesanan.txt (mode w), tambahkan pesanan susulan di akhir berkas (mode a), lalu baca berkas itu baris demi baris. Cetak banyak baris dan total jumlah boks. Gunakan with open agar berkas otomatis ditutup."
+ ],
+ "rujukan": [
+  "Buku Bab X, bagian E (mode w menimpa, mode a menambah), hlm. 245, dan bagian membaca berkas baris demi baris.",
+  "Video 64: Read external file dan Video 65: Write external file (Belajar Python).",
+  "Clue: contoh 03_tulis_with, 05_baca_baris, 06_mode_w_menimpa, dan 07_mode_a_menambah di Bab 10. Jangan lupa \\n di akhir tiap baris yang ditulis."
+ ],
+ "starter": "banyak = int(input())\ndaftar = [input() for i in range(banyak)]\nsusulan = input()\n\n# 1. tulis daftar ke \"pesanan.txt\" dengan mode w, satu pesanan per baris\n# 2. tambahkan susulan dengan mode a\n# 3. baca berkas baris demi baris, jumlahkan angka setelah koma\n\nbanyak_baris = 0\ntotal_boks = 0\n\nprint(f\"Banyak pesanan tersimpan: {banyak_baris}\")\nprint(f\"Total boks: {total_boks}\")\n",
+ "contohMasukan": "2\nToko Barokah Jaya,120\nBu Siti,40\nToko Makmur,15",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Tiap baris yang ditulis perlu diakhiri \\n. Saat membaca, baris.strip() membuang \\n lalu split(\",\") memisahkan nama dan jumlah."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab X, bagian E (hlm. 245) tentang mode w dan mode a."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 65: Write external file.",
+   "video": [
+    "9xiuFrL0wSw",
+    "3FfNwPIAtNw"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "2",
+    "Toko Barokah Jaya,120",
+    "Bu Siti,40",
+    "Toko Makmur,15"
+   ],
+   "expected": "Banyak pesanan tersimpan: 3\nTotal boks: 175",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1",
+    "Bu Ani,10",
+    "Bu Budi,5"
+   ],
+   "expected": "Banyak pesanan tersimpan: 2\nTotal boks: 15",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "A,1",
+    "B,2",
+    "C,3",
+    "D,4"
+   ],
+   "expected": "Banyak pesanan tersimpan: 4\nTotal boks: 10",
+   "hidden": true
+  },
+  {
+   "input": [
+    "0",
+    "Toko Z,7"
+   ],
+   "expected": "Banyak pesanan tersimpan: 1\nTotal boks: 7",
+   "hidden": true
+  }
+ ]
+}

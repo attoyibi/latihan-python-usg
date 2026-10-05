@@ -1,0 +1,87 @@
+{
+ "bab": 6,
+ "judul": "Rekap nilai pesanan hari ini",
+ "soal": [
+  "Baris pertama masukan adalah banyaknya pesanan (minimal 1), lalu satu baris nilai rupiah per pesanan. Simpan semuanya dalam sebuah list.",
+  "Cetak total pendapatan, pesanan terbesar, pesanan terkecil, dan dua pesanan terakhir yang masuk (dalam bentuk list). Format angka memakai pemisah ribuan seperti di buku."
+ ],
+ "rujukan": [
+  "Buku Bab VI, bagian C (mengakses elemen dengan indeks), hlm. 147, dan bagian slicing di bab yang sama.",
+  "Video 29: List dan Video 30: Manipulasi List (Kelas Terbuka).",
+  "Clue: contoh program pesanan_hari_ini memakai append, sum, max, min, dan irisan [-2:]."
+ ],
+ "starter": "pesanan_hari_ini = []\n\njumlah_pesanan = int(input())\nfor i in range(jumlah_pesanan):\n    nilai = int(input())\n    # simpan nilai ke dalam list\n\ntotal = 0\nterbesar = 0\nterkecil = 0\ndua_terakhir = []\n\nprint(f\"Total pendapatan: Rp{total:,}\")\nprint(f\"Pesanan terbesar: Rp{terbesar:,}\")\nprint(f\"Pesanan terkecil: Rp{terkecil:,}\")\nprint(f\"Dua pesanan terakhir: {dua_terakhir}\")\n",
+ "contohMasukan": "5\n230000\n75000\n410000\n120000\n88000",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Pakai append() untuk mengisi list, sum(), max(), dan min() untuk ringkasan. Dua elemen terakhir: irisan dengan indeks negatif."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VI, bagian C (hlm. 147) dan bagian slicing."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 30: Manipulasi List.",
+   "video": [
+    "tERK7b5Woqs",
+    "Xqvui6Bmrj0"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "5",
+    "230000",
+    "75000",
+    "410000",
+    "120000",
+    "88000"
+   ],
+   "expected": "Total pendapatan: Rp923,000\nPesanan terbesar: Rp410,000\nPesanan terkecil: Rp75,000\nDua pesanan terakhir: [120000, 88000]",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "10000",
+    "20000",
+    "30000"
+   ],
+   "expected": "Total pendapatan: Rp60,000\nPesanan terbesar: Rp30,000\nPesanan terkecil: Rp10,000\nDua pesanan terakhir: [20000, 30000]",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1",
+    "50000"
+   ],
+   "expected": "Total pendapatan: Rp50,000\nPesanan terbesar: Rp50,000\nPesanan terkecil: Rp50,000\nDua pesanan terakhir: [50000]",
+   "hidden": true
+  },
+  {
+   "input": [
+    "2",
+    "5000",
+    "5000"
+   ],
+   "expected": "Total pendapatan: Rp10,000\nPesanan terbesar: Rp5,000\nPesanan terkecil: Rp5,000\nDua pesanan terakhir: [5000, 5000]",
+   "hidden": true
+  },
+  {
+   "input": [
+    "6",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+   ],
+   "expected": "Total pendapatan: Rp21\nPesanan terbesar: Rp6\nPesanan terkecil: Rp1\nDua pesanan terakhir: [5, 6]",
+   "hidden": true
+  }
+ ]
+}

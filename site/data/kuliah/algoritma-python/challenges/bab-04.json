@@ -83,5 +83,10 @@
    "expected": "Total tagihan: Rp45,000",
    "hidden": true
   }
+ ],
+ "rujukan": [
+  "Buku Bab IV, bagian D (if tunggal, if-else, if-elif-else), hlm. 102; contoh program if_else_bayar dan ongkir_sejajar di bab yang sama.",
+  "Video 21: IF dan ELSE Statement dan Video 22: ELIF Statement (Kelas Terbuka).",
+  "Clue: soal ini sama dengan contoh potongan di buku, hanya angka ambangnya berbeda. Urutan syarat dari yang terbesar."
  ]
 }

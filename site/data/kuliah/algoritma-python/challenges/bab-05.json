@@ -1,0 +1,86 @@
+{
+ "bab": 5,
+ "judul": "Menjumlahkan boks dan berhenti saat dibatalkan",
+ "soal": [
+  "Kamu mencatat jumlah boks dari sejumlah pesanan hari ini. Baris pertama masukan adalah banyaknya pesanan, lalu satu baris jumlah boks per pesanan.",
+  "Aturannya: jumlah negatif dianggap salah ketik dan dilewati (cetak: Jumlah tidak valid, dilewati). Jumlah 0 berarti sisa pesanan dibatalkan: cetak Sisa pesanan dibatalkan lalu hentikan perulangan. Pesanan lainnya dijumlahkan. Di akhir cetak total boks."
+ ],
+ "rujukan": [
+  "Buku Bab V, bagian C (for dan range), hlm. 122, lalu bagian tentang break dan continue di bab yang sama.",
+  "Video 24: For Loop dan Video 25: While Loop (Kelas Terbuka).",
+  "Clue: contoh cuplikan break dan continue pada penghitungan pendapatan 23 pesanan di Bab 5."
+ ],
+ "starter": "banyak_pesanan = int(input())\ntotal_boks = 0\n\nfor i in range(banyak_pesanan):\n    jumlah_boks = int(input())\n    # Tambahkan aturan: negatif -> dilewati (continue), nol -> berhenti (break)\n    total_boks = total_boks + jumlah_boks\n\nprint(f\"Total boks: {total_boks}\")\n",
+ "contohMasukan": "4\n10\n-3\n20\n0",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Urutan pemeriksaan penting: periksa nol (break) dan negatif (continue) sebelum menjumlahkan."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab V, bagian C (hlm. 122) dan bagian break dan continue."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 24: For Loop.",
+   "video": [
+    "Z4qfMhx4XzQ",
+    "ZupffvoCChQ"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "4",
+    "10",
+    "-3",
+    "20",
+    "0"
+   ],
+   "expected": "Jumlah tidak valid, dilewati\nSisa pesanan dibatalkan\nTotal boks: 30",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "5",
+    "6",
+    "7"
+   ],
+   "expected": "Total boks: 18",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "-1",
+    "-2",
+    "-3"
+   ],
+   "expected": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nTotal boks: 0",
+   "hidden": true
+  },
+  {
+   "input": [
+    "5",
+    "10",
+    "0",
+    "99",
+    "99",
+    "99"
+   ],
+   "expected": "Sisa pesanan dibatalkan\nTotal boks: 10",
+   "hidden": true
+  },
+  {
+   "input": [
+    "1",
+    "0"
+   ],
+   "expected": "Sisa pesanan dibatalkan\nTotal boks: 0",
+   "hidden": true
+  }
+ ]
+}

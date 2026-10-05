@@ -1,0 +1,79 @@
+{
+ "bab": 11,
+ "judul": "Mengelola daftar pesanan (CRUD)",
+ "soal": [
+  "Daftar pesanan disimpan sebagai list berisi pasangan [nama, jumlah_boks]. Bagian tambah dan tampil sudah ada. Lengkapi ubah dan hapus.",
+  "Perintah dibaca satu per satu sampai muncul selesai: tambah <nama> <jumlah>, ubah <nama> <jumlah_baru>, hapus <nama>, tampil. Bila nama tidak ditemukan pada ubah atau hapus, cetak: Pesanan tidak ditemukan: <nama>."
+ ],
+ "rujukan": [
+  "Buku Bab XI, bagian G (menyatukan jadi aplikasi konsol), hlm. 273, dan bagian Create, Read, Update, Delete sebelumnya di bab yang sama.",
+  "Video Project 67: Persiapan dan Project 69: Create (Belajar Python PROJECT).",
+  "Clue: berkas crud.py dan demo_update, demo_delete di Bab 11. Hati-hati menghapus elemen list saat sedang diulang (lihat Bab 6)."
+ ],
+ "starter": "daftar = []\n\n\ndef tambah_pesanan(nama, jumlah):\n    daftar.append([nama, jumlah])\n    print(f\"Ditambahkan: {nama}\")\n\n\ndef ubah_pesanan(nama, jumlah_baru):\n    # cari nama; ubah jumlahnya, cetak \"Diubah: <nama>\"\n    # kalau tidak ada, cetak \"Pesanan tidak ditemukan: <nama>\"\n    pass\n\n\ndef hapus_pesanan(nama):\n    # cari nama; hapus dari daftar, cetak \"Dihapus: <nama>\"\n    # kalau tidak ada, cetak \"Pesanan tidak ditemukan: <nama>\"\n    pass\n\n\ndef tampil_pesanan():\n    if len(daftar) == 0:\n        print(\"Daftar kosong\")\n    for i, (nama, jumlah) in enumerate(daftar):\n        print(f\"{i + 1}. {nama} - {jumlah} boks\")\n\n\nwhile True:\n    perintah = input().split()\n    if perintah[0] == \"selesai\":\n        break\n    elif perintah[0] == \"tambah\":\n        tambah_pesanan(perintah[1], int(perintah[2]))\n    elif perintah[0] == \"ubah\":\n        ubah_pesanan(perintah[1], int(perintah[2]))\n    elif perintah[0] == \"hapus\":\n        hapus_pesanan(perintah[1])\n    elif perintah[0] == \"tampil\":\n        tampil_pesanan()\n",
+ "contohMasukan": "tambah Amanah 40\ntambah Cahaya 75\nubah Amanah 60\nhapus Cahaya\ntampil\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Ulangi list dengan for, bandingkan nama. Untuk menghapus, gunakan daftar.remove(item) atau del daftar[i] lalu return segera, jangan lanjut mengulang."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XI, bagian G (hlm. 273) dan bagian Update dan Delete."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python PROJECT 69: Create, lalu lanjutkan ke bagian Update dan Delete di playlist yang sama.",
+   "video": [
+    "PmdQwH_NU3U",
+    "TnZCxPbT1I8"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "tambah Amanah 40",
+    "tambah Cahaya 75",
+    "ubah Amanah 60",
+    "hapus Cahaya",
+    "tampil",
+    "selesai"
+   ],
+   "expected": "Ditambahkan: Amanah\nDitambahkan: Cahaya\nDiubah: Amanah\nDihapus: Cahaya\n1. Amanah - 60 boks",
+   "hidden": false
+  },
+  {
+   "input": [
+    "tampil",
+    "selesai"
+   ],
+   "expected": "Daftar kosong",
+   "hidden": false
+  },
+  {
+   "input": [
+    "tambah A 1",
+    "ubah B 5",
+    "hapus B",
+    "tampil",
+    "selesai"
+   ],
+   "expected": "Ditambahkan: A\nPesanan tidak ditemukan: B\nPesanan tidak ditemukan: B\n1. A - 1 boks",
+   "hidden": true
+  },
+  {
+   "input": [
+    "tambah A 1",
+    "tambah B 2",
+    "tambah C 3",
+    "hapus B",
+    "ubah C 9",
+    "tampil",
+    "selesai"
+   ],
+   "expected": "Ditambahkan: A\nDitambahkan: B\nDitambahkan: C\nDihapus: B\nDiubah: C\n1. A - 1 boks\n2. C - 9 boks",
+   "hidden": true
+  }
+ ]
+}

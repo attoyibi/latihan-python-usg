@@ -147,6 +147,9 @@ def cek_challenge(cid, bab):
     jenis = [p.get("jenis") for p in ch.get("petunjuk", [])]
     if jenis != ["teks", "buku", "video"]:
         err(f"{w}: petunjuk harus berurutan teks, buku, video (ada {jenis})")
+    ruj = ch.get("rujukan")
+    if not isinstance(ruj, list) or not ruj or not all(isinstance(x, str) and x.strip() for x in ruj):
+        err(f"{w}: 'rujukan' (catatan tempat belajar) wajib berupa daftar teks tidak kosong")
 
 
 def main():

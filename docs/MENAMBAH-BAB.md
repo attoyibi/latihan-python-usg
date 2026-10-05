@@ -35,6 +35,7 @@ Satu objek per bab, urut dari 1:
   "soal": ["Paragraf 1.", "Paragraf 2."],
   "starter": "kode awal yang tampil di editor\n",
   "contohMasukan": "120\n35000",
+  "rujukan": ["Buku Bab N, bagian X (judul), hlm. P.", "Video: judul video.", "Clue: contoh program di buku yang mirip."],
   "petunjuk": [
     { "jenis": "teks", "isi": "Petunjuk dari soal." },
     { "jenis": "buku", "isi": "Baca bagian ... (hlm. ...)." },

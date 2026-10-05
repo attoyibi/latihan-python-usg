@@ -215,3 +215,6 @@ body.gate #loginBtn,body.gate #daftarBtn{display:none}
 .kelas-row label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:3px}
 select.input{appearance:auto;padding-right:8px;cursor:pointer}
 @media (max-width:520px){.kelas-row{grid-template-columns:1fr 1fr}.kelas-row .field:first-child{grid-column:1/-1}}
+
+.rujukan{border:1px dashed var(--line);border-radius:10px;padding:8px 14px;margin:10px 0;font-size:13px;color:var(--muted)}
+.rujukan ul{margin:4px 0 0;padding-left:18px}

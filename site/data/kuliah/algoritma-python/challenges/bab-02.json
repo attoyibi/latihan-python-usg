@@ -1,0 +1,77 @@
+{
+ "bab": 2,
+ "judul": "Mengemas pudak ke dalam kotak",
+ "soal": [
+  "Pudak dikemas dalam kotak isi 20 biji. Bu Ida ingin tahu, dari sejumlah biji yang sudah jadi, berapa kotak yang penuh dan berapa biji yang tersisa.",
+  "Program menerima jumlah biji, lalu mencetak jumlah kotak penuh, sisa biji, dan apakah masih perlu satu kotak tambahan untuk sisa itu (True atau False)."
+ ],
+ "rujukan": [
+  "Buku Bab II, bagian B (variabel), hlm. 44, lanjut ke bagian operator aritmetika dan operator perbandingan di bab yang sama.",
+  "Video 04: Mengenal Variabel dan Video 05: Tipe Data (Kelas Terbuka).",
+  "Clue: operator // dan % pada daftar operator aritmetika; hasil perbandingan bertipe bool (lihat cuplikan operator logika di buku)."
+ ],
+ "starter": "ISI_KOTAK = 20\n\njumlah_biji = int(input())\n\n# Hitung kotak penuh dan sisa biji dengan operator pembagian bulat dan sisa bagi\nkotak_penuh = 0\nsisa_biji = 0\n# Perlu kotak tambahan kalau sisa lebih dari 0 (hasilnya True atau False)\nperlu_kotak_tambahan = False\n\nprint(\"Kotak penuh:\", kotak_penuh)\nprint(\"Sisa biji:\", sisa_biji)\nprint(\"Perlu kotak tambahan:\", perlu_kotak_tambahan)\n",
+ "contohMasukan": "95",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Pembagian bulat memakai //, sisa bagi memakai %. Hasil perbandingan seperti sisa > 0 sudah berupa True atau False."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab II, bagian operator aritmetika dan perbandingan (mulai hlm. 44)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 05: Tipe Data, perhatikan tipe bool.",
+   "video": [
+    "gxmTFXfrMzk",
+    "b3X0CH98Y9g"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "95"
+   ],
+   "expected": "Kotak penuh: 4\nSisa biji: 15\nPerlu kotak tambahan: True",
+   "hidden": false
+  },
+  {
+   "input": [
+    "40"
+   ],
+   "expected": "Kotak penuh: 2\nSisa biji: 0\nPerlu kotak tambahan: False",
+   "hidden": false
+  },
+  {
+   "input": [
+    "19"
+   ],
+   "expected": "Kotak penuh: 0\nSisa biji: 19\nPerlu kotak tambahan: True",
+   "hidden": true
+  },
+  {
+   "input": [
+    "0"
+   ],
+   "expected": "Kotak penuh: 0\nSisa biji: 0\nPerlu kotak tambahan: False",
+   "hidden": true
+  },
+  {
+   "input": [
+    "20"
+   ],
+   "expected": "Kotak penuh: 1\nSisa biji: 0\nPerlu kotak tambahan: False",
+   "hidden": true
+  },
+  {
+   "input": [
+    "201"
+   ],
+   "expected": "Kotak penuh: 10\nSisa biji: 1\nPerlu kotak tambahan: True",
+   "hidden": true
+  }
+ ]
+}

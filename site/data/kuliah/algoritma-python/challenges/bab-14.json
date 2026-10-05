@@ -1,0 +1,97 @@
+{
+ "bab": 14,
+ "judul": "Total pesanan dengan rekursi",
+ "soal": [
+  "Buku menghitung jumlah isi list dengan fungsi rekursif total_rekursif. Kali ini Bu Ida hanya ingin menjumlahkan pesanan yang sah, yaitu yang nilainya lebih dari 0 (nilai 0 atau negatif dianggap salah catat).",
+  "Lengkapi total_sah(daftar) tanpa perulangan for atau while: tentukan base case, lalu recursive case. Baris pertama masukan adalah banyaknya nilai, lalu nilainya satu per baris. Cetak: Total pesanan sah: <total>."
+ ],
+ "rujukan": [
+  "Buku Bab XIV, bagian C (base case dan recursive case), hlm. 332.",
+  "Video: Fungsi Rekursif Pada Python dan Tutorial Fungsi Rekursif Python.",
+  "Clue: total_rekursif_vs_perulangan di Bab 14 (base case daftar kosong, lalu daftar[0] + total_rekursif(daftar[1:]))."
+ ],
+ "starter": "def total_sah(daftar):\n    # base case: apa hasilnya bila daftar kosong?\n    # recursive case: pesanan pertama sah atau tidak, lalu sisanya diserahkan\n    # ke total_sah(daftar[1:])\n    return 0\n\n\nbanyak = int(input())\nnilai = [int(input()) for i in range(banyak)]\nprint(f\"Total pesanan sah: {total_sah(nilai)}\")\n",
+ "contohMasukan": "5\n40\n-5\n15\n0\n60",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Base case: daftar kosong menghasilkan 0. Bila daftar[0] > 0, hasilnya daftar[0] + total_sah(daftar[1:]); bila tidak, cukup total_sah(daftar[1:])."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XIV, bagian C (hlm. 332) dan contoh total_rekursif."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Fungsi Rekursif Pada Python.",
+   "video": [
+    "n6s7IpVrECk",
+    "VtvxvCkKlok"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "5",
+    "40",
+    "-5",
+    "15",
+    "0",
+    "60"
+   ],
+   "expected": "Total pesanan sah: 115",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "10",
+    "20",
+    "30"
+   ],
+   "expected": "Total pesanan sah: 60",
+   "hidden": false
+  },
+  {
+   "input": [
+    "0"
+   ],
+   "expected": "Total pesanan sah: 0",
+   "hidden": true
+  },
+  {
+   "input": [
+    "3",
+    "-1",
+    "-2",
+    "0"
+   ],
+   "expected": "Total pesanan sah: 0",
+   "hidden": true
+  },
+  {
+   "input": [
+    "1",
+    "99"
+   ],
+   "expected": "Total pesanan sah: 99",
+   "hidden": true
+  },
+  {
+   "input": [
+    "8",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1",
+    "1"
+   ],
+   "expected": "Total pesanan sah: 8",
+   "hidden": true
+  }
+ ]
+}

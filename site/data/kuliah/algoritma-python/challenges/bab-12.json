@@ -1,0 +1,119 @@
+{
+ "bab": 12,
+ "judul": "Binary search nomor pesanan",
+ "soal": [
+  "Nomor pesanan sudah terurut dari kecil ke besar. Baris pertama masukan adalah banyaknya nomor, baris kedua dan seterusnya nomornya satu per baris, baris terakhir adalah nomor yang dicari.",
+  "Lengkapi fungsi cari_biner(data, target) yang mengembalikan pasangan (indeks, langkah): indeks tempat target berada (atau -1 bila tidak ada) dan banyaknya langkah pengecekan nilai tengah. Hitung tengah dengan (kiri + kanan) // 2.",
+  "Cetak: Ditemukan di indeks <n> setelah <k> langkah, atau Tidak ditemukan setelah <k> langkah."
+ ],
+ "rujukan": [
+  "Buku Bab XII, bagian C (binary search, syarat data harus terurut), hlm. 290, dan bagian D (menulis dan menguji binary search), hlm. 292.",
+  "Video: Sequential Search dan Binary Search, dan Konsep Logika Binary Search.",
+  "Clue: cuplikan_05_bug_infinite_loop di Bab 12 memperlihatkan perulangan tanpa akhir bila kiri = tengah tanpa +1."
+ ],
+ "starter": "def cari_biner(data, target):\n    kiri, kanan = 0, len(data) - 1\n    langkah = 0\n    while kiri <= kanan:\n        tengah = (kiri + kanan) // 2\n        langkah = langkah + 1\n        # bandingkan data[tengah] dengan target, lalu geser kiri atau kanan\n        # (jangan lupa +1 atau -1 supaya perulangan berakhir)\n        break\n    return -1, langkah\n\n\nbanyak = int(input())\ndata = [int(input()) for i in range(banyak)]\ntarget = int(input())\n\nindeks, langkah = cari_biner(data, target)\nif indeks == -1:\n    print(f\"Tidak ditemukan setelah {langkah} langkah\")\nelse:\n    print(f\"Ditemukan di indeks {indeks} setelah {langkah} langkah\")\n",
+ "contohMasukan": "8\n2\n5\n8\n12\n16\n23\n38\n45\n23",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Bila data[tengah] == target, kembalikan (tengah, langkah). Bila lebih kecil, geser kiri ke tengah + 1. Bila lebih besar, geser kanan ke tengah - 1."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XII, bagian C (hlm. 290) dan bagian D (hlm. 292)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Konsep Logika Binary Search.",
+   "video": [
+    "8K983gxITCI",
+    "Xp68BLKf23w"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "8",
+    "2",
+    "5",
+    "8",
+    "12",
+    "16",
+    "23",
+    "38",
+    "45",
+    "23"
+   ],
+   "expected": "Ditemukan di indeks 5 setelah 2 langkah",
+   "hidden": false
+  },
+  {
+   "input": [
+    "8",
+    "2",
+    "5",
+    "8",
+    "12",
+    "16",
+    "23",
+    "38",
+    "45",
+    "2"
+   ],
+   "expected": "Ditemukan di indeks 0 setelah 3 langkah",
+   "hidden": false
+  },
+  {
+   "input": [
+    "8",
+    "2",
+    "5",
+    "8",
+    "12",
+    "16",
+    "23",
+    "38",
+    "45",
+    "10"
+   ],
+   "expected": "Tidak ditemukan setelah 3 langkah",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1",
+    "7",
+    "7"
+   ],
+   "expected": "Ditemukan di indeks 0 setelah 1 langkah",
+   "hidden": true
+  },
+  {
+   "input": [
+    "5",
+    "1",
+    "3",
+    "5",
+    "7",
+    "9",
+    "9"
+   ],
+   "expected": "Ditemukan di indeks 4 setelah 3 langkah",
+   "hidden": true
+  },
+  {
+   "input": [
+    "5",
+    "1",
+    "3",
+    "5",
+    "7",
+    "9",
+    "100"
+   ],
+   "expected": "Tidak ditemukan setelah 3 langkah",
+   "hidden": true
+  }
+ ]
+}

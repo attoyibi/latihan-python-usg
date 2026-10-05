@@ -1,0 +1,96 @@
+{
+ "bab": 8,
+ "judul": "Fungsi biaya kirim dan total tagihan",
+ "soal": [
+  "Fungsi hitung_potongan sudah tersedia (sama seperti di buku). Tugasmu menulis dua fungsi lain.",
+  "hitung_biaya_kirim(luar_kota, berat_kg=0): dalam kota gratis (0). Luar kota 5000, tetapi 12000 jika berat 8 kg atau lebih.",
+  "hitung_total(jumlah_boks, harga_satuan, luar_kota, berat_kg=0): total kotor dikurangi potongan, lalu ditambah biaya kirim. Masukan: jumlah boks, harga satuan, luar kota (ya atau tidak), berat kg. Cetak: Total tagihan: Rp<total dengan pemisah ribuan>."
+ ],
+ "rujukan": [
+  "Buku Bab VIII, bagian C (anatomi fungsi), hlm. 189: def, parameter, return, dan nilai bawaan parameter.",
+  "Video 44: Pengenalan Fungsi dan Video 46: Fungsi dengan return (Kelas Terbuka).",
+  "Clue: fungsi_pesanan.py di Bab 8 berisi hitung_potongan dan hitung_biaya_kirim versi buku. Soal ini mengubah aturan beratnya."
+ ],
+ "starter": "def hitung_potongan(jumlah_boks):\n    if jumlah_boks >= 150:\n        return 0.15\n    elif jumlah_boks >= 100:\n        return 0.12\n    elif jumlah_boks >= 50:\n        return 0.08\n    return 0.0\n\n\ndef hitung_biaya_kirim(luar_kota, berat_kg=0):\n    # tulis isi fungsi ini\n    return 0\n\n\ndef hitung_total(jumlah_boks, harga_satuan, luar_kota, berat_kg=0):\n    # tulis isi fungsi ini, panggil dua fungsi di atas\n    return 0\n\n\njumlah = int(input())\nharga = int(input())\nluar_kota = input() == \"ya\"\nberat = int(input())\n\ntotal = hitung_total(jumlah, harga, luar_kota, berat)\nprint(f\"Total tagihan: Rp{total:,.0f}\")\n",
+ "contohMasukan": "120\n3500\nya\n9",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Fungsi harus return, bukan print. hitung_total boleh memanggil hitung_potongan dan hitung_biaya_kirim di dalamnya."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VIII, bagian C (hlm. 189) tentang return dan parameter bawaan."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 46: Fungsi dengan return.",
+   "video": [
+    "ywE2eqG3-kc",
+    "ADcQu-8R0Ok"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "120",
+    "3500",
+    "ya",
+    "9"
+   ],
+   "expected": "Total tagihan: Rp381,600",
+   "hidden": false
+  },
+  {
+   "input": [
+    "40",
+    "3500",
+    "tidak",
+    "0"
+   ],
+   "expected": "Total tagihan: Rp140,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "50",
+    "4000",
+    "ya",
+    "5"
+   ],
+   "expected": "Total tagihan: Rp189,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "150",
+    "3500",
+    "ya",
+    "8"
+   ],
+   "expected": "Total tagihan: Rp458,250",
+   "hidden": true
+  },
+  {
+   "input": [
+    "100",
+    "3000",
+    "ya",
+    "7"
+   ],
+   "expected": "Total tagihan: Rp269,000",
+   "hidden": true
+  },
+  {
+   "input": [
+    "10",
+    "4000",
+    "tidak",
+    "20"
+   ],
+   "expected": "Total tagihan: Rp40,000",
+   "hidden": true
+  }
+ ]
+}

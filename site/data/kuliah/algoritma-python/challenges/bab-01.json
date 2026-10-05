@@ -1,0 +1,70 @@
+{
+ "bab": 1,
+ "judul": "Menghitung bahan Jubung dari jumlah pesanan",
+ "soal": [
+  "Di Bab 1 kamu sudah membaca program hitung_bahan.py untuk pudak. Sekarang bagian produksi minta versi untuk jubung.",
+  "Takaran satu jubung: tepung 22 gram, gula 15 gram, santan 40 mililiter. Program menerima jumlah jubung yang dipesan, lalu mencetak kebutuhan tepung (kg), gula (kg), dan santan (liter) dengan dua angka di belakang koma.",
+  "Kode awal di bawah belum benar: masukan masih berupa teks dan perhitungannya belum ditulis. Perbaiki dan lengkapi."
+ ],
+ "rujukan": [
+  "Buku Bab I, bagian C (lima syarat algoritma), hlm. 6, lalu contoh program hitung_bahan.py di bab yang sama.",
+  "Video 01: Belajar Python 01 (Kelas Terbuka).",
+  "Clue: input() selalu menghasilkan teks. Lihat contoh rekap_bermasalah dan rekap_diperbaiki di Bab 1."
+ ],
+ "starter": "TEPUNG_PER_JUBUNG = 22   # gram\nGULA_PER_JUBUNG = 15     # gram\nSANTAN_PER_JUBUNG = 40   # mililiter\n\njumlah_pesanan = input()\n\n# Hitung kebutuhan dalam satuan besar (gram -> kg, ml -> liter)\ntepung_kg = 0\ngula_kg = 0\nsantan_liter = 0\n\nprint(f\"Tepung : {tepung_kg:.2f} kg\")\nprint(f\"Gula   : {gula_kg:.2f} kg\")\nprint(f\"Santan : {santan_liter:.2f} liter\")\n",
+ "contohMasukan": "250",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Pesan error TypeError muncul karena input() menghasilkan teks, sedangkan rumus butuh angka. Bungkus dengan int()."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab I, bagian C, hlm. 6, dan bandingkan program rekap_bermasalah dengan rekap_diperbaiki."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python 01: Apa itu Python.",
+   "video": [
+    "iA8lLwmtKQM"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "250"
+   ],
+   "expected": "Tepung : 5.50 kg\nGula   : 3.75 kg\nSantan : 10.00 liter",
+   "hidden": false
+  },
+  {
+   "input": [
+    "100"
+   ],
+   "expected": "Tepung : 2.20 kg\nGula   : 1.50 kg\nSantan : 4.00 liter",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1"
+   ],
+   "expected": "Tepung : 0.02 kg\nGula   : 0.01 kg\nSantan : 0.04 liter",
+   "hidden": true
+  },
+  {
+   "input": [
+    "1000"
+   ],
+   "expected": "Tepung : 22.00 kg\nGula   : 15.00 kg\nSantan : 40.00 liter",
+   "hidden": true
+  },
+  {
+   "input": [
+    "0"
+   ],
+   "expected": "Tepung : 0.00 kg\nGula   : 0.00 kg\nSantan : 0.00 liter",
+   "hidden": true
+  }
+ ]
+}

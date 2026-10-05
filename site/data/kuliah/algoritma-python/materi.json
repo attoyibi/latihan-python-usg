@@ -16,7 +16,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 2,
@@ -41,7 +41,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 3,
@@ -66,7 +66,26 @@
    }
   ],
   "jenis": "unggah",
-  "challenge": false
+  "challenge": false,
+  "tugas": {
+   "judul": "Rancang alur pemesanan dengan flowchart dan pseudocode",
+   "soal": [
+    "UD Rasa Gresik menerima pesanan dari toko. Bila jumlah boks 100 atau lebih, pesanan dapat potongan 12 persen. Bila 50 sampai 99 boks, potongan 8 persen. Selain itu tanpa potongan. Pesanan luar kota ditambah biaya kirim.",
+    "Buat satu flowchart dengan simbol baku (mulai/selesai, masukan/keluaran, proses, keputusan) dan satu pseudocode untuk alur itu. Lalu lakukan penelusuran dengan tangan memakai dua contoh: 120 boks harga 35000 dalam kota, dan 40 boks harga 35000 luar kota.",
+    "Kumpulkan sebagai foto atau PDF: flowchart, pseudocode, dan tabel penelusuran dua contoh itu."
+   ],
+   "rujukan": [
+    "Buku Bab III, bagian C (flowchart: simbol baku dan artinya), hlm. 76; bagian D (pseudocode); bagian E (merancang cabang dan ulangan); bagian F (penelusuran).",
+    "Video: Mengenal Pseudocode (CodePolitan) dan Flowchart Looping dan Contoh Sehari-hari (Blank Stuck).",
+    "Clue: bagian H, Praktikum Terbimbing di Bab 3, memberi contoh penelusuran yang bisa kamu tiru langkahnya."
+   ],
+   "kriteria": [
+    "Memakai simbol baku dengan benar.",
+    "Setiap keputusan punya dua jalur bertanda ya dan tidak.",
+    "Pseudocode cocok dengan flowchart.",
+    "Penelusuran menunjukkan nilai tiap variabel di setiap langkah."
+   ]
+  }
  },
  {
   "bab": 4,
@@ -116,7 +135,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 6,
@@ -141,7 +160,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 7,
@@ -166,7 +185,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 8,
@@ -191,7 +210,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 9,
@@ -216,7 +235,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 10,
@@ -241,7 +260,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 11,
@@ -266,7 +285,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 12,
@@ -291,7 +310,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 13,
@@ -316,7 +335,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  },
  {
   "bab": 14,
@@ -341,6 +360,6 @@
    }
   ],
   "jenis": "kode",
-  "challenge": false
+  "challenge": true
  }
 ]

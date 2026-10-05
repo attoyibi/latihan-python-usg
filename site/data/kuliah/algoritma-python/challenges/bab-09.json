@@ -1,0 +1,75 @@
+{
+ "bab": 9,
+ "judul": "Menyalin pesanan tanpa mengubah aslinya",
+ "soal": [
+  "Kelas Pesanan sudah ada (dengan hitung_potongan dan hitung_biaya_kirim). Lengkapi dua hal: method hitung_total, dan fungsi salin_pesanan yang membuat objek Pesanan baru dengan isi yang sama.",
+  "Program membuat pesanan p1 dari masukan, menyalinnya ke cadangan, lalu mengubah berat cadangan menjadi berat baru. Cetak total p1 dan total cadangan. Total p1 tidak boleh ikut berubah."
+ ],
+ "rujukan": [
+  "Buku Bab IX, bagian C (anatomi kelas), hlm. 215, dan bagian referensi objek (mengapa dua nama bisa menunjuk satu objek).",
+  "Video OOP 01: Pendahuluan dan Video OOP 02: Constructor __init__() (Belajar Python OOP).",
+  "Clue: contoh 05_referensi dan 06_salin_pesanan di Bab 9. Kalau cadangan = p1 saja, perubahan pada cadangan ikut mengubah p1."
+ ],
+ "starter": "class Pesanan:\n    def __init__(self, nama, jumlah_boks, harga_satuan, luar_kota, berat_kg=0):\n        self.nama = nama\n        self.jumlah_boks = jumlah_boks\n        self.harga_satuan = harga_satuan\n        self.luar_kota = luar_kota\n        self.berat_kg = berat_kg\n\n    def hitung_potongan(self):\n        if self.jumlah_boks >= 150:\n            return 0.15\n        elif self.jumlah_boks >= 100:\n            return 0.12\n        elif self.jumlah_boks >= 50:\n            return 0.08\n        return 0.0\n\n    def hitung_biaya_kirim(self):\n        if not self.luar_kota:\n            return 0\n        return 10000 if self.berat_kg >= 5 else 5000\n\n    def hitung_total(self):\n        # kotor dikurangi potongan, ditambah biaya kirim\n        return 0\n\n\ndef salin_pesanan(p):\n    # kembalikan objek Pesanan baru berisi data yang sama\n    return p\n\n\np1 = Pesanan(\"Toko Barokah Jaya\", int(input()), int(input()), True, int(input()))\nberat_baru = int(input())\n\ncadangan = salin_pesanan(p1)\ncadangan.berat_kg = berat_baru\n\nprint(f\"Total p1: Rp{p1.hitung_total():,.0f}\")\nprint(f\"Total cadangan: Rp{cadangan.hitung_total():,.0f}\")\n",
+ "contohMasukan": "120\n3500\n6\n3",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "cadangan = p1 tidak membuat objek baru, hanya nama baru untuk objek yang sama. Buat objek baru dengan Pesanan(...) lalu isi dari atribut p."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab IX, bagian anatomi kelas (hlm. 215) dan bagian referensi, lalu contoh salin_pesanan."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Python OOP 02: Constructor __init__().",
+   "video": [
+    "1PjHsUnOkes",
+    "w9emRmkbeps"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "120",
+    "3500",
+    "6",
+    "3"
+   ],
+   "expected": "Total p1: Rp379,600\nTotal cadangan: Rp374,600",
+   "hidden": false
+  },
+  {
+   "input": [
+    "40",
+    "3500",
+    "6",
+    "9"
+   ],
+   "expected": "Total p1: Rp150,000\nTotal cadangan: Rp150,000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "150",
+    "4000",
+    "5",
+    "5"
+   ],
+   "expected": "Total p1: Rp520,000\nTotal cadangan: Rp520,000",
+   "hidden": true
+  },
+  {
+   "input": [
+    "10",
+    "3000",
+    "9",
+    "1"
+   ],
+   "expected": "Total p1: Rp40,000\nTotal cadangan: Rp35,000",
+   "hidden": true
+  }
+ ]
+}

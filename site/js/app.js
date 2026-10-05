@@ -210,6 +210,25 @@ function caseView(r, idx) {
   return d;
 }
 
+function rujukanBox(list) {
+  if (!list || !list.length) return null;
+  return h("div", { class: "rujukan" }, h("strong", {}, "Belajar dari:"), h("ul", {}, list.map((t) => h("li", {}, t))));
+}
+
+function tugasCard(m) {
+  const t = m.tugas;
+  if (!t) return h("section", { class: "card" }, h("h3", {}, "Kumpulkan tugas"), h("div", { class: "placeholder" }, "Bab ini tidak memakai kode. Kamu akan mengumpulkan foto atau PDF flowchart dan pseudocode. Fitur unggah dibuat pada Tahap 7."));
+  return h(
+    "section",
+    { class: "card soal", "aria-label": "Tugas rancangan" },
+    h("h3", {}, "Tugas: " + t.judul),
+    t.soal.map((p) => h("p", {}, p)),
+    rujukanBox(t.rujukan),
+    t.kriteria ? h("div", {}, h("strong", {}, "Yang dinilai:"), h("ul", {}, t.kriteria.map((k) => h("li", {}, k)))) : null,
+    h("div", { class: "placeholder" }, "Fitur unggah foto atau PDF dibuat pada Tahap 7. Untuk sementara siapkan berkasnya.")
+  );
+}
+
 function challengeCard(m, ch) {
   const draftKey = key("draft", m.bab);
   const bisa = supports(LANG);
@@ -297,6 +316,7 @@ function challengeCard(m, ch) {
     { class: "card soal", "aria-label": "Latihan kode" },
     h("h3", {}, ch ? "Tantangan: " + ch.judul : "Coba bebas"),
     ch ? ch.soal.map((p) => h("p", {}, p)) : h("p", { class: "muted" }, "Tantangan untuk bab ini belum disiapkan. Kamu tetap bisa mencoba kode di editor."),
+    ch ? rujukanBox(ch.rujukan) : null,
     bisa ? null : h("p", { class: "placeholder" }, "Penjalan kode " + bahasa + " belum tersedia di situs ini. Kamu bisa menulis kode di editor, tetapi belum bisa menjalankan atau menilainya di sini."),
     holder,
     h("label", { for: "stdin", class: "muted" }, "Masukan untuk tombol Jalankan (satu baris untuk setiap input)"),
@@ -358,7 +378,7 @@ async function renderBab(n) {
       { class: "cols" },
       videoCard(m),
       m.jenis === "unggah"
-        ? h("section", { class: "card" }, h("h3", {}, "Kumpulkan tugas"), h("div", { class: "placeholder" }, "Bab ini tidak memakai kode. Kamu akan mengumpulkan foto atau PDF flowchart dan pseudocode. Fitur unggah dibuat pada Tahap 7."))
+        ? tugasCard(m)
         : challengeCard(m, ch)
     ),
     h("section", { class: "card", "aria-label": "Laporan praktikum" }, h("h3", {}, "Laporan praktikum"), h("div", { class: "placeholder" }, isDone(m.bab) ? "Selamat, tantangan lulus. Formulir laporan hadir pada Tahap 2." : "Laporan terbuka setelah tantangan lulus."))
