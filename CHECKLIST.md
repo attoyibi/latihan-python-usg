@@ -304,3 +304,4 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - Kunci di `kunci/algoritma-python/` (gitignored); `python tools/uji_kunci.py` lulus 67 dari 67 kasus; `validasi_konten.py` kini mewajibkan `rujukan`.
 - Diuji di browser (server uji): kotak rujukan tampil, Bab 3 menampilkan tugas, kunci Bab 10 (baca/tulis berkas) lulus di Pyodide. Soal Bab 11 dan Bab 14 belum dicoba lewat Pyodide.
 - Belum: unggah tugas Bab 3 (Tahap 7); nomor halaman per sub-bab selain yang ada di materi.json perlu dicek dosen.
+- Kotak "Contoh" (masukan + keluaran harapan dari kasus uji terlihat pertama) di atas editor, dan pembanding setelah Jalankan bila masukan sama dengan kasus terlihat (cocok / selisih baris). Diuji di server uji: kode benar cocok, "5.5" vs "5.50" terdeteksi, masukan lain tanpa pembanding.

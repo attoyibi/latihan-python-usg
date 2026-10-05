@@ -210,6 +210,30 @@ function caseView(r, idx) {
   return d;
 }
 
+function normOut(t) {
+  return String(t).replace(/\r/g, "").split("\n").map((l) => l.replace(/\s+$/, "")).join("\n").replace(/\n+$/, "");
+}
+
+function normIn(t) {
+  const a = String(t).replace(/\r/g, "").split("\n");
+  while (a.length && a[a.length - 1] === "") a.pop();
+  return a.join("\n");
+}
+
+function contohBox(ch) {
+  const t = ch.tests.find((x) => !x.hidden);
+  if (!t) return null;
+  return h(
+    "div",
+    { class: "contoh" },
+    h("strong", {}, "Contoh"),
+    h("div", { class: "muted" }, "Masukan"),
+    h("pre", {}, t.input.join("\n")),
+    h("div", { class: "muted" }, "Keluaran yang diharapkan"),
+    h("pre", {}, t.expected)
+  );
+}
+
 function rujukanBox(list) {
   if (!list || !list.length) return null;
   return h("div", { class: "rujukan" }, h("strong", {}, "Belajar dari:"), h("ul", {}, list.map((t) => h("li", {}, t))));
@@ -239,6 +263,7 @@ function challengeCard(m, ch) {
   stdin.value = ch ? ch.contohMasukan : "";
   const out = h("pre", { class: "out", "aria-live": "polite" }, "Keluaran muncul di sini.");
   const result = h("div", { "aria-live": "polite" });
+  const banding = h("div", { "aria-live": "polite", class: "banding" });
   const hintBox = h("div", {});
   let hintShown = store.get(key("hint", m.bab), 0);
   const hintBtn = h("button", { type: "button", class: "btn btn-sm" });
@@ -281,6 +306,17 @@ function challengeCard(m, ch) {
       out.className = "out" + (r.error ? " err" : "");
       out.textContent = (r.stdout ? r.stdout + "\n" : "") + (r.error || "") || "(tidak ada keluaran)";
     }
+    banding.replaceChildren();
+    if (ch && !r.timeout && !r.error) {
+      const t = ch.tests.find((x) => !x.hidden && normIn(x.input.join("\n")) === normIn(stdin.value));
+      if (t) {
+        // Keluaran Jalankan memuat gema masukan; bandingkan keluaran murni seperti saat penilaian.
+        const murni = await run(editor.getValue(), lines, false, LANG);
+        const cocok = !murni.error && !murni.timeout && normOut(murni.stdout) === normOut(t.expected);
+        banding.append(h("div", { class: "verdict " + (cocok ? "pass" : "fail") }, cocok ? "Cocok dengan keluaran yang diharapkan untuk masukan ini." : "Belum cocok dengan keluaran yang diharapkan."));
+        if (!cocok) banding.append(h("div", { class: "muted" }, "Yang diharapkan"), h("pre", {}, t.expected), h("div", { class: "muted" }, "Keluaran programmu"), h("pre", {}, normOut(murni.stdout || murni.error || "") || "(kosong)"));
+      }
+    }
     runBtn.disabled = false;
   });
 
@@ -317,12 +353,14 @@ function challengeCard(m, ch) {
     h("h3", {}, ch ? "Tantangan: " + ch.judul : "Coba bebas"),
     ch ? ch.soal.map((p) => h("p", {}, p)) : h("p", { class: "muted" }, "Tantangan untuk bab ini belum disiapkan. Kamu tetap bisa mencoba kode di editor."),
     ch ? rujukanBox(ch.rujukan) : null,
+    ch ? contohBox(ch) : null,
     bisa ? null : h("p", { class: "placeholder" }, "Penjalan kode " + bahasa + " belum tersedia di situs ini. Kamu bisa menulis kode di editor, tetapi belum bisa menjalankan atau menilainya di sini."),
     holder,
     h("label", { for: "stdin", class: "muted" }, "Masukan untuk tombol Jalankan (satu baris untuk setiap input)"),
     stdin,
     h("div", { class: "actions" }, runBtn, ch ? sendBtn : null, ch ? resetBtn : null),
     out,
+    banding,
     result,
     ch ? h("div", { class: "actions" }, hintBtn) : null,
     hintBox
