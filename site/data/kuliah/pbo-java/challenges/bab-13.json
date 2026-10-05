@@ -1,0 +1,84 @@
+{
+ "bab": 13,
+ "judul": "Menambah jenis denda tanpa mengubah kelas lama",
+ "soal": [
+  "FineService menghitung denda lewat aturan (FineRule) yang didaftarkan per jenis. Perhatikan: untuk menambah jenis baru, kita tidak mengubah FineService maupun kelas aturan lama. Itulah prinsip Open-Closed.",
+  "Tambahkan dua kelas aturan baru: DigitalFine (selalu 0) dan ThesisFine (Rp1000 per hari, hari yang dihitung paling banyak 20), lalu daftarkan keduanya dengan nama 'digital' dan 'skripsi' di main.",
+  "Masukan: baris '<jenis> <hari terlambat>' sampai kata selesai. Jenis yang tidak terdaftar menghasilkan pesan 'Jenis tidak dikenal: <jenis>'."
+ ],
+ "rujukan": [
+  "Buku Bab XIII, bagian B (Single Responsibility dan Open-Closed), hlm. 168; bagian D (Interface Segregation dan Dependency Inversion), hlm. 171.",
+  "Video: SOLID Principles, Konsep dan Penjelasannya (HeyrozX) dan Apakah SOLID Wajib Digunakan? (Programmer Zaman Now).",
+  "Clue: Praktikum Terbimbing Bab 13 merefaktor LibraryService agar tiap kelas bertanggung jawab pada satu hal dan bergantung pada interface."
+ ],
+ "starter": "import java.util.HashMap;\nimport java.util.Map;\nimport java.util.Scanner;\n\ninterface FineRule {\n    long fine(long daysLate);\n}\n\nclass BookFine implements FineRule {\n    public long fine(long daysLate) {\n        return Math.max(0, daysLate) * 500;\n    }\n}\n\nclass JournalFine implements FineRule {\n    public long fine(long daysLate) {\n        return Math.max(0, daysLate) * 300;\n    }\n}\n\n// Tambahkan dua kelas aturan baru yang mengimplementasikan FineRule, tanpa mengubah kelas lain: DigitalFine (selalu 0) dan ThesisFine (Rp1000 per hari, hari yang dihitung paling banyak 20).\n\nclass FineService {\n    private Map<String, FineRule> rules = new HashMap<>();\n\n    void register(String type, FineRule rule) {\n        rules.put(type, rule);\n    }\n\n    long calculate(String type, long daysLate) {\n        FineRule rule = rules.get(type);\n        if (rule == null) {\n            throw new IllegalArgumentException(\"Jenis tidak dikenal: \" + type);\n        }\n        return rule.fine(daysLate);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        FineService service = new FineService();\n        service.register(\"buku\", new BookFine());\n        service.register(\"jurnal\", new JournalFine());\n        // Daftarkan aturan baru dengan nama jenis \"digital\" dan \"skripsi\".\n        Scanner in = new Scanner(System.in);\n        while (in.hasNextLine()) {\n            String line = in.nextLine().trim();\n            if (line.equals(\"selesai\")) {\n                break;\n            }\n            String[] p = line.split(\" \");\n            try {\n                System.out.println(p[0] + \": Rp\" + service.calculate(p[0], Long.parseLong(p[1])));\n            } catch (IllegalArgumentException e) {\n                System.out.println(e.getMessage());\n            }\n        }\n    }\n}\n",
+ "contohMasukan": "buku 4\njurnal 10\ndigital 30\nskripsi 25\nkomik 3\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "class DigitalFine implements FineRule { public long fine(long daysLate) { ... } }. Daftarkan dengan service.register(\"digital\", new DigitalFine())."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XIII, bagian B (hlm. 168) tentang Open-Closed."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton SOLID Principles: Konsep dan Penjelasannya.",
+   "video": [
+    "hKjk2CWd1kY",
+    "4YIUo7ZMMlk"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "buku 4",
+    "jurnal 10",
+    "digital 30",
+    "skripsi 25",
+    "komik 3",
+    "selesai"
+   ],
+   "expected": "buku: Rp2000\njurnal: Rp3000\ndigital: Rp0\nskripsi: Rp20000\nJenis tidak dikenal: komik",
+   "hidden": false
+  },
+  {
+   "input": [
+    "skripsi 5",
+    "selesai"
+   ],
+   "expected": "skripsi: Rp5000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "skripsi 20",
+    "skripsi 21",
+    "digital 0",
+    "selesai"
+   ],
+   "expected": "skripsi: Rp20000\nskripsi: Rp20000\ndigital: Rp0",
+   "hidden": true
+  },
+  {
+   "input": [
+    "buku -2",
+    "jurnal 1",
+    "novel 9",
+    "selesai"
+   ],
+   "expected": "buku: Rp0\njurnal: Rp300\nJenis tidak dikenal: novel",
+   "hidden": true
+  },
+  {
+   "input": [
+    "digital 0",
+    "selesai"
+   ],
+   "expected": "digital: Rp0",
+   "hidden": true
+  }
+ ]
+}

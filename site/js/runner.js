@@ -1,3 +1,5 @@
+import { runJava } from "./javarunner.js";
+
 const TIMEOUT_MS = 5000;
 
 let worker = null;
@@ -33,14 +35,15 @@ export function start() {
   if (!worker) spawn();
 }
 
-// Bahasa yang sudah punya penjalan. Bahasa lain (mis. Java) ditambahkan di sini bila mesinnya sudah dipilih.
-export const supports = (lang) => lang === "python";
+// Bahasa yang sudah punya penjalan: Python (Pyodide) dan Java (CheerpJ + ECJ, lihat javarunner.js).
+export const supports = (lang) => lang === "python" || lang === "java";
 
 // Menjalankan kode. echo=true menampilkan teks prompt dan masukan di keluaran (mode coba bebas).
 export async function run(code, inputs, echo, lang = "python") {
   if (!supports(lang)) {
     return { timeout: false, stdout: "", error: "Penjalan kode untuk bahasa " + lang + " belum tersedia." };
   }
+  if (lang === "java") return runJava(code, inputs);
   start();
   await readyPromise;
   const w = worker;

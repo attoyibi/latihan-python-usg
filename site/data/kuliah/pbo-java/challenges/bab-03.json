@@ -1,0 +1,84 @@
+{
+ "bab": 3,
+ "judul": "Menjaga NIM anggota dengan setter",
+ "soal": [
+  "Atribut nim pada kelas Member sudah private dan punya getter. Yang belum ada adalah penjaganya: setNim harus menolak NIM yang salah.",
+  "Aturan: NIM harus tepat 10 digit angka. Bila salah (null, ada huruf, terlalu pendek atau panjang), setNim melempar IllegalArgumentException dengan pesan NIM harus 10 digit angka: <nim>. Bila benar, NIM disimpan.",
+  "Masukan: nama, lalu beberapa calon NIM satu per baris sampai kata selesai."
+ ],
+ "rujukan": [
+  "Buku Bab III, bagian D (getter, setter, dan validasi data di dalam setter), hlm. 36; bagian C (access modifier), hlm. 33.",
+  "Video 09: Public dan Private Keywords dan Video 10: Getter dan Setter (Kelas Terbuka).",
+  "Clue: setPublicationYear di Bab 3 menolak tahun di luar rentang dengan IllegalArgumentException. Pola yang sama dipakai di sini."
+ ],
+ "starter": "import java.util.Scanner;\n\nclass Member {\n    private String nim;\n    private String name;\n\n    Member(String name) {\n        this.name = name;\n    }\n\n    String getNim() {\n        return nim;\n    }\n\n    void setNim(String nim) {\n        // Tolak NIM yang null atau bukan tepat 10 digit angka: lempar IllegalArgumentException dengan pesan \"NIM harus 10 digit angka: <nim>\". Bila benar, simpan.\n        this.nim = nim;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Member m = new Member(in.nextLine().trim());\n        while (in.hasNextLine()) {\n            String line = in.nextLine().trim();\n            if (line.equals(\"selesai\")) {\n                break;\n            }\n            try {\n                m.setNim(line);\n                System.out.println(\"NIM diterima: \" + m.getNim());\n            } catch (IllegalArgumentException e) {\n                System.out.println(\"Ditolak: \" + e.getMessage());\n            }\n        }\n        System.out.println(\"NIM tersimpan: \" + (m.getNim() == null ? \"belum ada\" : m.getNim()));\n    }\n}\n",
+ "contohMasukan": "Siti Aminah\n2024110012\n20241100\nabc4110012\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "String.matches(\"\\\\d{10}\") bernilai true bila isinya tepat 10 digit. Periksa dulu apakah nim null sebelum memanggil matches."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab III, bagian D (hlm. 36) dan contoh setPublicationYear."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 10: Getter dan Setter (Encapsulasi).",
+   "video": [
+    "aRb7SO6iiqE",
+    "zwDMHJzTUzs"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "Siti Aminah",
+    "2024110012",
+    "20241100",
+    "abc4110012",
+    "selesai"
+   ],
+   "expected": "NIM diterima: 2024110012\nDitolak: NIM harus 10 digit angka: 20241100\nDitolak: NIM harus 10 digit angka: abc4110012\nNIM tersimpan: 2024110012",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Budi",
+    "2024110099",
+    "selesai"
+   ],
+   "expected": "NIM diterima: 2024110099\nNIM tersimpan: 2024110099",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Ani",
+    "12345678901",
+    "1234567890",
+    "selesai"
+   ],
+   "expected": "Ditolak: NIM harus 10 digit angka: 12345678901\nNIM diterima: 1234567890\nNIM tersimpan: 1234567890",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Dewi",
+    "selesai"
+   ],
+   "expected": "NIM tersimpan: belum ada",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Eko",
+    "20241100 1",
+    "2024110012",
+    "selesai"
+   ],
+   "expected": "Ditolak: NIM harus 10 digit angka: 20241100 1\nNIM diterima: 2024110012\nNIM tersimpan: 2024110012",
+   "hidden": true
+  }
+ ]
+}

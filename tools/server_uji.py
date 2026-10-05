@@ -33,6 +33,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(data)
             return
+        rentang = self.headers.get("Range")
+        if rentang and rentang.startswith("bytes="):
+            # CheerpJ (penjalan Java) membaca berkas .jar per potongan dan butuh header Range.
+            berkas = Path(self.translate_path(self.path.split("?")[0]))
+            if berkas.is_file():
+                data = berkas.read_bytes()
+                awal, _, akhir = rentang[6:].partition("-")
+                mulai = int(awal) if awal else max(0, len(data) - int(akhir))
+                selesai = min(int(akhir), len(data) - 1) if akhir and awal else len(data) - 1
+                bagian = data[mulai : selesai + 1]
+                self.send_response(206)
+                self.send_header("Content-Type", self.guess_type(str(berkas)))
+                self.send_header("Content-Range", f"bytes {mulai}-{mulai + len(bagian) - 1}/{len(data)}")
+                self.send_header("Content-Length", str(len(bagian)))
+                self.send_header("Accept-Ranges", "bytes")
+                self.end_headers()
+                self.wfile.write(bagian)
+                return
         super().do_GET()
 
 

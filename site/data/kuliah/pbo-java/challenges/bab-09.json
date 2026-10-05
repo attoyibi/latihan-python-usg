@@ -1,0 +1,97 @@
+{
+ "bab": 9,
+ "judul": "Katalog buku berurutan dengan Map",
+ "soal": [
+  "Katalog menyimpan buku dalam Map berkunci kode (HashMap), seperti Praktikum Terbimbing Bab 9. Karena Map tidak punya urutan, katalog perlu method yang mengurutkan tampilan.",
+  "Lengkapi sortedByYearDesc(): salin isi Map ke ArrayList lalu urutkan dengan Comparator, tahun terbit terbaru lebih dulu, dan bila tahun sama urut judul dari A ke Z.",
+  "Masukan: jumlah buku, lalu satu buku per baris dalam format kode;judul;tahun, lalu kode-kode yang dicari sampai kata selesai. Kode yang sama dimasukkan dua kali akan menimpa yang lama (sifat Map)."
+ ],
+ "rujukan": [
+  "Buku Bab IX, bagian C (ArrayList, HashMap, dan pemilihannya); bagian D (generics); bagian E (iterasi, Comparable/Comparator, dan pengurutan objek).",
+  "Video 30: Generic Array List dan Video 31: Operasi Array List (Kelas Terbuka), serta Belajar Java Collections: Map (Sekolah Koding).",
+  "Clue: Catalog di Praktikum Terbimbing Bab 9 mengurutkan judul dengan Comparator.comparing(...)."
+ ],
+ "starter": "import java.util.ArrayList;\nimport java.util.Comparator;\nimport java.util.HashMap;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.Scanner;\n\nclass Book {\n    private String code;\n    private String title;\n    private int year;\n\n    Book(String code, String title, int year) {\n        this.code = code;\n        this.title = title;\n        this.year = year;\n    }\n\n    String getCode() {\n        return code;\n    }\n\n    String getTitle() {\n        return title;\n    }\n\n    int getYear() {\n        return year;\n    }\n}\n\nclass Catalog {\n    private Map<String, Book> books = new HashMap<>();\n\n    void add(Book b) {\n        books.put(b.getCode(), b);\n    }\n\n    Book findByCode(String code) {\n        return books.get(code);\n    }\n\n    int size() {\n        return books.size();\n    }\n\n    List<Book> sortedByYearDesc() {\n        // Salin books.values() ke ArrayList, lalu urutkan: tahun terbit terbaru lebih dulu; bila tahun sama, urut judul A ke Z (Comparator).\n        return new ArrayList<>(books.values());\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Catalog catalog = new Catalog();\n        int n = Integer.parseInt(in.nextLine().trim());\n        for (int i = 0; i < n; i++) {\n            String[] p = in.nextLine().split(\";\");\n            catalog.add(new Book(p[0].trim(), p[1].trim(), Integer.parseInt(p[2].trim())));\n        }\n        System.out.println(\"Katalog urut tahun terbaru:\");\n        for (Book b : catalog.sortedByYearDesc()) {\n            System.out.println(\"- \" + b.getTitle() + \" (\" + b.getYear() + \") [\" + b.getCode() + \"]\");\n        }\n        System.out.println(\"Total judul: \" + catalog.size());\n        while (in.hasNextLine()) {\n            String code = in.nextLine().trim();\n            if (code.equals(\"selesai\")) {\n                break;\n            }\n            Book b = catalog.findByCode(code);\n            System.out.println(b == null ? \"Tidak ada: \" + code : \"Ditemukan: \" + b.getTitle());\n        }\n    }\n}\n",
+ "contohMasukan": "4\nB01;Basis Data;2019\nB02;Struktur Data;2022\nB03;Algoritma;2019\nB04;Jaringan;2022\nB02\nB99\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Comparator.comparingInt(Book::getYear).reversed().thenComparing(Book::getTitle) mengurutkan tahun menurun lalu judul menaik."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab IX, bagian E tentang Comparator dan pengurutan objek."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 31: Operasi Array List, dan video Map dari Sekolah Koding.",
+   "video": [
+    "GTjuHxcBeJg",
+    "nUmr7xTamBg"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "4",
+    "B01;Basis Data;2019",
+    "B02;Struktur Data;2022",
+    "B03;Algoritma;2019",
+    "B04;Jaringan;2022",
+    "B02",
+    "B99",
+    "selesai"
+   ],
+   "expected": "Katalog urut tahun terbaru:\n- Jaringan (2022) [B04]\n- Struktur Data (2022) [B02]\n- Algoritma (2019) [B03]\n- Basis Data (2019) [B01]\nTotal judul: 4\nDitemukan: Struktur Data\nTidak ada: B99",
+   "hidden": false
+  },
+  {
+   "input": [
+    "2",
+    "X1;Zebra;2020",
+    "X2;Apel;2021",
+    "X1",
+    "selesai"
+   ],
+   "expected": "Katalog urut tahun terbaru:\n- Apel (2021) [X2]\n- Zebra (2020) [X1]\nTotal judul: 2\nDitemukan: Zebra",
+   "hidden": false
+  },
+  {
+   "input": [
+    "3",
+    "A1;Satu;2018",
+    "A1;Satu Baru;2020",
+    "A2;Dua;2018",
+    "A1",
+    "selesai"
+   ],
+   "expected": "Katalog urut tahun terbaru:\n- Satu Baru (2020) [A1]\n- Dua (2018) [A2]\nTotal judul: 2\nDitemukan: Satu Baru",
+   "hidden": true
+  },
+  {
+   "input": [
+    "1",
+    "K1;Tunggal;2000",
+    "selesai"
+   ],
+   "expected": "Katalog urut tahun terbaru:\n- Tunggal (2000) [K1]\nTotal judul: 1",
+   "hidden": true
+  },
+  {
+   "input": [
+    "5",
+    "C1;Lima;2024",
+    "C2;Empat;2024",
+    "C3;Tiga;2023",
+    "C4;Dua;2023",
+    "C5;Satu;2022",
+    "C5",
+    "C9",
+    "selesai"
+   ],
+   "expected": "Katalog urut tahun terbaru:\n- Empat (2024) [C2]\n- Lima (2024) [C1]\n- Dua (2023) [C4]\n- Tiga (2023) [C3]\n- Satu (2022) [C5]\nTotal judul: 5\nDitemukan: Satu\nTidak ada: C9",
+   "hidden": true
+  }
+ ]
+}

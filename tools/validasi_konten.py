@@ -106,8 +106,8 @@ def cek_materi(c):
         b = m.get("buku")
         if b is not None and "halaman" in b and not isinstance(b["halaman"], int):
             err(f"{w}: buku.halaman harus angka")
-        if not m.get("video"):
-            err(f"{w}: minimal satu video")
+        if not m.get("video") and m.get("jenis") != "unggah":
+            err(f"{w}: minimal satu video (bab berjenis unggah boleh tanpa video)")
         for v in m.get("video", []):
             if not re.fullmatch(r"[A-Za-z0-9_-]{11}", v.get("id", "")):
                 err(f"{w}: id video YouTube tidak valid: {v.get('id')!r}")

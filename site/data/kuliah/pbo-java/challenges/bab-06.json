@@ -1,0 +1,80 @@
+{
+ "bab": 6,
+ "judul": "Denda keterlambatan per jenis koleksi",
+ "soal": [
+  "Di Bab 6 kamu melihat calculateFine() berperilaku berbeda untuk buku, jurnal, dan item digital. Kini perpustakaan menambah skripsi.",
+  "Buat kelas Thesis turunan LibraryItem. Denda skripsi Rp1000 per hari, tetapi hari yang dihitung paling banyak 20. Lalu lengkapi perulangan di main: untuk tiap item cetak '<kode>: Rp<denda>' dan jumlahkan semuanya, tanpa memeriksa jenisnya dengan if (biarkan polimorfisme bekerja).",
+  "Masukan: baris '<jenis> <kode> <hari terlambat>' (jenis: buku, jurnal, digital, skripsi) sampai kata selesai."
+ ],
+ "rujukan": [
+  "Buku Bab VI, bagian C (overriding, polimorfisme dinamis), hlm. 76; bagian E (polimorfisme melalui referensi superclass pada koleksi objek).",
+  "Video 23: Polymorphism dan Video 25: Object Casting (Kelas Terbuka).",
+  "Clue: Praktikum Terbimbing Bab 6 menghitung calculateFine() lewat list berisi LibraryItem. Satu perulangan, banyak perilaku."
+ ],
+ "starter": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.Scanner;\n\nclass LibraryItem {\n    private String title;\n    private String itemCode;\n\n    LibraryItem(String title, String itemCode) {\n        this.title = title;\n        this.itemCode = itemCode;\n    }\n\n    String getItemCode() {\n        return itemCode;\n    }\n\n    double calculateFine(long daysLate) {\n        return Math.max(0, daysLate) * 500.0;\n    }\n}\n\nclass Journal extends LibraryItem {\n    Journal(String code) {\n        super(\"Jurnal \" + code, code);\n    }\n\n    @Override\n    double calculateFine(long daysLate) {\n        return Math.max(0, daysLate) * 300.0;\n    }\n}\n\nclass DigitalItem extends LibraryItem {\n    DigitalItem(String code) {\n        super(\"Digital \" + code, code);\n    }\n\n    @Override\n    double calculateFine(long daysLate) {\n        return 0.0;\n    }\n}\n\n// Buat kelas Thesis turunan LibraryItem. Constructor Thesis(String code) memanggil super(\"Skripsi \" + code, code). Override calculateFine: Rp1000 per hari, tetapi hari yang dihitung paling banyak 20.\n\npublic class Main {\n    static LibraryItem create(String type, String code) {\n        switch (type) {\n            case \"jurnal\":\n                return new Journal(code);\n            case \"digital\":\n                return new DigitalItem(code);\n            case \"skripsi\":\n                return new Thesis(code);\n            default:\n                return new LibraryItem(\"Buku \" + code, code);\n        }\n    }\n\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        List<LibraryItem> items = new ArrayList<>();\n        List<Long> days = new ArrayList<>();\n        while (in.hasNextLine()) {\n            String line = in.nextLine().trim();\n            if (line.equals(\"selesai\")) {\n                break;\n            }\n            String[] p = line.split(\" \");\n            items.add(create(p[0], p[1]));\n            days.add(Long.parseLong(p[2]));\n        }\n        long total = 0;\n        // Ulangi semua item. Untuk tiap item i cetak \"<kode>: Rp<denda>\" (denda dihitung lewat items.get(i).calculateFine(days.get(i)), cetak sebagai long), lalu jumlahkan ke total. Jangan periksa jenisnya dengan if.\n        System.out.println(\"Total denda: Rp\" + total);\n    }\n}\n",
+ "contohMasukan": "buku BK-01 4\njurnal JR-02 10\ndigital DG-03 30\nskripsi TS-04 25\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Math.min(hari, 20) membatasi hari yang dihitung. Di perulangan, cukup items.get(i).calculateFine(days.get(i)): Java memilih versi yang tepat sesuai jenis objek."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VI, bagian C (hlm. 76) dan bagian E tentang koleksi objek."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 23: Polymorphism.",
+   "video": [
+    "hvrS5b0k4Jk",
+    "MoIORVH4LwI"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "buku BK-01 4",
+    "jurnal JR-02 10",
+    "digital DG-03 30",
+    "skripsi TS-04 25",
+    "selesai"
+   ],
+   "expected": "BK-01: Rp2000\nJR-02: Rp3000\nDG-03: Rp0\nTS-04: Rp20000\nTotal denda: Rp25000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "skripsi TS-01 5",
+    "selesai"
+   ],
+   "expected": "TS-01: Rp5000\nTotal denda: Rp5000",
+   "hidden": false
+  },
+  {
+   "input": [
+    "skripsi TS-02 20",
+    "skripsi TS-03 21",
+    "selesai"
+   ],
+   "expected": "TS-02: Rp20000\nTS-03: Rp20000\nTotal denda: Rp40000",
+   "hidden": true
+  },
+  {
+   "input": [
+    "buku BK-09 -3",
+    "jurnal JR-09 0",
+    "selesai"
+   ],
+   "expected": "BK-09: Rp0\nJR-09: Rp0\nTotal denda: Rp0",
+   "hidden": true
+  },
+  {
+   "input": [
+    "selesai"
+   ],
+   "expected": "Total denda: Rp0",
+   "hidden": true
+  }
+ ]
+}

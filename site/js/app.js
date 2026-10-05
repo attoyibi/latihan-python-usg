@@ -1,4 +1,5 @@
 import { start, run, supports, onReadyChange } from "./runner.js";
+import { startJava, javaSiap, onJavaReadyChange } from "./javarunner.js";
 import { grade } from "./grader.js";
 import * as Auth from "./auth.js";
 
@@ -164,6 +165,7 @@ function renderSidebar() {
 }
 
 function videoCard(m) {
+  if (!m.video || !m.video.length) return h("section", { class: "card" }, h("h3", {}, "Video"), h("div", { class: "placeholder" }, "Bab ini tidak memakai video. Ikuti petunjuk di buku dan tugas di samping."));
   const frame = h("div", { class: "video" });
   const tabs = h("div", { class: "vtabs", role: "group", "aria-label": "Pilih video" });
   const info = h("p", { class: "muted" });
@@ -201,11 +203,11 @@ function caseView(r, idx) {
     d.append(
       h("div", { class: "muted" }, "Masukan"), h("pre", {}, t.input.join("\n")),
       h("div", { class: "muted" }, "Keluaran yang diharapkan"), h("pre", {}, t.expected),
-      h("div", { class: "muted" }, "Keluaran programmu"), h("pre", {}, r.error ? r.error : r.status === "timeout" ? "Program berjalan lebih dari 5 detik dan dihentikan." : r.actual)
+      h("div", { class: "muted" }, "Keluaran programmu"), h("pre", {}, r.error ? r.error : r.status === "timeout" ? "Program berjalan terlalu lama dan dihentikan." : r.actual)
     );
     if (r.status !== "pass") d.open = true;
   } else if (r.status !== "pass") {
-    d.append(h("p", { class: "muted" }, r.status === "timeout" ? "Program berjalan lebih dari 5 detik dan dihentikan." : r.error ? "Programmu error pada kasus ini." : "Keluaran belum cocok. Cek batas nilai dan urutan syaratmu."));
+    d.append(h("p", { class: "muted" }, r.status === "timeout" ? "Program berjalan terlalu lama dan dihentikan." : r.error ? "Programmu error pada kasus ini." : "Keluaran belum cocok. Cek batas nilai dan urutan syaratmu."));
   }
   return d;
 }
@@ -296,12 +298,12 @@ function challengeCard(m, ch) {
     markStarted(m.bab);
     runBtn.disabled = true;
     out.className = "out";
-    out.textContent = "Menjalankan";
+    out.textContent = LANG === "java" && !javaSiap() ? "Menyiapkan Java, pertama kali butuh sekitar 20 detik" : "Menjalankan";
     const lines = stdin.value === "" ? [] : stdin.value.split("\n");
     const r = await run(editor.getValue(), lines, true, LANG);
     if (r.timeout) {
       out.className = "out err";
-      out.textContent = "Program berjalan lebih dari 5 detik dan dihentikan. Periksa perulangan yang tidak pernah berhenti.";
+      out.textContent = "Program berjalan terlalu lama dan dihentikan. Periksa perulangan yang tidak pernah berhenti.";
     } else {
       out.className = "out" + (r.error ? " err" : "");
       out.textContent = (r.stdout ? r.stdout + "\n" : "") + (r.error || "") || "(tidak ada keluaran)";
@@ -321,13 +323,17 @@ function challengeCard(m, ch) {
   });
 
   resetBtn.addEventListener("click", () => {
-    if (confirm("Kode kamu akan diganti dengan kode awal. Lanjutkan?")) editor.setValue(ch ? ch.starter : "");
+    if (confirm("Kode kamu akan diganti dengan kode awal. Lanjutkan?")) {
+      editor.setValue(ch ? ch.starter : "");
+      banding.replaceChildren();
+      result.replaceChildren();
+    }
   });
 
   sendBtn.addEventListener("click", async () => {
     markStarted(m.bab);
     sendBtn.disabled = true;
-    result.replaceChildren(h("p", { class: "muted" }, "Memeriksa semua kasus uji"));
+    result.replaceChildren(h("p", { class: "muted" }, LANG === "java" && !javaSiap() ? "Menyiapkan Java, pertama kali butuh sekitar 20 detik" : "Memeriksa semua kasus uji"));
     const res = await grade(editor.getValue(), ch.tests, (c, i, e) => run(c, i, e, LANG));
     const passed = res.filter((r) => r.status === "pass").length;
     const all = passed === ch.tests.length;
@@ -1215,8 +1221,9 @@ async function route() {
     }
     useCourse(c, true);
     setPage("bab");
-    $("#pyStatus").hidden = c.bahasa !== "python";
+    $("#pyStatus").hidden = c.bahasa !== "python" && c.bahasa !== "java";
     if (c.bahasa === "python") start();
+    if (c.bahasa === "java") startJava();
     await renderBab(n);
     return;
   }
@@ -1271,8 +1278,15 @@ async function init() {
     $("#menuBtn").setAttribute("aria-expanded", String(open));
   });
   onReadyChange((ok) => {
+    if (LANG !== "python") return;
     const c = $("#pyStatus");
     c.textContent = ok ? "Python siap" : "Python: memuat";
+    c.classList.toggle("ready", ok);
+  });
+  onJavaReadyChange((ok) => {
+    if (LANG !== "java") return;
+    const c = $("#pyStatus");
+    c.textContent = ok ? "Java siap" : "Java: memuat (sekitar 20 detik)";
     c.classList.toggle("ready", ok);
   });
   if (Auth.enabled()) {

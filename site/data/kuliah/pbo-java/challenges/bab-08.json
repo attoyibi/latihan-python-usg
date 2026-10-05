@@ -1,0 +1,80 @@
+{
+ "bab": 8,
+ "judul": "Batas pinjam dengan custom exception",
+ "soal": [
+  "Seorang anggota hanya boleh meminjam 3 buku. Permintaan keempat harus ditolak lewat eksepsi, bukan lewat print di dalam kelas.",
+  "Buat kelas MemberLimitException (turunan Exception) dengan constructor berpesan. Di method borrow() pada kelas Member, lempar eksepsi itu bila loanCount sudah mencapai maxLoan, dengan pesan '<nama> sudah mencapai batas 3 buku'.",
+  "Perulangan di main sudah memakai try-catch-finally. Masukan: nama, lalu judul-judul yang ingin dipinjam sampai kata selesai."
+ ],
+ "rujukan": [
+  "Buku Bab VIII, bagian C (try-catch-finally), hlm. 103; bagian D (throw, throws, dan perambatan eksepsi), hlm. 105; bagian E (custom exception dan pesan yang bermakna).",
+  "Video 52: Mengenal Exception, Try, Catch, dan Finally dan Video 53: Exception pada method (Kelas Terbuka, seri Java Dasar).",
+  "Clue: BookNotAvailableException di Praktikum Terbimbing Bab 8 adalah contoh custom exception turunan Exception."
+ ],
+ "starter": "import java.util.Scanner;\n\n// Buat kelas MemberLimitException, turunan Exception (checked), dengan constructor yang menerima pesan dan meneruskannya ke super.\n\nclass Member {\n    private String name;\n    private int loanCount = 0;\n    private int maxLoan = 3;\n\n    Member(String name) {\n        this.name = name;\n    }\n\n    void borrow(String title) throws MemberLimitException {\n        // Bila loanCount sudah mencapai maxLoan, lempar MemberLimitException dengan pesan name + \" sudah mencapai batas \" + maxLoan + \" buku\". Bila belum, tambah loanCount.\n        loanCount++;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Member m = new Member(in.nextLine().trim());\n        while (in.hasNextLine()) {\n            String title = in.nextLine().trim();\n            if (title.equals(\"selesai\")) {\n                break;\n            }\n            try {\n                m.borrow(title);\n                System.out.println(\"Berhasil: \" + title);\n            } catch (MemberLimitException e) {\n                System.out.println(\"Gagal: \" + e.getMessage());\n            } finally {\n                System.out.println(\"Transaksi selesai\");\n            }\n        }\n    }\n}\n",
+ "contohMasukan": "Siti\nBasis Data\nStruktur Data\nPemrograman Web\nJaringan Komputer\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "class MemberLimitException extends Exception { constructor(String message) { super(message); } }. Di borrow, throw new MemberLimitException(...) sebelum loanCount bertambah."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VIII, bagian D (hlm. 105) dan bagian E tentang custom exception."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [Dasar] 52: Mengenal Exception, Try, Catch, dan Finally.",
+   "video": [
+    "u0EnKP6SdNM",
+    "MACrl1oNLhc"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "Siti",
+    "Basis Data",
+    "Struktur Data",
+    "Pemrograman Web",
+    "Jaringan Komputer",
+    "selesai"
+   ],
+   "expected": "Berhasil: Basis Data\nTransaksi selesai\nBerhasil: Struktur Data\nTransaksi selesai\nBerhasil: Pemrograman Web\nTransaksi selesai\nGagal: Siti sudah mencapai batas 3 buku\nTransaksi selesai",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Budi",
+    "A",
+    "B",
+    "selesai"
+   ],
+   "expected": "Berhasil: A\nTransaksi selesai\nBerhasil: B\nTransaksi selesai",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Ani",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "selesai"
+   ],
+   "expected": "Berhasil: A\nTransaksi selesai\nBerhasil: B\nTransaksi selesai\nBerhasil: C\nTransaksi selesai\nGagal: Ani sudah mencapai batas 3 buku\nTransaksi selesai\nGagal: Ani sudah mencapai batas 3 buku\nTransaksi selesai",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Eko",
+    "Solo",
+    "selesai"
+   ],
+   "expected": "Berhasil: Solo\nTransaksi selesai",
+   "hidden": true
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "bab": 5,
+ "judul": "Skripsi sebagai turunan item perpustakaan",
+ "soal": [
+  "Perpustakaan menyimpan skripsi. LibraryItem sudah tersedia (title, itemCode, getSummary). Skripsi punya dua data tambahan: pembimbing dan tahun.",
+  "Buat kelas Thesis turunan LibraryItem dengan atribut advisor dan year. Constructor Thesis(title, itemCode, advisor, year) harus memanggil super(...). Override getSummary() agar hasilnya ditambah teks ' - pembimbing: <advisor>, tahun <year>' di belakang ringkasan induk.",
+  "Masukan: judul, kode, pembimbing, tahun."
+ ],
+ "rujukan": [
+  "Buku Bab V, bagian B (superclass, subclass, extends), hlm. 60; bagian C (super pada constructor dan method), hlm. 63; bagian D (override dan @Override), hlm. 65.",
+  "Video 18: Introduction to Inheritance, Video 20: Super, dan Video 21: Subclass Constructor (Kelas Terbuka).",
+  "Clue: kelas Journal di Praktikum Terbimbing Bab 5 punya struktur yang sama: dua atribut, super(...) di constructor, dan override getSummary."
+ ],
+ "starter": "import java.util.Scanner;\n\nclass LibraryItem {\n    private String title;\n    private String itemCode;\n    private boolean available;\n\n    LibraryItem(String title, String itemCode) {\n        this.title = title;\n        this.itemCode = itemCode;\n        this.available = true;\n    }\n\n    String getSummary() {\n        String status = available ? \"Tersedia\" : \"Dipinjam\";\n        return title + \" [\" + itemCode + \", \" + status + \"]\";\n    }\n}\n\n// Buat kelas Thesis (skripsi) turunan LibraryItem dengan dua atribut tambahan: advisor (String) dan year (int). Constructor: Thesis(title, itemCode, advisor, year), panggil super(...) lebih dulu. Override getSummary(): hasil super.getSummary() + \" - pembimbing: <advisor>, tahun <year>\".\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        String title = in.nextLine().trim();\n        String code = in.nextLine().trim();\n        String advisor = in.nextLine().trim();\n        int year = Integer.parseInt(in.nextLine().trim());\n        LibraryItem biasa = new LibraryItem(\"Basis Data\", \"BK-001\");\n        LibraryItem skripsi = new Thesis(title, code, advisor, year);\n        System.out.println(biasa.getSummary());\n        System.out.println(skripsi.getSummary());\n    }\n}\n",
+ "contohMasukan": "Sistem Informasi Akademik\nTS-014\nDr. Ahmad\n2025",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Baris pertama constructor subclass adalah super(title, itemCode). Di getSummary, super.getSummary() memberi bagian induk, tinggal ditambah teksnya."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab V, bagian C (hlm. 63) dan contoh kelas Journal."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 21: Subclass Constructor (inheritance).",
+   "video": [
+    "CXqOqqe7zjo",
+    "MMCcP5Lnohs"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "Sistem Informasi Akademik",
+    "TS-014",
+    "Dr. Ahmad",
+    "2025"
+   ],
+   "expected": "Basis Data [BK-001, Tersedia]\nSistem Informasi Akademik [TS-014, Tersedia] - pembimbing: Dr. Ahmad, tahun 2025",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Pengolahan Citra",
+    "TS-020",
+    "Prof. Rina",
+    "2023"
+   ],
+   "expected": "Basis Data [BK-001, Tersedia]\nPengolahan Citra [TS-020, Tersedia] - pembimbing: Prof. Rina, tahun 2023",
+   "hidden": false
+  },
+  {
+   "input": [
+    "A",
+    "TS-1",
+    "B",
+    "1999"
+   ],
+   "expected": "Basis Data [BK-001, Tersedia]\nA [TS-1, Tersedia] - pembimbing: B, tahun 1999",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Analisis Big Data",
+    "TS-099",
+    "Dr. Budi Santoso, M.Kom",
+    "2026"
+   ],
+   "expected": "Basis Data [BK-001, Tersedia]\nAnalisis Big Data [TS-099, Tersedia] - pembimbing: Dr. Budi Santoso, M.Kom, tahun 2026",
+   "hidden": true
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+ "bab": 14,
+ "judul": "Factory dan Singleton untuk item perpustakaan",
+ "soal": [
+  "Pembuatan objek item perpustakaan dipusatkan di satu tempat (Factory Method), dan pencatatan semua item dipegang oleh satu pencatat bersama (Singleton).",
+  "Lengkapi LibraryItemFactory.create(type, title, code): 'buku' membuat Book, 'jurnal' membuat Journal, 'digital' membuat DigitalItem, jenis lain melempar IllegalArgumentException berpesan 'Jenis tidak dikenal: <type>'. Lalu jadikan ItemRegistry sebuah Singleton: constructor private, satu instance statis, dan getInstance() selalu mengembalikan instance yang sama.",
+  "Masukan: baris '<jenis>;<judul>;<kode>' sampai kata selesai."
+ ],
+ "rujukan": [
+  "Buku Bab XIV, bagian C (Singleton, kasus koneksi basis data), hlm. 182; bagian D (Factory Method, pembuatan objek koleksi perpustakaan); bagian E (arsitektur MVC), hlm. 187.",
+  "Video 2: Singleton dan Video 4: Factory Method (Programmer Zaman Now, seri Belajar Design Patterns).",
+  "Clue: DatabaseConnection.getInstance() dan LibraryItemFactory di Praktikum Terbimbing Bab 14 memakai pola yang sama persis."
+ ],
+ "starter": "import java.util.Scanner;\n\nclass LibraryItem {\n    protected String title;\n    protected String code;\n\n    LibraryItem(String title, String code) {\n        this.title = title;\n        this.code = code;\n    }\n\n    String getSummary() {\n        return title + \" (\" + code + \")\";\n    }\n}\n\nclass Book extends LibraryItem {\n    Book(String title, String code) {\n        super(title, code);\n    }\n\n    @Override\n    String getSummary() {\n        return \"Buku: \" + super.getSummary();\n    }\n}\n\nclass Journal extends LibraryItem {\n    Journal(String title, String code) {\n        super(title, code);\n    }\n\n    @Override\n    String getSummary() {\n        return \"Jurnal: \" + super.getSummary();\n    }\n}\n\nclass DigitalItem extends LibraryItem {\n    DigitalItem(String title, String code) {\n        super(title, code);\n    }\n\n    @Override\n    String getSummary() {\n        return \"Digital: \" + super.getSummary();\n    }\n}\n\nclass LibraryItemFactory {\n    // create(type, title, code): \"buku\" -> Book, \"jurnal\" -> Journal, \"digital\" -> DigitalItem. Jenis lain: lempar IllegalArgumentException dengan pesan \"Jenis tidak dikenal: <type>\".\n    static LibraryItem create(String type, String title, String code) {\n        return null;\n    }\n}\n\n// Jadikan ItemRegistry sebuah Singleton: constructor private, satu instance statis, getInstance() selalu mengembalikan instance yang sama. Method add(item) menambah hitungan, count() mengembalikannya.\nclass ItemRegistry {\n    private int count;\n\n    static ItemRegistry getInstance() {\n        return new ItemRegistry();\n    }\n\n    void add(LibraryItem item) {\n        count++;\n    }\n\n    int count() {\n        return count;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        ItemRegistry registry = ItemRegistry.getInstance();\n        while (in.hasNextLine()) {\n            String line = in.nextLine().trim();\n            if (line.equals(\"selesai\")) {\n                break;\n            }\n            String[] p = line.split(\";\");\n            try {\n                LibraryItem item = LibraryItemFactory.create(p[0].trim(), p[1].trim(), p[2].trim());\n                registry.add(item);\n                System.out.println(item.getSummary());\n            } catch (IllegalArgumentException e) {\n                System.out.println(e.getMessage());\n            }\n        }\n        System.out.println(\"Total item: \" + registry.count());\n        System.out.println(\"Instance sama: \" + (ItemRegistry.getInstance() == ItemRegistry.getInstance()));\n    }\n}\n",
+ "contohMasukan": "buku;Basis Data;BK-01\njurnal;Jurnal SI;JR-02\nkomik;Naruto;KM-03\ndigital;E-Book Java;DG-04\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Singleton: field static private, constructor private, dan getInstance() yang membuat instance hanya jika masih null. Factory: switch pada type, tiap case return objek yang sesuai."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XIV, bagian C (hlm. 182) tentang Singleton dan bagian D tentang Factory Method."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Design Patterns 2: Singleton, lalu 4: Factory Method.",
+   "video": [
+    "mkE3Nd4nwIM",
+    "4hdLY7WkAXY"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "buku;Basis Data;BK-01",
+    "jurnal;Jurnal SI;JR-02",
+    "komik;Naruto;KM-03",
+    "digital;E-Book Java;DG-04",
+    "selesai"
+   ],
+   "expected": "Buku: Basis Data (BK-01)\nJurnal: Jurnal SI (JR-02)\nJenis tidak dikenal: komik\nDigital: E-Book Java (DG-04)\nTotal item: 3\nInstance sama: true",
+   "hidden": false
+  },
+  {
+   "input": [
+    "buku;A;1",
+    "selesai"
+   ],
+   "expected": "Buku: A (1)\nTotal item: 1\nInstance sama: true",
+   "hidden": false
+  },
+  {
+   "input": [
+    "film;X;9",
+    "selesai"
+   ],
+   "expected": "Jenis tidak dikenal: film\nTotal item: 0\nInstance sama: true",
+   "hidden": true
+  },
+  {
+   "input": [
+    "selesai"
+   ],
+   "expected": "Total item: 0\nInstance sama: true",
+   "hidden": true
+  },
+  {
+   "input": [
+    "digital;D1;D-1",
+    "digital;D2;D-2",
+    "jurnal;J;J-1",
+    "selesai"
+   ],
+   "expected": "Digital: D1 (D-1)\nDigital: D2 (D-2)\nJurnal: J (J-1)\nTotal item: 3\nInstance sama: true",
+   "hidden": true
+  }
+ ]
+}

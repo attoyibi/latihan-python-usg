@@ -1,0 +1,91 @@
+{
+ "bab": 2,
+ "judul": "Anggota perpustakaan dengan dua constructor",
+ "soal": [
+  "Anggota biasa boleh meminjam 3 buku. Untuk dosen, batasnya bisa diatur sendiri. Kelas Member perlu dua constructor.",
+  "Lengkapi constructor pertama (memberId, name, email) yang menetapkan maxLoan = 3, dan constructor kedua yang menerima maxLoan juga dengan memanggil constructor pertama lewat this(...). Lengkapi juga canBorrow(loanCountNow): true bila pinjaman saat ini masih di bawah batas.",
+  "Masukan: id, nama, email, batas pinjam (atau - untuk bawaan), dan jumlah pinjaman sekarang."
+ ],
+ "rujukan": [
+  "Buku Bab II, bagian E (constructor, overloading constructor, dan this), lalu bagian B dan D di bab yang sama (hlm. 19 dan 23).",
+  "Video 04: Constructor dan Video 05: Methods (Kelas Terbuka), serta Video 17: Overloading Constructors and Methods.",
+  "Clue: kelas Member di Praktikum Terbimbing Bab 2 punya satu constructor kosong dan satu constructor berparameter."
+ ],
+ "starter": "import java.util.Scanner;\n\nclass Member {\n    String memberId;\n    String name;\n    String email;\n    int maxLoan;\n\n    // Constructor 1 (memberId, name, email): maxLoan = 3. Constructor 2 (ditambah maxLoan): panggil constructor 1 dengan this(...), lalu isi maxLoan.\n    Member(String memberId, String name, String email) {\n    }\n\n    Member(String memberId, String name, String email, int maxLoan) {\n    }\n\n    String getSummary() {\n        return memberId + \" - \" + name + \" (maks \" + maxLoan + \" buku)\";\n    }\n\n    boolean canBorrow(int loanCountNow) {\n        // Kembalikan true bila loanCountNow lebih kecil dari maxLoan.\n        return false;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        String id = in.nextLine().trim();\n        String name = in.nextLine().trim();\n        String email = in.nextLine().trim();\n        String batas = in.nextLine().trim();\n        int loans = Integer.parseInt(in.nextLine().trim());\n        Member m;\n        if (batas.equals(\"-\")) {\n            m = new Member(id, name, email);\n        } else {\n            m = new Member(id, name, email, Integer.parseInt(batas));\n        }\n        System.out.println(m.getSummary());\n        System.out.println(\"Boleh meminjam: \" + m.canBorrow(loans));\n    }\n}\n",
+ "contohMasukan": "20240012\nSiti Aminah\nsiti@usg.ac.id\n-\n3",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "this(...) di baris pertama constructor memanggil constructor lain di kelas yang sama. canBorrow cukup mengembalikan hasil perbandingan."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab II, bagian E tentang overloading constructor dan this."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 04: Constructor.",
+   "video": [
+    "45SxJ9GhEO0",
+    "TTt6v_be0Vk"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "20240012",
+    "Siti Aminah",
+    "siti@usg.ac.id",
+    "-",
+    "3"
+   ],
+   "expected": "20240012 - Siti Aminah (maks 3 buku)\nBoleh meminjam: false",
+   "hidden": false
+  },
+  {
+   "input": [
+    "20240012",
+    "Siti Aminah",
+    "siti@usg.ac.id",
+    "-",
+    "2"
+   ],
+   "expected": "20240012 - Siti Aminah (maks 3 buku)\nBoleh meminjam: true",
+   "hidden": false
+  },
+  {
+   "input": [
+    "19990001",
+    "Dr. Ahmad",
+    "ahmad@usg.ac.id",
+    "5",
+    "4"
+   ],
+   "expected": "19990001 - Dr. Ahmad (maks 5 buku)\nBoleh meminjam: true",
+   "hidden": false
+  },
+  {
+   "input": [
+    "19990001",
+    "Dr. Ahmad",
+    "ahmad@usg.ac.id",
+    "5",
+    "5"
+   ],
+   "expected": "19990001 - Dr. Ahmad (maks 5 buku)\nBoleh meminjam: false",
+   "hidden": true
+  },
+  {
+   "input": [
+    "20250033",
+    "Budi",
+    "budi@usg.ac.id",
+    "-",
+    "0"
+   ],
+   "expected": "20250033 - Budi (maks 3 buku)\nBoleh meminjam: true",
+   "hidden": true
+  }
+ ]
+}

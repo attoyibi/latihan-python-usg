@@ -1,0 +1,72 @@
+{
+ "bab": 1,
+ "judul": "Katalog majalah perpustakaan",
+ "soal": [
+  "Di Bab 1 kamu melihat program ObjekPerpustakaan: sebuah kelas kecil dengan data dan method pinjam. Sekarang perpustakaan ingin mencatat majalah.",
+  "Lengkapi kelas Majalah (judul, edisi, tersedia). Method tampilkan() mencetak: <judul> - edisi <edisi> [tersedia] atau [dipinjam]. Method pinjam() mengubah status bila masih tersedia, atau menolak bila sudah dipinjam.",
+  "Masukan: judul majalah, nomor edisi, lalu berapa kali pinjam() dicoba. Program mencetak status, mencoba meminjam, lalu mencetak status lagi."
+ ],
+ "rujukan": [
+  "Buku Bab I, bagian C (gagasan dasar paradigma berorientasi objek), hlm. 5, dan contoh ObjekPerpustakaan di bab yang sama.",
+  "Video 01: Pendahuluan dan Video 02a: Setup Visual Studio Code (Kelas Terbuka).",
+  "Clue: bandingkan ProsedurPerpustakaan (data dalam array) dengan ObjekPerpustakaan (data dan method dalam satu kelas)."
+ ],
+ "starter": "import java.util.Scanner;\n\nclass Majalah {\n    String judul;\n    int edisi;\n    boolean tersedia = true;\n\n    void tampilkan() {\n        // Cetak: <judul> - edisi <edisi> [tersedia] atau [dipinjam]. Pakai operator ?: seperti di buku.\n    }\n\n    void pinjam() {\n        // Bila tersedia: ubah jadi false dan cetak \"Dipinjam: <judul>\". Bila tidak: cetak \"Ditolak, sudah dipinjam: <judul>\".\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Majalah m = new Majalah();\n        m.judul = in.nextLine();\n        m.edisi = Integer.parseInt(in.nextLine().trim());\n        int percobaan = Integer.parseInt(in.nextLine().trim());\n        m.tampilkan();\n        for (int i = 0; i < percobaan; i++) {\n            m.pinjam();\n        }\n        m.tampilkan();\n    }\n}\n",
+ "contohMasukan": "Jurnal Sistem Informasi\n3\n2",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Operator ?: memilih antara dua nilai. Method pinjam() cukup memeriksa tersedia dengan if-else, lalu mengubahnya bila perlu."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab I, bagian C (hlm. 5) dan bandingkan dua contoh perpustakaan di bab itu."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 01: Pendahuluan.",
+   "video": [
+    "bxOPd_b0rg4",
+    "1vY5eNw5OdE"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "Jurnal Sistem Informasi",
+    "3",
+    "2"
+   ],
+   "expected": "Jurnal Sistem Informasi - edisi 3 [tersedia]\nDipinjam: Jurnal Sistem Informasi\nDitolak, sudah dipinjam: Jurnal Sistem Informasi\nJurnal Sistem Informasi - edisi 3 [dipinjam]",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Teknologi Pangan",
+    "12",
+    "1"
+   ],
+   "expected": "Teknologi Pangan - edisi 12 [tersedia]\nDipinjam: Teknologi Pangan\nTeknologi Pangan - edisi 12 [dipinjam]",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Gizi Kita",
+    "7",
+    "0"
+   ],
+   "expected": "Gizi Kita - edisi 7 [tersedia]\nGizi Kita - edisi 7 [tersedia]",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Sains Modern",
+    "1",
+    "3"
+   ],
+   "expected": "Sains Modern - edisi 1 [tersedia]\nDipinjam: Sains Modern\nDitolak, sudah dipinjam: Sains Modern\nDitolak, sudah dipinjam: Sains Modern\nSains Modern - edisi 1 [dipinjam]",
+   "hidden": true
+  }
+ ]
+}

@@ -1,0 +1,74 @@
+{
+ "bab": 10,
+ "judul": "Menyimpan katalog ke berkas CSV",
+ "soal": [
+  "Katalog perlu tersimpan agar tidak hilang saat program ditutup. Kamu menyimpannya ke berkas katalog.csv dengan NIO.2 (Path dan Files).",
+  "Masukan: jumlah judul, lalu tiap judul satu baris dalam format kode,judul, lalu satu baris susulan dengan format sama. Tulis dulu baris judul kolom 'kode,judul' dan semua isi (timpa berkas lama). Lalu baca berkas itu, tambahkan baris susulan ke daftar hasil baca, dan tulis ulang seluruh berkas. Terakhir baca semua baris kembali. (Catatan: penjalan Java di browser belum mendukung mode tambah APPEND, jadi berkas diperbarui dengan cara baca lalu tulis ulang.)",
+  "Program mencetak Banyak judul: <n> (tanpa baris judul kolom), lalu tiap judul diawali '- '."
+ ],
+ "rujukan": [
+  "Buku Bab X, bagian C (membaca dan menulis berkas teks serta CSV), hlm. 128; bagian E (NIO.2: Path dan Files, dan penanganan eksepsi berkas), hlm. 132.",
+  "Video 54: Pengenalan I/O Stream, input file (Kelas Terbuka, seri Java Dasar) dan Input/Output File Java (Keep On Coding).",
+  "Clue: exportTitlesCsv dan readTitlesCsv di CatalogFileUtil, Praktikum Terbimbing Bab 10, memakai Files.newBufferedWriter dan Files.readAllLines."
+ ],
+ "starter": "import java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Scanner in = new Scanner(System.in);\n        int n = Integer.parseInt(in.nextLine().trim());\n        List<String> daftar = new ArrayList<>();\n        for (int i = 0; i < n; i++) {\n            daftar.add(in.nextLine().trim());\n        }\n        String susulan = in.nextLine().trim();\n\n        Path path = Path.of(\"katalog.csv\");\n        List<String> isi = new ArrayList<>();\n        // 1) Tulis ke katalog.csv: baris judul kolom \"kode,judul\", lalu semua isi daftar, satu per baris (timpa berkas lama). 2) Baca kembali isinya, tambahkan baris susulan ke daftar hasil baca itu, lalu tulis ulang seluruh berkas. 3) Baca semua baris berkas ke daftar isi (Files.readAllLines).\n\n        System.out.println(\"Banyak judul: \" + (isi.size() - 1));\n        for (int i = 1; i < isi.size(); i++) {\n            System.out.println(\"- \" + isi.get(i).split(\",\")[1]);\n        }\n        Files.deleteIfExists(path);\n    }\n}\n",
+ "contohMasukan": "2\nB01,Basis Data\nB02,Struktur Data\nB03,Jaringan Komputer",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Files.write(path, daftarBaris) menulis (menimpa). Files.readAllLines(path) membaca semua baris ke List; tambahkan baris baru dengan add(), lalu Files.write lagi untuk menyimpan."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab X, bagian E (hlm. 132) tentang Path dan Files, dan bagian C untuk format CSV."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [Dasar] 54: Pengenalan I/O Stream, input file.",
+   "video": [
+    "YKnhpdWxp54",
+    "hgF21imQ_Is"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "2",
+    "B01,Basis Data",
+    "B02,Struktur Data",
+    "B03,Jaringan Komputer"
+   ],
+   "expected": "Banyak judul: 3\n- Basis Data\n- Struktur Data\n- Jaringan Komputer",
+   "hidden": false
+  },
+  {
+   "input": [
+    "1",
+    "K1,Satu",
+    "K2,Dua"
+   ],
+   "expected": "Banyak judul: 2\n- Satu\n- Dua",
+   "hidden": false
+  },
+  {
+   "input": [
+    "0",
+    "Z9,Susulan Saja"
+   ],
+   "expected": "Banyak judul: 1\n- Susulan Saja",
+   "hidden": true
+  },
+  {
+   "input": [
+    "3",
+    "A,Alfa",
+    "B,Beta",
+    "C,Gamma",
+    "D,Delta"
+   ],
+   "expected": "Banyak judul: 4\n- Alfa\n- Beta\n- Gamma\n- Delta",
+   "hidden": true
+  }
+ ]
+}

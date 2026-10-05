@@ -1,0 +1,80 @@
+{
+ "bab": 7,
+ "judul": "Majalah yang bisa dipinjam dan dicetak labelnya",
+ "soal": [
+  "Interface Borrowable (kontrak peminjaman) dan Printable (kontrak label, dengan default method printLabel) sudah tersedia seperti di Bab 7.",
+  "Buat kelas Magazine yang mengimplementasikan keduanya. borrow(): bila tersedia, jadi tidak tersedia dan cetak 'Dipinjam: <judul>'; bila tidak, cetak '<judul> sedang dipinjam'. returnItem(): jadi tersedia dan cetak 'Dikembalikan: <judul>'. getSummary(): '<judul> [Tersedia]' atau '<judul> [Dipinjam]'. printLabel() tidak perlu kamu tulis ulang.",
+  "Masukan: judul, lalu perintah (pinjam, kembali, label) sampai kata selesai."
+ ],
+ "rujukan": [
+  "Buku Bab VII, bagian C (interface, kontrak perilaku), hlm. 90; bagian D (default method dan static method); bagian E (memilih abstract class atau interface), hlm. 92.",
+  "Video 26: Abstract Class, Video 34: Interface, dan Video 35: Interface VS Abstract (Kelas Terbuka).",
+  "Clue: Praktikum Terbimbing Bab 7 menerapkan Borrowable dan Printable pada kelas Book dan DigitalItem."
+ ],
+ "starter": "import java.util.Scanner;\n\ninterface Borrowable {\n    boolean isAvailable();\n    void borrow();\n    void returnItem();\n}\n\ninterface Printable {\n    String getSummary();\n\n    default void printLabel() {\n        System.out.println(\"=== LABEL RAK ===\");\n        System.out.println(getSummary());\n        System.out.println(\"=================\");\n    }\n}\n\n// Buat kelas Magazine yang mengimplementasikan Borrowable dan Printable. Atribut: title dan available (awalnya true). borrow(): bila tersedia, jadi tidak tersedia dan cetak \"Dipinjam: <title>\"; bila tidak, cetak \"<title> sedang dipinjam\". returnItem(): jadi tersedia dan cetak \"Dikembalikan: <title>\". getSummary(): \"<title> [Tersedia]\" atau \"<title> [Dipinjam]\".\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Magazine m = new Magazine(in.nextLine().trim());\n        while (in.hasNextLine()) {\n            String cmd = in.nextLine().trim();\n            if (cmd.equals(\"selesai\")) {\n                break;\n            } else if (cmd.equals(\"pinjam\")) {\n                m.borrow();\n            } else if (cmd.equals(\"kembali\")) {\n                m.returnItem();\n            } else if (cmd.equals(\"label\")) {\n                m.printLabel();\n            }\n        }\n    }\n}\n",
+ "contohMasukan": "Jurnal Sistem Informasi\nlabel\npinjam\npinjam\nlabel\nkembali\nselesai",
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Satu kelas bisa implements beberapa interface dipisah koma. Method interface harus public di kelas. Default method didapat gratis."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab VII, bagian C (hlm. 90) tentang interface dan implements."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Belajar Java [OOP] 34: Interface.",
+   "video": [
+    "7N3lxM05cw0",
+    "ztQPFMFEItI"
+   ]
+  }
+ ],
+ "tests": [
+  {
+   "input": [
+    "Jurnal Sistem Informasi",
+    "label",
+    "pinjam",
+    "pinjam",
+    "label",
+    "kembali",
+    "selesai"
+   ],
+   "expected": "=== LABEL RAK ===\nJurnal Sistem Informasi [Tersedia]\n=================\nDipinjam: Jurnal Sistem Informasi\nJurnal Sistem Informasi sedang dipinjam\n=== LABEL RAK ===\nJurnal Sistem Informasi [Dipinjam]\n=================\nDikembalikan: Jurnal Sistem Informasi",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Gizi Kita",
+    "pinjam",
+    "selesai"
+   ],
+   "expected": "Dipinjam: Gizi Kita",
+   "hidden": false
+  },
+  {
+   "input": [
+    "Sains",
+    "kembali",
+    "label",
+    "selesai"
+   ],
+   "expected": "Dikembalikan: Sains\n=== LABEL RAK ===\nSains [Tersedia]\n=================",
+   "hidden": true
+  },
+  {
+   "input": [
+    "Teknologi",
+    "pinjam",
+    "kembali",
+    "pinjam",
+    "pinjam",
+    "selesai"
+   ],
+   "expected": "Dipinjam: Teknologi\nDikembalikan: Teknologi\nDipinjam: Teknologi\nTeknologi sedang dipinjam",
+   "hidden": true
+  }
+ ]
+}

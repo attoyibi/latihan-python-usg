@@ -1,1 +1,479 @@
-[]
+[
+ {
+  "bab": 1,
+  "judul": "Paradigma pemrograman berorientasi objek",
+  "ringkasan": "Program bisa disusun sebagai kumpulan objek yang memegang data dan perilakunya sendiri. Bab ini membandingkan gaya prosedural dengan gaya objek, dan mengenalkan empat pilar OOP serta ekosistem Java.",
+  "buku": {
+   "teks": "Bab I, bagian C: Gagasan dasar paradigma berorientasi objek",
+   "halaman": 5
+  },
+  "video": [
+   {
+    "id": "bxOPd_b0rg4",
+    "judul": "Belajar Java [OOP] 01: Pendahuluan",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "1vY5eNw5OdE",
+    "judul": "Belajar Java [OOP] 02a: Setup Visual Studio Code di Windows",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 2,
+  "judul": "Kelas, objek, atribut, method, constructor",
+  "ringkasan": "Kelas adalah cetak biru, objek adalah wujud nyatanya. Atribut menyimpan data, method melakukan pekerjaan, constructor menyiapkan objek saat dibuat.",
+  "buku": {
+   "teks": "Bab II, bagian B: Kelas sebagai cetak biru dan objek sebagai instans",
+   "halaman": 19
+  },
+  "video": [
+   {
+    "id": "aQRemTq6Two",
+    "judul": "Belajar Java [OOP] 03: Pengenalan Class dan Object",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "45SxJ9GhEO0",
+    "judul": "Belajar Java [OOP] 04: Constructor",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "_0rSpG23zps",
+    "judul": "Belajar Java [OOP] 05: Methods",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 3,
+  "judul": "Enkapsulasi dan access modifier",
+  "ringkasan": "Data dilindungi dengan private, lalu diakses lewat getter dan setter. Setter yang baik memeriksa nilai sebelum menyimpannya.",
+  "buku": {
+   "teks": "Bab III, bagian D: Getter, setter, dan validasi data di dalam setter",
+   "halaman": 36
+  },
+  "video": [
+   {
+    "id": "aRb7SO6iiqE",
+    "judul": "Belajar Java [OOP] 09: Public dan Private Keywords",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "zwDMHJzTUzs",
+    "judul": "Belajar Java [OOP] 10: Getter dan Setter (Encapsulasi)",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 4,
+  "judul": "Pemodelan dengan diagram kelas UML",
+  "ringkasan": "Sebelum menulis kode, rancang kelas dan hubungannya di atas kertas dengan diagram kelas UML.",
+  "buku": {
+   "teks": "Bab IV, bagian C: Relasi antarkelas, asosiasi, agregasi, komposisi",
+   "halaman": 47
+  },
+  "video": [
+   {
+    "id": "zoZuzFmEUP4",
+    "judul": "Apa itu UML? Beserta Pengertian dan Contohnya",
+    "channel": "Naistudio Academy",
+    "sumber": "lain"
+   },
+   {
+    "id": "shpryDoscDU",
+    "judul": "Belajar Class Diagram",
+    "channel": "Naistudio Academy",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "unggah",
+  "challenge": false,
+  "tugas": {
+   "judul": "Diagram kelas UML untuk peminjaman buku SIP-USG",
+   "soal": [
+    "Perpustakaan USG ingin mencatat peminjaman. Satu Anggota (Member) dapat meminjam banyak Buku, dan satu Peminjaman (Loan) mencatat satu anggota, satu buku, serta tanggal pinjam. Buku, Jurnal, dan Item Digital adalah jenis dari Item Perpustakaan (LibraryItem).",
+    "Gambar diagram kelas UML dengan: nama kelas, atribut dan method penting beserta visibilitasnya (+ dan -), relasi (asosiasi, agregasi atau komposisi, dan generalisasi) lengkap dengan multiplisitasnya. Tulis juga satu paragraf alasan mengapa kamu memilih agregasi atau komposisi di salah satu relasi.",
+    "Kumpulkan sebagai foto atau PDF diagram dan paragraf alasan."
+   ],
+   "rujukan": [
+    "Buku Bab IV, bagian B (notasi kelas), hlm. 47; bagian C (relasi antarkelas), hlm. 47; bagian D (multiplisitas dan generalisasi), hlm. 49; bagian E (dari diagram ke kode), hlm. 50.",
+    "Video: Apa itu UML? dan Belajar Class Diagram (Naistudio Academy).",
+    "Clue: bagian F, Praktikum Terbimbing di Bab 4, memuat diagram kelas lengkap SIP-USG yang bisa kamu jadikan contoh bentuk."
+   ],
+   "kriteria": [
+    "Notasi kelas, atribut, dan method benar, dengan visibilitas.",
+    "Jenis relasi tepat dan arahnya benar.",
+    "Multiplisitas tercantum di kedua ujung relasi.",
+    "Alasan memilih agregasi atau komposisi masuk akal."
+   ]
+  }
+ },
+ {
+  "bab": 5,
+  "judul": "Pewarisan (inheritance)",
+  "ringkasan": "Subclass mewarisi atribut dan method superclass lewat extends, memakai super untuk memanggil bagian induk, dan mengubah perilaku dengan override.",
+  "buku": {
+   "teks": "Bab V, bagian C: Kata kunci super pada constructor dan method",
+   "halaman": 63
+  },
+  "video": [
+   {
+    "id": "CXqOqqe7zjo",
+    "judul": "Learn Java [OOP] 18: Introduction to Inheritance",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "MMCcP5Lnohs",
+    "judul": "Learn Java [OOP] 20: Super (inheritance)",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "7okH5nc2LEc",
+    "judul": "Learn Java [OOP] 19: Overriding Methods (inheritance)",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "XHDA2qaTMw4",
+    "judul": "Belajar Java [OOP] 21: Subclass Constructor (inheritance)",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 6,
+  "judul": "Polimorfisme",
+  "ringkasan": "Satu pemanggilan method bisa berperilaku berbeda tergantung jenis objek sebenarnya. Inilah polimorfisme dinamis lewat override dan dynamic binding.",
+  "buku": {
+   "teks": "Bab VI, bagian C: Overriding (polimorfisme dinamis)",
+   "halaman": 76
+  },
+  "video": [
+   {
+    "id": "TTt6v_be0Vk",
+    "judul": "Learn Java [OOP] 17: Overloading Constructors and Methods",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "hvrS5b0k4Jk",
+    "judul": "Belajar Java [OOP] 23: Polymorphism",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "MoIORVH4LwI",
+    "judul": "Belajar Java [OOP] 25: Object Casting",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 7,
+  "judul": "Abstraksi: abstract class dan interface",
+  "ringkasan": "Interface adalah kontrak perilaku, abstract class adalah kerangka setengah jadi. Keduanya memaksa kelas turunan melengkapi bagian yang wajib.",
+  "buku": {
+   "teks": "Bab VII, bagian C: Interface, kontrak perilaku",
+   "halaman": 90
+  },
+  "video": [
+   {
+    "id": "7N3lxM05cw0",
+    "judul": "Belajar Java [OOP] 26: Abstract Class",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "ztQPFMFEItI",
+    "judul": "Belajar Java [OOP] 34: Interface",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "hkNgCn8Yl08",
+    "judul": "Belajar Java [OOP] 35: Interface VS Abstract",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 8,
+  "judul": "Penanganan eksepsi",
+  "ringkasan": "Kesalahan saat program berjalan ditangkap dengan try-catch-finally, dilempar dengan throw, dan bisa dibuat khusus lewat custom exception.",
+  "buku": {
+   "teks": "Bab VIII, bagian C: try-catch-finally dan try-with-resources",
+   "halaman": 103
+  },
+  "video": [
+   {
+    "id": "u0EnKP6SdNM",
+    "judul": "Belajar Java [Dasar] 52: Mengenal Exception - Try, Catch, dan Finally",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "MACrl1oNLhc",
+    "judul": "Belajar Java [Dasar] 53: Exception pada method (rantai exception)",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 9,
+  "judul": "Collection framework dan generics",
+  "ringkasan": "List, Set, dan Map menyimpan banyak objek dengan cara berbeda. Generics menjaga tipe isinya, Comparator mengatur urutannya.",
+  "buku": {
+   "teks": "Bab IX, bagian E: Iterasi, Comparable/Comparator, dan pengurutan objek"
+  },
+  "video": [
+   {
+    "id": "GTjuHxcBeJg",
+    "judul": "Learn Java [OOP] 30: Generic Array List",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "nUmr7xTamBg",
+    "judul": "Belajar Java [OOP] 31: Operasi Array List",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "-DVT3SvyXcA",
+    "judul": "Belajar Java Collections: Map (HashMap, TreeMap, LinkedHashMap)",
+    "channel": "Sekolah Koding",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 10,
+  "judul": "Operasi berkas dan object persistence",
+  "ringkasan": "Data disimpan ke berkas teks atau CSV dan dibaca kembali dengan Path dan Files, lengkap dengan penanganan eksepsi berkas.",
+  "buku": {
+   "teks": "Bab X, bagian E: NIO.2 (Path, Files) dan penanganan eksepsi berkas",
+   "halaman": 132
+  },
+  "video": [
+   {
+    "id": "YKnhpdWxp54",
+    "judul": "Belajar Java [Dasar] 54: Pengenalan I/O Stream, input file",
+    "channel": "Kelas Terbuka",
+    "sumber": "playlist"
+   },
+   {
+    "id": "hgF21imQ_Is",
+    "judul": "Input/Output File Java (Membaca & Menulis)",
+    "channel": "Keep On Coding",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 11,
+  "judul": "Koneksi basis data JDBC dan CRUD",
+  "ringkasan": "Program Java berbicara dengan basis data lewat JDBC. PreparedStatement dan pola DAO menjaga kode data tetap rapi.",
+  "buku": {
+   "teks": "Bab XI, bagian C: Statement, PreparedStatement, dan ResultSet",
+   "halaman": 141
+  },
+  "video": [
+   {
+    "id": "_25BmjGfjQQ",
+    "judul": "Tutorial Java Database (Bahasa Indonesia)",
+    "channel": "Programmer Zaman Now",
+    "sumber": "lain"
+   },
+   {
+    "id": "nnQTqEgJUVM",
+    "judul": "Java CRUD MySQL MVC Bagian 1 (Koneksi MySQL)",
+    "channel": "Abas Setiawan",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "unggah",
+  "challenge": false,
+  "tugas": {
+   "judul": "BookDAO yang berjalan terhadap basis data",
+   "soal": [
+    "Bab ini butuh basis data sungguhan, jadi dikerjakan di komputermu (VS Code dan MySQL atau MariaDB) lalu hasilnya dikumpulkan.",
+    "Buat basis data sip_usg dengan tabel books, lalu tulis kelas BookDAO yang memakai PreparedStatement untuk empat operasi: tambah buku, tampilkan semua, ubah judul, dan hapus buku.",
+    "Kumpulkan sebagai PDF: kode BookDAO, tangkapan layar hasil menjalankan keempat operasi, dan satu paragraf jawaban mengapa PreparedStatement lebih aman daripada Statement biasa."
+   ],
+   "rujukan": [
+    "Buku Bab XI, bagian B (arsitektur JDBC dan connection string), hlm. 140; bagian C (Statement, PreparedStatement, ResultSet), hlm. 141; bagian D (CRUD), hlm. 142; bagian E (pola DAO), hlm. 143.",
+    "Video: Tutorial Java Database (Programmer Zaman Now) dan Java CRUD MySQL MVC Bagian 1 (Abas Setiawan).",
+    "Clue: bagian F, Praktikum Terbimbing di Bab 11, mengerjakan BookDAO lengkap terhadap basis data sip_usg."
+   ],
+   "kriteria": [
+    "Keempat operasi CRUD berjalan dan terbukti di tangkapan layar.",
+    "Memakai PreparedStatement dengan parameter, bukan menggabung teks SQL.",
+    "Koneksi dan resource ditutup dengan benar.",
+    "Jawaban tentang keamanan menyebut SQL injection."
+   ]
+  }
+ },
+ {
+  "bab": 12,
+  "judul": "Antarmuka grafis dan event handling",
+  "ringkasan": "Aplikasi berjendela dibangun dari komponen Swing yang ditata layout manager dan dihidupkan oleh event listener.",
+  "buku": {
+   "teks": "Bab XII, bagian D: Event handling, listener, event object, dan lambda",
+   "halaman": 156
+  },
+  "video": [
+   {
+    "id": "iwW-5e5Rmrs",
+    "judul": "Java Swing Tutorial (Bahasa Indonesia)",
+    "channel": "Yohana Sri Rejeki",
+    "sumber": "lain"
+   },
+   {
+    "id": "JMDNuZyD9nw",
+    "judul": "Tutorial membuat tampilan GUI dengan Java Swing",
+    "channel": "Arunika",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "unggah",
+  "challenge": false,
+  "tugas": {
+   "judul": "Form data buku dengan Swing",
+   "soal": [
+    "Bab ini menghasilkan jendela aplikasi, jadi dikerjakan di komputermu lalu hasilnya dikumpulkan.",
+    "Buat jendela JFrame berisi kolom isian judul, penulis, dan tahun, serta tombol Simpan dan Hapus. Tata komponen dengan satu layout manager. Saat tombol Simpan ditekan (ActionListener atau lambda), isi kolom ditampilkan di sebuah tabel atau label hasil.",
+    "Kumpulkan sebagai PDF: kode, tangkapan layar jendela sebelum dan sesudah tombol Simpan ditekan, serta satu kalimat tentang layout manager yang dipilih dan alasannya."
+   ],
+   "rujukan": [
+    "Buku Bab XII, bagian B (komponen Swing), hlm. 154; bagian C (layout manager), hlm. 155; bagian D (event handling dan lambda), hlm. 156; bagian E (menghubungkan form dengan DAO), hlm. 157.",
+    "Video: Java Swing Tutorial (Yohana Sri Rejeki) dan Tutorial membuat tampilan GUI dengan Java Swing.",
+    "Clue: bagian F, Praktikum Terbimbing di Bab 12, membangun form data buku SIP-USG dengan tabel dan tombol CRUD."
+   ],
+   "kriteria": [
+    "Jendela tampil dengan komponen lengkap.",
+    "Layout rapi dan sesuai penjelasan.",
+    "Event tombol Simpan bekerja.",
+    "Kode bersih dan terbaca."
+   ]
+  }
+ },
+ {
+  "bab": 13,
+  "judul": "Prinsip desain SOLID",
+  "ringkasan": "Lima prinsip untuk kode yang mudah diubah. Open-Closed, misalnya, menambah perilaku baru dengan menambah kelas, bukan mengubah kelas lama.",
+  "buku": {
+   "teks": "Bab XIII, bagian B: Single Responsibility dan Open-Closed",
+   "halaman": 168
+  },
+  "video": [
+   {
+    "id": "hKjk2CWd1kY",
+    "judul": "SOLID Principles: Konsep dan Penjelasannya",
+    "channel": "HeyrozX",
+    "sumber": "lain"
+   },
+   {
+    "id": "4YIUo7ZMMlk",
+    "judul": "Apakah SOLID Wajib Digunakan?",
+    "channel": "Programmer Zaman Now",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 14,
+  "judul": "Pengantar design pattern",
+  "ringkasan": "Pola desain adalah resep yang sudah teruji. Singleton menjamin satu instance, Factory Method memusatkan pembuatan objek, MVC memisahkan data, tampilan, dan pengendali.",
+  "buku": {
+   "teks": "Bab XIV, bagian C: Singleton, kasus koneksi basis data",
+   "halaman": 182
+  },
+  "video": [
+   {
+    "id": "mkE3Nd4nwIM",
+    "judul": "Belajar Design Patterns 2: Singleton",
+    "channel": "Programmer Zaman Now",
+    "sumber": "lain"
+   },
+   {
+    "id": "4hdLY7WkAXY",
+    "judul": "Belajar Design Patterns 4: Factory Method",
+    "channel": "Programmer Zaman Now",
+    "sumber": "lain"
+   },
+   {
+    "id": "nnQTqEgJUVM",
+    "judul": "Java CRUD MySQL MVC Bagian 1 (Koneksi MySQL)",
+    "channel": "Abas Setiawan",
+    "sumber": "lain"
+   }
+  ],
+  "jenis": "kode",
+  "challenge": true
+ },
+ {
+  "bab": 15,
+  "judul": "Integrasi konsep dalam proyek",
+  "ringkasan": "Semua konsep Bab I sampai XIV dirakit menjadi satu aplikasi SIP-USG utuh lengkap dengan dokumentasi dan demonstrasi.",
+  "buku": {
+   "teks": "Bab XV, bagian B: Peta integrasi seluruh konsep Bab I sampai XIV",
+   "halaman": 198
+  },
+  "video": [],
+  "jenis": "unggah",
+  "challenge": false,
+  "tugas": {
+   "judul": "SIP-USG versi akhir dan demonstrasinya",
+   "soal": [
+    "Rakit aplikasi SIP-USG milikmu dari konsep Bab I sampai XIV: kelas dan objek, enkapsulasi, pewarisan, polimorfisme, interface, eksepsi, collection, berkas atau basis data, serta satu design pattern.",
+    "Kumpulkan sebagai PDF: diagram kelas final, daftar fitur yang berjalan beserta tangkapan layarnya, tabel yang memetakan tiap bab ke bagian kode tempat konsepnya dipakai, dan tautan ke repositori atau video demonstrasi singkat (maksimal 5 menit)."
+   ],
+   "rujukan": [
+    "Buku Bab XV, bagian B (peta integrasi seluruh konsep), hlm. 198; bagian C (tahapan pengembangan proyek); bagian D (dokumentasi dan etika kolaborasi), hlm. 202; bagian E (presentasi), hlm. 203.",
+    "Clue: bagian F, Praktikum Terbimbing di Bab 15, merakit SIP-USG versi akhir dan menyiapkan demonstrasi."
+   ],
+   "kriteria": [
+    "Fitur inti berjalan dan terbukti.",
+    "Setiap bab terpetakan ke kode nyata.",
+    "Dokumentasi jelas dan bisa diikuti orang lain.",
+    "Demonstrasi runtut."
+   ]
+  }
+ }
+]
