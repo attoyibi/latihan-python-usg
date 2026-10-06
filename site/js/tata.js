@@ -9,7 +9,10 @@ const jepit = (x, [a, b]) => Math.min(b, Math.max(a, x));
 
 // Penyimpanan pilihan tata letak (satu set untuk semua bab).
 export function baru(store) {
-  let s = Object.assign({}, AWAL, store.get("tata", {}));
+  const simpanan = store.get("tata", {});
+  let s = Object.assign({}, AWAL, simpanan);
+  // Di layar sempit video disembunyikan sampai peserta memilih menampilkannya: hemat gulir dan kuota.
+  if (!("video" in simpanan) && typeof matchMedia !== "undefined" && matchMedia("(max-width: 900px)").matches) s.video = false;
   s.vpct = jepit(Number(s.vpct) || AWAL.vpct, BATAS.vpct);
   s.tinggi = jepit(Number(s.tinggi) || AWAL.tinggi, BATAS.tinggi);
   const simpan = () => store.set("tata", s);

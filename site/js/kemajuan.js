@@ -29,13 +29,15 @@ export function teksSisa(sisaDetik) {
 
 /**
  * Spanduk "Menyiapkan <label>" dengan bilah kemajuan dan hitung mundur, tampil selama penjalan belum siap.
- * @param {{nama:string,label:string,awalMs:number,langgan:(cb:(siap:boolean)=>void)=>(()=>void),mulaiPada:()=>number,siap:()=>boolean}} o
+ * Bila pemuatan gagal, spanduk berubah menjadi pesan galat dengan tombol "Coba lagi" dan "Muat ulang halaman".
+ * @param {{nama:string,label:string,awalMs:number,langgan:(cb:(siap:boolean,gagal:object|null)=>void)=>(()=>void),mulaiPada:()=>number,siap:()=>boolean,gagal:()=>object|null,ulangi:()=>void,catatan?:string}} o
  */
 export function spandukSiap(o) {
   const isi = h("i");
   const teks = h("span", { class: "siap-teks" });
   const bar = h("div", { class: "pbar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-label": "Kemajuan menyiapkan " + o.label }, isi);
-  const el = h("div", { class: "siap-banner", role: "status" }, teks, bar);
+  const aksi = h("div", { class: "actions siap-aksi" });
+  const el = h("div", { class: "siap-banner", role: "status" }, teks, bar, aksi);
   let timer = null;
   let terpasang = false;
 
@@ -48,8 +50,25 @@ export function spandukSiap(o) {
     teks.textContent = "Menyiapkan " + o.label + ", " + teksSisa((est - lewat) / 1000) + ". Kamu bisa membaca soal dulu.";
     el.classList.toggle("lama", lewat > est);
   };
-  const atur = (siap) => {
+  const atur = (siap, galat) => {
     clearInterval(timer);
+    aksi.replaceChildren();
+    if (galat) {
+      el.hidden = false;
+      el.classList.remove("siap", "lama");
+      el.classList.add("gagal");
+      el.setAttribute("role", "alert");
+      isi.style.width = "100%";
+      teks.replaceChildren(
+        h("strong", {}, o.label + " belum bisa dipakai. "),
+        galat.pesan,
+        h("ul", { class: "saran" }, h("li", {}, "Pastikan internet stabil (lebih baik Wi-Fi), lalu tekan Coba lagi."), h("li", {}, "Tutup tab dan aplikasi lain, terutama di ponsel."), h("li", {}, "Bila tetap gagal, muat ulang halaman. Kodemu di editor tidak hilang."), o.catatan ? h("li", {}, o.catatan) : null)
+      );
+      aksi.append(h("button", { type: "button", class: "btn btn-primary btn-sm", onclick: () => o.ulangi() }, "Coba lagi"), h("button", { type: "button", class: "btn btn-sm", onclick: () => location.reload() }, "Muat ulang halaman"));
+      return;
+    }
+    el.classList.remove("gagal");
+    el.setAttribute("role", "status");
     if (siap) {
       isi.style.width = "100%";
       bar.setAttribute("aria-valuenow", "100");
@@ -66,16 +85,16 @@ export function spandukSiap(o) {
       timer = setInterval(gambar, 250);
     }
   };
-  const off = o.langgan((siap) => {
+  const off = o.langgan((siap, galat) => {
     // Elemen sudah dibuang dari halaman (pindah bab): berhenti mendengarkan.
     if (terpasang && !el.isConnected) {
       off();
       clearInterval(timer);
       return;
     }
-    atur(siap);
+    atur(siap, galat);
   });
-  atur(o.siap());
+  atur(o.siap(), o.gagal ? o.gagal() : null);
   queueMicrotask(() => (terpasang = true));
   return el;
 }

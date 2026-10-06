@@ -9,6 +9,7 @@ Data tiruan tersimpan di localStorage browser, bukan di server. Folder site/ tid
 Jalankan dari akar repositori:  python tools/server_uji.py [port]
 """
 import http.server
+import json
 import socketserver
 import sys
 from pathlib import Path
@@ -19,11 +20,40 @@ FAKE = ROOT / "tools" / "klien-tiruan.js"
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8124
 
 
+# Penyuntikan kegagalan untuk menguji pemulihan penjalan: buka /__gagal/java/mati, /__gagal/java/diam, atau
+# /__gagal/java/normal (juga untuk python). "mati" = skrip worker gagal dimuat (galat langsung), "diam" = worker tidak pernah siap.
+GAGAL = {"java": "normal", "python": "normal"}
+WORKER = {"/js/javaworker.js": "java", "/js/pyworker.js": "python"}
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(SITE), **kwargs)
 
+    def kirim_skrip(self, isi):
+        data = isi.encode("utf8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/javascript; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
     def do_GET(self):
+        jalur = self.path.split("?")[0]
+        if jalur.startswith("/__gagal/"):
+            _, _, bahasa, mode = jalur.split("/")[:4]
+            if bahasa in GAGAL and mode in ("mati", "diam", "normal"):
+                GAGAL[bahasa] = mode
+            self.kirim_skrip("ok " + json.dumps(GAGAL))
+            return
+        if jalur in WORKER and GAGAL[WORKER[jalur]] == "normal":
+            # Skrip worker tidak boleh di-cache saat uji, supaya penyuntikan kegagalan berlaku pada muat berikutnya.
+            self.kirim_skrip((SITE / jalur.lstrip("/")).read_text(encoding="utf8"))
+            return
+        if jalur in WORKER and GAGAL[WORKER[jalur]] != "normal":
+            self.kirim_skrip('throw new Error("simulasi: skrip penjalan gagal diunduh");' if GAGAL[WORKER[jalur]] == "mati" else "self.onmessage = function () {};")
+            return
         if self.path.split("?")[0] == "/config.js":
             data = FAKE.read_bytes()
             self.send_response(200)

@@ -1,5 +1,5 @@
-import { start, run, supports, onReadyChange, pythonSiap, pythonMulaiPada } from "./runner.js";
-import { startJava, javaSiap, javaMulaiPada, onJavaReadyChange, BATAS_JAVA_DETIK } from "./javarunner.js";
+import { start, run, supports, onReadyChange, pythonSiap, pythonGagal, pythonMulaiPada, ulangiPython } from "./runner.js";
+import { startJava, javaSiap, javaGagal, javaMulaiPada, ulangiJava, onJavaReadyChange, BATAS_JAVA_DETIK } from "./javarunner.js";
 import * as Kemajuan from "./kemajuan.js";
 import * as Anticopas from "./anticopas.js";
 import * as Rekam from "./rekam.js";
@@ -329,6 +329,7 @@ function tugasCard(m) {
 // ---------- Penjalan: kesiapan dan batas waktu ----------
 
 const penjalanSiap = () => (LANG === "java" ? javaSiap() : pythonSiap());
+const penjalanGagal = () => (LANG === "java" ? javaGagal() : pythonGagal());
 const mulaiPenjalan = () => (LANG === "java" ? startJava() : start());
 const BATAS_DETIK = () => (LANG === "java" ? BATAS_JAVA_DETIK : 5);
 
@@ -336,7 +337,7 @@ const BATAS_DETIK = () => (LANG === "java" ? BATAS_JAVA_DETIK : 5);
 async function tungguPenjalanSiap(saatMenunggu) {
   mulaiPenjalan();
   const mulai = Date.now();
-  while (!penjalanSiap() && Date.now() - mulai < 240000) {
+  while (!penjalanSiap() && !penjalanGagal() && Date.now() - mulai < 240000) {
     saatMenunggu((Date.now() - mulai) / 1000);
     await new Promise((r) => setTimeout(r, 200));
   }
@@ -351,6 +352,9 @@ function spandukPenjalan() {
     langgan: java ? onJavaReadyChange : onReadyChange,
     mulaiPada: java ? javaMulaiPada : pythonMulaiPada,
     siap: penjalanSiap,
+    gagal: penjalanGagal,
+    ulangi: java ? ulangiJava : ulangiPython,
+    catatan: java ? "Java butuh memori cukup besar. Bila ponselmu terus gagal, kerjakan bab ini di laptop atau komputer." : "",
   });
 }
 
@@ -413,6 +417,12 @@ function challengeCard(m, ch) {
     const lines = stdin.value === "" ? [] : stdin.value.split("\n");
     const kodeJalan = editor.getValue();
     await tungguPenjalanSiap(() => (out.textContent = pesanMenunggu()));
+    if (penjalanGagal()) {
+      out.className = "out err";
+      out.textContent = penjalanGagal().pesan + "\n\nTekan Coba lagi di spanduk atas editor.";
+      runBtn.disabled = false;
+      return;
+    }
     const berhenti = Kemajuan.hitungBatas(BATAS_DETIK(), (t) => (out.textContent = t));
     const r = await run(kodeJalan, lines, true, LANG);
     berhenti();
@@ -455,8 +465,14 @@ function challengeCard(m, ch) {
     result.replaceChildren(bar);
     bar.perbarui(0, penjalanSiap() ? "Memeriksa semua kasus uji" : pesanMenunggu());
     const kodeKirim = editor.getValue();
-    const rk = rekam ? rekam.ambil() : null; // pola dan rekaman cara menulis sejak kirim sebelumnya
     await tungguPenjalanSiap(() => bar.perbarui(sisaMuat().frac, pesanMenunggu()));
+    if (penjalanGagal()) {
+      // Belum dinilai: tidak dihitung sebagai percobaan dan tidak dikirim ke server.
+      result.replaceChildren(h("div", { class: "verdict fail" }, "Jawaban belum bisa diperiksa: " + penjalanGagal().pesan), h("p", { class: "muted" }, "Ini bukan kesalahan kodemu dan tidak dihitung sebagai percobaan. Tekan Coba lagi di spanduk atas editor, lalu kirim lagi."));
+      sendBtn.disabled = false;
+      return;
+    }
+    const rk = rekam ? rekam.ambil() : null; // pola dan rekaman cara menulis sejak kirim sebelumnya
     const res = await grade(kodeKirim, ch.tests, (c, i, e) => run(c, i, e, LANG), (i, n) => bar.perbarui((i - 1) / n, "Memeriksa kasus " + i + " dari " + n));
     const passed = res.filter((r) => r.status === "pass").length;
     const all = passed === ch.tests.length;
@@ -524,6 +540,7 @@ function challengeCard(m, ch) {
       value: startCode,
       mode: CM_MODE[LANG] || "text/plain",
       lineNumbers: true,
+      lineWrapping: typeof matchMedia !== "undefined" && matchMedia("(max-width: 900px)").matches, // ponsel: baris panjang dilipat agar terbaca
       indentUnit: 4,
       indentWithTabs: false,
       extraKeys: { Tab: (cm) => cm.replaceSelection("    ", "end") },
@@ -564,7 +581,7 @@ async function renderBab(n) {
   // Pemberitahuan sekali per akun: apa yang dicatat situs.
   const perluInfo = !store.get("info-pencatatan", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
   const infoBar = perluInfo
-    ? h("div", { class: "info-bar", role: "note" }, h("span", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, dan percobaan menempel. Isi yang ditempel tidak dicatat. Selengkapnya di "), h("a", { href: "#panduan" }, "Panduan"), h("span", {}, "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
+    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, dan percobaan menempel. Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
         store.set("info-pencatatan", true);
         e.target.closest(".info-bar").remove();
       } }, "Mengerti"))
@@ -793,7 +810,8 @@ function renderPanduan() {
       h("h3", { style: "margin-top:16px" }, "Arti penanda"),
       h("div", { class: "legend", style: "border:0;margin:0;padding:0" }, h("div", {}, h("span", { class: "st" }), "Belum dikerjakan"), h("div", {}, h("span", { class: "st sedang" }), "Sedang dikerjakan: sudah mengetik atau menjalankan, belum lulus"), h("div", {}, h("span", { class: "st selesai" }), "Selesai: tantangan lulus")),
       h("h3", { style: "margin-top:16px" }, "Catatan"),
-      h("ul", {}, li("Program yang berjalan terlalu lama dihentikan otomatis: 5 detik untuk Python, 8 detik untuk Java. Selama program berjalan ada hitungan waktunya."), li("Java perlu disiapkan dulu saat bab dibuka (sekitar 20 detik pertama kali). Bilah kemajuan di atas editor menunjukkan sisa waktunya; sambil menunggu, baca soalnya."), li("Saat dinilai, teks di dalam input(...) tidak dihitung; yang dibandingkan hanya hasil print."), li("Salin dan tempel dimatikan di halaman latihan. Ketik sendiri kodemu: justru mengetik yang membuatmu paham."),
+      h("ul", {}, li("Program yang berjalan terlalu lama dihentikan otomatis: 5 detik untuk Python, 8 detik untuk Java. Selama program berjalan ada hitungan waktunya."), li("Java perlu disiapkan dulu saat bab dibuka (sekitar 20 detik pertama kali). Bilah kemajuan di atas editor menunjukkan sisa waktunya; sambil menunggu, baca soalnya. Bila muncul pesan gagal, tekan Coba lagi; kodemu tidak hilang."),
+      li("Di ponsel: gunakan Wi-Fi untuk membuka bab pertama (pengunduhan awal cukup besar, setelah itu tersimpan). Java butuh memori cukup besar; bila terus gagal di ponselmu, kerjakan bab Java di laptop. Memegang ponsel secara mendatar membuat editor lebih lega."), li("Saat dinilai, teks di dalam input(...) tidak dihitung; yang dibandingkan hanya hasil print."), li("Salin dan tempel dimatikan di halaman latihan. Ketik sendiri kodemu: justru mengetik yang membuatmu paham."),
       li("Yang dicatat situs (diumumkan terbuka): kapan dan bagaimana kamu mengetik di editor latihan (waktu dan perubahan kode, bukan tombol di luar editor), kode tiap kali kamu mengirim jawaban, perangkat yang dipakai masuk (ID acak di browser ini, bukan alamat atau data perangkat kerasmu), dan jumlah percobaan menempel. Data ini hanya dibaca dosen pengampu untuk memastikan latihan dikerjakan sendiri, tidak dipakai sebagai satu-satunya dasar tuduhan, dan dihapus di akhir semester."), li("Tampilan bisa diatur: geser garis antara video dan soal, tarik pegangan di bawah editor untuk menambah tinggi, sembunyikan video, atau pakai Mode fokus (Esc untuk keluar)."), li("Progres tersimpan di akunmu, jadi tetap ada saat kamu masuk dari perangkat lain."))
     )
   );
@@ -1481,10 +1499,10 @@ async function init() {
     const open = $("#sidebar").classList.toggle("open");
     $("#menuBtn").setAttribute("aria-expanded", String(open));
   });
-  onReadyChange((ok) => {
+  onReadyChange((ok, galat) => {
     if (LANG !== "python") return;
     const c = $("#pyStatus");
-    c.textContent = ok ? "Python siap" : "Python: memuat";
+    c.textContent = galat ? "Python: gagal dimuat" : ok ? "Python siap" : "Python: memuat";
     c.classList.toggle("ready", ok);
   });
   Sinkron.onStatus((st) => {
@@ -1493,10 +1511,10 @@ async function init() {
     c.textContent = { menyimpan: "Menyimpan", tersimpan: "Tersimpan di akun", gagal: "Belum tersimpan, dicoba lagi" }[st] || "";
     c.classList.toggle("ready", st === "tersimpan");
   });
-  onJavaReadyChange((ok) => {
+  onJavaReadyChange((ok, galat) => {
     if (LANG !== "java") return;
     const c = $("#pyStatus");
-    c.textContent = ok ? "Java siap" : "Java: memuat (sekitar 20 detik)";
+    c.textContent = galat ? "Java: gagal dimuat" : ok ? "Java siap" : "Java: memuat (sekitar 20 detik)";
     c.classList.toggle("ready", ok);
   });
   if (Auth.enabled()) {

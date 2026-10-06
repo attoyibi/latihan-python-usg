@@ -320,3 +320,25 @@ dialog.putar input[type=range]{flex:1;min-width:140px}
 .info-bar span,.info-bar a{margin:0}
 .info-bar .btn{margin-left:auto}
 form.ganti-sandi{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+
+/* Ponsel: kepala halaman tidak boleh melebarkan halaman; sasaran sentuh cukup besar; huruf 16px agar iOS tidak memperbesar saat mengetik */
+@media (max-width:900px){
+  .top{flex-wrap:wrap;row-gap:6px}
+  .top .right{flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:100%;min-width:0}
+  .chip.user{max-width:120px}
+  #pyStatus,#syncStatus{white-space:normal;max-width:100%}
+  .btn,.btn-sm,.tabs .tab,.pw-toggle{min-height:40px}
+  .input,.stdin,.filters select,.filters input,select{font-size:16px}
+  .CodeMirror{font-size:16px}
+  .tata-bar .btn{flex:1 1 auto;justify-content:center}
+}
+@media (max-width:900px){
+  /* Kepala ringkas di ponsel: status penjalan ada di spanduk atas editor, Keluar ada di Profil */
+  #pyStatus,#logoutBtn,#siteName{display:none!important}
+  .top .logo svg{width:30px;height:30px}
+}
+.siap-banner.gagal{border-left-color:var(--danger);background:var(--danger-bg);color:var(--ink)}
+.siap-banner.gagal .pbar{display:none}
+.siap-banner .saran{margin:6px 0;padding-left:18px}
+.siap-banner .siap-aksi{margin-top:6px}
+.info-bar p{margin:0;flex:1 1 260px}

@@ -18,6 +18,11 @@ python tools/java-runner/build.py
 2. Pemuatan pertama dan kompilasi pertama lambat (sekitar 15 sampai 20 detik pada koneksi biasa). Setelah itu, tiap kompilasi dan eksekusi hanya sekitar 0,1 detik. Status di bilah atas menunjukkan "Java siap".
 3. Tiap pekerjaan dikirim sebagai berkas, hasilnya dibaca dari berkas lain. Worker dipakai supaya perulangan tak berujung bisa dihentikan: setelah 8 detik worker dimatikan lalu dimulai ulang (butuh pemanasan lagi).
 
+## Bila pemuatan gagal ("Coba lagi")
+Pemuatan Java (dan Python) bisa gagal: internet putus atau diblokir, koneksi sangat lambat, atau memori perangkat tidak cukup. Situs mendeteksi empat kasus (skrip tidak bisa diunduh, melebihi batas waktu muat 180 detik untuk Java dan 120 untuk Python, galat saat menyiapkan, worker mati mendadak) dan mengubah spanduk di atas editor menjadi pesan jelas dengan saran dan dua tombol: **Coba lagi** (memulai penjalan dari awal tanpa memuat ulang halaman) dan **Muat ulang halaman**. Kode di editor tidak hilang. Jalankan dan Kirim jawaban saat gagal memberi pesan yang sama, dan jawaban **tidak dihitung sebagai percobaan** serta tidak dikirim ke server. Bila browser mematikan seluruh tab karena memori, tidak ada yang bisa ditangkap; peserta cukup membuka ulang.
+
+Menguji kegagalan di komputer sendiri (server uji): `/__gagal/java/mati` (skrip gagal dimuat), `/__gagal/java/diam` (tidak pernah siap), dan `/__gagal/java/normal` (pulih); sama untuk `python`. Setelah mengubah mode, muat ulang skrip dengan `fetch('/js/javaworker.js', {cache:'reload'})` karena browser menyimpan skrip worker. Tambahkan `?muatmaks=5000` di alamat untuk memperpendek batas waktu muat.
+
 ## Batasan yang perlu diketahui
 
 - **Kode soal berupa satu berkas `Main.java`** berisi kelas `Main` dengan `public static void main`, ditambah kelas lain di berkas yang sama (tanpa `public`). Masukan dibaca dengan `Scanner(System.in)`.

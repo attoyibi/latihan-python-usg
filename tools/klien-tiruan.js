@@ -261,6 +261,8 @@
 
   window.APP_CONFIG = {
     PENDAFTARAN: TERBUKA || TANPA_KONFIRMASI ? "buka" : "tutup",
+    // ?muatmaks=4000 memperpendek batas waktu muat penjalan (untuk menguji gagal muat bersama /__gagal/... di server uji).
+    MUAT_MAKS_MS: Number((/[?&]muatmaks=(\d+)/.exec(location.search) || [])[1]) || 0,
     client: {
       auth: {
         getSession: async () => ({ data: { session: db.session } }),
