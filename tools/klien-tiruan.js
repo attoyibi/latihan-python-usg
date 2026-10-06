@@ -25,6 +25,8 @@
     listeners.forEach((l) => l(ev, s));
   };
   const TERBUKA = /[?&]terbuka=1/.test(location.search);
+  // ?tanpakonfirmasi=1: meniru Supabase dengan "Confirm email" dimatikan (pendaftaran langsung masuk, tanpa email). Menyertakan terbuka=1.
+  const TANPA_KONFIRMASI = /[?&]tanpakonfirmasi=1/.test(location.search);
 
   if (!db.users) {
     db.users = {
@@ -258,7 +260,7 @@
   }
 
   window.APP_CONFIG = {
-    PENDAFTARAN: TERBUKA ? "buka" : "tutup",
+    PENDAFTARAN: TERBUKA || TANPA_KONFIRMASI ? "buka" : "tutup",
     client: {
       auth: {
         getSession: async () => ({ data: { session: db.session } }),
@@ -274,11 +276,17 @@
           return { data: { session: db.session }, error: null };
         },
         signUp: async ({ email, password }) => {
-          if (!TERBUKA) return { data: { user: null, session: null }, error: { message: "Signups not allowed for this instance", code: "signup_disabled" } };
+          if (!TERBUKA && !TANPA_KONFIRMASI) return { data: { user: null, session: null }, error: { message: "Signups not allowed for this instance", code: "signup_disabled" } };
           const b = batasEmail(email);
           if (b) return { data: {}, error: b };
-          if (db.users[email]) return { data: { user: { id: db.users[email].id, identities: [] }, session: null }, error: null };
+          if (db.users[email] && !TANPA_KONFIRMASI) return { data: { user: { id: db.users[email].id, identities: [] }, session: null }, error: null };
           if (password.length < 6) return { data: {}, error: { message: "Password should be at least 6 characters.", code: "weak_password" } };
+          if (TANPA_KONFIRMASI) {
+            if (db.users[email]) return { data: { user: null, session: null }, error: { message: "User already registered", code: "user_already_exists" } };
+            db.users[email] = { id: idDari(email), password, confirmed: true, meta: {} };
+            setSession(mkSession(email), "SIGNED_IN");
+            return { data: { user: db.session.user, session: db.session }, error: null };
+          }
           db.users[email] = { id: idDari(email), password, confirmed: false, meta: {} };
           db.pending = { tipe: "konfirmasi", email };
           save();

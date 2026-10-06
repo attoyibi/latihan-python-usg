@@ -22,7 +22,7 @@ export const localMode = () => !enabled() && cfg().MODE_LOKAL === true;
 export const needsSetup = () => !enabled() && !localMode();
 // Pendaftaran mandiri: "tutup" (bawaan, fitur Daftar disembunyikan) atau "buka". Pada kelas tertutup, dosen mendaftarkan peserta
 // lebih dulu (tools/impor_peserta.mjs) dan peserta hanya masuk.
-export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "tutup") === "buka";
+export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "buka") === "buka";
 export const getSession = () => session;
 // Klien Supabase untuk modul lain (sinkron progres, dashboard instruktur). null sebelum init() atau bila tidak tersambung.
 export const getClient = () => client;

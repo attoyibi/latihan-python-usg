@@ -7,7 +7,7 @@
 //   SUPABASE_URL        alamat proyek, mis. https://abcdxyz.supabase.co
 //   SUPABASE_ANON_KEY   kunci "anon" (atau "publishable") dari Project Settings > API
 //   MODE_LOKAL          opsional, "true" hanya untuk uji tampilan tanpa akun
-//   PENDAFTARAN         opsional, "tutup" (bawaan: Daftar disembunyikan, peserta didaftarkan dosen) atau "buka"
+//   PENDAFTARAN         opsional, "buka" (bawaan: peserta mendaftar sendiri) atau "tutup" (Daftar disembunyikan, peserta didaftarkan dosen)
 //
 // Bila kedua variabel kosong, config.js dibiarkan apa adanya dan situs menampilkan
 // layar "Situs belum tersambung ke Supabase".
@@ -28,7 +28,7 @@ const out = i > -1 && process.argv[i + 1] ? resolve(process.argv[i + 1]) : join(
 const url = (process.env.SUPABASE_URL || "").trim();
 const key = (process.env.SUPABASE_ANON_KEY || "").trim();
 const lokal = (process.env.MODE_LOKAL || "").trim().toLowerCase() === "true";
-const pendaftaran = (process.env.PENDAFTARAN || "tutup").trim().toLowerCase();
+const pendaftaran = (process.env.PENDAFTARAN || "buka").trim().toLowerCase();
 
 function gagal(pesan) {
   console.error("[buat_config] GAGAL: " + pesan);

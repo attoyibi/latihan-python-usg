@@ -1200,8 +1200,38 @@ function renderProfil() {
       saveBtn.disabled = false;
     }
   });
+  // Ganti kata sandi (peserta yang sudah masuk, tanpa email).
+  const fsb = sandiField("sandi-baru", "Kata sandi baru", { autocomplete: "new-password" });
+  const fub = sandiField("ulang-baru", "Ulangi kata sandi baru", { autocomplete: "new-password" });
+  const msgSandi = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const sandiBtn = h("button", { type: "submit", class: "btn" }, "Ganti kata sandi");
+  const formSandi = h("form", { novalidate: "", class: "ganti-sandi" }, h("h3", {}, "Ganti kata sandi"), fsb.node, h("p", { class: "muted" }, "Minimal " + Auth.MIN_SANDI + " karakter, memuat huruf dan angka."), fub.node, h("div", { class: "actions" }, sandiBtn), msgSandi);
+  formSandi.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    fsb.err.textContent = "";
+    fub.err.textContent = "";
+    msgSandi.textContent = "";
+    const es = Auth.validasiSandi(fsb.input.value);
+    const eu = !es && fsb.input.value !== fub.input.value ? "Kata sandi dan pengulangannya belum sama." : "";
+    fsb.err.textContent = es;
+    fub.err.textContent = eu;
+    if (es || eu) return;
+    sandiBtn.disabled = true;
+    msgSandi.textContent = "Menyimpan";
+    try {
+      await Auth.updatePassword(fsb.input.value);
+      fsb.input.value = "";
+      fub.input.value = "";
+      msgSandi.textContent = "Kata sandi diganti. Pakai yang baru saat masuk berikutnya.";
+    } catch (e) {
+      msgSandi.textContent = "";
+      fsb.err.textContent = e.message;
+    } finally {
+      sandiBtn.disabled = false;
+    }
+  });
   $("#main").replaceChildren(
-    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, progres, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."))
+    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, progres, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."), formSandi, h("p", { class: "muted" }, "Email tidak bisa diubah di sini. Bila perlu email lain, daftar ulang dengan email baru atau hubungi dosen."))
   );
 }
 

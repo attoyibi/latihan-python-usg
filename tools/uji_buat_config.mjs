@@ -47,7 +47,7 @@ uji("URL berisi suntikan skrip ditolak", { SUPABASE_URL: 'https://x.supabase.co"
 uji("kunci acak bukan JWT ditolak", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: "bukan-kunci" }, { kode: 1, ada: false });
 uji("role selain anon ditolak", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: jwt("authenticated") }, { kode: 1, ada: false });
 uji("PENDAFTARAN=tutup masuk ke config", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: anon, PENDAFTARAN: "tutup" }, { kode: 0, ada: true, berisi: '"PENDAFTARAN": "tutup"' });
-uji("PENDAFTARAN bawaan adalah tutup (Daftar disembunyikan)", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: anon }, { kode: 0, ada: true, berisi: '"PENDAFTARAN": "tutup"' });
+uji("PENDAFTARAN bawaan adalah buka (peserta mendaftar sendiri)", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: anon }, { kode: 0, ada: true, berisi: '"PENDAFTARAN": "buka"' });
 uji("PENDAFTARAN=buka tetap bisa dinyalakan", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: anon, PENDAFTARAN: "buka" }, { kode: 0, ada: true, berisi: '"PENDAFTARAN": "buka"' });
 uji("PENDAFTARAN bernilai aneh ditolak", { SUPABASE_URL: URL_OK, SUPABASE_ANON_KEY: anon, PENDAFTARAN: "mungkin" }, { kode: 1, ada: false });
 uji("MODE_LOKAL saja membuat berkas", { MODE_LOKAL: "true" }, { kode: 0, ada: true, berisi: '"MODE_LOKAL": true' });

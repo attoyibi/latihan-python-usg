@@ -11,7 +11,7 @@ window.APP_CONFIG = {
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
   MODE_LOKAL: false,
-  // "tutup" (bawaan): pendaftaran mandiri disembunyikan; peserta didaftarkan dosen dan hanya masuk.
-  // "buka": menampilkan Daftar. Fitur itu belum dikembangkan dan belum diuji dengan Supabase sungguhan.
-  PENDAFTARAN: "tutup",
+  // "buka" (bawaan): peserta mendaftar sendiri (matikan "Confirm email" di Supabase agar tanpa batas email; lihat docs/PENDAFTARAN-MANDIRI.md).
+  // "tutup": Daftar disembunyikan; peserta didaftarkan dosen dan hanya masuk.
+  PENDAFTARAN: "buka",
 };

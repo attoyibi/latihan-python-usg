@@ -35,7 +35,7 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
    - **hanya mengirim ke anggota tim proyek**. Peserta yang bukan anggota tidak akan menerima email apa pun;
    - tidak dijamin ketersediaannya dan hanya untuk uji coba.
 
-   Pada kelas tertutup dengan akun dari dosen, SMTP hanya dibutuhkan bila ada peserta yang lupa kata sandi. Pada pendaftaran mandiri, SMTP wajib karena setiap pendaftar butuh email konfirmasi.
+   Pada kelas tertutup dengan akun dari dosen, SMTP hanya dibutuhkan bila ada peserta yang lupa kata sandi. Pada pendaftaran mandiri dengan "Confirm email" dimatikan (disarankan, lihat [PENDAFTARAN-MANDIRI.md](PENDAFTARAN-MANDIRI.md)), pendaftaran tidak mengirim email, jadi SMTP hanya dibutuhkan untuk Lupa kata sandi. Bila "Confirm email" dibiarkan menyala, SMTP wajib karena setiap pendaftar butuh email konfirmasi.
 
    Caranya: **Project Settings > Authentication > SMTP Settings**, aktifkan *Enable Custom SMTP*, lalu isi `host`, `port`, `user`, `password`, alamat pengirim, dan nama pengirim dari layanan email pilihan Anda. Layanan yang disebut dokumentasi Supabase: Resend, AWS SES, Postmark, SendGrid, ZeptoMail, dan Brevo. Periksa sendiri batas paket gratis dan syarat verifikasi domain atau pengirim di layanan itu. Setelah SMTP sendiri aktif, batas bawaan Supabase menjadi **30 email per jam**; naikkan di **Authentication > Rate Limits** bila perlu.
 10. Catat dua nilai dari **Project Settings > API**: **Project URL** dan kunci **anon** (atau *publishable*).
@@ -86,7 +86,7 @@ Repositori sudah membawa setelan yang dibutuhkan (`vercel.json`, `netlify.toml`,
    |---|---|
    | `SUPABASE_URL` | Project URL, mis. `https://abcdxyz.supabase.co` |
    | `SUPABASE_ANON_KEY` | kunci anon / publishable |
-   | `PENDAFTARAN` (opsional) | bawaan `tutup`: tombol Daftar **disembunyikan** dan peserta didaftarkan dosen (lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)). `buka` menampilkan Daftar, tetapi fitur itu belum dikembangkan dan belum diuji dengan Supabase sungguhan |
+   | `PENDAFTARAN` (opsional) | bawaan `buka`: peserta mendaftar sendiri. Matikan "Confirm email" di Supabase supaya tanpa batas email (lihat [PENDAFTARAN-MANDIRI.md](PENDAFTARAN-MANDIRI.md)). `tutup` menyembunyikan Daftar dan peserta didaftarkan dosen (lihat [DAFTARKAN-PESERTA.md](DAFTARKAN-PESERTA.md)). Untuk kelas langsung tanpa batas email, matikan "Confirm email" di Supabase; lihat [PENDAFTARAN-MANDIRI.md](PENDAFTARAN-MANDIRI.md). Diuji dengan klien tiruan, belum dengan Supabase sungguhan |
 
 4. **Deploy.** Bila kunci yang dipakai ternyata `service_role`, build dibatalkan dengan pesan yang menjelaskan sebabnya. Bila variabel dikosongkan, situs menampilkan layar "belum tersambung ke Supabase".
 
