@@ -1,21 +1,32 @@
 import { runJava } from "./javarunner.js";
+import { catatLama } from "./kemajuan.js";
 
 const TIMEOUT_MS = 5000;
 
 let worker = null;
 let readyPromise = null;
 let seq = 0;
-let readyCb = () => {};
+const pendengar = [];
 let isReady = false;
+let mulaiPada = Date.now();
 
+export const pythonSiap = () => isReady;
+export const pythonMulaiPada = () => mulaiPada;
+
+// Mendaftar untuk perubahan status siap; mengembalikan fungsi untuk berhenti mendengarkan.
 export function onReadyChange(cb) {
-  readyCb = cb;
+  pendengar.push(cb);
   cb(isReady);
+  return () => {
+    const i = pendengar.indexOf(cb);
+    if (i >= 0) pendengar.splice(i, 1);
+  };
 }
 
 function spawn() {
   isReady = false;
-  readyCb(false);
+  mulaiPada = Date.now();
+  pendengar.slice().forEach((cb) => cb(false));
   worker = new Worker("js/pyworker.js");
   const w = worker;
   readyPromise = new Promise((resolve) => {
@@ -23,7 +34,8 @@ function spawn() {
       if (e.data && e.data.type === "ready") {
         w.removeEventListener("message", h);
         isReady = true;
-        readyCb(true);
+        catatLama("python", Date.now() - mulaiPada);
+        pendengar.slice().forEach((cb) => cb(true));
         resolve();
       }
     };

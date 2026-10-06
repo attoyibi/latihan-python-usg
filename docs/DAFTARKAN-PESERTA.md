@@ -107,5 +107,6 @@ Peserta yang emailnya salah tidak akan bisa masuk (kata sandi awalnya terkait em
 | `budi@kampus.ac.id` | `Rahasia-Budi1` | kelas **lama** `SI-1A`: di Profil diminta memilih kelas yang baru |
 | `lupa@kampus.ac.id` | `Rahasia-Lupa1` | untuk mencoba Lupa kata sandi (tanpa profil) |
 | `kedaluwarsa@kampus.ac.id` | `Rahasia-Lama1` | tautan atur ulang kata sandinya kedaluwarsa |
+| `dosen@kampus.ac.id` | `Dosen-Uji123` | instruktur: membuka [Dashboard instruktur](DASHBOARD-INSTRUKTUR.md), dengan 26 peserta contoh |
 
 Tambahkan `?terbuka=1` di alamat (mis. `http://127.0.0.1:8124/?terbuka=1`) untuk mencoba mode pendaftaran mandiri: tombol Daftar muncul dan butuh konfirmasi email. "Email" di mode uji muncul sebagai kotak kuning "Email tiruan" di pojok kanan bawah; tombolnya meniru klik tautan di email.

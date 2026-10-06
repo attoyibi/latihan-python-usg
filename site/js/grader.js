@@ -8,9 +8,12 @@ export function normalize(s) {
     .replace(/\n+$/, "");
 }
 
-export async function grade(code, tests, run) {
+// saatKasus(i, total) dipanggil sebelum tiap kasus diperiksa (i mulai dari 1), untuk indikator kemajuan.
+export async function grade(code, tests, run, saatKasus = () => {}) {
   const results = [];
+  let i = 0;
   for (const t of tests) {
+    saatKasus(++i, tests.length);
     const r = await run(code, t.input, false);
     let status;
     if (r.timeout) status = "timeout";

@@ -46,18 +46,21 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 
 Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersifat menambah dan aman untuk data yang sudah ada.
 
-1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan empat kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
+1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan lima kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
 
-   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | Yang perlu dijalankan |
-   |---|---|---|---|---|
-   | false | false | false | false | `0001`, `0002`, `0003`, lalu `0004` |
-   | true | true | true | false | **hanya `0004`** |
-   | true | true | false | false | `0003`, lalu `0004` |
-   | true | true | true | true | tidak ada, sudah mutakhir |
+   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | `0005_integritas` | Yang perlu dijalankan |
+   |---|---|---|---|---|---|
+   | false | false | false | false | false | `0001`, `0002`, `0003`, `0004`, lalu `0005` |
+   | true | true | true | true | false | **hanya `0005`** |
+   | true | true | true | false | false | `0004`, lalu `0005` |
+   | true | true | false | false | false | `0003`, `0004`, lalu `0005` |
+   | true | true | true | true | true | tidak ada, sudah mutakhir |
+
+   `0005` menambah pelacakan keaslian pengerjaan (perangkat dan cara menulis); lihat [DASHBOARD-INSTRUKTUR.md](DASHBOARD-INSTRUKTUR.md). Tanpa `0005`, situs tetap berjalan, tetapi tab Sinyal integritas kosong dan dashboard menampilkan galat saat memuatnya.
 
 2. Jalankan masing-masing di query baru, **berurutan**.
 3. Menjalankan ulang migrasi yang sudah terpasang juga aman, dalam urutan apa pun (sudah diuji), tetapi tidak perlu.
-4. Pastikan setelahnya `supabase/periksa_migrasi.sql` menunjukkan keempatnya `true`.
+4. Pastikan setelahnya `supabase/periksa_migrasi.sql` menunjukkan semuanya `true`.
 
 Data yang sudah ada (profil peserta, dan progres atau laporan bila sudah ada) tidak hilang. Data lama dari sebelum `0003` otomatis dianggap milik mata kuliah `algoritma-python`. **Kelas lama** seperti `SI-1A` tetap tersimpan apa adanya; peserta diminta memilih kelas baru (prodi, angkatan, huruf) di halaman Profil, dan sampai itu kolom `angkatan` dan `rombel` mereka kosong.
 

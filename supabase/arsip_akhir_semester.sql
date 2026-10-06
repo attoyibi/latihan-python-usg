@@ -10,8 +10,10 @@
 -- komentar. Hapus tanda komentar hanya setelah langkah 1 dan 2 selesai.
 
 -- Contoh: hapus riwayat percobaan dan aktivitas, simpan progres dan laporan.
--- delete from public.percobaan;
+-- delete from public.percobaan;      -- termasuk pola dan rekaman cara menulis
 -- delete from public.aktivitas;
+-- delete from public.sesi_perangkat;  -- catatan perangkat yang dipakai masuk
+-- delete from public.perangkat_bersama;
 
 -- Contoh: hapus seluruh data peserta semester ini (akun, progres, laporan, unggahan).
 -- Berkas di Storage ('tugas') harus dihapus terpisah lewat dashboard Storage.

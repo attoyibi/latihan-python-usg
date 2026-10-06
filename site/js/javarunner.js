@@ -1,23 +1,34 @@
 // Antarmuka penjalan Java untuk halaman. Bentuk run() sama dengan penjalan Python di runner.js.
-const TIMEOUT_MS = 8000;
+import { catatLama } from "./kemajuan.js";
+
+export const BATAS_JAVA_DETIK = 8;
+const TIMEOUT_MS = BATAS_JAVA_DETIK * 1000;
 
 let worker = null;
 let siap = false;
 let siapPromise = null;
 let seq = 0;
 
-let readyCb = () => {};
+const pendengar = [];
+let mulaiPada = Date.now();
 
 export const javaSiap = () => siap;
+export const javaMulaiPada = () => mulaiPada;
 
+// Mendaftar untuk perubahan status siap; mengembalikan fungsi untuk berhenti mendengarkan.
 export function onJavaReadyChange(cb) {
-  readyCb = cb;
+  pendengar.push(cb);
   cb(siap);
+  return () => {
+    const i = pendengar.indexOf(cb);
+    if (i >= 0) pendengar.splice(i, 1);
+  };
 }
 
 function spawn() {
   siap = false;
-  readyCb(false);
+  mulaiPada = Date.now();
+  pendengar.slice().forEach((cb) => cb(false));
   worker = new Worker("js/javaworker.js");
   const w = worker;
   siapPromise = new Promise((resolve, reject) => {
@@ -26,7 +37,8 @@ function spawn() {
       if (e.data.type === "ready") {
         w.removeEventListener("message", h);
         siap = true;
-        readyCb(true);
+        catatLama("java", Date.now() - mulaiPada);
+        pendengar.slice().forEach((cb) => cb(true));
         resolve();
       } else if (e.data.type === "fatal") {
         w.removeEventListener("message", h);

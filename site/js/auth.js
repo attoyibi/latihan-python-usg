@@ -24,6 +24,8 @@ export const needsSetup = () => !enabled() && !localMode();
 // lebih dulu (tools/impor_peserta.mjs) dan peserta hanya masuk.
 export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "tutup") === "buka";
 export const getSession = () => session;
+// Klien Supabase untuk modul lain (sinkron progres, dashboard instruktur). null sebelum init() atau bila tidak tersambung.
+export const getClient = () => client;
 export const getProfile = () => profile;
 export const getUserId = () => (session && session.user ? session.user.id : null);
 export const getEmail = () => (session && session.user ? session.user.email : null);

@@ -297,5 +297,100 @@ console.log("\n== Tahap E: menjalankan ulang migrasi pada proyek yang sudah leng
   cek("setelah diulang, data peserta tidak hilang", (await q("select count(*)::int as n from public.progres")).rows[0].n >= 3);
 }
 
+console.log("\n== Tahap F: perintah sinkron progres dan dashboard instruktur ==");
+{
+  // supabase-js .upsert(rows, { onConflict: "user_id,matakuliah_id,bab" }) menjadi INSERT ... ON CONFLICT (...) DO UPDATE.
+  const UP = "insert into public.progres (user_id, matakuliah_id, bab, status, jumlah_jalankan, jumlah_kirim, pertama_dibuka, lulus_pada, jalur) values ($1, 'algoritma-python', $2, $3, $4, $5, now(), $6, $7) on conflict (user_id, matakuliah_id, bab) do update set status = excluded.status, jumlah_jalankan = excluded.jumlah_jalankan, jumlah_kirim = excluded.jumlah_kirim, pertama_dibuka = excluded.pertama_dibuka, lulus_pada = excluded.lulus_pada, jalur = excluded.jalur returning status, jumlah_kirim, jalur";
+  const r1 = await sisip(U2, UP, U2, 5, "sedang", 3, 1, null, null);
+  cek("peserta menyimpan progres 'sedang' lewat upsert", !r1.error && r1.rows[0].status === "sedang", r1.error);
+  const r2 = await sisip(U2, UP, U2, 5, "selesai", 6, 2, new Date().toISOString(), "bantuan");
+  cek("upsert kedua memperbarui baris yang sama (selesai, jalur bantuan)", !r2.error && r2.rows[0].status === "selesai" && r2.rows[0].jalur === "bantuan", r2.error);
+  cek("tidak muncul baris ganda untuk bab yang sama", (await q("select count(*)::int as n from public.progres where user_id = $1 and matakuliah_id = 'algoritma-python' and bab = 5", [U2])).rows[0].n === 1);
+  cek("jalur 'langsung' diterima", !(await sisip(U2, UP, U2, 6, "selesai", 1, 1, new Date().toISOString(), "langsung")).error);
+  cek("jalur di luar aturan ditolak", ditolak(await sisip(U2, UP, U2, 7, "selesai", 1, 1, null, "curang"), "23514"));
+  cek("status di luar aturan ditolak", ditolak(await sisip(U2, UP, U2, 7, "lulus", 1, 1, null, null), "23514"));
+  cek("peserta tidak bisa menyimpan progres atas nama peserta lain", ditolak(await sisip(U2, UP, U1, 9, "selesai", 1, 1, null, "langsung"), RLS));
+  cek("upsert tidak bisa menimpa progres peserta lain", ditolak(await sisip(U2, UP, U1, 4, "belum", 0, 0, null, null), RLS));
+  cek("progres peserta 1 tidak berubah oleh percobaan itu", (await q("select status from public.progres where user_id = $1 and bab = 4", [U1])).rows[0].status === "selesai");
+
+  const PERC = "insert into public.percobaan (user_id, matakuliah_id, bab, jenis, lulus, kasus_lulus, kasus_total, kasus_gagal, kode, dibuat_pada) values ($1, 'algoritma-python', $2, 'kirim', $3, $4, 7, $5, $6, now())";
+  cek("peserta menyimpan percobaan dengan daftar kasus gagal", !(await sisip(U2, PERC, U2, 5, false, 3, "{3,4,5,6}", "print(1)")).error);
+  cek("kode sepanjang batas (20000) diterima", !(await sisip(U2, PERC, U2, 5, false, 0, "{}", "x".repeat(20000))).error);
+  cek("kode lebih dari batas ditolak", ditolak(await sisip(U2, PERC, U2, 5, false, 0, "{}", "x".repeat(20001)), "23514"));
+  cek("percobaan atas nama peserta lain ditolak", ditolak(await sisip(U2, PERC, U1, 5, true, 7, "{}", "print(1)"), RLS));
+
+  // Dashboard instruktur: dua query, profil peserta dan progres satu mata kuliah.
+  const peserta = (await sisip(IN, "select id, nama, nim, kelas, prodi, angkatan, rombel, peran from public.profiles where peran = 'peserta' order by id")).rows;
+  cek("instruktur memuat daftar peserta tanpa dirinya sendiri", peserta.length >= 2 && peserta.every((x) => x.peran === "peserta") && !peserta.some((x) => x.id === IN));
+  const semua = (await sisip(IN, "select * from public.progres where matakuliah_id = 'algoritma-python' order by user_id, bab")).rows;
+  cek("instruktur membaca progres semua peserta", new Set(semua.map((x) => x.user_id)).size >= 2);
+  cek("instruktur melihat jalur bantuan peserta 2 di bab 5", semua.some((x) => x.user_id === U2 && x.bab === 5 && x.jalur === "bantuan"));
+  cek("instruktur bisa memuat per halaman (range)", (await sisip(IN, "select * from public.progres where matakuliah_id = 'algoritma-python' order by user_id, bab limit 1 offset 1")).rows.length === 1);
+  cek("instruktur tidak bisa mengubah progres peserta", (await sisip(IN, "update public.progres set status = 'belum' where user_id = $1", U2)).n === 0);
+  cek("instruktur tidak bisa mengubah riwayat percobaan", (await sisip(IN, "update public.percobaan set lulus = true where user_id = $1", U2)).n === 0);
+  // Peserta biasa membuka halaman instruktur: kedua query tetap hanya mengembalikan datanya sendiri.
+  // (Pada tahap ini peserta 2 sudah pernah dijadikan instruktur oleh uji Tahap C, jadi dipakai peserta baru.)
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  await db.query("insert into auth.users (id, email) values ($1, 'peserta6@x.id')", [U6]);
+  await db.query("insert into public.profiles (id, nama, nim, kelas) values ($1, 'Peserta Enam', '2024110606', 'SI-2024-C')", [U6]);
+  cek("peserta 6 menyimpan progresnya", !(await sisip(U6, UP, U6, 1, "selesai", 2, 1, new Date().toISOString(), "langsung")).error);
+  const pesertaBiasa = (await sisip(U6, "select id from public.profiles where peran = 'peserta' order by id")).rows;
+  cek("peserta biasa hanya mendapat profilnya sendiri dari query dashboard", pesertaBiasa.length === 1 && pesertaBiasa[0].id === U6);
+  const progresBiasa = (await sisip(U6, "select * from public.progres where matakuliah_id = 'algoritma-python'")).rows;
+  cek("peserta biasa hanya mendapat progresnya sendiri dari query dashboard", progresBiasa.length === 1 && progresBiasa.every((x) => x.user_id === U6));
+  cek("peserta biasa tidak bisa menjadikan dirinya instruktur lewat sinkron", ditolak(await sisip(U6, "update public.profiles set peran = 'instruktur' where id = $1", U6), RLS));
+  cek("peserta 6 yang baru tetap tidak melihat dashboard instruktur (is_instruktur false)", (await sisip(U6, "select public.is_instruktur() as x")).rows[0].x === false);
+  // Jejak tempel yang diblokir (aktivitas): satu baris berisi jumlah, tanpa isi yang ditempel.
+  const AKT = "insert into public.aktivitas (user_id, matakuliah_id, bab, jenis, detail, dibuat_pada) values ($1, 'algoritma-python', $2, 'tempel_diblokir', $3::jsonb, now())";
+  cek("peserta mencatat percobaan tempel yang diblokir", !(await sisip(U6, AKT, U6, 4, '{"jumlah":3,"lokasi":"latihan"}')).error);
+  cek("peserta tidak bisa mencatat jejak atas nama orang lain", ditolak(await sisip(U6, AKT, U2, 4, '{"jumlah":1}'), RLS));
+  cek("peserta tidak bisa mengubah atau menghapus jejaknya", (await sisip(U6, "update public.aktivitas set detail = '{}' where user_id = $1", U6)).n === 0 && (await sisip(U6, "delete from public.aktivitas where user_id = $1", U6)).n === 0);
+  const jejakInstruktur = (await sisip(IN, "select user_id, bab, detail from public.aktivitas where matakuliah_id = 'algoritma-python' and jenis = 'tempel_diblokir' order by id")).rows;
+  cek("instruktur membaca jejak tempel semua peserta (query dashboard)", jejakInstruktur.some((x) => x.user_id === U6 && x.detail.jumlah === 3));
+  cek("peserta lain tidak melihat jejak tempel orang lain", (await sisip(U1, "select * from public.aktivitas where user_id = $1", U6)).rows.length === 0);
+  cek("pengunjung (anon) ditolak membaca progres", ditolak(await sebagai("anon", null, () => q("select * from public.progres")), RLS));
+  cek("pengunjung (anon) ditolak menulis progres", ditolak(await sebagai("anon", null, () => q("insert into public.progres (user_id, matakuliah_id, bab) values ($1, 'algoritma-python', 1)", [U2])), RLS));
+}
+
+console.log("\n== Tahap G: migrasi 0005 (sinyal keaslian pengerjaan) ==");
+{
+  if (!(await jalankan("0005_integritas.sql berjalan", migrasi("0005_integritas.sql")))) process.exit(1);
+  cek("0005 aman dijalankan ulang", await jalankan("0005 diulang", migrasi("0005_integritas.sql")));
+  cek("0001 sampai 0005 berurutan diulang tanpa galat", await jalankan("ulang semuanya sampai 0005", migrasi("0001_skema.sql") + migrasi("0002_keamanan.sql") + migrasi("0003_matakuliah.sql") + migrasi("0004_kelas_terstruktur.sql") + migrasi("0005_integritas.sql")));
+
+  const DEV1 = "dev-aaaaaaaa-1111";
+  const DEV2 = "dev-bbbbbbbb-2222";
+  const rpc = (uid, dev, agen = "Chrome di Windows") => sisip(uid, "select public.catat_perangkat($1, $2)", dev, agen);
+  cek("peserta mencatat perangkatnya lewat fungsi", !(await rpc(U1, DEV1)).error);
+  cek("mencatat lagi menaikkan jumlah masuk, bukan baris ganda", !(await rpc(U1, DEV1)).error && (await q("select jumlah_masuk from public.sesi_perangkat where user_id = $1 and device_id = $2", [U1, DEV1])).rows[0].jumlah_masuk === 2);
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  cek("akun lain di perangkat yang sama tercatat sebagai baris terpisah", !(await rpc(U6, DEV1)).error && (await q("select count(*)::int as n from public.sesi_perangkat where device_id = $1", [DEV1])).rows[0].n === 2);
+  cek("peserta tidak bisa menulis langsung ke sesi_perangkat", ditolak(await sisip(U1, "insert into public.sesi_perangkat (user_id, device_id) values ($1, 'dev-cccccccc-3333')", U1), "42501"));
+  cek("peserta tidak bisa mengubah catatan perangkatnya", ditolak(await sisip(U1, "update public.sesi_perangkat set jumlah_masuk = 0 where user_id = $1", U1), "42501"));
+  cek("fungsi memakai identitas sesi (tidak ada parameter untuk berpura-pura jadi orang lain)", (await q("select count(*)::int as n from public.sesi_perangkat where user_id = $1 and device_id = $2", [U6, DEV2])).rows[0].n === 0 && !(await rpc(U6, DEV2)).error && (await q("select count(*)::int as n from public.sesi_perangkat where user_id = $1 and device_id = $2", [U1, DEV2])).rows[0].n === 0);
+  cek("ID perangkat terlalu pendek ditolak", ditolak(await rpc(U1, "pendek"), "23514"));
+  cek("pengunjung (anon) tidak bisa memanggil fungsi", ditolak(await sebagai("anon", null, () => q("select public.catat_perangkat('dev-dddddddd-4444', 'x')")), RLS) || ditolak(await sebagai("anon", null, () => q("select public.catat_perangkat('dev-dddddddd-4444', 'x')")), "42501"));
+  cek("peserta hanya melihat catatan perangkatnya sendiri", (await sisip(U1, "select * from public.sesi_perangkat")).rows.every((r) => r.user_id === U1));
+  const dua = (await sisip(IN, "select device_id, count(distinct user_id)::int as akun from public.sesi_perangkat group by device_id having count(distinct user_id) > 1")).rows;
+  cek("instruktur menemukan perangkat yang dipakai lebih dari satu akun", dua.length === 1 && dua[0].device_id === DEV1 && dua[0].akun === 2, JSON.stringify(dua));
+  const U9 = "99999999-9999-9999-9999-999999999999";
+  await db.query("insert into auth.users (id, email) values ($1, 'tanpaprofil@x.id')", [U9]);
+  cek("akun tanpa profil dilewati tanpa galat dan tanpa baris", !(await rpc(U9, "dev-eeeeeeee-5555")).error && (await q("select count(*)::int as n from public.sesi_perangkat where user_id = $1", [U9])).rows[0].n === 0);
+
+  cek("peserta tidak bisa menandai perangkat bersama", ditolak(await sisip(U1, "insert into public.perangkat_bersama (device_id) values ($1)", DEV1), RLS));
+  cek("instruktur menandai perangkat bersama (lab)", !(await sisip(IN, "insert into public.perangkat_bersama (device_id, catatan, ditandai_oleh) values ($1, 'Lab 1', $2)", DEV1, IN)).error);
+  cek("peserta tidak melihat daftar perangkat bersama", (await sisip(U1, "select * from public.perangkat_bersama")).rows.length === 0);
+  cek("instruktur membaca daftar perangkat bersama", (await sisip(IN, "select * from public.perangkat_bersama")).rows.length === 1);
+  cek("instruktur mencabut tanda perangkat bersama", (await sisip(IN, "delete from public.perangkat_bersama where device_id = $1", DEV1)).n === 1);
+
+  const PERC = "insert into public.percobaan (user_id, matakuliah_id, bab, jenis, lulus, kode, pola, rekaman) values ($1, 'algoritma-python', 4, 'kirim', true, 'print(1)', $2::jsonb, $3::jsonb)";
+  cek("percobaan menyimpan pola dan rekaman menulis", !(await sisip(U6, PERC, U6, '{"cps":3.1,"linier":0.4}', '[["e",0,0,0,"print",5,900]]')).error);
+  cek("rekaman terlalu besar ditolak", ditolak(await sisip(U6, PERC, U6, "{}", JSON.stringify([["e", 0, 0, 0, "x".repeat(130000), 1, 1]])), "23514"));
+  cek("pola terlalu besar ditolak", ditolak(await sisip(U6, PERC, U6, JSON.stringify({ x: "y".repeat(5000) }), "[]"), "23514"));
+  cek("peserta lain tidak membaca rekaman menulis orang lain", (await sisip(U1, "select rekaman from public.percobaan where user_id = $1", U6)).rows.length === 0);
+  cek("instruktur membaca pola dan rekaman", (await sisip(IN, "select pola, rekaman from public.percobaan where user_id = $1 and rekaman is not null", U6)).rows.length >= 1);
+  cek("rekaman tidak bisa diubah peserta setelah terkirim", (await sisip(U6, "update public.percobaan set rekaman = '[]' where user_id = $1", U6)).n === 0);
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);
