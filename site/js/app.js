@@ -5,6 +5,7 @@ import * as Anticopas from "./anticopas.js";
 import * as Rekam from "./rekam.js";
 import { laporanCard } from "./laporan.js";
 import * as Konsep from "./konsep.js";
+import * as Sesi from "./sesi.js";
 import { idPerangkat, agenRingkas } from "./perangkat.js";
 import { grade } from "./grader.js";
 import * as Auth from "./auth.js";
@@ -675,6 +676,7 @@ async function renderBab(n) {
     return;
   }
   current = m.bab;
+  Sesi.catatKonteks(COURSE && COURSE.id, m.bab); // jam dan lama belajar (tanpa isi) untuk kehadiran; gagal tidak mengganggu
   renderSidebar();
   const main = $("#main");
   let ch = null;
@@ -688,10 +690,10 @@ async function renderBab(n) {
   Tata.bersihkan();
   TATA = Tata.baru(store);
   // Pemberitahuan sekali per akun: apa yang dicatat situs.
-  const perluInfo = !store.get("info-pencatatan", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
+  const perluInfo = !store.get("info-pencatatan-2", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
   const infoBar = perluInfo
-    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, dan percobaan menempel. Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
-        store.set("info-pencatatan", true);
+    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, percobaan menempel, serta jam dan lama kamu aktif belajar di situs ini (dipakai sebagai kehadiran dan keaktifan). Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
+        store.set("info-pencatatan-2", true);
         e.target.closest(".info-bar").remove();
       } }, "Mengerti"))
     : null;
@@ -903,7 +905,8 @@ function renderKuliah(publik) {
 function renderCourse(c) {
   const { total, done } = courseProgress(c);
   const ready = c.aktif && total > 0;
-  $("#main").replaceChildren(
+  Sesi.catatKonteks(c.id, null);
+  $("#main").replaceChildren(...[
     h(
       "section",
       { class: "card" },
@@ -917,7 +920,7 @@ function renderCourse(c) {
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
     ready ? babGrid() : null
-  );
+  ].filter(Boolean));
 }
 
 function renderTidakAda() {
@@ -937,7 +940,7 @@ function renderPanduan() {
       h("h3", { style: "margin-top:16px" }, "Catatan"),
       h("ul", {}, li("Program yang berjalan terlalu lama dihentikan otomatis: 5 detik untuk Python, 8 detik untuk Java. Selama program berjalan ada hitungan waktunya."), li("Java perlu disiapkan dulu saat bab dibuka (sekitar 20 detik pertama kali). Bilah kemajuan di atas editor menunjukkan sisa waktunya; sambil menunggu, baca soalnya. Bila muncul pesan gagal, tekan Coba lagi; kodemu tidak hilang."),
       li("Di ponsel: gunakan Wi-Fi untuk membuka bab pertama (pengunduhan awal cukup besar, setelah itu tersimpan). Java butuh memori cukup besar; bila terus gagal di ponselmu, kerjakan bab Java di laptop. Memegang ponsel secara mendatar membuat editor lebih lega."), li("Saat dinilai, teks di dalam input(...) tidak dihitung; yang dibandingkan hanya hasil print."), li("Salin dan tempel dimatikan di halaman latihan. Ketik sendiri kodemu: justru mengetik yang membuatmu paham."),
-      li("Yang dicatat situs (diumumkan terbuka): kapan dan bagaimana kamu mengetik di editor latihan (waktu dan perubahan kode, bukan tombol di luar editor), kode tiap kali kamu mengirim jawaban, perangkat yang dipakai masuk (ID acak di browser ini, bukan alamat atau data perangkat kerasmu), dan jumlah percobaan menempel. Data ini hanya dibaca dosen pengampu untuk memastikan latihan dikerjakan sendiri, tidak dipakai sebagai satu-satunya dasar tuduhan, dan dihapus di akhir semester."), li("Tampilan bisa diatur: geser garis antara video dan soal, tarik pegangan di bawah editor untuk menambah tinggi, sembunyikan video, atau pakai Mode fokus (Esc untuk keluar)."), li("Progres tersimpan di akunmu, jadi tetap ada saat kamu masuk dari perangkat lain."))
+      li("Yang dicatat situs (diumumkan terbuka): kapan dan bagaimana kamu mengetik di editor latihan (waktu dan perubahan kode, bukan tombol di luar editor), kode tiap kali kamu mengirim jawaban, perangkat yang dipakai masuk (ID acak di browser ini, bukan alamat atau data perangkat kerasmu), jumlah percobaan menempel, serta jam dan lama kamu aktif di situs beserta bab yang kamu buka (aktif berarti tab terlihat dan ada gerakan; dipakai untuk kehadiran dan keaktifan, tanpa isi apa pun dan tanpa melihat tab atau aplikasi lain). Data ini hanya dibaca dosen pengampu untuk memastikan latihan dikerjakan sendiri, tidak dipakai sebagai satu-satunya dasar tuduhan, dan dihapus di akhir semester."), li("Tampilan bisa diatur: geser garis antara video dan soal, tarik pegangan di bawah editor untuk menambah tinggi, sembunyikan video, atau pakai Mode fokus (Esc untuk keluar)."), li("Progres tersimpan di akunmu, jadi tetap ada saat kamu masuk dari perangkat lain."))
     )
   );
 }
@@ -1477,6 +1480,7 @@ function namaTujuan(hash) {
 
 // Keluar: kembali ke halaman depan (publik), bukan ke formulir masuk.
 async function keluar() {
+  await Sesi.akhiriSesi(); // kirim sisa waktu sebelum sesi masuk dilepas
   await Auth.signOut();
   hapusTujuan();
   if (location.hash !== "#beranda") location.hash = "#beranda";

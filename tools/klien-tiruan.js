@@ -88,6 +88,77 @@
     save();
   }
 
+  // Data contoh kehadiran (tab "Kehadiran" dashboard): jadwal empat kelas, pengerjaan, dan sesi belajar selama tiga pekan.
+  // Coba dengan ?sekarang=2026-10-06T01:47:00Z (Selasa 08:47 WIB) agar hasilnya sama dengan rancangan di dokumentasi.
+  if (!db.seed6) {
+    db.seed6 = true;
+    const kelasSeed = ["SI-2024-A", "SI-2024-B", "SI-2025-A", "SI-2025-B"];
+    const jam = [["01:00", "03:00"], ["06:00", "08:00"], ["03:00", "05:00"], ["02:00", "04:00"]]; // UTC (WIB dikurangi 7 jam)
+    const pertama = ["2026-09-16", "2026-09-17", "2026-09-15", "2026-09-18"];
+    db.jadwal_kelas = [];
+    kelasSeed.forEach((kelas, k) => {
+      for (let n = 1; n <= 8; n++) {
+        const geser = (n - 1) * 7 * 86400000;
+        const mulai = Date.parse(pertama[k] + "T" + jam[k][0] + ":00Z") + geser;
+        const selesai = Date.parse(pertama[k] + "T" + jam[k][1] + ":00Z") + geser;
+        const libur = (kelas === "SI-2024-B" && n === 4) || (kelas === "SI-2025-B" && n === 3);
+        const dipindah = kelas === "SI-2025-A" && n === 5;
+        db.jadwal_kelas.push({ matakuliah_id: "algoritma-python", kelas, pertemuan: n, mulai: new Date(mulai + (dipindah ? 86400000 : 0)).toISOString(), selesai: new Date(selesai + (dipindah ? 86400000 : 0)).toISOString(), libur, dipindah, catatan: null });
+      }
+    });
+    db.jadwal_riwayat = [
+      { id: 1, matakuliah_id: "algoritma-python", kelas: "SI-2024-B", oleh: "u-dosen_kampus_ac_id", ringkasan: "P4 ditandai libur", dibuat_pada: "2026-10-05T09:20:00Z" },
+      { id: 2, matakuliah_id: "algoritma-python", kelas: "SI-2025-A", oleh: "u-dosen_kampus_ac_id", ringkasan: "P5 dipindah dari Sel 13 Okt ke Rab 14 Okt", dibuat_pada: "2026-10-03T02:00:00Z" },
+    ];
+    db.koreksi_kehadiran = [];
+    let acak = 12345;
+    const rnd = () => ((acak = (acak * 1103515245 + 12345) % 2147483648) / 2147483648);
+    const kelasHari = [3, 4, 2, 5]; // Rab, Kam, Sel, Jum (hari dalam minggu, 0 = Minggu)
+    db.percobaan = db.percobaan || [];
+    db.sesi_belajar = [];
+    let pid = 2000;
+    const wib = (tgl, jamWib) => Date.parse(tgl + "T00:00:00Z") + (jamWib - 7) * 3600000;
+    for (let i = 1; i <= 26; i++) {
+      const uid = "u-seed" + i;
+      const q = [0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3][(i * 3) % 9];
+      const k = (i - 1) % 4;
+      for (let d = 0; d < 23; d++) {
+        const tgl = new Date(Date.parse("2026-09-14T00:00:00Z") + d * 86400000);
+        const tglStr = tgl.toISOString().slice(0, 10);
+        const dow = tgl.getUTCDay();
+        const dekat = [1, 2, 3].some((x) => (dow + x) % 7 === kelasHari[k]);
+        const p = dekat ? q * 0.75 : q * 0.18;
+        const aktif = rnd() < p;
+        const baca = !aktif && rnd() < 0.12;
+        if (!aktif && !baca) continue;
+        const mulaiMs = wib(tglStr, rnd() < 0.6 ? 19 + rnd() * 3 : 8 + rnd() * 4);
+        const bab = 1 + Math.floor(d / 4);
+        const dur = (12 + Math.floor(rnd() * 55)) * 60000;
+        if (mulaiMs >= Date.parse("2026-09-24T00:00:00Z")) {
+          db.sesi_belajar.push({ id: "ses-" + i + "-" + d, user_id: uid, matakuliah_id: "algoritma-python", mulai: new Date(mulaiMs).toISOString(), terakhir: new Date(mulaiMs + dur).toISOString(), aktif_detik: Math.round((dur / 1000) * (0.55 + rnd() * 0.35)), denyut: Math.round(dur / 30000), bab_dibuka: [bab] });
+        }
+        if (aktif) {
+          const kali = 1 + Math.floor(rnd() * 3);
+          for (let x = 0; x < kali; x++) {
+            const t = mulaiMs + (x + 1) * 4 * 60000;
+            const lulus = rnd() < 0.55 || x === kali - 1;
+            const skew = rnd() < 0.05 ? -3 * 86400000 : 0; // sebagian kecil jam perangkat menyimpang
+            db.percobaan.push({ id: ++pid, user_id: uid, matakuliah_id: "algoritma-python", bab, jenis: "kirim", lulus, kasus_lulus: lulus ? 7 : 3, kasus_total: 7, kasus_gagal: [], kode: "# latihan " + i + "-" + d + "-" + x, pola: null, rekaman: null, dibuat_pada: new Date(t + skew).toISOString(), diterima_pada: new Date(t + 3000).toISOString() });
+          }
+        }
+      }
+      // sesi di dalam jam kuliah pada pertemuan yang sudah lewat (hanya setelah pencatatan sesi berjalan)
+      db.jadwal_kelas.filter((j) => j.kelas === kelasSeed[k] && !j.libur && Date.parse(j.mulai) >= Date.parse("2026-09-24T00:00:00Z") && Date.parse(j.selesai) < Date.parse("2026-10-06T01:47:00Z")).forEach((j) => {
+        if (rnd() < q * 0.85) {
+          const mulai = Date.parse(j.mulai) + Math.floor(rnd() * 20) * 60000;
+          const dur = (20 + Math.floor(rnd() * 70)) * 60000;
+          db.sesi_belajar.push({ id: "kls-" + i + "-" + j.pertemuan, user_id: uid, matakuliah_id: "algoritma-python", mulai: new Date(mulai).toISOString(), terakhir: new Date(mulai + dur).toISOString(), aktif_detik: Math.round((dur / 1000) * 0.7), denyut: Math.round(dur / 30000), bab_dibuka: [j.pertemuan] });
+        }
+      });
+    }
+    save();
+  }
+
   function klikTautan() {
     const p = db.pending;
     if (!p) return;
@@ -144,7 +215,7 @@
   const TABEL_DATA = { progres: ["user_id", "matakuliah_id", "bab"], laporan: ["user_id", "matakuliah_id", "bab"], percobaan: null };
   const kunci = (nama, r) => TABEL_DATA[nama].map((k) => r[k]).join("|");
   const bisaBaca = (nama, r) => {
-    if (nama === "perangkat_bersama" || nama === "penilaian_laporan") return instruktur();
+    if (nama === "perangkat_bersama" || nama === "penilaian_laporan" || ["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran"].includes(nama)) return instruktur();
     return instruktur() || (nama === "profiles" ? r.id === uidSaya() : r.user_id === uidSaya());
   };
 
@@ -160,6 +231,10 @@
       },
       order(k) {
         q.urut.push(k);
+        return chain;
+      },
+      gt(k, v) {
+        (q.gt = q.gt || []).push([k, v]);
         return chain;
       },
       range(a, b) {
@@ -219,6 +294,28 @@
         save();
         return { data: null, error: null };
       }
+      if (nama === "sesi_belajar" && q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table sesi_belajar" } };
+      if (["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran"].includes(nama) && q.op !== "select") {
+        if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
+        const tabel = (db[nama] = db[nama] || []);
+        const kunciTabel = { jadwal_kelas: ["matakuliah_id", "kelas", "pertemuan"], koreksi_kehadiran: ["matakuliah_id", "user_id", "pertemuan"] }[nama];
+        if (q.op === "delete") {
+          db[nama] = tabel.filter((r) => !(Object.keys(q.f).every((k) => String(r[k]) === String(q.f[k])) && (q.gt || []).every(([k, v]) => Number(r[k]) > Number(v))));
+          save();
+          return { data: null, error: null };
+        }
+        for (const r of Array.isArray(q.rows) ? q.rows : [q.rows]) {
+          if (nama === "jadwal_kelas" && !(Date.parse(r.selesai) > Date.parse(r.mulai))) return { data: null, error: { code: "23514", message: "check constraint jadwal_kelas" } };
+          if (nama === "koreksi_kehadiran" && !["hadir", "tidak"].includes(r.status)) return { data: null, error: { code: "23514", message: "check constraint koreksi" } };
+          if (kunciTabel) {
+            const i = tabel.findIndex((x) => kunciTabel.every((k) => String(x[k]) === String(r[k])));
+            if (i >= 0) tabel[i] = Object.assign({}, tabel[i], r);
+            else tabel.push(Object.assign({}, r));
+          } else tabel.push(Object.assign({ id: tabel.length + 1, dibuat_pada: new Date().toISOString() }, r));
+        }
+        save();
+        return { data: null, error: null };
+      }
       if (nama === "perangkat_bersama" && q.op !== "select") {
         if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
         db.perangkat_bersama = db.perangkat_bersama || [];
@@ -246,7 +343,7 @@
         return { data: null, error: null };
       }
       let baris = nama === "profiles" ? Object.values(db.profiles) : db[nama] || [];
-      baris = baris.filter((r) => bisaBaca(nama, r) && Object.keys(q.f).every((k) => String(r[k]) === String(q.f[k])));
+      baris = baris.filter((r) => bisaBaca(nama, r) && Object.keys(q.f).every((k) => String(r[k]) === String(q.f[k])) && (q.gt || []).every(([k, v]) => Number(r[k]) > Number(v)));
       for (const k of q.urut.slice().reverse()) baris = baris.slice().sort((a, b) => (a[k] < b[k] ? -1 : a[k] > b[k] ? 1 : 0));
       if (q.dari !== null) baris = baris.slice(q.dari, q.sampai + 1);
       return { data: baris.map((r) => Object.assign({}, r)), error: null };
@@ -360,6 +457,26 @@
         },
       },
       rpc: async (nama, args) => {
+        if (nama === "catat_denyut") {
+          if (!db.session) return { data: null, error: { code: "42501", message: "harus masuk dulu" } };
+          const uid = uidSaya();
+          if (!db.profiles[uid]) return { data: null, error: null };
+          db.sesi_belajar = db.sesi_belajar || [];
+          const tambah = Math.min(Math.max(Number(args.p_tambah) || 0, 0), 120);
+          const skrg = Date.now();
+          const ada = db.sesi_belajar.find((x) => x.id === args.p_sesi);
+          if (!ada) {
+            db.sesi_belajar.push({ id: args.p_sesi, user_id: uid, matakuliah_id: args.p_matakuliah, mulai: new Date(skrg).toISOString(), terakhir: new Date(skrg).toISOString(), aktif_detik: Math.min(tambah, 90), denyut: 1, bab_dibuka: args.p_bab ? [args.p_bab] : [] });
+          } else if (ada.user_id === uid) {
+            const lewat = Math.max(0, Math.round((skrg - Date.parse(ada.terakhir)) / 1000));
+            ada.aktif_detik = Math.min(86400, ada.aktif_detik + Math.min(tambah, lewat + 5));
+            ada.terakhir = new Date(skrg).toISOString();
+            ada.denyut++;
+            if (args.p_bab && !ada.bab_dibuka.includes(args.p_bab)) ada.bab_dibuka.push(args.p_bab);
+          }
+          save();
+          return { data: null, error: null };
+        }
         if (nama !== "catat_perangkat") return { data: null, error: { code: "42883", message: "function does not exist" } };
         if (!db.session) return { data: null, error: { code: "42501", message: "harus masuk dulu" } };
         const uid = uidSaya();

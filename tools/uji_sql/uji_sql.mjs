@@ -429,5 +429,69 @@ console.log("\n== Tahap H: laporan praktikum (selalu terbuka, tidak pernah dikun
   cek("instruktur membaca semua penilaian (query tab Laporan)", (await sisip(IN, "select * from public.penilaian_laporan order by laporan_id")).rows.length >= 1);
 }
 
+console.log("\n== Tahap I: migrasi 0006 (kehadiran dan keaktifan) pada data yang sudah ada ==");
+{
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  const sebelum = (await q("select count(*)::int as n from public.percobaan")).rows[0].n;
+  if (!(await jalankan("0006_kehadiran.sql berjalan di atas data lama", migrasi("0006_kehadiran.sql")))) process.exit(1);
+  cek("0006 aman dijalankan ulang", await jalankan("0006 diulang", migrasi("0006_kehadiran.sql")));
+  cek("0001 sampai 0006 berurutan diulang tanpa galat", await jalankan("ulang semuanya sampai 0006", migrasi("0001_skema.sql") + migrasi("0002_keamanan.sql") + migrasi("0003_matakuliah.sql") + migrasi("0004_kelas_terstruktur.sql") + migrasi("0005_integritas.sql") + migrasi("0006_kehadiran.sql")));
+  cek("data percobaan lama utuh (tidak ada yang hilang)", (await q("select count(*)::int as n from public.percobaan")).rows[0].n === sebelum && sebelum > 0);
+  cek("baris lama dibiarkan tanpa jam server (tidak dikarang)", (await q("select count(*)::int as n from public.percobaan where diterima_pada is null")).rows[0].n === sebelum);
+
+  const PERC = "insert into public.percobaan (user_id, matakuliah_id, bab, jenis, lulus, kode, dibuat_pada, diterima_pada) values ($1, 'algoritma-python', 4, 'kirim', true, 'print(1)', $2, $3) returning diterima_pada, dibuat_pada";
+  const baru = await sisip(U6, PERC, U6, "2026-10-01T00:00:00Z", "2000-01-01T00:00:00Z");
+  cek("baris baru diberi jam server walau browser mencoba mengisinya", !baru.error && new Date(baru.rows[0].diterima_pada).getFullYear() >= 2025, baru.error);
+  cek("jam perangkat tetap tersimpan terpisah dari jam server", !baru.error && new Date(baru.rows[0].dibuat_pada).toISOString().startsWith("2026-10-01"));
+  const akt = await sisip(U6, "insert into public.aktivitas (user_id, matakuliah_id, bab, jenis, detail, diterima_pada) values ($1, 'algoritma-python', 4, 'tempel_diblokir', '{}', '2000-01-01') returning diterima_pada", U6);
+  cek("aktivitas baru juga memakai jam server", !akt.error && new Date(akt.rows[0].diterima_pada).getFullYear() >= 2025);
+
+  // ---- sesi belajar lewat catat_denyut ----
+  const SES = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  const den = (uid, sesi, bab, tambah, mk = "algoritma-python") => sisip(uid, "select public.catat_denyut($1::uuid, $2, $3, $4)", sesi, mk, bab, tambah);
+  cek("peserta membuka sesi dan bab pertama tercatat", !(await den(U6, SES, 4, 60)).error && (await q("select bab_dibuka, aktif_detik, denyut from public.sesi_belajar where id = $1", [SES])).rows[0].denyut === 1);
+  for (let i = 0; i < 10; i++) await den(U6, SES, 4, 120);
+  const rapat = (await q("select aktif_detik, denyut from public.sesi_belajar where id = $1", [SES])).rows[0];
+  cek("denyut beruntun cepat tidak bisa menggelembungkan waktu aktif (dibatasi waktu nyata server)", rapat.aktif_detik < 200 && rapat.denyut === 11, JSON.stringify(rapat));
+  await den(U6, SES, 5, 0);
+  await den(U6, SES, 5, 0);
+  cek("bab yang dibuka dicatat tanpa duplikat", JSON.stringify((await q("select bab_dibuka from public.sesi_belajar where id = $1", [SES])).rows[0].bab_dibuka) === "[4,5]");
+  const aktifSebelum = (await q("select aktif_detik from public.sesi_belajar where id = $1", [SES])).rows[0].aktif_detik;
+  await den(U1, SES, 9, 120);
+  const sesudah = (await q("select aktif_detik, user_id, bab_dibuka from public.sesi_belajar where id = $1", [SES])).rows[0];
+  cek("peserta lain tidak bisa menambah atau membajak sesi orang lain", sesudah.user_id === U6 && sesudah.aktif_detik === aktifSebelum && JSON.stringify(sesudah.bab_dibuka) === "[4,5]");
+  cek("peserta tidak bisa menulis langsung ke sesi_belajar", ditolak(await sisip(U6, "insert into public.sesi_belajar (id, user_id, matakuliah_id) values ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', $1, 'algoritma-python')", U6), "42501"));
+  cek("peserta tidak bisa mengubah lama aktifnya langsung", ditolak(await sisip(U6, "update public.sesi_belajar set aktif_detik = 86400 where id = $1", SES), "42501"));
+  cek("mata kuliah yang tidak ada dilewati tanpa baris", !(await den(U6, "cccccccc-cccc-4ccc-8ccc-cccccccccccc", 1, 10, "tidak-ada")).error && (await q("select count(*)::int as n from public.sesi_belajar where id = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc'")).rows[0].n === 0);
+  cek("peserta hanya membaca sesinya sendiri", (await sisip(U1, "select * from public.sesi_belajar")).rows.every((r) => r.user_id === U1));
+  cek("instruktur membaca semua sesi", (await sisip(IN, "select * from public.sesi_belajar where user_id = $1", U6)).rows.length === 1);
+  cek("pengunjung (anon) tidak bisa memanggil catat_denyut", ditolak(await sebagai("anon", null, () => q("select public.catat_denyut('dddddddd-dddd-4ddd-8ddd-dddddddddddd'::uuid, 'algoritma-python', 1, 10)")), "42501"));
+  const U9 = "99999999-9999-9999-9999-999999999999";
+  cek("akun tanpa profil dilewati tanpa baris", !(await den(U9, "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee", 1, 10)).error && (await q("select count(*)::int as n from public.sesi_belajar where user_id = $1", [U9])).rows[0].n === 0);
+
+  // ---- jadwal per kelas ----
+  const JAD = "insert into public.jadwal_kelas (matakuliah_id, kelas, pertemuan, mulai, selesai, libur, dipindah) values ('algoritma-python', $1, $2, $3, $4, $5, $6) on conflict (matakuliah_id, kelas, pertemuan) do update set mulai = excluded.mulai, selesai = excluded.selesai, libur = excluded.libur, dipindah = excluded.dipindah, diperbarui_pada = now() returning pertemuan";
+  cek("instruktur membuat jadwal pertemuan", !(await sisip(IN, JAD, "SI-2024-A", 1, "2026-10-07T01:00:00Z", "2026-10-07T03:00:00Z", false, false)).error);
+  cek("mengubah pertemuan yang sama memperbarui baris, bukan menggandakan", !(await sisip(IN, JAD, "SI-2024-A", 1, "2026-10-09T03:00:00Z", "2026-10-09T05:00:00Z", false, true)).error && (await q("select count(*)::int as n from public.jadwal_kelas where kelas = 'SI-2024-A' and pertemuan = 1")).rows[0].n === 1);
+  cek("jam selesai harus setelah jam mulai", ditolak(await sisip(IN, JAD, "SI-2024-A", 2, "2026-10-14T03:00:00Z", "2026-10-14T01:00:00Z", false, false), "23514"));
+  cek("pertemuan boleh ditandai libur", !(await sisip(IN, JAD, "SI-2024-A", 3, "2026-10-21T01:00:00Z", "2026-10-21T03:00:00Z", true, false)).error);
+  cek("peserta tidak bisa menulis jadwal", ditolak(await sisip(U6, JAD, "SI-2024-A", 4, "2026-10-28T01:00:00Z", "2026-10-28T03:00:00Z", false, false), RLS));
+  cek("peserta tidak bisa mengubah jadwal yang ada", (await sisip(U6, "update public.jadwal_kelas set libur = true where kelas = 'SI-2024-A'")).n === 0);
+  cek("peserta tidak membaca jadwal", (await sisip(U6, "select * from public.jadwal_kelas")).rows.length === 0);
+  cek("instruktur membaca jadwal (query tab Kehadiran)", (await sisip(IN, "select * from public.jadwal_kelas where matakuliah_id = 'algoritma-python' order by kelas, pertemuan")).rows.length === 2);
+  cek("instruktur mencatat riwayat perubahan jadwal", !(await sisip(IN, "insert into public.jadwal_riwayat (matakuliah_id, kelas, oleh, ringkasan) values ('algoritma-python', 'SI-2024-A', $1, 'P1 dipindah ke Jumat 10.00')", IN)).error);
+  cek("riwayat tidak bisa ditulis atau dibaca peserta", ditolak(await sisip(U6, "insert into public.jadwal_riwayat (matakuliah_id, kelas, ringkasan) values ('algoritma-python', 'SI-2024-A', 'palsu')"), RLS) && (await sisip(U6, "select * from public.jadwal_riwayat")).rows.length === 0);
+  cek("riwayat tidak bisa diubah atau dihapus (hanya tambah)", ditolak(await sisip(IN, "update public.jadwal_riwayat set ringkasan = 'x'"), "42501") && ditolak(await sisip(IN, "delete from public.jadwal_riwayat"), "42501"));
+
+  // ---- koreksi manual ----
+  const KOR = "insert into public.koreksi_kehadiran (matakuliah_id, user_id, pertemuan, status, alasan, oleh) values ('algoritma-python', $1, $2, $3, $4, $5) on conflict (matakuliah_id, user_id, pertemuan) do update set status = excluded.status, alasan = excluded.alasan, oleh = excluded.oleh returning status";
+  cek("instruktur mengoreksi kehadiran dengan alasan", !(await sisip(IN, KOR, U6, 1, "hadir", "sakit, kirim surat", IN)).error);
+  cek("koreksi ulang memperbarui baris yang sama", !(await sisip(IN, KOR, U6, 1, "tidak", "dibatalkan", IN)).error && (await q("select count(*)::int as n from public.koreksi_kehadiran where user_id = $1", [U6])).rows[0].n === 1);
+  cek("status koreksi di luar aturan ditolak", ditolak(await sisip(IN, KOR, U6, 2, "terlambat", null, IN), "23514"));
+  cek("peserta tidak bisa mengoreksi kehadirannya sendiri", ditolak(await sisip(U6, KOR, U6, 3, "hadir", "saya hadir", U6), RLS));
+  cek("peserta tidak membaca koreksi", (await sisip(U6, "select * from public.koreksi_kehadiran")).rows.length === 0);
+  cek("tidak ada sesi tanpa pemilik (tanpa data yatim)", (await q("select count(*)::int as n from public.sesi_belajar s where not exists (select 1 from public.profiles p where p.id = s.user_id)")).rows[0].n === 0);
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

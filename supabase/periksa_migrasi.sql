@@ -5,7 +5,8 @@
 --   0001 = tabel dasar, 0002 = aturan keamanan, 0003 = banyak mata kuliah.
 -- 0004 = kelas terstruktur (prodi, angkatan, rombel).
 -- 0005 = sinyal keaslian pengerjaan (perangkat, pola dan rekaman menulis).
--- Jalankan hanya migrasi yang masih false, berurutan (0001, 0002, 0003, 0004, lalu 0005).
+-- 0006 = kehadiran dan keaktifan (jadwal per kelas, sesi belajar, jam server, koreksi).
+-- Jalankan hanya migrasi yang masih false, berurutan (0001, 0002, 0003, 0004, 0005, lalu 0006).
 
 select
   to_regclass('public.profiles') is not null as "0001_skema",
@@ -25,4 +26,10 @@ select
     and exists (
       select 1 from information_schema.columns
       where table_schema = 'public' and table_name = 'percobaan' and column_name = 'rekaman'
-    ) as "0005_integritas";
+    ) as "0005_integritas",
+  to_regclass('public.jadwal_kelas') is not null
+    and to_regclass('public.sesi_belajar') is not null
+    and exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'percobaan' and column_name = 'diterima_pada'
+    ) as "0006_kehadiran";

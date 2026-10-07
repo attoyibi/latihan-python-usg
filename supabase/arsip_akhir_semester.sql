@@ -14,6 +14,9 @@
 -- delete from public.aktivitas;
 -- delete from public.sesi_perangkat;  -- catatan perangkat yang dipakai masuk
 -- delete from public.perangkat_bersama;
+-- delete from public.sesi_belajar;       -- jam dan lama aktif belajar (kehadiran dan keaktifan)
+-- delete from public.koreksi_kehadiran;  -- koreksi manual kehadiran
+-- Jadwal (jadwal_kelas, jadwal_riwayat) boleh disimpan atau dihapus sesuai kebutuhan.
 
 -- Contoh: hapus seluruh data peserta semester ini (akun, progres, laporan, unggahan).
 -- Berkas di Storage ('tugas') harus dihapus terpisah lewat dashboard Storage.

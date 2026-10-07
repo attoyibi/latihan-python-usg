@@ -353,3 +353,10 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - Setiap bab punya tantangan: bab teori (Algoritma 3; PBO 4, 11, 12, 15) berjenis `konsep` (`site/js/konsep.js`): lulus 70 persen, ulang tanpa batas, pilihan diacak, kunci tampil setelah lulus, hasil ikut sinkron dan masuk dashboard.
 - Dashboard instruktur: tab "Laporan" dengan rubrik 1 sampai 4 (`penilaian.js`, `laporan-ui.js`, tabel `penilaian_laporan`), CSV. Terverifikasi di browser dengan klien tiruan; uji: uji_konsep, uji_penilaian, uji_laporan, tes SQL 196.
 - BELUM: Supabase sungguhan; tampilan ponsel komponen konsep/laporan; uji PDF di ponsel; uji integritas untuk percobaan konsep identik.
+
+## Catatan sesi: kehadiran dan keaktifan
+- Migrasi `0006_kehadiran.sql` (hanya menambah): jam server `diterima_pada` (dipaksa trigger, data lama dibiarkan kosong), tabel `sesi_belajar` (ditulis hanya lewat `catat_denyut`, tambahan waktu dibatasi waktu nyata server), `jadwal_kelas`, `jadwal_riwayat`, `koreksi_kehadiran` (hanya instruktur). Diuji di harness SQL (234 uji, termasuk di atas data lama).
+- `site/js/kehadiran.js` (logika murni, 89 uji, mutasi terdeteksi), `pencatat.js` dan `sesi.js` (pencatat sesi; aktif = tab terlihat dan ada gerakan dalam 90 detik; akun instruktur tidak dicatat; 22 uji), `kehadiran-ui.js` (tab dashboard).
+- Aturan: siap sebelum kelas = mengerjakan dalam 6 hari sebelum jam mulai; bila pencatatan sesi sudah berjalan sejak jendela dimulai juga aktif minimal 20 menit. Hadir = siap. Libur dan koreksi manual diperhitungkan. Mengubah jadwal pertemuan yang sudah berlangsung meminta konfirmasi dan menampilkan dampaknya.
+- Pemberitahuan ke peserta diperbarui (info bar `info-pencatatan-2` dan Panduan): jam dan lama aktif dicatat untuk kehadiran dan keaktifan.
+- BELUM: Supabase sungguhan; impor kehadiran SIAKAD (format CSV belum diketahui); tampilan Langsung memakai muat ulang manual, bukan pembaruan otomatis; menonton video YouTube tidak terukur; uji di ponsel peserta sungguhan.
