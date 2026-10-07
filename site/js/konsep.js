@@ -327,17 +327,17 @@ export function buatButir(b, nomor, jawabanAwal, ubah) {
       break;
     }
     case "relasi": {
-      const sel = (opsi, nilai, label) => {
-        const s = h("select", { class: "pilih-relasi", "aria-label": label }, h("option", { value: "" }, "pilih"), ...opsi.map((o) => h("option", { value: o, selected: nilai === o ? "" : false }, o)));
+      const sel = (opsi, nilai, label, kelas) => {
+        const s = h("select", { class: "pilih-relasi " + kelas, "aria-label": label }, h("option", { value: "" }, "pilih"), ...opsi.map((o) => h("option", { value: o, selected: nilai === o ? "" : false }, o)));
         s.addEventListener("change", ubah);
         return s;
       };
       const baris = b.pasangan.map((p, i) => {
         const x = (jawabanAwal && jawabanAwal[i]) || {};
-        const sa = p.a !== undefined ? sel(b.multiplisitas, x.a, "Multiplisitas di sisi " + p.dari) : null;
-        const sb = p.b !== undefined ? sel(b.multiplisitas, x.b, "Multiplisitas di sisi " + p.ke) : null;
-        const sr = sel(b.relasi, x.relasi, "Jenis relasi " + p.dari + " dan " + p.ke);
-        return { sa, sb, sr, el: h("div", { class: "relasi-baris" }, h("span", { class: "kotak-uml" }, p.dari), sa, h("span", { class: "garis-uml", "aria-hidden": "true" }, "──"), sr, h("span", { class: "garis-uml", "aria-hidden": "true" }, "──"), sb, h("span", { class: "kotak-uml" }, p.ke)) };
+        const sa = p.a !== undefined ? sel(b.multiplisitas, x.a, "Multiplisitas di sisi " + p.dari, "u-sa") : null;
+        const sb = p.b !== undefined ? sel(b.multiplisitas, x.b, "Multiplisitas di sisi " + p.ke, "u-sb") : null;
+        const sr = sel(b.relasi, x.relasi, "Jenis relasi " + p.dari + " dan " + p.ke, "u-sr");
+        return { sa, sb, sr, el: h("div", { class: "relasi-baris" }, h("span", { class: "kotak-uml u-dari" }, p.dari), sa, h("span", { class: "garis-uml", "aria-hidden": "true" }, "──"), sr, h("span", { class: "garis-uml", "aria-hidden": "true" }, "──"), sb, h("span", { class: "kotak-uml u-ke" }, p.ke)) };
       });
       badan = h("div", { class: "relasi" }, ...baris.map((x) => x.el));
       ambil = () => baris.map((x) => ({ relasi: x.sr.value, a: x.sa ? x.sa.value : undefined, b: x.sb ? x.sb.value : undefined }));

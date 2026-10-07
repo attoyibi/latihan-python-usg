@@ -378,3 +378,12 @@ form.ganti-sandi{margin-top:18px;padding-top:14px;border-top:1px solid var(--lin
 input.isian{max-width:420px}
 .lap-baca{margin:8px 0}
 .lap-baca p{margin:2px 0 8px;white-space:pre-wrap}
+@media (max-width:640px){
+.relasi-baris{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"dari ke" "sa sb" "sr sr";gap:8px;padding:10px;margin:10px 0;border:1px solid var(--line);border-radius:10px}
+.relasi-baris .garis-uml{display:none}
+.relasi-baris .u-dari{grid-area:dari}.relasi-baris .u-ke{grid-area:ke}
+.relasi-baris .u-sa{grid-area:sa}.relasi-baris .u-sb{grid-area:sb}.relasi-baris .u-sr{grid-area:sr}
+.kotak-uml{text-align:center;overflow-wrap:anywhere}
+.pilih-relasi{width:100%;min-height:40px;font-size:16px}
+summary{padding-block:10px}
+}

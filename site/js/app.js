@@ -714,7 +714,7 @@ async function renderBab(n) {
   });
   Sinkron.ambilLaporan(COURSE.id, m.bab).then((baris) => baris && laporan.terapkanServer(baris));
   const bar = Tata.pasang(cols, vc, TATA, { punyaVideo: !!(m.video && m.video.length), punyaEditor: m.jenis === "kode", ambilEditor: () => editor });
-  main.replaceChildren(
+  main.replaceChildren(...[
     infoBar,
     h(
       "section",
@@ -728,7 +728,7 @@ async function renderBab(n) {
     cols,
     m.jenis === "konsep" && m.tugas ? tugasCard(m, true) : null,
     laporan
-  );
+  ].filter(Boolean));
   main.scrollTop = 0;
   window.scrollTo(0, 0);
 }
