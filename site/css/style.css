@@ -523,3 +523,4 @@ tr.klik:hover{background:var(--soft)}
 .kh-kot.lx{background:transparent;border:1px dashed var(--line)}
 @media (max-width:640px){.kh-semester td:nth-child(2){min-width:150px}}
 @media (max-width:640px){.kh-bulan .kh-hbtn{min-height:40px}}
+dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;min-height:40px;max-width:100%}
