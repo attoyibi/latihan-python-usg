@@ -54,3 +54,9 @@ Untuk memilih siapa yang perlu ditanya langsung, bukan untuk memvonis. Perlu mig
 **Cara memakainya:** pilih beberapa peserta dari daftar (tinggi dulu), putar ulang rekamannya, lalu minta mereka menjelaskan atau mengubah satu baris kodenya langsung. Itu yang paling andal; sistem tidak bisa melihat bila peserta menyerahkan laptopnya atau berbagi layar.
 
 **Batas yang jujur:** ID perangkat hilang bila data browser dihapus; alamat IP belum dicatat (butuh fungsi server tambahan); soal bervariasi per peserta belum ada. Semua sinyal punya penjelasan wajar, jadi jangan dijadikan satu-satunya dasar penilaian atau tuduhan.
+
+## Tab Laporan: membaca dan menilai laporan
+
+Laporan peserta selalu terbuka dan tidak pernah dikunci, jadi laporan yang belum lengkap atau kodenya belum lulus juga muncul di sini. Tabel menunjukkan kolom yang memadai (dari lima), jumlah karakter, **persen diketik** (huruf yang tercatat diketik langsung dibanding isi laporan; angka rendah berarti isi masuk lewat jalan lain), percobaan tempel yang diblokir, menit menulis, dan kapan terakhir diekspor PDF.
+
+Tekan "Baca dan nilai" untuk membaca lima kolom (tujuan, pertanyaan konsep, langkah, kendala, kesimpulan) lalu beri skor 1 sampai 4 pada empat rubrik: ketepatan konsep, kejelasan dengan bahasa sendiri, kejujuran refleksi kendala, kesesuaian dengan kode atau hasil, plus komentar opsional. Penilaian hanya bisa ditulis akun instruktur dan tidak ditampilkan ke peserta. "Unduh CSV" mengekspor daftar beserta nilainya. Saringan: bab, hanya yang belum dinilai, cari nama atau NIM.

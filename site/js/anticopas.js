@@ -7,6 +7,9 @@
 import { h } from "./dom.js";
 
 const PESAN = "Salin dan tempel dinonaktifkan di latihan ini. Ketik sendiri supaya benar-benar paham.";
+// Seret-lepas milik situs sendiri (soal urutkan, seret ke kelas) menandai datanya dengan jenis ini, sehingga bukan teks dari luar.
+export const JENIS_SERET_SENDIRI = "application/x-latihan-seret";
+const dariSendiri = (e) => !!(e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes(JENIS_SERET_SENDIRI));
 const TEMPEL = new Set(["insertFromPaste", "insertFromDrop", "insertFromYank", "insertFromPasteAsQuotation"]);
 let toast = null;
 let tutup = null;
@@ -50,12 +53,12 @@ export function blokirSalinTempel(akar, opsi = {}) {
       ditempel();
     }),
     pasang("drop", (e) => {
-      if (kecualikan()) return;
+      if (kecualikan() || dariSendiri(e)) return; // seret-lepas milik situs dibiarkan sampai ke penanganannya
       hentikan(e);
       ditempel();
     }),
     pasang("dragover", (e) => {
-      if (!kecualikan()) e.preventDefault();
+      if (!kecualikan() && !dariSendiri(e)) e.preventDefault();
     }),
     pasang("copy", (e) => {
       if (kecualikan()) return;

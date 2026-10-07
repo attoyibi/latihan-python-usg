@@ -22,7 +22,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa kelemahan paradigma prosedural dibanding berorientasi objek pada contoh perpustakaan? Sebutkan dua dari empat pilar OOP beserta contohmu."
  },
  {
   "bab": 2,
@@ -53,7 +54,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan perbedaan kelas dan objek, serta fungsi constructor dan kata kunci this."
  },
  {
   "bab": 3,
@@ -78,7 +80,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Mengapa atribut dibuat private dan diakses lewat getter dan setter? Beri contoh validasi di dalam setter."
  },
  {
   "bab": 4,
@@ -102,8 +105,8 @@
     "sumber": "lain"
    }
   ],
-  "jenis": "unggah",
-  "challenge": false,
+  "jenis": "konsep",
+  "challenge": true,
   "tugas": {
    "judul": "Diagram kelas UML untuk peminjaman buku SIP-USG",
    "soal": [
@@ -122,7 +125,8 @@
     "Multiplisitas tercantum di kedua ujung relasi.",
     "Alasan memilih agregasi atau komposisi masuk akal."
    ]
-  }
+  },
+  "pertanyaanKonsep": "Jelaskan perbedaan asosiasi, agregasi, dan komposisi dengan contoh dari sistem perpustakaan."
  },
  {
   "bab": 5,
@@ -159,7 +163,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa yang dilakukan extends, super, dan override? Mengapa anotasi @Override dianjurkan?"
  },
  {
   "bab": 6,
@@ -190,7 +195,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda overloading dan overriding? Jelaskan dynamic binding dengan contoh method calculateFine()."
  },
  {
   "bab": 7,
@@ -221,7 +227,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Kapan kamu memilih abstract class dan kapan memilih interface? Beri alasan dan contoh."
  },
  {
   "bab": 8,
@@ -246,7 +253,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda checked dan unchecked exception, dan apa fungsi blok finally?"
  },
  {
   "bab": 9,
@@ -276,7 +284,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Mengapa HashMap lebih cocok daripada ArrayList untuk mencari buku berdasarkan kode? Apa gunanya generics?"
  },
  {
   "bab": 10,
@@ -301,7 +310,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda byte stream dan character stream, dan mengapa try-with-resources dipakai saat membuka berkas?"
  },
  {
   "bab": 11,
@@ -325,8 +335,8 @@
     "sumber": "lain"
    }
   ],
-  "jenis": "unggah",
-  "challenge": false,
+  "jenis": "konsep",
+  "challenge": true,
   "tugas": {
    "judul": "BookDAO yang berjalan terhadap basis data",
    "soal": [
@@ -345,7 +355,8 @@
     "Koneksi dan resource ditutup dengan benar.",
     "Jawaban tentang keamanan menyebut SQL injection."
    ]
-  }
+  },
+  "pertanyaanKonsep": "Mengapa PreparedStatement lebih aman daripada Statement biasa? Apa peran pola DAO?"
  },
  {
   "bab": 12,
@@ -369,8 +380,8 @@
     "sumber": "lain"
    }
   ],
-  "jenis": "unggah",
-  "challenge": false,
+  "jenis": "konsep",
+  "challenge": true,
   "tugas": {
    "judul": "Form data buku dengan Swing",
    "soal": [
@@ -389,7 +400,8 @@
     "Event tombol Simpan bekerja.",
     "Kode bersih dan terbaca."
    ]
-  }
+  },
+  "pertanyaanKonsep": "Bagaimana event handling bekerja: apa itu listener, dan mengapa lambda memudahkan penulisannya?"
  },
  {
   "bab": 13,
@@ -414,7 +426,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan prinsip Open-Closed dengan contoh penambahan jenis denda baru."
  },
  {
   "bab": 14,
@@ -445,7 +458,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan fungsi Singleton dan Factory Method, masing-masing dengan contoh dari SIP-USG."
  },
  {
   "bab": 15,
@@ -456,8 +470,8 @@
    "halaman": 198
   },
   "video": [],
-  "jenis": "unggah",
-  "challenge": false,
+  "jenis": "konsep",
+  "challenge": true,
   "tugas": {
    "judul": "SIP-USG versi akhir dan demonstrasinya",
    "soal": [
@@ -474,6 +488,7 @@
     "Dokumentasi jelas dan bisa diikuti orang lain.",
     "Demonstrasi runtut."
    ]
-  }
+  },
+  "pertanyaanKonsep": "Konsep bab mana yang paling sulit bagimu pada proyek akhir ini, dan bagaimana kamu mengatasinya?"
  }
 ]

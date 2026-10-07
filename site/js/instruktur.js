@@ -4,6 +4,7 @@
 import { h, $ } from "./dom.js";
 import * as Auth from "./auth.js";
 import * as IntegUI from "./integritas-ui.js";
+import * as LaporanUI from "./laporan-ui.js";
 import { SEL, SEL_TEKS, susunRekap, saringPeserta, pilihanSaringan, buatCsv, ambilSemua, AMBANG_TERSANGKUT } from "./rekap.js";
 
 const LAMBANG = { "selesai-langsung": "✓", "selesai-bantuan": "✓*", sedang: "◐", belum: "○", unggah: "–" };
@@ -70,6 +71,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
   const baru = async () => {
     main.replaceChildren(h("section", { class: "card" }, h("h2", {}, "Dashboard instruktur"), h("p", { class: "muted" }, "Memuat data peserta")));
     IntegUI.reset();
+    LaporanUI.reset();
     await muat(keadaan.cid);
     tampilkan(main, kuliahAktif, kuliah);
   };
@@ -79,6 +81,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     keadaan.cid = selKuliah.value;
     keadaan.data = null;
     IntegUI.reset();
+    LaporanUI.reset();
     keadaan.saring = { prodi: "", angkatan: "", rombel: "", cari: "" };
     renderInstruktur({ kuliahAktif });
   });
@@ -92,11 +95,15 @@ function tampilkan(main, kuliahAktif, kuliah) {
     "section",
     { class: "card" },
     h("h2", {}, "Dashboard instruktur"),
-    h("p", { class: "muted" }, keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
-    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas")),
+    h("p", { class: "muted" }, keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
+    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan")),
     h("div", { class: "filters" }, h("label", {}, "Mata kuliah ", selKuliah), h("button", { type: "button", class: "btn btn-sm", onclick: baru }, "Muat ulang"))
   );
 
+  if (keadaan.tab === "laporan") {
+    LaporanUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null });
+    return;
+  }
   if (keadaan.tab === "integritas") {
     IntegUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null, tempel: keadaan.data ? keadaan.data.tempel : [] });
     return;

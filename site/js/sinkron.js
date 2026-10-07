@@ -18,6 +18,7 @@ let uidAntrean = null;
 let progres = new Map(); // "mk|bab" -> baris progres
 let percobaan = []; // baris percobaan menunggu kirim
 let jejak = []; // baris aktivitas menunggu kirim
+let laporanAntre = new Map(); // "mk|bab" -> baris laporan terbaru yang menunggu kirim
 let timer = null;
 let berjalan = false;
 let status = "diam"; // diam | menyimpan | tersimpan | gagal
@@ -44,19 +45,21 @@ function pakaiAkun() {
   progres = new Map();
   percobaan = [];
   jejak = [];
+  laporanAntre = new Map();
   try {
     const x = JSON.parse(localStorage.getItem(kunciAntrean(uid)) || "null");
     if (x) {
       progres = new Map(x.progres || []);
       percobaan = x.percobaan || [];
       jejak = x.jejak || [];
+      laporanAntre = new Map(x.laporan || []);
     }
   } catch (e) {}
 }
 
 function simpanAntrean() {
   try {
-    localStorage.setItem(kunciAntrean(uidAntrean), JSON.stringify({ progres: [...progres.entries()], percobaan, jejak }));
+    localStorage.setItem(kunciAntrean(uidAntrean), JSON.stringify({ progres: [...progres.entries()], percobaan, jejak, laporan: [...laporanAntre.entries()] }));
   } catch (e) {}
 }
 
@@ -82,6 +85,22 @@ export function catat(mataKuliah, bab, data) {
   jadwalkan(0);
 }
 
+// Laporan praktikum: hanya versi terbaru per bab yang perlu dikirim (disimpan otomatis tiap beberapa detik).
+export function laporan(mataKuliah, bab, baris) {
+  if (!aktif()) return;
+  pakaiAkun();
+  laporanAntre.set(mataKuliah + "|" + bab, baris);
+  simpanAntrean();
+  jadwalkan(JEDA_MS);
+}
+
+// Laporan milik peserta di server untuk satu bab (null bila belum ada atau gagal dibaca).
+export async function ambilLaporan(mataKuliah, bab) {
+  if (!aktif()) return null;
+  const { data, error } = await Auth.getClient().from("laporan").select("*").eq("user_id", Auth.getUserId()).eq("matakuliah_id", mataKuliah).eq("bab", bab).maybeSingle();
+  return error ? null : data || null;
+}
+
 // Jejak aktivitas. Kejadian beruntun dengan jenis dan bab sama digabung menjadi satu baris berisi jumlahnya,
 // supaya tidak membanjiri tabel. Isi yang dicoba ditempel TIDAK pernah dicatat, hanya jumlahnya.
 export function aktivitas(mataKuliah, bab, jenis, detail = {}) {
@@ -101,7 +120,7 @@ const galatPermanen = (e) => !!e && typeof e.code === "string" && (e.code.starts
 export async function kirimSekarang() {
   if (berjalan || !aktif()) return;
   pakaiAkun();
-  if (!progres.size && !percobaan.length && !jejak.length) return;
+  if (!progres.size && !percobaan.length && !jejak.length && !laporanAntre.size) return;
   berjalan = true;
   setStatus("menyimpan");
   const client = Auth.getClient();
@@ -128,9 +147,18 @@ export async function kirimSekarang() {
       if (error && !galatPermanen(error)) throw error;
       jejak = jejak.slice(n);
     }
+    if (laporanAntre.size) {
+      const kirim = [...laporanAntre.entries()];
+      const { error } = await client.from("laporan").upsert(
+        kirim.map(([, r]) => Object.assign({ user_id: uid }, r)),
+        { onConflict: "user_id,matakuliah_id,bab" }
+      );
+      if (error && !galatPermanen(error)) throw error;
+      for (const [k, v] of kirim) if (laporanAntre.get(k) === v) laporanAntre.delete(k);
+    }
     simpanAntrean();
     setStatus("tersimpan");
-    if (progres.size || percobaan.length || jejak.length) jadwalkan(JEDA_MS);
+    if (progres.size || percobaan.length || jejak.length || laporanAntre.size) jadwalkan(JEDA_MS);
   } catch (e) {
     setStatus("gagal");
     jadwalkan(ULANG_MS);

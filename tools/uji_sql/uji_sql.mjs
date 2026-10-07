@@ -392,5 +392,42 @@ console.log("\n== Tahap G: migrasi 0005 (sinyal keaslian pengerjaan) ==");
   cek("rekaman tidak bisa diubah peserta setelah terkirim", (await sisip(U6, "update public.percobaan set rekaman = '[]' where user_id = $1", U6)).n === 0);
 }
 
+console.log("\n== Tahap H: laporan praktikum (selalu terbuka, tidak pernah dikunci) ==");
+{
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  // supabase-js .upsert(rows, { onConflict: "user_id,matakuliah_id,bab" }) menjadi INSERT ... ON CONFLICT ... DO UPDATE
+  const LAP = "insert into public.laporan (user_id, matakuliah_id, bab, jawaban, jumlah_ketikan, percobaan_tempel, durasi_menulis_detik, kode_verifikasi, status, dikumpulkan_pada) values ($1, 'algoritma-python', $2, $3::jsonb, $4::jsonb, $5, $6, $7, 'draf', $8) on conflict (user_id, matakuliah_id, bab) do update set jawaban = excluded.jawaban, jumlah_ketikan = excluded.jumlah_ketikan, percobaan_tempel = excluded.percobaan_tempel, durasi_menulis_detik = excluded.durasi_menulis_detik, kode_verifikasi = excluded.kode_verifikasi, status = excluded.status, dikumpulkan_pada = excluded.dikumpulkan_pada returning kode_verifikasi, status";
+  const sim = (bab, jawaban, kode, eks = null, tempel = 0) => sisip(U6, LAP, U6, bab, JSON.stringify(jawaban), JSON.stringify({ tujuan: 30 }), tempel, 12, kode, eks);
+
+  const a = await sim(21, { tujuan: "awal" }, "KODE0001");
+  cek("peserta menyimpan laporan pertama kali (kode verifikasi dari klien)", !a.error && a.rows[0].kode_verifikasi === "KODE0001" && a.rows[0].status === "draf", a.error);
+  const b = await sim(21, { tujuan: "diperbarui, lebih panjang", konsep: "ada" }, "KODE0001");
+  cek("menyimpan ulang memperbarui baris yang sama, bukan menggandakan", !b.error && (await q("select count(*)::int as n from public.laporan where user_id = $1 and bab = 21", [U6])).rows[0].n === 1 && (await q("select jawaban from public.laporan where user_id = $1 and bab = 21", [U6])).rows[0].jawaban.konsep === "ada");
+  const c = await sim(21, { tujuan: "setelah ekspor" }, "KODE0001", new Date().toISOString(), 3);
+  cek("mencatat waktu ekspor (dikumpulkan_pada) tanpa mengunci laporan", !c.error && c.rows[0].status === "draf");
+  const d = await sim(21, { tujuan: "masih bisa diedit lagi setelah ekspor" }, "KODE0001", new Date().toISOString(), 3);
+  cek("SETELAH diekspor, laporan masih bisa diedit (tidak pernah dikunci)", !d.error && (await q("select jawaban from public.laporan where user_id = $1 and bab = 21", [U6])).rows[0].jawaban.tujuan.startsWith("masih bisa"));
+  cek("jumlah ketikan dan percobaan tempel tersimpan", (await q("select percobaan_tempel, jumlah_ketikan from public.laporan where user_id = $1 and bab = 21", [U6])).rows[0].percobaan_tempel === 3);
+  cek("kode verifikasi harus unik: kode yang sama di laporan lain ditolak", ditolak(await sim(22, {}, "KODE0001"), "23505"));
+  cek("laporan kosong boleh disimpan (belum diisi tidak jadi masalah)", !(await sim(23, {}, "KODE0003")).error);
+  cek("peserta tidak bisa menyimpan laporan atas nama peserta lain", ditolak(await sisip(U6, LAP, U1, 24, "{}", "{}", 0, 0, "KODE0004", null), RLS));
+  cek("peserta lain tidak bisa membaca laporan orang lain", (await sisip(U1, "select * from public.laporan where user_id = $1", U6)).rows.length === 0);
+  cek("peserta hanya membaca laporannya sendiri (query pemulihan di situs)", (await sisip(U6, "select * from public.laporan where user_id = $1 and matakuliah_id = 'algoritma-python' and bab = 21", U6)).rows.length === 1);
+  cek("instruktur membaca semua laporan", (await sisip(IN, "select * from public.laporan where user_id = $1", U6)).rows.length >= 2);
+  cek("instruktur tidak bisa mengubah isi laporan peserta", (await sisip(IN, "update public.laporan set jawaban = '{}' where user_id = $1 and bab = 21", U6)).n === 0);
+  cek("status di luar aturan ditolak", ditolak(await sisip(U6, "update public.laporan set status = 'lulus' where user_id = $1 and bab = 21", U6), "23514"));
+  cek("laporan di mata kuliah lain pada bab yang sama berdiri sendiri", !(await sisip(U6, "insert into public.laporan (user_id, matakuliah_id, bab, jawaban, kode_verifikasi) values ($1, 'pbo-java', 21, '{}', 'KODE0005')", U6)).error);
+
+  // Penilaian oleh instruktur: supabase-js .upsert(row, { onConflict: "laporan_id" })
+  const lapId = (await q("select id from public.laporan where user_id = $1 and bab = 21 and matakuliah_id = 'algoritma-python'", [U6])).rows[0].id;
+  const NILAI = "insert into public.penilaian_laporan (laporan_id, penilai, skor_konsep, skor_bahasa, skor_refleksi, skor_kode, komentar, dinilai_pada) values ($1, $2, $3, $4, $5, $6, $7, now()) on conflict (laporan_id) do update set penilai = excluded.penilai, skor_konsep = excluded.skor_konsep, skor_bahasa = excluded.skor_bahasa, skor_refleksi = excluded.skor_refleksi, skor_kode = excluded.skor_kode, komentar = excluded.komentar returning skor_konsep";
+  cek("instruktur menyimpan penilaian rubrik", !(await sisip(IN, NILAI, lapId, IN, 3, 4, 2, 3, "cukup baik")).error);
+  cek("menilai ulang memperbarui penilaian yang sama", (await sisip(IN, NILAI, lapId, IN, 4, 4, 4, 4, "sangat baik")).rows[0].skor_konsep === 4 && (await q("select count(*)::int as n from public.penilaian_laporan where laporan_id = $1", [lapId])).rows[0].n === 1);
+  cek("skor di luar 1 sampai 4 ditolak database", ditolak(await sisip(IN, NILAI, lapId, IN, 5, 4, 4, 4, null), "23514"));
+  cek("peserta tidak bisa menulis penilaian atas laporannya sendiri", ditolak(await sisip(U6, NILAI, lapId, U6, 4, 4, 4, 4, "nilai sendiri"), RLS));
+  cek("peserta lain tidak membaca penilaian", (await sisip(U1, "select * from public.penilaian_laporan where laporan_id = $1", lapId)).rows.length === 0);
+  cek("instruktur membaca semua penilaian (query tab Laporan)", (await sisip(IN, "select * from public.penilaian_laporan order by laporan_id")).rows.length >= 1);
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

@@ -1,0 +1,129 @@
+{
+ "bab": 12,
+ "jenis": "konsep",
+ "judul": "Antarmuka grafis dan event handling",
+ "soal": [
+  "Praktik Swing dikerjakan di komputermu (jendela tidak bisa tampil di situs). Di sini kamu menguji konsepnya: komponen, layout, dan event.",
+  "Boleh diulang. Lulus bila 70 persen bagian benar; setelah lulus, jawaban dan penjelasannya ditampilkan."
+ ],
+ "rujukan": [
+  "Buku Bab XII, bagian B (komponen Swing), hlm. 154; bagian C (layout manager), hlm. 155; bagian D (event handling dan lambda), hlm. 156; bagian E (menghubungkan form dengan DAO), hlm. 157.",
+  "Video: Java Swing Tutorial (Yohana Sri Rejeki) dan Tutorial membuat tampilan GUI dengan Java Swing.",
+  "Clue: bagian F, Praktikum Terbimbing di Bab 12, membangun form data buku SIP-USG."
+ ],
+ "lulus": 0.7,
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Bayangkan jendela sebagai wadah bersusun: JFrame berisi JPanel berisi komponen."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XII bagian B (hlm. 154) dan D (hlm. 156)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Java Swing Tutorial lalu Tutorial GUI dengan Java Swing.",
+   "video": [
+    "iwW-5e5Rmrs",
+    "JMDNuZyD9nw"
+   ]
+  }
+ ],
+ "butir": [
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan komponen Swing dengan fungsinya.",
+   "pasangan": [
+    [
+     "JFrame",
+     "Jendela utama aplikasi"
+    ],
+    [
+     "JPanel",
+     "Wadah untuk mengelompokkan komponen"
+    ],
+    [
+     "JButton",
+     "Tombol yang bisa diklik"
+    ],
+    [
+     "JTextField",
+     "Kolom isian satu baris"
+    ],
+    [
+     "JTable",
+     "Menampilkan data dalam baris dan kolom"
+    ]
+   ],
+   "penjelasan": ""
+  },
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan layout manager dengan cara menatanya.",
+   "pasangan": [
+    [
+     "FlowLayout",
+     "Berurutan dari kiri ke kanan, pindah baris bila penuh"
+    ],
+    [
+     "BorderLayout",
+     "Lima area: utara, selatan, timur, barat, tengah"
+    ],
+    [
+     "GridLayout",
+     "Kisi baris dan kolom berukuran sama"
+    ]
+   ],
+   "penjelasan": ""
+  },
+  {
+   "tipe": "urutkan",
+   "tanya": "Susun alur ketika pengguna mengklik tombol Simpan.",
+   "langkah": [
+    "Pengguna mengklik tombol",
+    "Swing membuat objek ActionEvent",
+    "Listener yang terdaftar dipanggil (actionPerformed)",
+    "Handler membaca isi kolom dan memperbarui tampilan"
+   ],
+   "penjelasan": "Listener adalah penghubung antara kejadian dan kode yang menanganinya."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Kita bisa menulis tombol.addActionListener(e -> simpan()) karena ActionListener adalah ...",
+   "opsi": [
+    "functional interface (hanya satu method abstrak)",
+    "kelas abstrak",
+    "tipe primitif",
+    "pustaka eksternal"
+   ],
+   "benar": 0,
+   "penjelasan": "Lambda hanya cocok untuk interface dengan satu method abstrak."
+  },
+  {
+   "tipe": "isian",
+   "tanya": "Lengkapi: tombol.add______(e -> simpan());",
+   "jawaban": [
+    "ActionListener",
+    "actionlistener"
+   ],
+   "penjelasan": "addActionListener mendaftarkan listener klik."
+  },
+  {
+   "tipe": "banyak",
+   "tanya": "Pilih semua pernyataan yang benar.",
+   "opsi": [
+    "Komponen disusun di dalam container seperti JFrame atau JPanel",
+    "Jendela baru tampil setelah setVisible(true) dipanggil",
+    "JFrame selalu tampil otomatis tanpa setVisible",
+    "Listener memisahkan kejadian dari kode penanganannya"
+   ],
+   "benar": [
+    0,
+    1,
+    3
+   ],
+   "penjelasan": ""
+  }
+ ]
+}

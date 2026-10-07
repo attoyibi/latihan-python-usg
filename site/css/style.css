@@ -342,3 +342,39 @@ form.ganti-sandi{margin-top:18px;padding-top:14px;border-top:1px solid var(--lin
 .siap-banner .saran{margin:6px 0;padding-left:18px}
 .siap-banner .siap-aksi{margin-top:6px}
 .info-bar p{margin:0;flex:1 1 260px}
+.lap-kolom{margin:12px 0}
+.lap-bantu{margin:2px 0 6px;font-size:13px}
+.lap-area{min-height:90px;resize:vertical;font-size:15px}
+.lap-hitung{display:block;font-size:12px;margin-top:3px}
+.lap-hitung.cukup{color:var(--ok)}
+.lap-status{margin-left:10px}
+.butir{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--card)}
+.butir.benar{border-color:var(--ok);background:var(--ok-bg)}
+.butir.salah{border-color:var(--warn)}
+.butir-tanya{margin:0 0 8px}
+.butir-status.ok{color:var(--ok);font-weight:700;margin:6px 0 2px}
+.butir-status.no{color:var(--warn);font-weight:700;margin:6px 0 2px}
+.butir-kunci,.butir-penjelasan{margin:4px 0;font-size:13.5px}
+.pilihan-daftar{display:grid;gap:6px}
+.pilihan{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--soft)}
+.pilihan input{margin-top:3px}
+.pilihan:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.urutkan-daftar{margin:6px 0;padding-left:22px;display:grid;gap:6px}
+.urutkan-butir{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);cursor:grab}
+.urutkan-aksi{display:flex;gap:4px;flex-shrink:0}
+.seret-kolam{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:1px dashed var(--line);border-radius:10px;min-height:44px;margin-bottom:8px}
+.seret-chip{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);cursor:grab;text-align:left}
+.seret-chip.pilih{border-color:var(--brand);background:var(--brand-soft);outline:2px solid var(--brand)}
+.seret-slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.seret-slot{border:2px solid var(--line);border-radius:12px;padding:8px 10px;min-height:70px;background:var(--soft)}
+.seret-slot.sasaran{border-color:var(--brand);cursor:copy}
+.seret-isi{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.seret-judul{font-size:13.5px}
+.tabel-jawab input.input{padding:6px 8px;min-width:70px}
+.relasi-baris{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}
+.kotak-uml{border:2px solid var(--ink);border-radius:4px;padding:4px 10px;font-weight:700;background:var(--card)}
+.garis-uml{color:var(--muted)}
+.pilih-relasi{padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:13px}
+input.isian{max-width:420px}
+.lap-baca{margin:8px 0}
+.lap-baca p{margin:2px 0 8px;white-space:pre-wrap}

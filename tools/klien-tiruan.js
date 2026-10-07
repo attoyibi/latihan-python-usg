@@ -76,6 +76,18 @@
     save();
   }
 
+  // Laporan contoh (tab "Laporan" dashboard): satu ditulis wajar, satu isinya hampir tidak diketik, satu masih pendek.
+  if (!db.seed5) {
+    db.seed5 = true;
+    const bagian = (n) => "Kalimat jawaban peserta yang ditulis sendiri dengan susah payah. ".repeat(n).trim();
+    db.laporan = db.laporan || [];
+    const lap = (id, n, bab, jawaban, ketikan, tempel, durasi) => db.laporan.push({ id: "lap-" + id, user_id: "u-seed" + n, matakuliah_id: "algoritma-python", bab, jawaban, jumlah_ketikan: ketikan, percobaan_tempel: tempel, durasi_menulis_detik: durasi, kode_verifikasi: "DEMO" + String(id).padStart(4, "0"), status: "draf", dikumpulkan_pada: "2026-10-06T09:00:00Z", dibuat_pada: "2026-10-05T09:00:00Z", diperbarui_pada: "2026-10-06T09:00:00Z" });
+    lap(1, 2, 4, { tujuan: bagian(1), konsep: bagian(2), langkah: bagian(2), kendala: bagian(1), kesimpulan: bagian(1) }, { tujuan: 66, konsep: 130, langkah: 128, kendala: 64, kesimpulan: 60 }, 0, 780);
+    lap(2, 5, 5, { tujuan: bagian(1), konsep: bagian(2), langkah: bagian(2), kendala: bagian(1), kesimpulan: bagian(1) }, { tujuan: 4, konsep: 6, langkah: 3 }, 6, 40);
+    lap(3, 7, 6, { tujuan: "Belajar list." }, { tujuan: 13 }, 0, 25);
+    save();
+  }
+
   function klikTautan() {
     const p = db.pending;
     if (!p) return;
@@ -129,10 +141,10 @@
     const p = db.profiles[uidSaya()];
     return !!p && p.peran === "instruktur";
   };
-  const TABEL_DATA = { progres: ["user_id", "matakuliah_id", "bab"], percobaan: null };
+  const TABEL_DATA = { progres: ["user_id", "matakuliah_id", "bab"], laporan: ["user_id", "matakuliah_id", "bab"], percobaan: null };
   const kunci = (nama, r) => TABEL_DATA[nama].map((k) => r[k]).join("|");
   const bisaBaca = (nama, r) => {
-    if (nama === "perangkat_bersama") return instruktur();
+    if (nama === "perangkat_bersama" || nama === "penilaian_laporan") return instruktur();
     return instruktur() || (nama === "profiles" ? r.id === uidSaya() : r.user_id === uidSaya());
   };
 
@@ -196,6 +208,17 @@
         }
       }
       if (nama === "sesi_perangkat" && q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table sesi_perangkat" } };
+      if (nama === "penilaian_laporan" && q.op !== "select") {
+        if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
+        db.penilaian_laporan = db.penilaian_laporan || [];
+        for (const r of Array.isArray(q.rows) ? q.rows : [q.rows]) {
+          const ada = db.penilaian_laporan.findIndex((x) => x.laporan_id === r.laporan_id);
+          if (ada >= 0) db.penilaian_laporan[ada] = Object.assign({}, db.penilaian_laporan[ada], r);
+          else db.penilaian_laporan.push(r);
+        }
+        save();
+        return { data: null, error: null };
+      }
       if (nama === "perangkat_bersama" && q.op !== "select") {
         if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
         db.perangkat_bersama = db.perangkat_bersama || [];
@@ -209,9 +232,9 @@
         if (daftar.some((r) => r.user_id !== uidSaya())) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
         const tabelData = (db[nama] = db[nama] || []);
         for (const r of daftar) {
-          if (nama === "progres") {
-            const k = kunci("progres", r);
-            const ada = tabelData.findIndex((x) => kunci("progres", x) === k);
+          if (nama === "progres" || nama === "laporan") {
+            const k = kunci(nama, r);
+            const ada = tabelData.findIndex((x) => kunci(nama, x) === k);
             const baru = Object.assign({ jumlah_jalankan: 0, jumlah_kirim: 0, diperbarui_pada: new Date().toISOString() }, ada >= 0 ? tabelData[ada] : {}, r, { diperbarui_pada: new Date().toISOString() });
             if (ada >= 0) tabelData[ada] = baru;
             else tabelData.push(baru);

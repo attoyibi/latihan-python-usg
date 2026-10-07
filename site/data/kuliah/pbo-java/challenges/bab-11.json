@@ -1,0 +1,160 @@
+{
+ "bab": 11,
+ "jenis": "konsep",
+ "judul": "Koneksi basis data JDBC dan CRUD",
+ "soal": [
+  "Praktik JDBC dikerjakan di komputermu (MySQL atau MariaDB dan VS Code). Di sini kamu menguji pemahaman konsepnya lebih dulu.",
+  "Boleh diulang. Lulus bila 70 persen bagian benar; setelah lulus, jawaban dan penjelasannya ditampilkan."
+ ],
+ "rujukan": [
+  "Buku Bab XI, bagian B (arsitektur JDBC dan connection string), hlm. 140; bagian C (Statement, PreparedStatement, ResultSet), hlm. 141; bagian D (CRUD), hlm. 142; bagian E (pola DAO), hlm. 143.",
+  "Video: Tutorial Java Database (Programmer Zaman Now) dan Java CRUD MySQL MVC Bagian 1 (Abas Setiawan).",
+  "Clue: bagian F, Praktikum Terbimbing di Bab 11, mengerjakan BookDAO lengkap terhadap basis data sip_usg."
+ ],
+ "lulus": 0.7,
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Ingat alurnya: sambung, siapkan perintah, isi parameter, jalankan, baca hasil, tutup."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XI bagian C (hlm. 141) dan D (hlm. 142)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Tutorial Java Database dan CRUD MySQL MVC bagian 1.",
+   "video": [
+    "_25BmjGfjQQ",
+    "nnQTqEgJUVM"
+   ]
+  }
+ ],
+ "butir": [
+  {
+   "tipe": "urutkan",
+   "tanya": "Susun langkah menjalankan satu perintah SQL dengan JDBC.",
+   "langkah": [
+    "Buat Connection ke basis data dengan URL-nya",
+    "Siapkan PreparedStatement dengan tanda tanya sebagai parameter",
+    "Isi parameter dengan setString atau setInt",
+    "Jalankan dengan executeQuery atau executeUpdate",
+    "Baca ResultSet baris demi baris (untuk SELECT)",
+    "Tutup ResultSet, PreparedStatement, dan Connection"
+   ],
+   "penjelasan": "Sumber daya harus ditutup; try-with-resources membuatnya otomatis."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "PreparedStatement lebih aman daripada Statement biasa karena ...",
+   "opsi": [
+    "parameter dipisahkan dari teks SQL sehingga mencegah SQL injection",
+    "ia berjalan lebih cepat selalu",
+    "ia tidak butuh koneksi",
+    "ia menyimpan sandi secara otomatis"
+   ],
+   "benar": 0,
+   "penjelasan": "Nilai parameter tidak pernah dianggap bagian dari perintah SQL, jadi masukan jahat tidak bisa mengubah makna perintah."
+  },
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan kelas atau interface JDBC dengan fungsinya.",
+   "pasangan": [
+    [
+     "Connection",
+     "Sambungan ke basis data"
+    ],
+    [
+     "PreparedStatement",
+     "Perintah SQL berparameter"
+    ],
+    [
+     "ResultSet",
+     "Hasil query yang dibaca baris demi baris"
+    ],
+    [
+     "DriverManager",
+     "Membuat Connection dari URL basis data"
+    ]
+   ],
+   "penjelasan": ""
+  },
+  {
+   "tipe": "seret",
+   "tanya": "Seret setiap perintah SQL ke operasi CRUD-nya.",
+   "wadah": [
+    {
+     "id": "c",
+     "nama": "Create"
+    },
+    {
+     "id": "r",
+     "nama": "Read"
+    },
+    {
+     "id": "u",
+     "nama": "Update"
+    },
+    {
+     "id": "d",
+     "nama": "Delete"
+    }
+   ],
+   "butir": [
+    {
+     "teks": "INSERT INTO books (title) VALUES (?)",
+     "wadah": "c"
+    },
+    {
+     "teks": "SELECT * FROM books",
+     "wadah": "r"
+    },
+    {
+     "teks": "UPDATE books SET title = ? WHERE id = ?",
+     "wadah": "u"
+    },
+    {
+     "teks": "DELETE FROM books WHERE id = ?",
+     "wadah": "d"
+    }
+   ],
+   "penjelasan": "Create = INSERT, Read = SELECT, Update = UPDATE, Delete = DELETE."
+  },
+  {
+   "tipe": "isian",
+   "tanya": "Kata kunci SQL untuk mengubah data yang sudah ada di tabel adalah ...",
+   "jawaban": [
+    "update"
+   ],
+   "penjelasan": "UPDATE ... SET ... WHERE ..."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Pola DAO dipakai untuk ...",
+   "opsi": [
+    "memisahkan kode akses data dari logika dan tampilan",
+    "mempercepat jaringan",
+    "menggantikan basis data",
+    "membuat tampilan lebih indah"
+   ],
+   "benar": 0,
+   "penjelasan": "DAO menyembunyikan detail SQL di balik method seperti findById dan save."
+  },
+  {
+   "tipe": "banyak",
+   "tanya": "Pilih semua pernyataan yang benar.",
+   "opsi": [
+    "Tanpa WHERE, UPDATE mengubah semua baris",
+    "ResultSet dan Connection perlu ditutup setelah dipakai",
+    "Menggabung input pengguna langsung ke teks SQL itu aman",
+    "Connection string memuat alamat server dan nama basis data"
+   ],
+   "benar": [
+    0,
+    1,
+    3
+   ],
+   "penjelasan": "Menggabung input ke SQL membuka SQL injection; gunakan parameter."
+  }
+ ]
+}

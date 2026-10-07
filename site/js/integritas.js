@@ -159,7 +159,8 @@ export function analisis({ peserta, sesi = [], bersama = [], percobaan = [], tem
   // ---- Kemiripan antar peserta ----
   const pasangan = [];
   const perBab = new Map();
-  for (const p of kirim) if (p.kode) (perBab.get(p.bab) || perBab.set(p.bab, []).get(p.bab)).push(p);
+  // Jawaban tantangan konsep (pola.jenis konsep) tidak dibandingkan: pilihannya terbatas sehingga jawaban yang sama itu wajar.
+  for (const p of kirim) if (p.kode && !(p.pola && p.pola.jenis === "konsep")) (perBab.get(p.bab) || perBab.set(p.bab, []).get(p.bab)).push(p);
   for (const [bab, daftar] of perBab) {
     const totalPeserta = new Set(daftar.map((x) => x.user_id)).size;
     // (a) percobaan SALAH yang persis sama. Kode awal yang belum diubah dan kesalahan umum dipakai banyak orang, jadi

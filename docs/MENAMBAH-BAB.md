@@ -73,3 +73,7 @@ python -m http.server 8000
 ```
 
 Buka `http://localhost:8000/#k/algoritma-python/bab-4`.
+
+## Bab berjenis konsep (tanpa kode)
+
+Untuk bab teori seperti UML atau flowchart, set `"jenis": "konsep"` dan `"challenge": true` di materi.json, lalu buat `challenges/bab-NN.json` berisi `jenis: "konsep"`, `lulus` (bawaan 0.7), `petunjuk` 3 tingkat, `rujukan`, dan `butir[]`. Tipe butir: `pilgan`, `banyak`, `urutkan`, `cocokkan`, `seret` (seret ke wadah), `isian`, `tabel` (penelusuran), `relasi` (UML dengan multiplisitas). Peserta lulus pada skor 70 persen, boleh mengulang tanpa batas, pilihan diacak, dan kunci serta penjelasan baru tampil setelah lulus. Contoh: algoritma-python bab 3 dan pbo-java bab 4. `python tools/validasi_konten.py` memeriksa konsistensi butir (kunci ada di opsi, pasangan unik, wadah ada) dan `node tools/uji_konsep.mjs` menguji penilaiannya.

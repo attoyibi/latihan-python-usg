@@ -1,0 +1,159 @@
+{
+ "bab": 15,
+ "jenis": "konsep",
+ "judul": "Integrasi konsep dalam proyek",
+ "soal": [
+  "Bab penutup: merakit SIP-USG dari seluruh konsep. Praktiknya adalah proyek akhirmu; di sini kamu menguji peta integrasinya.",
+  "Boleh diulang. Lulus bila 70 persen bagian benar; setelah lulus, jawaban dan penjelasannya ditampilkan."
+ ],
+ "rujukan": [
+  "Buku Bab XV, bagian B (peta integrasi seluruh konsep), hlm. 198; bagian C (tahapan pengembangan proyek); bagian D (dokumentasi dan etika kolaborasi), hlm. 202; bagian E (presentasi), hlm. 203.",
+  "Clue: bagian F, Praktikum Terbimbing di Bab 15, merakit SIP-USG versi akhir dan menyiapkan demonstrasi."
+ ],
+ "lulus": 0.7,
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Ingat pembagian tanggung jawab: model menyimpan data, view menampilkan, controller menghubungkan, DAO mengurus basis data."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab XV bagian B (peta integrasi, hlm. 198) dan D (dokumentasi, hlm. 202)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Bab ini tidak punya video khusus; tonton ulang video bab yang paling kamu rasa lemah.",
+   "video": []
+  }
+ ],
+ "butir": [
+  {
+   "tipe": "seret",
+   "tanya": "Seret setiap bagian SIP-USG ke lapisan MVC tempatnya.",
+   "wadah": [
+    {
+     "id": "model",
+     "nama": "Model (data dan aturan)"
+    },
+    {
+     "id": "view",
+     "nama": "View (tampilan)"
+    },
+    {
+     "id": "controller",
+     "nama": "Controller (penghubung)"
+    },
+    {
+     "id": "dao",
+     "nama": "DAO (akses basis data)"
+    }
+   ],
+   "butir": [
+    {
+     "teks": "Kelas Book dan Member dengan atribut private",
+     "wadah": "model"
+    },
+    {
+     "teks": "Form Swing BookFormFrame",
+     "wadah": "view"
+    },
+    {
+     "teks": "BookController yang menerima klik dari form",
+     "wadah": "controller"
+    },
+    {
+     "teks": "BookDAOImpl dengan PreparedStatement",
+     "wadah": "dao"
+    }
+   ],
+   "penjelasan": "Pemisahan lapisan membuat tiap bagian bisa diubah tanpa merusak yang lain."
+  },
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan konsep dengan bab tempat konsep itu dibahas.",
+   "pasangan": [
+    [
+     "Enkapsulasi",
+     "Bab 3"
+    ],
+    [
+     "Pewarisan",
+     "Bab 5"
+    ],
+    [
+     "Abstraksi (interface)",
+     "Bab 7"
+    ],
+    [
+     "Penanganan eksepsi",
+     "Bab 8"
+    ],
+    [
+     "JDBC",
+     "Bab 11"
+    ]
+   ],
+   "penjelasan": ""
+  },
+  {
+   "tipe": "urutkan",
+   "tanya": "Susun tahapan pengembangan proyek.",
+   "langkah": [
+    "Analisis kebutuhan",
+    "Perancangan (diagram kelas)",
+    "Implementasi (kode)",
+    "Pengujian",
+    "Dokumentasi dan presentasi"
+   ],
+   "penjelasan": ""
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Dalam kerja tim, etika yang benar adalah ...",
+   "opsi": [
+    "mencantumkan sumber dan pembagian kerja tiap anggota",
+    "mengakui semua pekerjaan sebagai milikmu",
+    "menyalin kode tanpa menyebut sumber",
+    "menyembunyikan siapa mengerjakan apa"
+   ],
+   "benar": 0,
+   "penjelasan": "Kejujuran tentang sumber dan kontribusi adalah dasar kolaborasi."
+  },
+  {
+   "tipe": "banyak",
+   "tanya": "Pilih semua isi dokumentasi proyek yang baik.",
+   "opsi": [
+    "README berisi cara menjalankan",
+    "Diagram kelas",
+    "Daftar fitur yang berjalan",
+    "Kata sandi basis data asli di repositori publik"
+   ],
+   "benar": [
+    0,
+    1,
+    2
+   ],
+   "penjelasan": "Jangan pernah menaruh kata sandi asli di repositori publik."
+  },
+  {
+   "tipe": "isian",
+   "tanya": "Pola desain yang menjamin hanya ada satu objek koneksi basis data adalah ...",
+   "jawaban": [
+    "singleton"
+   ],
+   "penjelasan": "Singleton menyediakan satu instance yang diakses lewat getInstance()."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Huruf O pada SOLID adalah singkatan dari ...",
+   "opsi": [
+    "Open-Closed Principle",
+    "Object Oriented",
+    "Overload Operator",
+    "Optional Output"
+   ],
+   "benar": 0,
+   "penjelasan": ""
+  }
+ ]
+}

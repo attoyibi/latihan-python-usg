@@ -98,16 +98,18 @@ def cek_materi(c):
         for k in ("bab", "judul", "ringkasan", "video", "jenis"):
             if k not in m:
                 err(f"{w}: kolom '{k}' tidak ada")
-        if m.get("jenis") not in ("kode", "unggah"):
-            err(f"{w}: 'jenis' harus 'kode' atau 'unggah'")
+        if m.get("jenis") not in ("kode", "konsep", "unggah"):
+            err(f"{w}: 'jenis' harus 'kode', 'konsep', atau 'unggah'")
         if m.get("jenis") == "kode" and not c.get("bahasa"):
             err(f"{w}: bab berjenis kode, tetapi mata kuliah tidak punya bahasa")
         babs.append(m.get("bab"))
         b = m.get("buku")
         if b is not None and "halaman" in b and not isinstance(b["halaman"], int):
             err(f"{w}: buku.halaman harus angka")
-        if not m.get("video") and m.get("jenis") != "unggah":
-            err(f"{w}: minimal satu video (bab berjenis unggah boleh tanpa video)")
+        if not m.get("video") and m.get("jenis") == "kode":
+            err(f"{w}: minimal satu video (bab berjenis konsep atau unggah boleh tanpa video)")
+        if "pertanyaanKonsep" in m and (not isinstance(m["pertanyaanKonsep"], str) or len(m["pertanyaanKonsep"].strip()) < 20):
+            err(f"{w}: pertanyaanKonsep harus teks (pertanyaan untuk kolom konsep laporan)")
         for v in m.get("video", []):
             if not re.fullmatch(r"[A-Za-z0-9_-]{11}", v.get("id", "")):
                 err(f"{w}: id video YouTube tidak valid: {v.get('id')!r}")
@@ -118,6 +120,89 @@ def cek_materi(c):
     for m in materi:
         if m.get("challenge"):
             cek_challenge(cid, m["bab"])
+
+
+def cek_konsep(w, ch):
+    """Tantangan konsep: tiap butir harus konsisten (kunci ada di pilihan, pasangan unik, wadah ada, dst.)."""
+    for k in ("judul", "soal", "petunjuk", "butir", "rujukan"):
+        if k not in ch:
+            err(f"{w}: kolom '{k}' tidak ada")
+    jenis = [p.get("jenis") for p in ch.get("petunjuk", [])]
+    if jenis != ["teks", "buku", "video"]:
+        err(f"{w}: petunjuk harus berurutan teks, buku, video (ada {jenis})")
+    ruj = ch.get("rujukan")
+    if not isinstance(ruj, list) or not ruj or not all(isinstance(x, str) and x.strip() for x in ruj):
+        err(f"{w}: 'rujukan' wajib berupa daftar teks tidak kosong")
+    lulus = ch.get("lulus", 0.7)
+    if not isinstance(lulus, (int, float)) or not (0 < lulus <= 1):
+        err(f"{w}: 'lulus' harus antara 0 dan 1")
+    butir = ch.get("butir", [])
+    if len(butir) < 4:
+        err(f"{w}: minimal 4 butir (ada {len(butir)})")
+    for i, b in enumerate(butir, 1):
+        x = f"{w}: butir {i}"
+        t = b.get("tipe")
+        if not isinstance(b.get("tanya"), str) or not b["tanya"].strip():
+            err(f"{x}: 'tanya' kosong")
+        if t == "pilgan":
+            op = b.get("opsi", [])
+            if len(op) < 2 or len(set(op)) != len(op):
+                err(f"{x}: opsi harus minimal 2 dan unik")
+            if not isinstance(b.get("benar"), int) or not (0 <= b["benar"] < len(op)):
+                err(f"{x}: 'benar' harus indeks opsi")
+        elif t == "banyak":
+            op = b.get("opsi", [])
+            br = b.get("benar", [])
+            if len(op) < 3 or len(set(op)) != len(op):
+                err(f"{x}: opsi harus minimal 3 dan unik")
+            if not br or not all(isinstance(k, int) and 0 <= k < len(op) for k in br) or len(set(br)) != len(br):
+                err(f"{x}: 'benar' harus daftar indeks opsi yang unik dan tidak kosong")
+            if len(br) == len(op):
+                err(f"{x}: semua opsi benar, tidak ada yang menguji")
+        elif t == "urutkan":
+            lg = b.get("langkah", [])
+            if len(lg) < 3 or len(set(lg)) != len(lg):
+                err(f"{x}: langkah minimal 3 dan unik")
+        elif t == "cocokkan":
+            ps = b.get("pasangan", [])
+            if len(ps) < 3 or any(not isinstance(p, list) or len(p) != 2 for p in ps):
+                err(f"{x}: pasangan minimal 3, masing-masing [kiri, kanan]")
+            else:
+                if len({p[0] for p in ps}) != len(ps) or len({p[1] for p in ps}) != len(ps):
+                    err(f"{x}: sisi kiri dan kanan pasangan harus unik")
+        elif t == "seret":
+            wd = {k.get("id") for k in b.get("wadah", [])}
+            br = b.get("butir", [])
+            if len(wd) < 2:
+                err(f"{x}: minimal 2 wadah")
+            if len(br) < 3 or len({k.get("teks") for k in br}) != len(br):
+                err(f"{x}: butir minimal 3 dan teksnya unik")
+            for k in br:
+                if k.get("wadah") not in wd:
+                    err(f"{x}: butir '{k.get('teks')}' menunjuk wadah yang tidak ada")
+            if len({k.get("wadah") for k in br}) < 2:
+                err(f"{x}: butir harus tersebar ke minimal 2 wadah")
+        elif t == "isian":
+            if not b.get("jawaban") or not all(isinstance(a, str) and a.strip() for a in b["jawaban"]):
+                err(f"{x}: 'jawaban' harus daftar teks tidak kosong")
+        elif t == "tabel":
+            kol = b.get("kolom", [])
+            for br in b.get("baris", []):
+                if len(br.get("sel", [])) != len(kol):
+                    err(f"{x}: jumlah sel baris '{br.get('label')}' tidak sama dengan jumlah kolom")
+            if not b.get("baris"):
+                err(f"{x}: baris kosong")
+        elif t == "relasi":
+            if not b.get("relasi") or not b.get("multiplisitas") or not b.get("pasangan"):
+                err(f"{x}: relasi, multiplisitas, dan pasangan wajib ada")
+            for p in b.get("pasangan", []):
+                if p.get("benar") not in b.get("relasi", []):
+                    err(f"{x}: relasi benar '{p.get('benar')}' tidak ada di daftar relasi")
+                for sisi in ("a", "b"):
+                    if sisi in p and p[sisi] not in b.get("multiplisitas", []):
+                        err(f"{x}: multiplisitas '{p[sisi]}' tidak ada di daftar")
+        else:
+            err(f"{x}: tipe tidak dikenal: {t!r}")
 
 
 def cek_challenge(cid, bab):
@@ -131,6 +216,9 @@ def cek_challenge(cid, bab):
     w = f"kuliah/{cid}/challenges/{path.name}"
     if ch.get("bab") != bab:
         err(f"{w}: kolom 'bab' harus {bab}")
+    if ch.get("jenis") == "konsep":
+        cek_konsep(w, ch)
+        return
     for k in ("judul", "soal", "starter", "petunjuk", "tests"):
         if k not in ch:
             err(f"{w}: kolom '{k}' tidak ada")

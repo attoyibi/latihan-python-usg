@@ -1,0 +1,163 @@
+{
+ "bab": 3,
+ "jenis": "konsep",
+ "judul": "Flowchart, pseudocode, dan penelusuran",
+ "soal": [
+  "Bab ini tidak berisi kode Python. Kamu menguji pemahaman rancangan: simbol flowchart, urutan langkah pseudocode, dan penelusuran dengan tangan.",
+  "Kamu boleh mengulang sebanyak yang kamu mau. Lulus bila 70 persen bagian benar; setelah lulus, jawaban yang benar dan penjelasannya ditampilkan."
+ ],
+ "rujukan": [
+  "Buku Bab III, bagian C (flowchart: simbol baku dan artinya), hlm. 76; bagian D (pseudocode); bagian E (cabang dan ulangan); bagian F (penelusuran).",
+  "Video: Mengenal Pseudocode (CodePolitan) dan Flowchart Looping dan Contoh Sehari-hari (Blank Stuck).",
+  "Clue: bagian H, Praktikum Terbimbing di Bab 3, memberi contoh penelusuran yang bisa kamu tiru."
+ ],
+ "lulus": 0.7,
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Kerjakan yang kamu yakin dulu. Soal seret dan urutkan boleh diubah berkali-kali sebelum diperiksa."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab III bagian C (simbol, hlm. 76), D (pseudocode), dan F (penelusuran)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Mengenal Pseudocode, lalu Flowchart Looping dan Contoh Sehari-hari.",
+   "video": [
+    "Qf4Npdwar_s",
+    "ld6F5qCg84o"
+   ]
+  }
+ ],
+ "butir": [
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan simbol flowchart dengan artinya.",
+   "pasangan": [
+    [
+     "Oval (terminator)",
+     "Awal atau akhir program"
+    ],
+    [
+     "Jajar genjang",
+     "Masukan atau keluaran data"
+    ],
+    [
+     "Persegi panjang",
+     "Proses atau perhitungan"
+    ],
+    [
+     "Belah ketupat",
+     "Keputusan dengan jalur ya dan tidak"
+    ],
+    [
+     "Panah",
+     "Arah alur"
+    ]
+   ],
+   "penjelasan": "Bentuk simbol menunjukkan jenis langkahnya, jadi orang lain bisa membaca alur tanpa penjelasan tambahan."
+  },
+  {
+   "tipe": "urutkan",
+   "tanya": "Susun pseudocode potongan harga UD Rasa Gresik ini ke urutan yang benar.",
+   "langkah": [
+    "Mulai",
+    "Baca jumlah_boks dan harga_satuan",
+    "Hitung total_kotor = jumlah_boks x harga_satuan",
+    "Tentukan potongan: 12 persen bila 100 boks atau lebih, 8 persen bila 50 boks atau lebih, selain itu 0",
+    "Hitung total_bayar = total_kotor dikurangi potongan",
+    "Tampilkan total_bayar",
+    "Selesai"
+   ],
+   "penjelasan": "Data harus dibaca sebelum dihitung, dan potongan harus ditentukan sebelum dikurangkan."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Kotak keputusan (belah ketupat) pada flowchart harus punya ...",
+   "opsi": [
+    "dua jalur keluar yang diberi label ya dan tidak",
+    "satu jalur keluar saja",
+    "tiga jalur keluar tanpa label",
+    "tidak ada jalur masuk"
+   ],
+   "benar": 0,
+   "penjelasan": "Keputusan bercabang; setiap cabang harus jelas dan diberi label."
+  },
+  {
+   "tipe": "tabel",
+   "tanya": "Telusuri dengan tangan. Pseudocode: total = 0; ulangi untuk i dari 1 sampai 3: total = total + i x 10. Isi nilai i, total sebelum, dan total sesudah tiap putaran.",
+   "kolom": [
+    "i",
+    "total sebelum",
+    "total sesudah"
+   ],
+   "baris": [
+    {
+     "label": "Putaran 1",
+     "sel": [
+      "1",
+      "0",
+      "10"
+     ]
+    },
+    {
+     "label": "Putaran 2",
+     "sel": [
+      "2",
+      "10",
+      "30"
+     ]
+    },
+    {
+     "label": "Putaran 3",
+     "sel": [
+      "3",
+      "30",
+      "60"
+     ]
+    }
+   ],
+   "penjelasan": "Total sesudah putaran ini menjadi total sebelum pada putaran berikutnya."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Penelusuran dengan tangan berguna terutama untuk ...",
+   "opsi": [
+    "menemukan kesalahan logika sebelum kode ditulis",
+    "mempercepat komputer",
+    "mengganti kebutuhan menulis kode",
+    "mengurangi ukuran berkas"
+   ],
+   "benar": 0,
+   "penjelasan": "Menjalankan rancangan di atas kertas membuat kesalahan terlihat sebelum biayanya mahal."
+  },
+  {
+   "tipe": "isian",
+   "tanya": "Pesanan 120 boks dengan harga 35000 per boks mendapat potongan 12 persen. Berapa total_bayar? (angka saja)",
+   "jawaban": [
+    "3696000",
+    "3.696.000",
+    "3,696,000"
+   ],
+   "penjelasan": "Kotor 120 x 35000 = 4.200.000; potongan 12 persen = 504.000; bayar 3.696.000."
+  },
+  {
+   "tipe": "banyak",
+   "tanya": "Pilih semua ciri pseudocode yang baik.",
+   "opsi": [
+    "Tidak terikat sintaks bahasa pemrograman tertentu",
+    "Langkahnya berurutan dan jelas",
+    "Harus bisa langsung dijalankan oleh Python",
+    "Memakai kalimat terstruktur",
+    "Boleh memuat langkah yang ambigu"
+   ],
+   "benar": [
+    0,
+    1,
+    3
+   ],
+   "penjelasan": "Pseudocode adalah rancangan yang terbaca manusia; tidak perlu dieksekusi dan tidak boleh ambigu."
+  }
+ ]
+}

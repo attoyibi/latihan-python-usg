@@ -3,6 +3,8 @@ import { startJava, javaSiap, javaGagal, javaMulaiPada, ulangiJava, onJavaReadyC
 import * as Kemajuan from "./kemajuan.js";
 import * as Anticopas from "./anticopas.js";
 import * as Rekam from "./rekam.js";
+import { laporanCard } from "./laporan.js";
+import * as Konsep from "./konsep.js";
 import { idPerangkat, agenRingkas } from "./perangkat.js";
 import { grade } from "./grader.js";
 import * as Auth from "./auth.js";
@@ -129,7 +131,7 @@ async function hidrasi() {
         return;
       }
       const perBab = new Map(baris.map((r) => [Number(r.bab), r]));
-      for (const m of kuliah.materi.filter((x) => x.jenis === "kode")) {
+      for (const m of kuliah.materi.filter((x) => x.jenis !== "unggah")) {
         const r = perBab.get(m.bab);
         if (r) {
           if (r.status === "selesai" && !store.get(kunciDi(c.id, "done", m.bab), false)) {
@@ -312,17 +314,107 @@ function rujukanBox(list) {
   return kotakLipat("rujukan", "rujukan", "Belajar dari", h("ul", {}, list.map((t) => h("li", {}, t))));
 }
 
-function tugasCard(m) {
+// ---------- Tantangan konsep (tanpa kode) ----------
+
+function konsepCard(m, ch) {
+  if (!ch) return h("section", { class: "card soal" }, h("h3", {}, "Tantangan konsep"), h("p", { class: "muted" }, "Tantangan untuk bab ini belum disiapkan."));
+  const butir = ch.butir;
+  const mulai = Date.now();
+  const draf = store.get(key("konsepDraf", m.bab), []);
+  let timerDraf = null;
+  const hasilBox = h("div", { "aria-live": "polite" });
+  const periksa = h("button", { type: "button", class: "btn btn-primary" }, "Periksa jawaban");
+  const kosongkan = h("button", { type: "button", class: "btn btn-ghost" }, "Kosongkan jawaban");
+  const simpanDraf = () => {
+    clearTimeout(timerDraf);
+    timerDraf = setTimeout(() => store.set(key("konsepDraf", m.bab), items.map((x) => x.ambil())), 400);
+  };
+  const items = butir.map((b, i) =>
+    Konsep.buatButir(b, i + 1, draf[i], () => {
+      markStarted(m.bab);
+      simpanDraf();
+    })
+  );
+
+  // Petunjuk bertahap, sama seperti tantangan kode.
+  const hintBox = h("div", {});
+  let hintShown = store.get(key("hint", m.bab), 0);
+  const hintBtn = h("button", { type: "button", class: "btn btn-sm" });
+  const renderHints = () => {
+    hintBox.replaceChildren();
+    ch.petunjuk.slice(0, hintShown).forEach((p, i) => hintBox.append(h("div", { class: "hint" }, h("strong", {}, ["Petunjuk soal", "Baca di buku", "Tonton video"][i] + ": "), p.isi)));
+    hintBtn.textContent = hintShown >= ch.petunjuk.length ? "Semua petunjuk sudah dibuka" : "Butuh petunjuk? (" + hintShown + " dari " + ch.petunjuk.length + ")";
+    hintBtn.disabled = hintShown >= ch.petunjuk.length;
+  };
+  hintBtn.addEventListener("click", () => {
+    hintShown++;
+    store.set(key("hint", m.bab), hintShown);
+    renderHints();
+  });
+
+  periksa.addEventListener("click", () => {
+    markStarted(m.bab);
+    const jawaban = items.map((x) => x.ambil());
+    const nilai = Konsep.nilaiSemua(butir, jawaban);
+    const tries = store.get(key("tries", m.bab), 0) + 1;
+    store.set(key("tries", m.bab), tries);
+    store.set(key("konsepDraf", m.bab), jawaban);
+    const sudah = isDone(m.bab);
+    const persen = Math.round(nilai.persen * 100);
+    // Jawaban benar dan penjelasannya baru ditampilkan setelah lulus (atau bila sudah pernah lulus), supaya tidak sekadar disalin.
+    items.forEach((x, i) => x.tandai(nilai.per[i], nilai.lulus || sudah));
+    hasilBox.replaceChildren(h("div", { class: "verdict " + (nilai.lulus ? "pass" : "fail") }, nilai.lulus ? "Lulus. Skor " + persen + " persen (" + nilai.benar + " dari " + nilai.total + " bagian benar). Jawaban dan penjelasan ditampilkan di tiap soal." : "Belum lulus: skor " + persen + " persen (" + nilai.benar + " dari " + nilai.total + " bagian benar). Butuh " + Math.round(Konsep.AMBANG_LULUS * 100) + " persen. Perbaiki soal yang bertanda salah, lalu periksa lagi."));
+    if (nilai.lulus && !sudah) {
+      store.set(key("done", m.bab), true);
+      store.set(key("lulus", m.bab), new Date().toISOString());
+      store.set(key("jalur", m.bab), store.get(key("hint", m.bab), 0) > 0 ? "bantuan" : "langsung");
+      renderSidebar();
+      $("#statusLine").textContent = "Bab " + m.bab + " - " + STATUS_TEXT.selesai;
+      const em = $("#statusLine").previousSibling;
+      if (em) em.className = "st selesai";
+    }
+    store.set(key("kirimTerakhir", m.bab), { konsep: true, lulus: nilai.lulus, persen, kasus_lulus: nilai.benar, kasus_total: nilai.total, waktu: new Date().toISOString() });
+    Sinkron.catat(COURSE.id, m.bab, { lulus: nilai.lulus, kasus_lulus: nilai.benar, kasus_total: nilai.total, kasus_gagal: nilai.butirSalah, kode: JSON.stringify(jawaban), pola: { jenis: "konsep", butir: butir.length, durasi_s: Math.round((Date.now() - mulai) / 1000), petunjuk: hintShown, percobaan_ke: tries } });
+    sinkronBab(m.bab);
+  });
+  kosongkan.addEventListener("click", () => {
+    if (!confirm("Semua jawabanmu di soal ini akan dikosongkan. Lanjutkan?")) return;
+    store.set(key("konsepDraf", m.bab), []);
+    renderBab(m.bab);
+  });
+  renderHints();
+
+  const kartu = h(
+    "section",
+    { class: "card soal", "aria-label": "Tantangan konsep" },
+    h("h3", {}, "Tantangan konsep: " + ch.judul),
+    ch.soal.map((p) => h("p", {}, p)),
+    rujukanBox(ch.rujukan),
+    ...items.map((x) => x.el),
+    h("div", { class: "actions" }, periksa, kosongkan),
+    hasilBox,
+    h("div", { class: "actions" }, hintBtn),
+    hintBox
+  );
+  Anticopas.blokirSalinTempel(kartu, {
+    lokasi: "konsep",
+    kecualikan: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur",
+    saatTempel: (lokasi) => Sinkron.aktivitas(COURSE.id, m.bab, "tempel_diblokir", { lokasi }),
+  });
+  return kartu;
+}
+
+function tugasCard(m, praktik) {
   const t = m.tugas;
   if (!t) return h("section", { class: "card" }, h("h3", {}, "Kumpulkan tugas"), h("div", { class: "placeholder" }, "Bab ini tidak memakai kode. Kamu akan mengumpulkan foto atau PDF flowchart dan pseudocode. Fitur unggah dibuat pada Tahap 7."));
   return h(
     "section",
     { class: "card soal", "aria-label": "Tugas rancangan" },
-    h("h3", {}, "Tugas: " + t.judul),
+    h("h3", {}, (praktik ? "Tugas praktik: " : "Tugas: ") + t.judul),
     t.soal.map((p) => h("p", {}, p)),
     rujukanBox(t.rujukan),
     t.kriteria ? h("div", {}, h("strong", {}, "Yang dinilai:"), h("ul", {}, t.kriteria.map((k) => h("li", {}, k)))) : null,
-    h("div", { class: "placeholder" }, "Fitur unggah foto atau PDF dibuat pada Tahap 7. Untuk sementara siapkan berkasnya.")
+    h("div", { class: "placeholder" }, praktik ? "Kerjakan di komputermu, lalu kumpulkan hasilnya (berkas dan tangkapan layar) lewat sistem pengumpulan kampus bersama PDF laporan di bawah. Laporan tetap bisa diekspor kapan saja." : "Fitur unggah foto atau PDF dibuat pada Tahap 7. Untuk sementara siapkan berkasnya.")
   );
 }
 
@@ -478,6 +570,7 @@ function challengeCard(m, ch) {
     const all = passed === ch.tests.length;
     const tries = store.get(key("tries", m.bab), 0) + 1;
     store.set(key("tries", m.bab), tries);
+    store.set(key("kirimTerakhir", m.bab), { kode: kodeKirim, lulus: all, kasus_lulus: passed, kasus_total: ch.tests.length, waktu: new Date().toISOString() });
     Sinkron.catat(COURSE.id, m.bab, { lulus: all, kasus_lulus: passed, kasus_total: ch.tests.length, kasus_gagal: res.map((r, i) => (r.status === "pass" ? 0 : i + 1)).filter((x) => x > 0), kode: kodeKirim, pola: rk && rk.pola, rekaman: rk && rk.rekaman });
     result.replaceChildren(
       h("div", { class: "verdict " + (all ? "pass" : "fail") }, all ? "Lulus. Semua " + ch.tests.length + " kasus cocok." : "Belum lulus: " + passed + " dari " + ch.tests.length + " kasus cocok."),
@@ -559,6 +652,22 @@ function challengeCard(m, ch) {
   return card;
 }
 
+// Lampiran PDF: kiriman terakhir (walaupun belum lulus) atau, bila belum pernah mengirim, kode di editor saat ini.
+function lampiranLaporan(m, ch) {
+  if (m.jenis === "unggah" || !ch) return null;
+  const k = store.get(key("kirimTerakhir", m.bab), null);
+  if (m.jenis === "konsep") {
+    if (!k) return { tipe: "konsep", judul: "hasil tantangan konsep", isi: "", hasil: "Belum pernah memeriksa jawaban tantangan konsep." };
+    return { tipe: "konsep", judul: "hasil tantangan konsep", isi: "", hasil: "Skor terakhir " + k.persen + " persen (" + k.kasus_lulus + " dari " + k.kasus_total + " bagian benar): " + (k.lulus ? "lulus." : "belum lulus.") };
+  }
+  if (k) {
+    const hasil = k.lulus ? "Hasil: lulus, semua " + k.kasus_total + " kasus uji cocok." : "Hasil: belum lulus, " + k.kasus_lulus + " dari " + k.kasus_total + " kasus uji cocok.";
+    return { tipe: "kode", judul: "kode terakhir yang dikirim", isi: k.kode, hasil };
+  }
+  const draf = store.get(key("draft", m.bab), null);
+  return { tipe: "kode", judul: "kode di editor (belum pernah dikirim)", isi: draf || (ch ? ch.starter : ""), hasil: "Belum pernah dikirim untuk dinilai." };
+}
+
 async function renderBab(n) {
   const m = MATERI.find((x) => x.bab === n);
   if (!m) {
@@ -587,9 +696,24 @@ async function renderBab(n) {
       } }, "Mengerti"))
     : null;
   const vc = videoCard(m);
-  const isi = m.jenis === "unggah" ? tugasCard(m) : challengeCard(m, ch);
+  const isi = m.jenis === "kode" ? challengeCard(m, ch) : m.jenis === "konsep" ? konsepCard(m, ch) : tugasCard(m);
   const cols = h("div", { class: "cols" }, vc, isi);
-  const bar = Tata.pasang(cols, vc, TATA, { punyaVideo: !!(m.video && m.video.length), punyaEditor: m.jenis !== "unggah", ambilEditor: () => editor });
+  const profilLap = Auth.getProfile() || { nama: "(tanpa akun)", nim: "-", kelas: "-" };
+  const laporan = laporanCard({
+    store,
+    kunci: key("laporan", m.bab),
+    mataKuliah: { id: COURSE.id, nama: COURSE.nama },
+    bab: m.bab,
+    judul: m.judul,
+    pertanyaan: m.pertanyaanKonsep,
+    profil: profilLap,
+    instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur",
+    simpanKeServer: (baris) => Sinkron.laporan(COURSE.id, m.bab, baris),
+    catatTempel: () => Sinkron.aktivitas(COURSE.id, m.bab, "tempel_diblokir", { lokasi: "laporan" }),
+    lampiran: () => lampiranLaporan(m, ch),
+  });
+  Sinkron.ambilLaporan(COURSE.id, m.bab).then((baris) => baris && laporan.terapkanServer(baris));
+  const bar = Tata.pasang(cols, vc, TATA, { punyaVideo: !!(m.video && m.video.length), punyaEditor: m.jenis === "kode", ambilEditor: () => editor });
   main.replaceChildren(
     infoBar,
     h(
@@ -602,7 +726,8 @@ async function renderBab(n) {
     ),
     bar,
     cols,
-    h("section", { class: "card bab-laporan", "aria-label": "Laporan praktikum" }, h("h3", {}, "Laporan praktikum"), h("div", { class: "placeholder" }, isDone(m.bab) ? "Selamat, tantangan lulus. Formulir laporan hadir pada Tahap 2." : "Laporan terbuka setelah tantangan lulus."))
+    m.jenis === "konsep" && m.tugas ? tugasCard(m, true) : null,
+    laporan
   );
   main.scrollTop = 0;
   window.scrollTo(0, 0);
@@ -620,7 +745,7 @@ function babGrid() {
         h(
           "div",
           {},
-          h("span", { class: "num" }, "BAB " + String(m.bab).padStart(2, "0") + (m.jenis === "unggah" ? " / UNGGAH TUGAS" : " / KODE")),
+          h("span", { class: "num" }, "BAB " + String(m.bab).padStart(2, "0") + (m.jenis === "unggah" ? " / UNGGAH TUGAS" : m.jenis === "konsep" ? " / KONSEP" : " / KODE")),
           h("strong", {}, m.judul),
           h("span", { class: "muted" }, STATUS_TEXT[statusOf(m.bab)])
         )

@@ -16,7 +16,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan dengan bahasamu sendiri apa itu algoritma, sebutkan dua dari lima syaratnya, lalu beri contoh dari kegiatan membuat pudak."
  },
  {
   "bab": 2,
@@ -41,7 +42,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda tipe int, float, str, dan bool? Beri satu contoh nilai nyata dari pesanan UD Rasa Gresik untuk masing-masing tipe."
  },
  {
   "bab": 3,
@@ -65,8 +67,8 @@
     "sumber": "lain"
    }
   ],
-  "jenis": "unggah",
-  "challenge": false,
+  "jenis": "konsep",
+  "challenge": true,
   "tugas": {
    "judul": "Rancang alur pemesanan dengan flowchart dan pseudocode",
    "soal": [
@@ -85,7 +87,8 @@
     "Pseudocode cocok dengan flowchart.",
     "Penelusuran menunjukkan nilai tiap variabel di setiap langkah."
    ]
-  }
+  },
+  "pertanyaanKonsep": "Mengapa kita merancang dengan flowchart dan pseudocode sebelum menulis kode? Jelaskan satu kesalahan rancangan yang akan ketahuan saat penelusuran dengan tangan."
  },
  {
   "bab": 4,
@@ -110,7 +113,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Mengapa urutan syarat pada if-elif-else penting? Beri contoh potongan harga yang hasilnya salah bila urutan syaratnya dibalik."
  },
  {
   "bab": 5,
@@ -135,7 +139,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Kapan memakai for dan kapan memakai while? Jelaskan apa yang terjadi bila kondisi while tidak pernah menjadi False."
  },
  {
   "bab": 6,
@@ -160,7 +165,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa arti indeks negatif dan irisan (slicing) pada list? Jelaskan mengapa menghapus elemen saat list sedang diulang itu berbahaya."
  },
  {
   "bab": 7,
@@ -185,7 +191,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Bagaimana cara mengakses elemen di baris ke-2 kolom ke-3 pada nested list? Jelaskan mengapa string disebut tidak bisa diubah (immutable)."
  },
  {
   "bab": 8,
@@ -210,7 +217,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda print dan return di dalam fungsi? Mengapa parameter bawaan (default) berguna? Beri contoh dari biaya kirim."
  },
  {
   "bab": 9,
@@ -235,7 +243,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan apa yang terjadi pada baris cadangan = p1, dan mengapa mengubah cadangan ikut mengubah p1. Bagaimana cara membuat salinan yang benar?"
  },
  {
   "bab": 10,
@@ -260,7 +269,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa beda mode w dan mode a saat membuka berkas? Mengapa with open lebih aman daripada open dan close manual?"
  },
  {
   "bab": 11,
@@ -285,7 +295,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan empat operasi CRUD dengan contoh pada daftar pesanan, dan satu masalah yang muncul bila menghapus elemen list saat diulang."
  },
  {
   "bab": 12,
@@ -310,7 +321,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Mengapa binary search mensyaratkan data terurut? Kira-kira berapa langkah maksimum untuk 1000 data dibanding linear search?"
  },
  {
   "bab": 13,
@@ -335,7 +347,8 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Jelaskan cara kerja bubble sort dengan bahasamu sendiri, dan mengapa untuk data besar kita memakai sorted() bawaan Python."
  },
  {
   "bab": 14,
@@ -360,6 +373,7 @@
    }
   ],
   "jenis": "kode",
-  "challenge": true
+  "challenge": true,
+  "pertanyaanKonsep": "Apa itu base case dan recursive case? Apa yang terjadi bila base case lupa ditulis?"
  }
 ]

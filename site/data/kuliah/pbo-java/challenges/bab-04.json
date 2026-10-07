@@ -1,0 +1,225 @@
+{
+ "bab": 4,
+ "jenis": "konsep",
+ "judul": "Pemodelan dengan diagram kelas UML",
+ "soal": [
+  "Bab ini tentang merancang sebelum menulis kode: membaca dan menyusun diagram kelas UML untuk SIP-USG (sistem informasi perpustakaan).",
+  "Boleh diulang sebanyak yang kamu mau. Lulus bila 70 persen bagian benar; setelah lulus, jawaban dan penjelasannya ditampilkan."
+ ],
+ "rujukan": [
+  "Buku Bab IV, bagian B (notasi kelas), hlm. 47; bagian C (relasi antarkelas), hlm. 47; bagian D (multiplisitas dan generalisasi), hlm. 49; bagian E (dari diagram ke kode), hlm. 50.",
+  "Video: Apa itu UML? dan Belajar Class Diagram (Naistudio Academy).",
+  "Clue: bagian F, Praktikum Terbimbing di Bab 4, memuat diagram kelas lengkap SIP-USG sebagai contoh."
+ ],
+ "lulus": 0.7,
+ "petunjuk": [
+  {
+   "jenis": "teks",
+   "isi": "Mulai dari soal notasi dan seret atribut; yang paling sulit (relasi dan multiplisitas) kerjakan terakhir. Pikirkan 'satu anggota punya berapa peminjaman?'."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Baca Bab IV bagian B (hlm. 47), C (relasi), dan D (multiplisitas, hlm. 49)."
+  },
+  {
+   "jenis": "video",
+   "isi": "Tonton Apa itu UML? lalu Belajar Class Diagram.",
+   "video": [
+    "zoZuzFmEUP4",
+    "shpryDoscDU"
+   ]
+  }
+ ],
+ "butir": [
+  {
+   "tipe": "cocokkan",
+   "tanya": "Pasangkan simbol visibilitas dengan artinya.",
+   "pasangan": [
+    [
+     "+",
+     "public: terlihat dari mana saja"
+    ],
+    [
+     "-",
+     "private: hanya terlihat di kelasnya"
+    ],
+    [
+     "#",
+     "protected: terlihat di kelas dan turunannya"
+    ],
+    [
+     "~",
+     "package: terlihat di paket yang sama"
+    ]
+   ],
+   "penjelasan": "Pada diagram, atribut biasanya bertanda minus dan method yang dipakai luar bertanda plus."
+  },
+  {
+   "tipe": "seret",
+   "tanya": "Seret setiap atribut dan method ke kelas yang memilikinya.",
+   "wadah": [
+    {
+     "id": "member",
+     "nama": "Member"
+    },
+    {
+     "id": "book",
+     "nama": "Book"
+    },
+    {
+     "id": "loan",
+     "nama": "Loan"
+    }
+   ],
+   "butir": [
+    {
+     "teks": "- memberId : String",
+     "wadah": "member"
+    },
+    {
+     "teks": "- name : String",
+     "wadah": "member"
+    },
+    {
+     "teks": "+ canBorrow(loanCountNow : int) : boolean",
+     "wadah": "member"
+    },
+    {
+     "teks": "- title : String",
+     "wadah": "book"
+    },
+    {
+     "teks": "- isbn : String",
+     "wadah": "book"
+    },
+    {
+     "teks": "+ isPublishedAfter(year : int) : boolean",
+     "wadah": "book"
+    },
+    {
+     "teks": "- loanDate : String",
+     "wadah": "loan"
+    },
+    {
+     "teks": "+ getDueDate() : String",
+     "wadah": "loan"
+    }
+   ],
+   "penjelasan": "Tiap kelas memegang data dan perilaku yang paling dekat dengannya."
+  },
+  {
+   "tipe": "relasi",
+   "tanya": "Tentukan jenis relasi dan multiplisitas di setiap ujung (kiri adalah sisi kelas pertama, kanan adalah sisi kelas kedua).",
+   "relasi": [
+    "asosiasi",
+    "agregasi",
+    "komposisi",
+    "generalisasi (pewarisan)",
+    "dependensi"
+   ],
+   "multiplisitas": [
+    "1",
+    "0..1",
+    "0..*",
+    "1..*"
+   ],
+   "pasangan": [
+    {
+     "dari": "Member",
+     "ke": "Loan",
+     "benar": "asosiasi",
+     "a": "1",
+     "b": "0..*"
+    },
+    {
+     "dari": "Loan",
+     "ke": "Book",
+     "benar": "asosiasi",
+     "a": "0..*",
+     "b": "1"
+    },
+    {
+     "dari": "Catalog",
+     "ke": "Book",
+     "benar": "agregasi",
+     "a": "1",
+     "b": "0..*"
+    },
+    {
+     "dari": "Book",
+     "ke": "Isbn",
+     "benar": "komposisi",
+     "a": "1",
+     "b": "1"
+    },
+    {
+     "dari": "Journal",
+     "ke": "LibraryItem",
+     "benar": "generalisasi (pewarisan)"
+    }
+   ],
+   "penjelasan": "Satu anggota bisa punya banyak peminjaman; satu peminjaman mencatat satu buku. Katalog mengumpulkan buku tetapi buku bisa ada tanpa katalog (agregasi). Isbn tidak berarti tanpa Book (komposisi). Journal adalah jenis LibraryItem (generalisasi)."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Garis dengan segitiga kosong yang menunjuk ke superclass menandakan ...",
+   "opsi": [
+    "generalisasi (pewarisan)",
+    "komposisi",
+    "agregasi",
+    "dependensi"
+   ],
+   "benar": 0,
+   "penjelasan": "Segitiga kosong adalah notasi pewarisan: subclass menunjuk ke superclass."
+  },
+  {
+   "tipe": "pilgan",
+   "tanya": "Multiplisitas 0..* di ujung relasi berarti ...",
+   "opsi": [
+    "nol atau lebih",
+    "tepat satu",
+    "satu atau lebih",
+    "paling banyak nol"
+   ],
+   "benar": 0,
+   "penjelasan": "Bintang berarti tak terbatas; 0..* berarti boleh tidak ada sama sekali, boleh banyak."
+  },
+  {
+   "tipe": "banyak",
+   "tanya": "Pilih semua pernyataan yang benar tentang komposisi.",
+   "opsi": [
+    "Bagian tidak ada tanpa keseluruhannya",
+    "Digambar dengan belah ketupat terisi penuh",
+    "Bagian dapat berdiri sendiri secara bebas",
+    "Digambar dengan belah ketupat kosong"
+   ],
+   "benar": [
+    0,
+    1
+   ],
+   "penjelasan": "Komposisi lebih kuat daripada agregasi: bila keseluruhan hilang, bagiannya ikut hilang."
+  },
+  {
+   "tipe": "urutkan",
+   "tanya": "Susun langkah menerjemahkan satu kotak kelas pada diagram menjadi kode Java.",
+   "langkah": [
+    "Tulis deklarasi class dengan nama dari kotak",
+    "Ubah atribut bertanda minus menjadi field private",
+    "Ubah operasi bertanda plus menjadi method public",
+    "Tambahkan constructor",
+    "Terjemahkan relasi menjadi atribut referensi atau koleksi"
+   ],
+   "penjelasan": "Kerangka dulu, lalu isi, lalu hubungan dengan kelas lain."
+  },
+  {
+   "tipe": "isian",
+   "tanya": "Simbol visibilitas pada diagram untuk atribut private adalah ... (tulis tanda atau namanya)",
+   "jawaban": [
+    "-",
+    "minus",
+    "tanda minus"
+   ],
+   "penjelasan": "Minus berarti private."
+  }
+ ]
+}
