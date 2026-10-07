@@ -8,7 +8,7 @@ import { ambilSemua } from "./rekap.js";
 import * as K from "./kehadiran.js";
 
 let cache = null; // { cid, jadwal, koreksi, sesi, percobaan, laporan, riwayat }
-const ui = { gen: null, sub: "s", kf: "", kj: "", n: null, gran: "h", bentuk: "d", hari: null, mgg: null, buka: "", edit: null, konf: null, pesan: "", idPeserta: "" };
+const ui = { urutS: { k: "skor", a: false }, bln: 0, gen: null, sub: "s", kf: "", kj: "", n: null, gran: "h", bentuk: "d", hari: null, mgg: null, buka: "", edit: null, konf: null, pesan: "", idPeserta: "" };
 
 export function reset() {
   cache = null;
@@ -357,7 +357,7 @@ function tabAktivitas(ctx, a) {
     a.ulang();
   };
   const seg = (nilai, teks, kunci) => h("button", { type: "button", class: "btn btn-sm" + (ui[kunci] === nilai ? " on" : ""), onclick: ganti(kunci, nilai) }, teks);
-  const kontrol = h("div", { class: "actions" }, seg("h", "Per hari", "gran"), seg("m", "Per minggu", "gran"), h("span", { class: "kh-pisah" }), seg("d", "Daftar", "bentuk"), seg("k", "Kalender", "bentuk"));
+  const kontrol = h("div", { class: "actions" }, seg("h", "Per hari", "gran"), seg("m", "Per minggu", "gran"), seg("b", "Per bulan", "gran"), seg("s", "Semester", "gran"), h("span", { class: "kh-pisah" }), seg("d", "Daftar", "bentuk"), seg("k", "Kalender", "bentuk"));
   const bagian = [];
   if (ui.gran === "h") {
     const hariIni = K.tanggalWib(sekarangT);
@@ -389,7 +389,7 @@ function tabAktivitas(ctx, a) {
     } else {
       bagian.push(kartu(h("h3", {}, "Kalender 14 hari terakhir"), kalender(peserta, deret.map((tgl) => ({ judul: String(+tgl.slice(8)), ket: tgl, level: (p) => K.ringkasHari(kejadianDari(ctx, p.id), tgl).level, klik: () => { ui.hari = tgl; ui.bentuk = "d"; a.ulang(); } })), ctx), legendaLevel(), info("Terlihat siapa yang rutin tiap hari dan siapa yang baru muncul menjelang kelas. Ketuk satu kotak untuk membuka rincian tanggalnya.")));
     }
-  } else {
+  } else if (ui.gran === "m") {
     const minggu = Array.from({ length: 8 }, (_, i) => seninSekarang - (7 - i) * 7 * K.HARI_MS);
     const stripM = h("div", { class: "kh-hari" }, minggu.map((s, i) => h("button", { type: "button", class: "kh-hbtn" + (s === ui.mgg && ui.bentuk === "d" ? " on" : ""), onclick: () => { ui.mgg = s; ui.bentuk = "d"; a.ulang(); } }, "M" + (i + 1), h("b", {}, K.tanggalWib(s).slice(8) + "-" + K.tanggalWib(s + 6 * K.HARI_MS).slice(8)))));
     if (ui.bentuk === "d") {
@@ -409,9 +409,158 @@ function tabAktivitas(ctx, a) {
     } else {
       bagian.push(kartu(h("h3", {}, "Kalender 8 minggu terakhir"), kalender(peserta, minggu.map((s, i) => ({ judul: "M" + (i + 1), ket: K.teksTanggal(s), level: (p) => { const m = K.ringkasMinggu(kejadianDari(ctx, p.id), s, sekarangT); return m.hariAktif === 0 ? 0 : m.hariAktif <= 2 ? 1 : m.hariAktif <= 4 ? 2 : 3; }, klik: () => { ui.mgg = s; ui.bentuk = "d"; a.ulang(); } })), ctx), h("div", { class: "kh-legenda" }, h("span", {}, h("i", { class: "kh-kot l0" }), " tidak aktif"), h("span", {}, h("i", { class: "kh-kot l1" }), " 1 sampai 2 hari aktif"), h("span", {}, h("i", { class: "kh-kot l2" }), " 3 sampai 4 hari"), h("span", {}, h("i", { class: "kh-kot l3" }), " 5 hari atau lebih")), info("Ketuk satu kotak untuk membuka minggunya.")));
     }
+  } else if (ui.gran === "b") {
+    bagian.push(...bulanTampil(ctx, a, peserta));
+  } else {
+    bagian.push(...semesterTampil(ctx, a, peserta));
   }
   return [kartu(h("h3", {}, "Tampilan"), kontrol), ...bagian, tanpaJadwal(ctx)];
 }
+
+// ---------- periode: bulan dan semester (otomatis dari jadwal) ----------
+function periodeCtx(ctx) {
+  const jd = pilihKelas(ctx).map((k) => ctx.jadwal.get(k));
+  let awalData = null;
+  for (const k of ctx.kejadian.values()) {
+    for (const t of [k.kerja[0] && k.kerja[0].t, k.sesi[0] && k.sesi[0].mulai, k.jalan[0]]) if (Number.isFinite(t) && (awalData === null || t < awalData)) awalData = t;
+  }
+  return K.periodeSemester(jd, ctx.sekarang, awalData);
+}
+const tanpaPeriode = () => kartu(h("p", { class: "muted" }, "Belum ada jadwal maupun data aktivitas, jadi periode belum bisa ditentukan. Atur jadwal kelas di tab Jadwal."));
+const ketPeriode = (p) => (p.dariJadwal ? "Periode otomatis dari jadwal kelas: " : "Belum ada jadwal; periode dari data paling awal: ") + K.teksTanggal(p.mulai) + " sampai " + K.teksTanggal(p.akhir - 1) + ".";
+
+function skorSemua(ctx, peserta) {
+  const laporanPer = new Map();
+  for (const l of cache.laporan) {
+    if (!laporanPer.has(l.user_id)) laporanPer.set(l.user_id, new Set());
+    laporanPer.get(l.user_id).add(Number(l.bab));
+  }
+  const pertemuanLalu = (p) => {
+    const rows = K.cariJadwal(ctx.jadwal, p.kelas);
+    return rows ? rows.filter((j) => !j.libur && j.mulai <= ctx.sekarang).length : 0;
+  };
+  const awalJadwal = Math.min(...[...ctx.jadwal.values()].flat().map((j) => j.mulai), ctx.sekarang);
+  const mingguSemester = Math.max(1, Math.ceil((ctx.sekarang - awalJadwal) / (7 * K.HARI_MS)));
+  const mingguSesi = ctx.sesiMulai === null ? 1 : Math.max(1, Math.ceil((ctx.sekarang - ctx.sesiMulai) / (7 * K.HARI_MS)));
+  return peserta.map((p) => {
+    const target = { bab: Math.max(1, pertemuanLalu(p)), hari: Math.max(2, mingguSemester * 2), laporan: Math.max(1, pertemuanLalu(p)), menitPerMinggu: 150 };
+    return { p, s: K.skorKeaktifan({ k: kejadianDari(ctx, p.id), laporan: (laporanPer.get(p.id) || new Set()).size, target, tersediaWaktu: ctx.sesiMulai !== null, minggu: mingguSesi }), target };
+  });
+}
+
+const stripMinggu = (kurva) => h("div", { class: "kh-wk", style: "grid-template-columns:repeat(" + kurva.length + ",minmax(0,1fr))" }, kurva.map((m, i) => h("span", { class: m.depan ? "lx" : "l" + m.level, title: "M" + (i + 1) + " " + K.teksTanggal(m.awal) + (m.depan ? ": belum berlangsung" : ": " + m.hariAktif + " hari aktif, " + m.menit + " menit, " + m.kirim + " pengerjaan") })));
+
+function bulanTampil(ctx, a, peserta) {
+  const per = periodeCtx(ctx);
+  if (!per) return [tanpaPeriode()];
+  const bulan = K.daftarBulan(per);
+  const bulanIni = K.awalBulan(ctx.sekarang);
+  if (!ui.bln || !bulan.includes(ui.bln)) ui.bln = bulan.includes(bulanIni) ? bulanIni : bulan[bulan.length - 1];
+  const strip = h("div", { class: "kh-bulan" }, bulan.map((b) => h("button", { type: "button", class: "kh-hbtn" + (b === ui.bln && ui.bentuk === "d" ? " on" : ""), onclick: () => { ui.bln = b; ui.bentuk = "d"; a.ulang(); } }, K.labelBulan(b))));
+  const hitungBulan = (p, b) => K.ringkasRentang(kejadianDari(ctx, p.id), b, K.awalBulanBerikut(b), ctx.sekarang);
+  if (ui.bentuk === "k") {
+    const hariTersedia = (b) => Math.max(1, Math.min(K.awalBulanBerikut(b), ctx.sekarang + 1) - b) / K.HARI_MS;
+    return [
+      kartu(
+        h("h3", {}, "Kalender per bulan"),
+        h("p", { class: "muted" }, ketPeriode(per)),
+        kalender(peserta, bulan.map((b) => ({ judul: K.labelBulan(b).replace(" 20", " "), ket: K.labelBulan(b), level: (p) => { const r = hitungBulan(p, b); const rasio = r.hariAktif / hariTersedia(b); return r.hariAktif === 0 ? 0 : rasio >= 0.5 ? 3 : rasio >= 0.25 ? 2 : 1; }, klik: () => { ui.bln = b; ui.bentuk = "d"; a.ulang(); } })), ctx),
+        h("div", { class: "kh-legenda" }, h("span", {}, h("i", { class: "kh-kot l0" }), " tidak aktif"), h("span", {}, h("i", { class: "kh-kot l1" }), " kurang dari seperempat hari aktif"), h("span", {}, h("i", { class: "kh-kot l2" }), " seperempat sampai separuh"), h("span", {}, h("i", { class: "kh-kot l3" }), " separuh hari atau lebih")),
+        info("Satu kolom per bulan. Ketuk satu kotak untuk membuka rincian bulan itu.")
+      ),
+    ];
+  }
+  const rows = peserta.map((p) => ({ p, r: hitungBulan(p, ui.bln) }));
+  const aktif = rows.filter((x) => x.r.hariAktif > 0).length;
+  const rata = (f) => (rows.length ? Math.round((rows.reduce((s, x) => s + f(x.r), 0) / rows.length) * 10) / 10 : 0);
+  const urut = rows.slice().sort((x, y) => y.r.hariAktif - x.r.hariAktif || y.r.menit - x.r.menit || x.p.nama.localeCompare(y.p.nama, "id"));
+  const csv = tombol("Unduh CSV bulan ini", () => a.unduh("aktivitas-" + K.labelBulan(ui.bln).replace(" ", "-") + ".csv", csvBulan(urut)));
+  return [
+    kartu(
+      h("h3", {}, "Bulan " + K.labelBulan(ui.bln)),
+      strip,
+      h("p", { class: "muted" }, aktif + " dari " + peserta.length + " aktif, rata-rata " + rata((r) => r.hariAktif) + " hari aktif, " + rata((r) => r.menit) + " menit, dan " + rata((r) => r.babLulus) + " bab lulus per peserta. " + ketPeriode(per)),
+      h("div", { class: "actions" }, csv),
+      urut.length
+        ? h("div", { class: "tablewrap" }, h("table", { class: "rekap" }, h("caption", { class: "sr-only" }, "Aktivitas per peserta bulan " + K.labelBulan(ui.bln)), h("thead", {}, h("tr", {}, ["Peserta", "Hari aktif", "Hari mengerjakan", "Menit aktif", "Pengerjaan", "Jalankan", "Bab lulus"].map((t) => h("th", { scope: "col" }, t)))), h("tbody", {}, urut.map(({ p, r }) => h("tr", { class: "klik", onclick: () => dialogPeserta(ctx, p, a) }, h("th", { scope: "row", class: "nama" }, h("strong", {}, p.nama), h("small", {}, (p.nim || "") + " | " + (p.kelas || ""))), h("td", { class: "n" }, String(r.hariAktif)), h("td", { class: "n" }, String(r.hariKerja)), h("td", { class: "n" }, String(r.menit)), h("td", { class: "n" }, String(r.kirim)), h("td", { class: "n" }, String(r.jalankan)), h("td", { class: "n" }, String(r.babLulus)))))))
+        : h("p", { class: "muted" }, "Tidak ada peserta."),
+      info("Hari aktif = hari ada pengerjaan, atau membuka situs minimal " + K.MENIT_BACA + " menit aktif. Menit aktif baru terkumpul sejak pencatatan sesi berjalan, jadi bulan-bulan sebelumnya bisa menunjukkan 0 menit walau peserta aktif. Ketuk satu baris untuk melihat rinciannya.")
+    ),
+  ];
+}
+function csvBulan(urut) {
+  const kutip = (v) => {
+    const s = v === null || v === undefined ? "" : String(v);
+    const aman = /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
+    return /[",\n\r]/.test(aman) ? '"' + aman.replace(/"/g, '""') + '"' : aman;
+  };
+  const baris = [["NIM", "Nama", "Kelas", "Hari aktif", "Hari mengerjakan", "Menit aktif", "Pengerjaan", "Jalankan", "Bab lulus"].map(kutip).join(",")];
+  for (const { p, r } of urut) baris.push([p.nim, p.nama, p.kelas, r.hariAktif, r.hariKerja, r.menit, r.kirim, r.jalankan, r.babLulus].map(kutip).join(","));
+  return baris.join("\r\n") + "\r\n";
+}
+
+const KOLOM_SEMESTER = [["nama", "Peserta"], ["minggu", "Minggu demi minggu"], ["hariAktif", "Hari aktif"], ["menit", "Menit aktif"], ["kirim", "Pengerjaan"], ["jalankan", "Jalankan"], ["babLulus", "Bab lulus"], ["hadir", "Hadir"], ["skor", "Skor"]];
+function semesterTampil(ctx, a, peserta) {
+  const per = periodeCtx(ctx);
+  if (!per) return [tanpaPeriode()];
+  const minggu = K.daftarMinggu(per);
+  const skor = new Map(skorSemua(ctx, peserta).map((x) => [x.p.id, x.s.skor]));
+  const hadirDari = (id) => {
+    const b = ctx.hasil.baris.find((x) => x.p.id === id);
+    return b ? b.persen : null;
+  };
+  const rows = peserta.map((p) => {
+    const k = kejadianDari(ctx, p.id);
+    return { p, total: K.ringkasRentang(k, per.mulai, per.akhir, ctx.sekarang), minggu: K.kurvaMingguan(k, minggu, ctx.sekarang), persenHadir: hadirDari(p.id), skor: skor.get(p.id) || 0 };
+  });
+  const nilai = { nama: (r) => r.p.nama || "", hariAktif: (r) => r.total.hariAktif, menit: (r) => r.total.menit, kirim: (r) => r.total.kirim, jalankan: (r) => r.total.jalankan, babLulus: (r) => r.total.babLulus, hadir: (r) => (r.persenHadir === null ? -1 : r.persenHadir), skor: (r) => r.skor };
+  const kunci = nilai[ui.urutS.k] ? ui.urutS.k : "skor";
+  const urut = rows.slice().sort((x, y) => {
+    const a1 = nilai[kunci](x);
+    const b1 = nilai[kunci](y);
+    const d = typeof a1 === "string" ? a1.localeCompare(b1, "id") : b1 - a1;
+    return (ui.urutS.a ? -d : d) || x.p.nama.localeCompare(y.p.nama, "id");
+  });
+  const rata = K.rataRingkas(rows);
+  const kelas = [...new Set(rows.map((r) => r.p.kelas || "-"))].sort();
+  const perKelas = kelas.length > 1 ? kelas.map((k) => ({ k, r: K.rataRingkas(rows.filter((x) => (x.p.kelas || "-") === k)) })) : [];
+  const aktifMinggu = minggu.filter((m) => m <= ctx.sekarang).length;
+  const ringkas = kartu(
+    h("h3", {}, "Semester: " + K.teksTanggal(per.mulai) + " sampai " + K.teksTanggal(per.akhir - 1)),
+    h("p", { class: "muted" }, ketPeriode(per) + " Sudah berjalan " + aktifMinggu + " dari " + minggu.length + " minggu."),
+    h("div", { class: "d-stats" }, stat(String(peserta.length), "peserta"), stat(String(rata.hariAktif), "rata-rata hari aktif"), stat(String(rata.menit), "rata-rata menit aktif"), stat(String(rata.babLulus), "rata-rata bab lulus"), stat(rata.hadir + "%", "rata-rata hadir")),
+    perKelas.length ? h("div", { class: "tablewrap" }, h("table", { class: "rekap" }, h("caption", { class: "sr-only" }, "Rata-rata per kelas"), h("thead", {}, h("tr", {}, ["Kelas", "Peserta", "Hari aktif", "Menit aktif", "Pengerjaan", "Bab lulus", "Hadir", "Skor"].map((t) => h("th", { scope: "col" }, t)))), h("tbody", {}, perKelas.map(({ k, r }) => h("tr", {}, h("th", { scope: "row", class: "nama" }, k), h("td", { class: "n" }, String(r.n)), h("td", { class: "n" }, String(r.hariAktif)), h("td", { class: "n" }, String(r.menit)), h("td", { class: "n" }, String(r.kirim)), h("td", { class: "n" }, String(r.babLulus)), h("td", { class: "n" }, r.hadir + "%"), h("td", { class: "n" }, String(r.skor))))))) : null
+  );
+  if (ui.bentuk === "k") {
+    return [
+      ringkas,
+      kartu(
+        h("h3", {}, "Kalender semester per minggu"),
+        h("div", { class: "actions" }, tombol("Unduh CSV semester", () => a.unduh("semester-" + cache.cid + ".csv", K.csvSemester(urut, minggu)))),
+        kalender(urut.map((r) => r.p), minggu.map((s, i) => ({ judul: "M" + (i + 1), ket: K.teksTanggal(s), level: (p) => { const r = urut.find((x) => x.p.id === p.id); return r.minggu[i].depan ? 0 : r.minggu[i].level; }, klik: () => { ui.mgg = s; ui.gran = "m"; ui.bentuk = "d"; a.ulang(); } })), ctx),
+        legendaMinggu(),
+        info("Satu kolom per minggu sepanjang semester. Ketuk satu kotak untuk membuka minggu itu.")
+      ),
+    ];
+  }
+  const th = ([k, t]) => (k === "minggu" ? h("th", { scope: "col" }, t) : h("th", { scope: "col", class: "klik" + (kunci === k ? " urut" : ""), onclick: () => { ui.urutS = ui.urutS.k === k ? { k, a: !ui.urutS.a } : { k, a: false }; a.ulang(); } }, t + (kunci === k ? (ui.urutS.a ? " ↑" : " ↓") : "")));
+  return [
+    ringkas,
+    kartu(
+      h("h3", {}, "Semua peserta sepanjang semester"),
+      h("div", { class: "actions" }, tombol("Unduh CSV semester", () => a.unduh("semester-" + cache.cid + ".csv", K.csvSemester(urut, minggu)))),
+      urut.length
+        ? h("div", { class: "tablewrap" }, h("table", { class: "rekap kh-semester" }, h("caption", { class: "sr-only" }, "Keaktifan tiap peserta sepanjang semester"), h("thead", {}, h("tr", {}, KOLOM_SEMESTER.map(th))), h("tbody", {}, urut.map((r) => h("tr", { class: "klik", onclick: () => dialogPeserta(ctx, r.p, a) }, h("th", { scope: "row", class: "nama" }, h("strong", {}, r.p.nama), h("small", {}, (r.p.nim || "") + " | " + (r.p.kelas || ""))), h("td", {}, stripMinggu(r.minggu)), h("td", { class: "n" }, String(r.total.hariAktif)), h("td", { class: "n" }, String(r.total.menit)), h("td", { class: "n" }, String(r.total.kirim)), h("td", { class: "n" }, String(r.total.jalankan)), h("td", { class: "n" }, String(r.total.babLulus)), h("td", { class: "n" }, r.persenHadir === null ? "-" : r.persenHadir + "%"), h("td", { class: "n" }, String(r.skor)))))))
+        : h("p", { class: "muted" }, "Tidak ada peserta."),
+      legendaMinggu(),
+      info("Strip kecil menunjukkan tiap minggu semester: makin pekat berarti makin banyak hari aktif; kotak putus-putus adalah minggu yang belum berlangsung. Menit aktif baru terkumpul sejak pencatatan sesi berjalan, jadi minggu-minggu awal bisa 0 menit walau peserta aktif. Hadir mengikuti jadwal kelas; skor adalah ringkasan, bukan nilai. Klik judul kolom untuk mengurutkan dan ketuk satu baris untuk rinciannya.")
+    ),
+  ];
+}
+function legendaMinggu() {
+  return h("div", { class: "kh-legenda" }, h("span", {}, h("i", { class: "kh-kot l0" }), " tidak aktif"), h("span", {}, h("i", { class: "kh-kot l1" }), " 1 sampai 2 hari aktif"), h("span", {}, h("i", { class: "kh-kot l2" }), " 3 sampai 4 hari"), h("span", {}, h("i", { class: "kh-kot l3" }), " 5 hari atau lebih"), h("span", {}, h("i", { class: "kh-kot lx" }), " belum berlangsung"));
+}
+
 function pesertaDi(ctx) {
   if (!ui.kf) return ctx.peserta.slice().sort((x, y) => x.nama.localeCompare(y.nama, "id"));
   return anggotaKelas(ctx, ui.kf).map((b) => b.p).sort((x, y) => x.nama.localeCompare(y.nama, "id"));
@@ -426,22 +575,7 @@ function kalender(peserta, kolom, ctx) {
 // ---------- tab: keaktifan ----------
 function tabKeaktifan(ctx, a) {
   const peserta = pesertaDi(ctx);
-  const laporanPer = new Map();
-  for (const l of cache.laporan) {
-    if (!laporanPer.has(l.user_id)) laporanPer.set(l.user_id, new Set());
-    laporanPer.get(l.user_id).add(Number(l.bab));
-  }
-  const pertemuanLalu = (p) => {
-    const rows = K.cariJadwal(ctx.jadwal, p.kelas);
-    return rows ? rows.filter((j) => !j.libur && j.mulai <= ctx.sekarang).length : 0;
-  };
-  const awalJadwal = Math.min(...[...ctx.jadwal.values()].flat().map((j) => j.mulai), ctx.sekarang);
-  const mingguSemester = Math.max(1, Math.ceil((ctx.sekarang - awalJadwal) / (7 * K.HARI_MS)));
-  const mingguSesi = ctx.sesiMulai === null ? 1 : Math.max(1, Math.ceil((ctx.sekarang - ctx.sesiMulai) / (7 * K.HARI_MS)));
-  const hitungSkor = peserta.map((p) => {
-    const target = { bab: Math.max(1, pertemuanLalu(p)), hari: Math.max(2, mingguSemester * 2), laporan: Math.max(1, pertemuanLalu(p)), menitPerMinggu: 150 };
-    return { p, s: K.skorKeaktifan({ k: kejadianDari(ctx, p.id), laporan: (laporanPer.get(p.id) || new Set()).size, target, tersediaWaktu: ctx.sesiMulai !== null, minggu: mingguSesi }), target };
-  });
+  const hitungSkor = skorSemua(ctx, peserta);
   hitungSkor.sort((x, y) => y.s.skor - x.s.skor || x.p.nama.localeCompare(y.p.nama, "id"));
   const baris = hitungSkor.map(({ p, s }) => h("div", { class: "kh-skor klik", onclick: () => dialogPeserta(ctx, p, a) }, h("span", {}, h("strong", {}, p.nama), kecil(p.kelas || "")), h("div", { class: "kh-bar", role: "img", "aria-label": "Skor " + s.skor }, s.waktu !== null ? h("i", { class: "w", style: "width:" + s.waktu + "%" }) : null, h("i", { class: "b", style: "width:" + s.bab + "%" }), h("i", { class: "h", style: "width:" + s.hari + "%" }), h("i", { class: "l", style: "width:" + s.lap + "%" })), h("b", {}, String(s.skor))));
   return [
@@ -607,12 +741,14 @@ function dialogPeserta(ctx, p, a) {
   const b = ctx.hasil.baris.find((x) => x.p.id === p.id);
   const k = kejadianDari(ctx, p.id);
   const hari14 = Array.from({ length: 14 }, (_, i) => K.tanggalWib(ctx.sekarang - i * K.HARI_MS)).map((tgl) => K.ringkasHari(k, tgl)).filter((r) => r.level > 0);
+  const per = periodeCtx(ctx);
   const perPertemuan = b && b.ada ? b.pertemuan.map((x) => h("li", {}, h("strong", {}, "P" + x.n + " " + K.teksTanggal(x.jadwal.mulai) + ": "), pil(TEKS_STATUS[x.status][0], TEKS_STATUS[x.status][1]), x.status === "hadir" || x.status === "tidak" ? " " + (x.siap.siap ? "siap, selesai " + x.siap.jamSebelum + " jam sebelum kelas" : "belum siap (" + x.siap.menit + " menit aktif, " + x.siap.kerja + " kali mengerjakan)") : "", x.koreksi ? " | dikoreksi dosen" + (x.koreksi.alasan ? ": " + x.koreksi.alasan : "") : "")) : [];
   dialog(p.nama + " (" + (p.nim || "-") + ", " + (p.kelas || "-") + ")", [
     b && b.ada ? h("p", { class: "muted" }, "Hadir " + b.hadir + " dari " + b.total + " pertemuan yang sudah dinilai" + (b.persen !== null ? " (" + b.persen + "%)" : "") + (b.rataJam !== null ? ", rata-rata selesai " + b.rataJam + " jam sebelum kelas" : "") + (b.mepet ? ", " + b.mepet + " kali mepet" : "") + ".") : h("p", { class: "kh-peringatan" }, "Kelas peserta ini belum punya jadwal."),
     k.janggal ? h("p", { class: "muted" }, k.janggal + " catatan memiliki jam perangkat yang menyimpang lebih dari 10 menit dari jam server. Yang dipakai adalah jam server.") : null,
     h("h4", {}, "Per pertemuan"),
     perPertemuan.length ? h("ul", { class: "kh-kegiatan" }, perPertemuan) : h("p", { class: "muted" }, "Belum ada pertemuan."),
+    ...(per ? [h("h4", {}, "Minggu demi minggu sepanjang semester"), stripMinggu(K.kurvaMingguan(k, K.daftarMinggu(per), ctx.sekarang)), legendaMinggu()] : []),
     h("h4", {}, "Aktivitas 14 hari terakhir"),
     hari14.length ? h("div", {}, hari14.map((r) => h("div", { class: "kh-blok" }, h("div", { class: "kh-baris" }, h("strong", {}, K.teksTanggal(K.dariWib(r.tgl, "12:00"))), pil(K.teksLevel(r.level), TEKS_LEVEL_KELAS[r.level]), h("span", { class: "muted" }, r.menit + " menit aktif")), h("ul", { class: "kh-kegiatan" }, r.kegiatan.map((x) => h("li", {}, h("b", {}, K.jamWib(x.t)), " " + x.teks)))))) : h("p", { class: "muted" }, "Tidak ada aktivitas tercatat dalam 14 hari terakhir."),
   ]);

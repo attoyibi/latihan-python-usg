@@ -369,3 +369,8 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - Persetujuan penelitian: pertanyaan sekali di halaman bab dan pilihan di Profil; menolak atau belum menjawab = tidak ikut ekspor; tidak berpengaruh ke nilai.
 - Uji: uji_galat 23, uji_jejak 33, uji_riset 37, uji_rekam, uji_sinkron (baris Jalankan, batch, cadangan tanpa kolom baru, batas antrean).
 - BELUM: Supabase sungguhan; izin etik dan nomor persetujuan etik (urusan peneliti); buka buku dan video belum tercatat per kejadian; petunjuk tercatat sebagai tingkat pada tiap baris, bukan kejadian bertanda waktu sendiri; analisis statistik lanjutan (hanya deskriptif); uji di ponsel peserta sungguhan.
+
+## Catatan sesi: bulan dan semester
+- Tab Aktivitas: Per bulan dan Semester (periode otomatis dari jadwal kelas lewat `periodeSemester`, `daftarMinggu`, `daftarBulan`, `ringkasRentang`, `kurvaMingguan`, `rataRingkas`, `csvSemester` di `kehadiran.js`; tanpa tabel baru). Daftar dan kalender, urut kolom, rata-rata per kelas, CSV, kurva mingguan di rincian peserta.
+- Sesi yang melewati tengah malam kini dihitung pada hari ia dimulai (sebelumnya terhitung aktif di dua hari). Waktu Jalankan dicatat terpisah di `kejadian.jalan`.
+- Perbaikan: urutan nama pada klik pertama di Jejak peserta dan Semester kini A ke Z. Uji kehadiran 111.

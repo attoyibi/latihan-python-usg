@@ -80,13 +80,16 @@ export function selisihJam(r) {
 export function susunKejadian({ percobaan = [], progres = [], sesi = [] }) {
   const peta = new Map();
   const ambil = (id) => {
-    if (!peta.has(id)) peta.set(id, { kerja: [], sesi: [], janggal: 0 });
+    if (!peta.has(id)) peta.set(id, { kerja: [], sesi: [], jalan: [], janggal: 0 });
     return peta.get(id);
   };
   for (const r of percobaan) {
-    if (r.jenis === "jalankan") continue; // tombol Jalankan dicatat untuk jejak peserta; kehadiran hanya menghitung Kirim dan Periksa jawaban
     const t = waktuBaris(r);
     if (!Number.isFinite(t)) continue;
+    if (r.jenis === "jalankan") {
+      ambil(r.user_id).jalan.push(t); // tombol Jalankan dihitung untuk ringkasan, tetapi bukan pengerjaan untuk kehadiran
+      continue;
+    }
     const k = ambil(r.user_id);
     k.kerja.push({ t, bab: Number(r.bab), lulus: !!r.lulus });
     if (selisihJam(r) !== null) k.janggal++;
@@ -107,10 +110,11 @@ export function susunKejadian({ percobaan = [], progres = [], sesi = [] }) {
   for (const k of peta.values()) {
     k.kerja.sort((a, b) => a.t - b.t);
     k.sesi.sort((a, b) => a.mulai - b.mulai);
+    k.jalan.sort((a, b) => a - b);
   }
   return peta;
 }
-export const kejadianKosong = () => ({ kerja: [], sesi: [], janggal: 0 });
+export const kejadianKosong = () => ({ kerja: [], sesi: [], jalan: [], janggal: 0 });
 /** Kapan pencatatan sesi mulai berjalan (sesi paling awal di seluruh data) atau null bila belum ada. */
 export function sesiMulaiGlobal(sesi) {
   let min = null;
@@ -257,7 +261,8 @@ export function ringkasHari(k, tgl) {
   const awal = dariWib(tgl, "00:00");
   const akhir = awal + HARI_MS;
   const kerja = k.kerja.filter((x) => x.t >= awal && x.t < akhir);
-  const sesi = k.sesi.filter((s) => s.mulai < akhir && s.akhir >= awal);
+  // Sesi dihitung pada hari ia dimulai (satu sesi yang melewati tengah malam tidak dihitung aktif di dua hari).
+  const sesi = k.sesi.filter((s) => s.mulai >= awal && s.mulai < akhir);
   const menit = Math.round(sesi.reduce((a, s) => a + s.aktif, 0) / 60);
   const lulus = kerja.filter((x) => x.lulus).length;
   const level = lulus ? 3 : kerja.length ? 2 : menit >= MENIT_BACA ? 1 : 0;
@@ -365,4 +370,94 @@ export function csvKehadiran(baris) {
     rows.push([b.p.nim, b.p.nama, b.p.kelas, ...sel, b.hadir, b.total, b.persen === null ? "" : b.persen, b.rataJam === null ? "" : b.rataJam, b.mepet].map(kutip).join(","));
   }
   return rows.join("\r\n") + "\r\n";
+}
+
+// ---------- periode: minggu, bulan, semester ----------
+export const awalBulan = (t) => {
+  const d = dw(t);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1) - WIB_MS;
+};
+export const awalBulanBerikut = (t) => {
+  const d = dw(t);
+  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) - WIB_MS;
+};
+export const labelBulan = (t) => {
+  const d = dw(t);
+  return BULAN[d.getUTCMonth()] + " " + d.getUTCFullYear();
+};
+/** Berapa hari aktif dalam satu minggu menjadi tingkat warna 0 sampai 3. */
+export const levelHariAktif = (n) => (n <= 0 ? 0 : n <= 2 ? 1 : n <= 4 ? 2 : 3);
+
+/**
+ * Batas semester otomatis dari jadwal: Senin pekan pertemuan pertama sampai akhir pekan pertemuan terakhir (pertemuan libur tidak dihitung).
+ * @param {object[][]} daftarJadwal array berisi array baris jadwal (satu per kelas) yang dipakai
+ * @param {number|null} awalData bila belum ada jadwal, awal dipakai dari data paling awal (akhir = sekarang)
+ * @returns {{mulai:number, akhir:number, dariJadwal:boolean}|null} akhir bersifat eksklusif; null bila tidak ada data sama sekali
+ */
+export function periodeSemester(daftarJadwal, sekarang, awalData = null) {
+  const aktif = daftarJadwal.flat().filter((j) => !j.libur);
+  if (aktif.length) {
+    const mulai = awalMinggu(Math.min(...aktif.map((j) => j.mulai)));
+    const akhir = awalMinggu(Math.max(...aktif.map((j) => j.selesai))) + 7 * HARI_MS;
+    return { mulai, akhir, dariJadwal: true };
+  }
+  if (awalData === null || awalData === undefined || !Number.isFinite(awalData)) return null;
+  return { mulai: awalMinggu(awalData), akhir: awalMinggu(sekarang) + 7 * HARI_MS, dariJadwal: false };
+}
+/** Senin 00:00 WIB tiap minggu dalam periode. */
+export function daftarMinggu(p) {
+  const a = [];
+  for (let t = p.mulai; t < p.akhir; t += 7 * HARI_MS) a.push(t);
+  return a;
+}
+/** Awal tiap bulan (WIB) yang beririsan dengan periode. */
+export function daftarBulan(p) {
+  const a = [];
+  for (let t = awalBulan(p.mulai); t < p.akhir; t = awalBulanBerikut(t)) a.push(t);
+  return a;
+}
+/**
+ * Ringkasan satu peserta pada rentang [awal, akhirEx). Hari yang belum terjadi (setelah sekarang) tidak dihitung.
+ * menit dijumlah dari sesi yang MULAI di rentang itu (tidak ganda walau sesi melewati tengah malam).
+ */
+export function ringkasRentang(k, awal, akhirEx, sekarang) {
+  const batas = Math.min(akhirEx, sekarang + 1);
+  let hariAktif = 0;
+  let hariKerja = 0;
+  for (let t = awalHari(awal); t < batas; t += HARI_MS) {
+    const r = ringkasHari(k, tanggalWib(t));
+    if (r.level > 0) hariAktif++;
+    if (r.level >= 2) hariKerja++;
+  }
+  const kerja = k.kerja.filter((x) => x.t >= awal && x.t < batas);
+  const lulus = kerja.filter((x) => x.lulus);
+  return {
+    hariAktif,
+    hariKerja,
+    menit: Math.round(k.sesi.filter((s) => s.mulai >= awal && s.mulai < batas).reduce((a, s) => a + s.aktif, 0) / 60),
+    kirim: kerja.length,
+    jalankan: k.jalan.filter((t) => t >= awal && t < batas).length,
+    lulus: lulus.length,
+    babLulus: new Set(lulus.map((x) => x.bab)).size,
+  };
+}
+/** Satu entri per minggu: hari aktif, menit, dan tingkat warna. depan = minggu belum berlangsung. */
+export function kurvaMingguan(k, minggu, sekarang) {
+  return minggu.map((awal) => {
+    const depan = awal > sekarang;
+    const r = depan ? { hariAktif: 0, hariKerja: 0, menit: 0, kirim: 0, jalankan: 0, lulus: 0, babLulus: 0 } : ringkasRentang(k, awal, awal + 7 * HARI_MS, sekarang);
+    return Object.assign({ awal, depan, level: levelHariAktif(r.hariAktif) }, r);
+  });
+}
+/** Rata-rata beberapa baris ringkasan (mis. satu kelas). */
+export function rataRingkas(rows) {
+  const n = rows.length;
+  const rata = (f) => (n ? Math.round((rows.reduce((a, r) => a + f(r), 0) / n) * 10) / 10 : 0);
+  return { n, hariAktif: rata((r) => r.total.hariAktif), menit: rata((r) => r.total.menit), kirim: rata((r) => r.total.kirim), babLulus: rata((r) => r.total.babLulus), hadir: n ? Math.round(rows.reduce((a, r) => a + (r.persenHadir === null ? 0 : r.persenHadir), 0) / n) : 0, skor: rata((r) => r.skor) };
+}
+export function csvSemester(rows, minggu) {
+  const kepala = ["NIM", "Nama", "Kelas", "Hari aktif", "Hari mengerjakan", "Menit aktif", "Pengerjaan (Kirim dan Periksa)", "Jalankan", "Bab lulus", "Persen hadir", "Skor keaktifan", ...minggu.map((t, i) => "M" + (i + 1) + " " + tanggalWib(t).slice(5) + " (hari aktif)")];
+  const hasil = [kepala.map(kutip).join(",")];
+  for (const r of rows) hasil.push([r.p.nim, r.p.nama, r.p.kelas, r.total.hariAktif, r.total.hariKerja, r.total.menit, r.total.kirim, r.total.jalankan, r.total.babLulus, r.persenHadir === null ? "" : r.persenHadir, r.skor, ...r.minggu.map((m) => (m.depan ? "" : m.hariAktif))].map(kutip).join(","));
+  return hasil.join("\r\n") + "\r\n";
 }

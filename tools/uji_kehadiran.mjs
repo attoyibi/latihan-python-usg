@@ -59,7 +59,9 @@ cek("bab yang masih dikerjakan bukan lulus", !k1.kerja.some((x) => x.bab === 7))
 cek("sesi tersusun dengan lama aktif", k1.sesi.length === 1 && k1.sesi[0].aktif === 1500);
 cek("jam server mencegah jam perangkat palsu mengubah waktu", kej.get("u2").kerja[0].t === Date.parse("2026-10-05T12:00:00Z") && kej.get("u2").janggal === 1);
 const kejJ = K.susunKejadian({ percobaan: [{ user_id: "j1", bab: 4, jenis: "jalankan", lulus: null, dibuat_pada: "2026-10-05T12:00:00Z" }, { user_id: "j1", bab: 4, jenis: "kirim", lulus: false, dibuat_pada: "2026-10-05T12:10:00Z" }] });
-cek("baris Jalankan tidak dihitung sebagai pengerjaan untuk kehadiran (hanya Kirim)", kejJ.get("j1").kerja.length === 1 && !K.susunKejadian({ percobaan: [{ user_id: "j2", bab: 4, jenis: "jalankan", dibuat_pada: "2026-10-05T12:00:00Z" }] }).get("j2"));
+const kejJ2 = K.susunKejadian({ percobaan: [{ user_id: "j2", bab: 4, jenis: "jalankan", dibuat_pada: "2026-10-05T12:00:00Z" }] }).get("j2");
+cek("baris Jalankan tidak dihitung sebagai pengerjaan untuk kehadiran (hanya Kirim)", kejJ.get("j1").kerja.length === 1 && kejJ2.kerja.length === 0);
+cek("Jalankan dicatat terpisah (waktunya) untuk ringkasan", kejJ.get("j1").jalan.length === 1 && kejJ2.jalan.length === 1 && kejJ2.jalan[0] === Date.parse("2026-10-05T12:00:00Z"));
 cek("sesiMulaiGlobal mengambil sesi paling awal", K.sesiMulaiGlobal([{ mulai: "2026-10-05T00:00:00Z" }, { mulai: "2026-10-03T00:00:00Z" }]) === Date.parse("2026-10-03T00:00:00Z") && K.sesiMulaiGlobal([]) === null);
 
 console.log("\n== siap sebelum kelas ==");
@@ -209,5 +211,55 @@ cek("CSV memuat kolom pertemuan dan status H A L", baris[0].includes("P1") && ba
 cek("koreksi manual ditandai bintang", baris[2].includes("H*"));
 cek("rumus dan tanda kutip di nama diamankan", baris[5].startsWith("'=1+1") && baris[5].includes('"Di ""Ki"", S."'));
 
+
+console.log("\n== periode: minggu, bulan, semester ==");
+{
+  const jd = K.buatJadwal({ kelas: "A", tanggalPertama: "2026-09-16", jamMulai: "08:00", jamSelesai: "10:00", jumlah: 14 });
+  const jb = K.buatJadwal({ kelas: "B", tanggalPertama: "2026-09-17", jamMulai: "13:00", jamSelesai: "15:00", jumlah: 14 });
+  const p = K.periodeSemester([jd, jb], K.dariWib("2026-10-07", "09:00"));
+  cek("semester otomatis: Senin pekan pertemuan pertama sampai akhir pekan pertemuan terakhir", p.dariJadwal && K.tanggalWib(p.mulai) === "2026-09-14" && K.hariDariWib(p.mulai) === 1 && K.tanggalWib(p.akhir - 1) === "2026-12-20", K.tanggalWib(p.akhir - 1));
+  const libur = K.tandaiLibur(jd, 1, true);
+  cek("pertemuan libur di awal tidak menggeser awal semester", K.tanggalWib(K.periodeSemester([libur], 0).mulai) === "2026-09-21");
+  cek("tanpa jadwal dipakai awal data sampai pekan ini", (() => { const q = K.periodeSemester([[]], K.dariWib("2026-10-07", "09:00"), K.dariWib("2026-09-01", "10:00")); return !q.dariJadwal && K.tanggalWib(q.mulai) === "2026-08-31" && K.tanggalWib(q.akhir - 1) === "2026-10-11"; })() && K.periodeSemester([[]], 0, null) === null);
+  const mg = K.daftarMinggu(p);
+  cek("daftar minggu: 14 pekan, semuanya Senin", mg.length === 14 && mg.every((t) => K.hariDariWib(t) === 1));
+  const bl = K.daftarBulan(p);
+  cek("daftar bulan: September sampai Desember, awal bulan WIB", bl.length === 4 && K.labelBulan(bl[0]) === "Sep 2026" && K.labelBulan(bl[3]) === "Des 2026" && bl.every((t) => K.tanggalWib(t).endsWith("-01") && K.jamWib(t) === "00:00"));
+  cek("bulan mengikuti WIB, bukan UTC (1 Okt 00:30 WIB masih Oktober)", K.labelBulan(Date.parse("2026-09-30T17:30:00Z")) === "Okt 2026" && K.labelBulan(Date.parse("2026-09-30T16:30:00Z")) === "Sep 2026");
+  cek("level hari aktif", [0, 1, 2, 3, 4, 5, 7].map(K.levelHariAktif).join() === "0,1,1,2,2,3,3");
+
+  const mk = (kerja, sesi, jalan = []) => ({ kerja, sesi, jalan, janggal: 0 });
+  const T = (tgl, jam) => K.dariWib(tgl, jam);
+  const kk = mk(
+    [{ t: T("2026-09-15", "20:00"), bab: 1, lulus: false }, { t: T("2026-09-15", "20:10"), bab: 1, lulus: true }, { t: T("2026-09-22", "09:00"), bab: 2, lulus: true }, { t: T("2026-10-20", "09:00"), bab: 3, lulus: true }],
+    [{ mulai: T("2026-09-15", "19:00"), akhir: T("2026-09-15", "20:30"), aktif: 3000, bab: [1] }, { mulai: T("2026-09-30", "23:30"), akhir: T("2026-10-01", "00:30"), aktif: 1800, bab: [2] }],
+    [T("2026-09-15", "19:30"), T("2026-09-15", "19:40"), T("2026-09-15", "19:50")]
+  );
+  const SK = T("2026-10-07", "09:00");
+  const sem = K.ringkasRentang(kk, p.mulai, p.akhir, SK);
+  cek("ringkasan semester: hari aktif 3 (dua hari mengerjakan, satu hanya sesi)", sem.hariAktif === 3 && sem.hariKerja === 2, JSON.stringify(sem));
+  cek("peristiwa setelah 'sekarang' tidak dihitung", sem.kirim === 3 && sem.babLulus === 2, JSON.stringify(sem));
+  cek("menit dari sesi yang mulai di rentang, tidak ganda untuk sesi lewat tengah malam", sem.menit === 80, String(sem.menit));
+  cek("Jalankan dihitung terpisah dari pengerjaan", sem.jalankan === 3);
+  const sep = K.ringkasRentang(kk, K.awalBulan(T("2026-09-15", "10:00")), K.awalBulanBerikut(T("2026-09-15", "10:00")), SK);
+  const okt = K.ringkasRentang(kk, K.awalBulan(T("2026-10-02", "10:00")), K.awalBulanBerikut(T("2026-10-02", "10:00")), SK);
+  cek("ringkasan per bulan memisahkan September dan Oktober", sep.hariAktif === 3 && sep.menit === 80 && okt.hariAktif === 0 && okt.kirim === 0, JSON.stringify([sep, okt]));
+  const kv = K.kurvaMingguan(kk, mg, SK);
+  cek("kurva mingguan: tiga minggu pertama aktif, minggu keempat sepi", kv[0].hariAktif === 1 && kv[0].level === 1 && kv[1].hariAktif === 1 && kv[2].hariAktif === 1 && kv[3].hariAktif === 0 && kv[3].level === 0, JSON.stringify(kv.slice(0, 4).map((x) => x.hariAktif)));
+  cek("minggu yang belum berlangsung ditandai depan dan kosong", kv[4].depan === true && kv[4].level === 0 && kv[3].depan === false);
+  cek("minggu berjalan dihitung hanya sampai sekarang", kv[3].awal <= SK && !kv[3].depan);
+  const kosongK = K.ringkasRentang(mk([], [], []), p.mulai, p.akhir, SK);
+  cek("peserta tanpa data: semua nol tanpa galat", kosongK.hariAktif === 0 && kosongK.menit === 0 && kosongK.babLulus === 0);
+  const rows = [
+    { p: { nim: "1", nama: "Ani", kelas: "A" }, total: sem, persenHadir: 100, skor: 80, minggu: kv },
+    { p: { nim: "=2", nama: "Bimo", kelas: "B" }, total: kosongK, persenHadir: null, skor: 0, minggu: kv.map((m) => Object.assign({}, m, { hariAktif: 0 })) },
+  ];
+  const rata = K.rataRingkas(rows);
+  cek("rata-rata kelompok", rata.n === 2 && rata.hariAktif === 1.5 && rata.hadir === 50 && rata.skor === 40, JSON.stringify(rata));
+  cek("rata-rata kelompok kosong tidak membagi nol", K.rataRingkas([]).n === 0 && K.rataRingkas([]).hariAktif === 0);
+  const cs = K.csvSemester(rows, mg).split("\r\n");
+  cek("CSV semester: kepala memuat kolom per minggu, satu baris per peserta, rumus diamankan", cs[0].includes("M1 09-14") && cs[0].includes("M14") && cs[1].startsWith("1,Ani,A,3,2,80,") && cs[2].startsWith("'=2,Bimo") && cs.length === 4, cs[1]);
+  cek("CSV semester: minggu yang belum berlangsung kosong, bukan nol", cs[1].split(",").slice(11)[4] === "" && cs[1].split(",").slice(11)[0] === "1");
+}
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

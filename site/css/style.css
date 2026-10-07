@@ -513,3 +513,13 @@ tr.klik:hover{background:var(--soft)}
 @media (max-width:640px){.filters>*,.filters select,.filters input{max-width:100%;min-width:0}.filters select{flex:1 1 140px;text-overflow:ellipsis}.filters input[type=search]{flex:1 1 100%}}
 .riset-rinci{margin:0 0 8px}.riset-rinci summary{cursor:pointer;color:var(--brand-strong);font-size:13.5px;padding:6px 0}.riset-rinci p{margin:4px 0 0}
 @media (max-width:640px){.riset-pilihan,.rs-cek,.kh-pilkol label{min-height:40px;align-items:center}.riset-pilihan input,.rs-cek input,.kh-pilkol input{width:20px;height:20px}}
+
+/* ---- periode bulan dan semester ---- */
+.kh-bulan{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 10px}
+.kh-bulan .kh-hbtn{padding:6px 12px;font-size:13px}
+.kh-wk{display:grid;gap:2px;min-width:180px}
+.kh-wk span{height:16px;border-radius:3px}
+.kh-semester td:nth-child(2){min-width:200px}
+.kh-kot.lx{background:transparent;border:1px dashed var(--line)}
+@media (max-width:640px){.kh-semester td:nth-child(2){min-width:150px}}
+@media (max-width:640px){.kh-bulan .kh-hbtn{min-height:40px}}

@@ -125,7 +125,7 @@ function daftar({ ringkas, unduh, ulang, kuliah, skrg }) {
     });
   });
   const selKelas = h("select", { id: "jKelas", "aria-label": "Kelas", onchange: (e) => { ui.kelas = e.target.value; ulang(); } }, h("option", { value: "" }, "Semua kelas"), kelasAda.map((k) => h("option", { value: k, selected: k === ui.kelas ? "" : false }, k)));
-  const th = (k, t) => h("th", { scope: "col", class: "klik" + (ui.urut.k === k ? " urut" : ""), onclick: () => { ui.urut = ui.urut.k === k ? { k, a: !ui.urut.a } : { k, a: k === "nama" }; ulang(); } }, t + (ui.urut.k === k ? (ui.urut.a ? " ↑" : " ↓") : ""));
+  const th = (k, t) => h("th", { scope: "col", class: "klik" + (ui.urut.k === k ? " urut" : ""), onclick: () => { ui.urut = ui.urut.k === k ? { k, a: !ui.urut.a } : { k, a: false }; ulang(); } }, t + (ui.urut.k === k ? (ui.urut.a ? " ↑" : " ↓") : ""));
   const baris = L.map((r) =>
     h(
       "tr",

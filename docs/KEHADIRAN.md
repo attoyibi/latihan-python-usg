@@ -22,6 +22,16 @@ Semuanya ada di `site/js/kehadiran.js` dan mudah diubah (konstanta di bagian ata
 | Hanya membaca | Membuka situs minimal 2 menit aktif pada hari itu tanpa mengirim jawaban. |
 | Skor keaktifan | 0 sampai 100: waktu aktif 30, bab lulus 30, hari mengerjakan 20, laporan 20. Bila belum ada data sesi, bobot waktu dibuang dan skor diskalakan dari tiga komponen lain agar peserta lama tidak dirugikan. Hanya ringkasan untuk membantu nilai akhir, bukan nilai itu sendiri. |
 
+## Per bulan dan semester (tab Aktivitas)
+
+Selain Per hari dan Per minggu, tab **Aktivitas** punya **Per bulan** dan **Semester** untuk melihat keaktifan sepanjang semester. Tidak ada tabel baru: semuanya dihitung dari data yang sama (percobaan, sesi, progres, laporan).
+
+- **Periode otomatis dari jadwal kelas**: dari Senin pekan pertemuan pertama sampai akhir pekan pertemuan terakhir (pertemuan libur tidak dihitung). Memilih satu kelas membatasi periode ke jadwal kelas itu; memilih Semua kelas memakai gabungan jadwalnya. Bila belum ada jadwal, awal periode diambil dari data aktivitas paling awal.
+- **Per bulan**: pilih bulan di baris tombol; tiap peserta punya hari aktif, hari mengerjakan, menit aktif, pengerjaan, Jalankan, dan bab lulus. Bentuk Kalender menampilkan semua bulan sekaligus. Bisa diunduh CSV.
+- **Semester**: satu baris per peserta untuk seluruh periode: strip minggu demi minggu (makin pekat makin banyak hari aktif), hari aktif, menit aktif, pengerjaan, Jalankan, bab lulus, persen hadir, dan skor. Judul kolom bisa diklik untuk mengurutkan. Bila ada beberapa kelas, tampil rata-rata per kelas. Bentuk Kalender menampilkan peserta × minggu. Ketuk satu peserta untuk melihat kurva mingguannya selama semester. Bisa diunduh CSV.
+- Hari yang belum terjadi tidak dihitung dan minggu yang belum berlangsung ditandai putus-putus. Sesi yang melewati tengah malam dihitung pada hari ia dimulai.
+- **Menit aktif baru terkumpul sejak pencatatan sesi berjalan**, jadi bulan atau minggu sebelumnya bisa menunjukkan 0 menit walau peserta aktif; hari aktif, pengerjaan, dan bab lulus tetap terisi dari data lama.
+
 ## Jam yang dipercaya
 
 Baris yang masuk ke database diberi **jam server** (`diterima_pada`) oleh database sendiri; browser tidak bisa mengisinya. Yang dipakai adalah jam server bila ada, jika tidak jam perangkat (data lama, sebelum migrasi). Peserta yang mengubah jam perangkatnya tidak bisa membuat tugas tampak selesai lebih awal. Bila jam perangkat menyimpang lebih dari 10 menit dari jam server, dashboard memberi tahu di rincian peserta. Semua tanggal ditampilkan dalam WIB.
