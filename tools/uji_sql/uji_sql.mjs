@@ -493,5 +493,68 @@ console.log("\n== Tahap I: migrasi 0006 (kehadiran dan keaktifan) pada data yang
   cek("tidak ada sesi tanpa pemilik (tanpa data yatim)", (await q("select count(*)::int as n from public.sesi_belajar s where not exists (select 1 from public.profiles p where p.id = s.user_id)")).rows[0].n === 0);
 }
 
+console.log("\n== Tahap J: migrasi 0007 (jejak peserta dan persetujuan penelitian) pada data yang sudah ada ==");
+{
+  const U1 = "11111111-1111-1111-1111-111111111111";
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  const sebelum = (await q("select count(*)::int as n from public.percobaan")).rows[0].n;
+  if (!(await jalankan("0007_riset_perilaku.sql berjalan di atas data lama", migrasi("0007_riset_perilaku.sql")))) process.exit(1);
+  cek("0007 aman dijalankan ulang", await jalankan("0007 diulang", migrasi("0007_riset_perilaku.sql")));
+  cek("0001 sampai 0007 berurutan diulang tanpa galat", await jalankan("ulang semuanya sampai 0007", ["0001_skema", "0002_keamanan", "0003_matakuliah", "0004_kelas_terstruktur", "0005_integritas", "0006_kehadiran", "0007_riset_perilaku"].map((f) => migrasi(f + ".sql")).join("\n")));
+  cek("data percobaan lama utuh dan kolom baru kosong", (await q("select count(*)::int as n from public.percobaan")).rows[0].n === sebelum && (await q("select count(*)::int as n from public.percobaan where hasil is not null or galat_jenis is not null")).rows[0].n === 0);
+
+  const JAL = "insert into public.percobaan (user_id, matakuliah_id, bab, jenis, lulus, kode, pola, rekaman, hasil, galat_jenis, galat_pesan, cocok_contoh, petunjuk) values ($1, 'algoritma-python', 4, 'jalankan', null, 'print(x)', '{\"cps\":3}'::jsonb, $2::jsonb, $3, $4, $5, $6, $7) returning id, diterima_pada";
+  const jal = await sisip(U6, JAL, U6, '{"awal":"","e":[["e",0,0,0,"print(x)",8,900]]}', "galat", "NameError", "name 'x' is not defined", null, 1);
+  cek("peserta menyimpan baris Jalankan lengkap dengan hasil dan jenis galat", !jal.error && jal.rows[0].diterima_pada !== null, jal.error);
+  const jalan = await sisip(U6, JAL, U6, null, "jalan", null, null, true, 0);
+  cek("Jalankan yang berjalan dan cocok dengan contoh tersimpan", !jalan.error);
+  cek("hasil di luar daftar ditolak", ditolak(await sisip(U6, JAL, U6, null, "mungkin", null, null, null, 0), "23514"));
+  cek("pesan galat lebih dari 300 karakter ditolak", ditolak(await sisip(U6, JAL, U6, null, "galat", "NameError", "x".repeat(301), null, 0), "23514"));
+  cek("jenis galat lebih dari 60 karakter ditolak", ditolak(await sisip(U6, JAL, U6, null, "galat", "y".repeat(61), "x", null, 0), "23514"));
+  cek("jumlah petunjuk di luar 0 sampai 9 ditolak", ditolak(await sisip(U6, JAL, U6, null, "jalan", null, null, null, 12), "23514"));
+  cek("rekaman Jalankan lebih dari 40 ribu karakter ditolak", ditolak(await sisip(U6, JAL, U6, JSON.stringify({ awal: "", e: [["e", 0, 0, 0, "x".repeat(41000), 1, 1]] }), "jalan", null, null, null, 0), "23514"));
+  cek("rekaman Kirim yang besar (di bawah batas lama) tetap diterima", !(await sisip(U6, "insert into public.percobaan (user_id, matakuliah_id, bab, jenis, lulus, kode, rekaman, hasil) values ($1, 'algoritma-python', 4, 'kirim', false, 'x', $2::jsonb, 'gagal')", U6, JSON.stringify({ awal: "", e: [["e", 0, 0, 0, "x".repeat(50000), 1, 1]] }))).error);
+  cek("peserta lain tidak membaca baris Jalankan orang lain", (await sisip(U1, "select * from public.percobaan where user_id = $1 and jenis = 'jalankan'", U6)).rows.length === 0);
+  cek("instruktur membaca semua Jalankan dan galatnya (query Jejak peserta)", (await sisip(IN, "select id, user_id, bab, jenis, hasil, galat_jenis, petunjuk, pola, dibuat_pada, diterima_pada from public.percobaan where matakuliah_id = 'algoritma-python' and jenis = 'jalankan' order by id")).rows.length >= 2);
+  cek("peserta tidak bisa mengubah hasil percobaan yang sudah terkirim", (await sisip(U6, "update public.percobaan set hasil = 'lulus' where user_id = $1", U6)).n === 0);
+  cek("analisis integritas yang hanya memakai jenis kirim tidak terpengaruh baris Jalankan", (await sisip(IN, "select count(*)::int as n from public.percobaan where jenis = 'kirim' and matakuliah_id = 'algoritma-python' and user_id = $1", U6)).rows[0].n >= 1);
+
+  // ---- persetujuan penelitian ----
+  const UBAH = "update public.profiles set riset_setuju = $2 where id = $1";
+  cek("sebelum menjawab, persetujuan kosong dan tanpa kode", (await sisip(U1, "select riset_setuju, kode_riset, riset_setuju_pada from public.profiles where id = $1", U1)).rows[0].riset_setuju === null);
+  cek("peserta menyatakan setuju sendiri", (await sisip(U1, UBAH, U1, true)).n === 1);
+  const p1 = (await sisip(U1, "select riset_setuju, kode_riset, riset_setuju_pada from public.profiles where id = $1", U1)).rows[0];
+  cek("kode riset dibuat otomatis berbentuk R- diikuti 8 karakter dan waktu setuju tercatat", /^R-[0-9a-f]{8}$/.test(p1.kode_riset || "") && p1.riset_setuju_pada !== null, JSON.stringify(p1));
+  const palsu = await sisip(U1, "update public.profiles set kode_riset = 'R-palsu123' where id = $1", U1);
+  cek("peserta tidak bisa mengubah kode risetnya sendiri (diabaikan)", (await q("select kode_riset from public.profiles where id = $1", [U1])).rows[0].kode_riset === p1.kode_riset, JSON.stringify(palsu));
+  await sisip(U1, UBAH, U1, false);
+  const p1b = (await q("select riset_setuju, kode_riset, riset_setuju_pada from public.profiles where id = $1", [U1])).rows[0];
+  cek("menarik persetujuan tetap mencatat waktu dan kode tidak berubah", p1b.riset_setuju === false && p1b.kode_riset === p1.kode_riset && new Date(p1b.riset_setuju_pada) >= new Date(p1.riset_setuju_pada));
+  await sisip(U1, "update public.profiles set nama = 'Nama Baru Peserta Satu' where id = $1", U1);
+  cek("mengubah data lain tidak menggeser waktu persetujuan", (await q("select riset_setuju_pada from public.profiles where id = $1", [U1])).rows[0].riset_setuju_pada.toString() === p1b.riset_setuju_pada.toString());
+  await sisip(U6, UBAH, U6, true);
+  const k6 = (await q("select kode_riset from public.profiles where id = $1", [U6])).rows[0].kode_riset;
+  cek("tiap peserta mendapat kode riset berbeda", /^R-/.test(k6 || "") && k6 !== p1.kode_riset);
+  cek("peserta tidak melihat persetujuan atau kode orang lain", (await sisip(U1, "select riset_setuju, kode_riset from public.profiles where id = $1", U6)).rows.length === 0);
+  cek("instruktur membaca persetujuan dan kode semua peserta", (await sisip(IN, "select id, riset_setuju, kode_riset from public.profiles where riset_setuju is not null")).rows.length >= 2);
+  cek("peran tetap tidak bisa dinaikkan lewat perubahan profil", ditolak(await sisip(U1, "update public.profiles set peran = 'instruktur' where id = $1", U1), RLS) || (await q("select peran from public.profiles where id = $1", [U1])).rows[0].peran === "peserta");
+
+  // ---- catatan ekspor ----
+  const LOG = "insert into public.riset_ekspor_log (matakuliah_id, oleh, jumlah_peserta, jumlah_baris, opsi) values ('algoritma-python', $1, 2, 40, '{\"kode\":false}'::jsonb)";
+  cek("instruktur mencatat ekspor", !(await sisip(IN, LOG, IN)).error);
+  cek("peserta tidak bisa menulis atau membaca catatan ekspor", ditolak(await sisip(U6, LOG, U6), RLS) && (await sisip(U6, "select * from public.riset_ekspor_log")).rows.length === 0);
+  cek("catatan ekspor tidak bisa diubah atau dihapus (hanya tambah)", ditolak(await sisip(IN, "update public.riset_ekspor_log set jumlah_baris = 0"), "42501") && ditolak(await sisip(IN, "delete from public.riset_ekspor_log"), "42501"));
+}
+
+console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
+{
+  const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
+  const r = await q(periksa);
+  const baris = r.rows && r.rows[0];
+  const kolom = baris ? Object.keys(baris) : [];
+  cek("periksa_migrasi.sql berjalan dan memuat tujuh kolom", !r.error && kolom.length === 7, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0007 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+}
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

@@ -48,7 +48,7 @@ async function muat(cid) {
       ambilSemua(() => c.from("jadwal_kelas").select("*").eq("matakuliah_id", cid).order("kelas").order("pertemuan")),
       ambilSemua(() => c.from("koreksi_kehadiran").select("*").eq("matakuliah_id", cid).order("user_id")),
       ambilSemua(() => c.from("sesi_belajar").select("*").eq("matakuliah_id", cid).order("id")),
-      ambilSemua(() => c.from("percobaan").select("user_id,bab,lulus,dibuat_pada,diterima_pada").eq("matakuliah_id", cid).order("id")),
+      ambilSemua(() => c.from("percobaan").select("user_id,bab,jenis,lulus,dibuat_pada,diterima_pada").eq("matakuliah_id", cid).order("id")),
       ambilSemua(() => c.from("laporan").select("user_id,bab").eq("matakuliah_id", cid).order("user_id")),
       ambilSemua(() => c.from("jadwal_riwayat").select("*").eq("matakuliah_id", cid).order("id")),
     ]);

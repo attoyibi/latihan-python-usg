@@ -2,6 +2,7 @@
 // Menguji sinkron progres (site/js/sinkron.js) dengan klien Supabase tiruan di memori.
 // Jalankan:  node tools/uji_sinkron.mjs
 let gagal = 0;
+const sama = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 function cek(nama, ok, detail = "") {
   if (!ok) gagal++;
   console.log((ok ? "OK    " : "GAGAL ") + nama + (ok ? "" : "  " + detail));
@@ -17,6 +18,8 @@ globalThis.window = { addEventListener: (n, f) => (pendengar["w:" + n] = f), APP
 // Klien tiruan: mencatat panggilan, bisa dipaksa gagal.
 const log = { progres: [], percobaan: [], aktivitas: [], opsi: [], rpc: [] };
 let gagalSekarang = null;
+let kolomHilang = false; // meniru database yang belum menjalankan migrasi 0007
+const panggilanInsert = [];
 let session = { user: { id: "u1", email: "a@x.id" } };
 const klien = {
   auth: { getSession: async () => ({ data: { session } }), onAuthStateChange: () => ({ data: { subscription: {} } }) },
@@ -39,6 +42,8 @@ const klien = {
         log.aktivitas.push(...rows);
         return { error: null };
       }
+      panggilanInsert.push(rows.length);
+      if (kolomHilang && rows.some((r) => "hasil" in r)) return { error: { code: "PGRST204", message: "Could not find the 'hasil' column of 'percobaan' in the schema cache" } };
       log.percobaan.push(...rows);
       return { error: null };
     },
@@ -141,6 +146,61 @@ cek("ambilProgres mengembalikan baris dari server", Array.isArray(baris) && bari
 gagalSekarang = { message: "boom" };
 cek("ambilProgres mengembalikan null bila gagal (bukan memalsukan data kosong)", (await Sinkron.ambilProgres("algoritma-python")) === null);
 gagalSekarang = null;
+
+// ---------- baris Jalankan, hasil, dan galat ----------
+session = { user: { id: "u1", email: "a@x.id" } };
+await Auth.init();
+{
+  const awal = log.percobaan.length;
+  Sinkron.catat("algoritma-python", 4, { jenis: "jalankan", hasil: "galat", galat_jenis: "SyntaxError", galat_pesan: "expected ':'", petunjuk: 1, kode: "if x", pola: { cps: 3 }, rekaman: { awal: "", e: [] } });
+  Sinkron.catat("algoritma-python", 4, { jenis: "jalankan", hasil: "jalan", cocok_contoh: true, petunjuk: 1, kode: "print(1)" });
+  Sinkron.catat("algoritma-python", 4, { lulus: false, kasus_lulus: 3, kasus_total: 7, kasus_gagal: [4], hasil: "gagal", petunjuk: 2, kode: "print(2)" });
+  await Sinkron.kirimSekarang();
+  const baru = log.percobaan.slice(awal);
+  cek("Jalankan dikirim sebagai baris jenis jalankan tanpa nilai lulus", baru[0].jenis === "jalankan" && baru[0].lulus === null && baru[0].kasus_total === null && baru[0].kasus_gagal === null);
+  cek("hasil, jenis galat, pesan, dan petunjuk ikut terkirim", baru[0].hasil === "galat" && baru[0].galat_jenis === "SyntaxError" && baru[0].galat_pesan === "expected ':'" && baru[0].petunjuk === 1 && baru[0].user_id === "u1");
+  cek("pola dan rekaman Jalankan ikut terkirim", baru[0].pola.cps === 3 && baru[0].rekaman.awal === "");
+  cek("cocok dengan contoh tersimpan sebagai boolean, kosong bila tidak dibandingkan", baru[1].cocok_contoh === true && baru[0].cocok_contoh === null);
+  cek("Kirim tetap berbentuk Kirim lengkap dengan kasus uji", baru[2].jenis === "kirim" && baru[2].lulus === false && baru[2].kasus_lulus === 3 && baru[2].hasil === "gagal");
+  Sinkron.catat("algoritma-python", 4, { jenis: "jalankan", hasil: "galat", galat_jenis: "y".repeat(100), galat_pesan: "z".repeat(1000), petunjuk: 99, kode: "x" });
+  await Sinkron.kirimSekarang();
+  const terakhir = log.percobaan.at(-1);
+  cek("jenis dan pesan galat dipotong, petunjuk dibatasi 0 sampai 9", terakhir.galat_jenis.length === 60 && terakhir.galat_pesan.length === 300 && terakhir.petunjuk === 9);
+}
+{
+  panggilanInsert.length = 0;
+  for (let i = 0; i < 25; i++) Sinkron.catat("algoritma-python", 5, { jenis: "jalankan", hasil: "jalan", kode: "print(" + i + ")" });
+  await Sinkron.kirimSekarang();
+  cek("banyak baris dikirim per sepuluh (permintaan kecil)", sama(panggilanInsert, [10, 10, 5]), JSON.stringify(panggilanInsert));
+}
+{
+  // database belum punya kolom baru (migrasi 0007 belum dijalankan): Kirim tidak boleh macet
+  kolomHilang = true;
+  panggilanInsert.length = 0;
+  const awal = log.percobaan.length;
+  Sinkron.catat("algoritma-python", 6, { jenis: "jalankan", hasil: "galat", galat_jenis: "NameError", kode: "x" });
+  Sinkron.catat("algoritma-python", 6, { lulus: true, kasus_lulus: 7, kasus_total: 7, kasus_gagal: [], hasil: "lulus", petunjuk: 0, kode: "print(1)" });
+  await Sinkron.kirimSekarang();
+  const baru = log.percobaan.slice(awal);
+  cek("tanpa kolom baru di database, Kirim tetap terkirim tanpa kolom itu", baru.length === 1 && baru[0].jenis === "kirim" && baru[0].lulus === true && !("hasil" in baru[0]) && !("petunjuk" in baru[0]));
+  cek("tanpa kolom baru, baris Jalankan dilewati dan antrean tidak macet", !baru.some((r) => r.jenis === "jalankan"));
+  Sinkron.catat("algoritma-python", 6, { lulus: false, kasus_lulus: 1, kasus_total: 7, kasus_gagal: [2], kode: "x" });
+  await Sinkron.kirimSekarang();
+  cek("setelah itu langsung memakai bentuk lama tanpa mencoba kolom baru lagi", log.percobaan.at(-1).kasus_lulus === 1 && !("hasil" in log.percobaan.at(-1)));
+  kolomHilang = false;
+}
+{
+  // antrean offline dibatasi: Jalankan terlama dibuang lebih dulu, Kirim dipertahankan
+  gagalSekarang = { message: "offline" };
+  for (let i = 0; i < 320; i++) Sinkron.catat("algoritma-python", 7, { jenis: "jalankan", hasil: "jalan", kode: "j" + i });
+  Sinkron.catat("algoritma-python", 7, { lulus: true, kasus_lulus: 7, kasus_total: 7, kasus_gagal: [], kode: "kirim-penting" });
+  const antrean = JSON.parse(localStorage.getItem("latihan:u1:antrean-sinkron")).percobaan;
+  cek("antrean percobaan offline dibatasi 300 baris", antrean.length === 300, String(antrean.length));
+  cek("saat dibatasi, Kirim tidak dibuang dan Jalankan terlama yang dibuang", antrean.some((r) => r.kode === "kirim-penting") && !antrean.some((r) => r.kode === "j0") && antrean.some((r) => r.kode === "j319"));
+  gagalSekarang = null;
+  await Sinkron.kirimSekarang();
+  cek("setelah online, antrean terkirim semua", JSON.parse(localStorage.getItem("latihan:u1:antrean-sinkron")).percobaan.length === 0);
+}
 
 // Tanpa sesi: tidak mengirim apa pun.
 session = null;

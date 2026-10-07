@@ -482,3 +482,31 @@ summary{padding-block:10px}
 }
 .kh-matriks th.nama small,.kh-matriks th[scope=row] small{display:block;color:var(--muted);font-size:11.5px;font-weight:400}
 .kh-matriks th small{display:block}
+
+/* ---- Jejak peserta dan Riset ---- */
+th.klik{cursor:pointer;user-select:none}
+th.urut{color:var(--ink)}
+tr.klik{cursor:pointer}
+tr.klik:hover{background:var(--soft)}
+.rekap td.n{text-align:right;font-variant-numeric:tabular-nums}
+.kh-kolom{margin:0 0 10px}
+.kh-kolom summary{cursor:pointer;color:var(--muted);font-size:13px;padding:6px 0}
+.kh-pilkol{display:flex;flex-wrap:wrap;gap:6px 16px;padding:8px 12px;background:var(--soft);border-radius:10px;font-size:13px}
+.kh-pilkol label{display:flex;gap:4px;align-items:center;cursor:pointer}
+.rs-bar{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr) minmax(70px,auto);gap:10px;align-items:center;font-size:13px;margin:6px 0}
+.rs-t{height:12px;border-radius:4px;background:var(--soft);overflow:hidden}
+.rs-t i{display:block;height:100%;background:var(--brand)}
+.rs-t i.rs-galat{background:var(--danger)}
+.rs-t i.rs-bab{background:#378add}
+.rs-t i.rs-lain{background:#7f77dd}
+.rs-n{text-align:right;white-space:nowrap}
+.rs-dua{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin:14px 0}
+.rs-dua h4,.rs-opsi{margin:0 0 6px}
+.rs-opsi{display:flex;flex-direction:column;gap:4px;margin:8px 0;font-size:13.5px}
+.rs-cek{display:flex;gap:6px;align-items:flex-start;cursor:pointer}
+.rs-pratinjau{font-family:var(--mono);font-size:12px}
+.rs-pratinjau th,.rs-pratinjau td{white-space:nowrap}
+.riset-profil{margin:18px 0;padding:14px;border:1px solid var(--line);border-radius:12px}
+.riset-pilihan{display:flex;gap:8px;align-items:center;margin:6px 0;cursor:pointer}
+.riset-bar p{margin:0 0 8px}
+@media (max-width:640px){.rs-dua{grid-template-columns:minmax(0,1fr)}.rs-bar{grid-template-columns:minmax(0,1fr) minmax(0,auto);row-gap:2px}.rs-bar .rs-t{grid-column:1 / -1;order:3}.rs-n{white-space:normal}}

@@ -3,7 +3,8 @@
 // browser; modul ini menyusulkannya ke server tanpa pernah menghalangi peserta mengerjakan soal.
 //
 //   tandai(mataKuliah, ringkasan)  ringkasan satu bab berubah (dikirim setelah jeda singkat)
-//   catat(mataKuliah, bab, data)   satu kali "Kirim jawaban" (riwayat percobaan beserta kodenya)
+//   catat(mataKuliah, bab, data)   satu kali "Kirim jawaban" atau satu kali tombol Jalankan (data.jenis = "jalankan"):
+//                                  riwayat percobaan beserta kode, hasil, jenis galat, dan cara menulisnya
 //   aktivitas(mataKuliah, bab, jenis, detail)  jejak kecil (mis. percobaan tempel yang diblokir), digabung per jenis dan bab
 //   ambilProgres(mataKuliah)       progres milik peserta di server (untuk digabung saat masuk)
 //
@@ -13,6 +14,22 @@ import * as Auth from "./auth.js";
 const JEDA_MS = 2500;
 const ULANG_MS = 30000;
 const MAKS_KODE = 20000;
+const BATCH_PERCOBAAN = 10; // baris percobaan bisa besar (kode dan rekaman), jadi dikirim per sepuluh
+const MAKS_ANTREAN_PERCOBAAN = 300;
+// Kolom baru (migrasi 0007). Bila database belum punya, baris dikirim tanpa kolom itu dan baris Jalankan dilewati,
+// supaya Kirim tidak pernah macet hanya karena migrasi belum dijalankan.
+let kolomBaruAda = true;
+const KOLOM_BARU = ["hasil", "galat_jenis", "galat_pesan", "cocok_contoh", "petunjuk"];
+export const kolomBelumAda = (e) => !!e && (e.code === "PGRST204" || e.code === "42703" || /column .* (does not exist|of relation)|could not find the '.*' column/i.test(String(e.message || "")));
+function tanpaKolomBaru(baris) {
+  return baris
+    .filter((r) => r.jenis !== "jalankan")
+    .map((r) => {
+      const x = Object.assign({}, r);
+      for (const k of KOLOM_BARU) delete x[k];
+      return x;
+    });
+}
 
 let uidAntrean = null;
 let progres = new Map(); // "mk|bab" -> baris progres
@@ -80,7 +97,30 @@ export function catat(mataKuliah, bab, data) {
   if (!aktif()) return;
   pakaiAkun();
   const kode = typeof data.kode === "string" ? data.kode.slice(0, MAKS_KODE) : null;
-  percobaan.push({ matakuliah_id: mataKuliah, bab, jenis: "kirim", lulus: !!data.lulus, kasus_lulus: data.kasus_lulus, kasus_total: data.kasus_total, kasus_gagal: data.kasus_gagal || [], kode, pola: data.pola || null, rekaman: data.rekaman || null, dibuat_pada: new Date().toISOString() });
+  const jalankan = data.jenis === "jalankan";
+  percobaan.push({
+    matakuliah_id: mataKuliah,
+    bab,
+    jenis: jalankan ? "jalankan" : "kirim",
+    lulus: jalankan ? null : !!data.lulus,
+    kasus_lulus: jalankan ? null : data.kasus_lulus,
+    kasus_total: jalankan ? null : data.kasus_total,
+    kasus_gagal: jalankan ? null : data.kasus_gagal || [],
+    kode,
+    hasil: data.hasil || null,
+    galat_jenis: data.galat_jenis ? String(data.galat_jenis).slice(0, 60) : null,
+    galat_pesan: data.galat_pesan ? String(data.galat_pesan).slice(0, 300) : null,
+    cocok_contoh: typeof data.cocok_contoh === "boolean" ? data.cocok_contoh : null,
+    petunjuk: Number.isInteger(data.petunjuk) ? Math.min(9, Math.max(0, data.petunjuk)) : null,
+    pola: data.pola || null,
+    rekaman: data.rekaman || null,
+    dibuat_pada: new Date().toISOString(),
+  });
+  // Antrean tidak boleh tumbuh tanpa batas saat offline lama: baris Jalankan paling lama dibuang lebih dulu.
+  while (percobaan.length > MAKS_ANTREAN_PERCOBAAN) {
+    const i = percobaan.findIndex((r) => r.jenis === "jalankan");
+    percobaan.splice(i >= 0 ? i : 0, 1);
+  }
   simpanAntrean();
   jadwalkan(0);
 }
@@ -135,11 +175,19 @@ export async function kirimSekarang() {
       if (error && !galatPermanen(error)) throw error;
       for (const [k, v] of kirim) if (progres.get(k) === v) progres.delete(k);
     }
-    if (percobaan.length) {
-      const n = percobaan.length;
-      const { error } = await client.from("percobaan").insert(percobaan.slice(0, n).map((r) => Object.assign({ user_id: uid }, r)));
+    while (percobaan.length) {
+      const bagian = percobaan.slice(0, BATCH_PERCOBAAN);
+      const siapkan = (baris) => baris.map((r) => Object.assign({ user_id: uid }, r));
+      let baris = kolomBaruAda ? bagian : tanpaKolomBaru(bagian);
+      let { error } = baris.length ? await client.from("percobaan").insert(siapkan(baris)) : { error: null };
+      if (error && kolomBaruAda && kolomBelumAda(error)) {
+        kolomBaruAda = false;
+        baris = tanpaKolomBaru(bagian);
+        ({ error } = baris.length ? await client.from("percobaan").insert(siapkan(baris)) : { error: null });
+      }
       if (error && !galatPermanen(error)) throw error;
-      percobaan = percobaan.slice(n);
+      percobaan = percobaan.slice(bagian.length);
+      simpanAntrean();
     }
     if (jejak.length) {
       const n = jejak.length;

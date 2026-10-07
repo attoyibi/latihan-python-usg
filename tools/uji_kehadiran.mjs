@@ -58,6 +58,8 @@ cek("lulus yang hanya ada di progres tetap dihitung (data hasil sinkron lama)", 
 cek("bab yang masih dikerjakan bukan lulus", !k1.kerja.some((x) => x.bab === 7));
 cek("sesi tersusun dengan lama aktif", k1.sesi.length === 1 && k1.sesi[0].aktif === 1500);
 cek("jam server mencegah jam perangkat palsu mengubah waktu", kej.get("u2").kerja[0].t === Date.parse("2026-10-05T12:00:00Z") && kej.get("u2").janggal === 1);
+const kejJ = K.susunKejadian({ percobaan: [{ user_id: "j1", bab: 4, jenis: "jalankan", lulus: null, dibuat_pada: "2026-10-05T12:00:00Z" }, { user_id: "j1", bab: 4, jenis: "kirim", lulus: false, dibuat_pada: "2026-10-05T12:10:00Z" }] });
+cek("baris Jalankan tidak dihitung sebagai pengerjaan untuk kehadiran (hanya Kirim)", kejJ.get("j1").kerja.length === 1 && !K.susunKejadian({ percobaan: [{ user_id: "j2", bab: 4, jenis: "jalankan", dibuat_pada: "2026-10-05T12:00:00Z" }] }).get("j2"));
 cek("sesiMulaiGlobal mengambil sesi paling awal", K.sesiMulaiGlobal([{ mulai: "2026-10-05T00:00:00Z" }, { mulai: "2026-10-03T00:00:00Z" }]) === Date.parse("2026-10-03T00:00:00Z") && K.sesiMulaiGlobal([]) === null);
 
 console.log("\n== siap sebelum kelas ==");

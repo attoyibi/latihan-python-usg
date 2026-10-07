@@ -4,7 +4,7 @@
 //
 // Aturan yang dipakai (semuanya tertulis di sini supaya mudah diubah):
 //   * Satu pertemuan punya tenggat = jam mulai kelas. "Jendela kesiapan" = 6 hari sebelum jam mulai sampai jam mulai.
-//   * Siap = ada pengerjaan (kirim kode atau periksa jawaban konsep, atau lulus bab) di jendela itu.
+//   * Siap = ada pengerjaan (kirim kode atau periksa jawaban konsep, atau lulus bab) di jendela itu. Menekan Jalankan saja tidak dihitung.
 //     Bila pencatatan sesi sudah berjalan sejak sebelum jendela dimulai, peserta juga harus aktif minimal
 //     AMBANG_MENIT_SIAP menit. Untuk jendela sebelum pencatatan sesi aktif, menit aktif tidak diminta (datanya tidak ada).
 //   * Status pertemuan: libur, belum (kelas belum mulai), hadir (siap), tidak (tidak siap). Koreksi manual menimpa.
@@ -84,6 +84,7 @@ export function susunKejadian({ percobaan = [], progres = [], sesi = [] }) {
     return peta.get(id);
   };
   for (const r of percobaan) {
+    if (r.jenis === "jalankan") continue; // tombol Jalankan dicatat untuk jejak peserta; kehadiran hanya menghitung Kirim dan Periksa jawaban
     const t = waktuBaris(r);
     if (!Number.isFinite(t)) continue;
     const k = ambil(r.user_id);

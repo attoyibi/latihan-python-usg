@@ -212,6 +212,26 @@ export async function saveProfile(p) {
   return data;
 }
 
+// Persetujuan penelitian dibaca dan ditulis terpisah dari profil supaya masuk dan simpan profil tidak pernah ikut gagal
+// bila migrasi 0007 belum dijalankan. ada=false berarti fitur belum tersedia di database.
+export async function ambilPersetujuanRiset() {
+  const uid = getUserId();
+  if (!uid || !client) return { ada: false };
+  try {
+    const { data, error } = await client.from("profiles").select("riset_setuju").eq("id", uid).maybeSingle();
+    if (error || !data) return { ada: false };
+    return { ada: true, nilai: data.riset_setuju === true ? true : data.riset_setuju === false ? false : null };
+  } catch (e) {
+    return { ada: false };
+  }
+}
+export async function setPersetujuanRiset(nilai) {
+  const uid = getUserId();
+  if (!uid || !client) return { ok: false, galat: "Sesi berakhir. Masuk lagi." };
+  const { error } = await client.from("profiles").update({ riset_setuju: nilai === true }).eq("id", uid);
+  return error ? { ok: false, galat: friendly(error) } : { ok: true };
+}
+
 export async function signOut() {
   await client.auth.signOut();
 }

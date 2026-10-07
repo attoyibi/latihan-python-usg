@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Menguji perekam cara menulis (site/js/rekam.js): ringkasan pola, pemadatan, dan putar ulang.
 // Jalankan:  node tools/uji_rekam.mjs
-import { hitungPola, susunUlang, rekamanAman, pasangRekam, MAKS_REKAMAN } from "../site/js/rekam.js";
+import { hitungPola, susunUlang, rekamanAman, pasangRekam, gabungRekaman, MAKS_REKAMAN, MAKS_REKAMAN_JALANKAN } from "../site/js/rekam.js";
 import { idPerangkat, agenRingkas } from "../site/js/perangkat.js";
 
 let gagal = 0;
@@ -205,5 +205,46 @@ function ketikManusia(ed, jam, teks, mulaiIdx) {
   cek("ringkasan agen tidak membawa nomor versi", !/\d/.test(agenRingkas("Mozilla/5.0 (Windows NT 10.0) Chrome/126.0.0.0 Safari/537.36")));
 }
 
+
+// ---------- lihat() untuk baris Jalankan dan gabungRekaman ----------
+{
+  const jam = { t: 1000 };
+  const ed = editorPalsu("x = 1");
+  const rk = pasangRekam(ed, "x = 1", { sekarang: () => jam.t });
+  const ketik = (idx, teks) => {
+    for (let i = 0; i < teks.length; i++) {
+      jam.t += 120;
+      ed.ubah(idx + i, 0, teks[i]);
+    }
+  };
+  ketik(5, "\nprint(x)");
+  rk.jalankan();
+  const l1 = rk.lihat();
+  cek("lihat() mengembalikan pola dan rekaman sejak kirim terakhir", !!l1.pola && !!l1.rekaman && l1.rekaman.awal === "x = 1");
+  cek("lihat() menghitung Jalankan yang baru ditekan", l1.pola.jalankan === 1, JSON.stringify(l1.pola.jalankan));
+  jam.t += 500;
+  ketik(ed.teks.length, "\nprint(x + 1)");
+  rk.jalankan();
+  const l2 = rk.lihat();
+  cek("memanggil lihat() tidak menghapus catatan: rekaman berikutnya memuat yang sebelumnya", susunUlang(l2.rekaman).length > susunUlang(l1.rekaman).length && l2.pola.jalankan === 2);
+  const k = rk.ambil();
+  cek("ambil() setelah lihat() tetap utuh dari awal (rantai Kirim tidak berubah)", k.awal === "x = 1" && k.pola.jalankan === 2 && susunUlang(k.rekaman).at(-1).teks === ed.teks);
+  cek("setelah ambil(), catatan baru dimulai dari kode sekarang", rk.lihat().awal === ed.teks && rk.lihat().pola.jalankan === 0);
+  // batas ukuran khusus Jalankan
+  const besar = [];
+  for (let i = 0; i < 4000; i++) besar.push({ t: i * 1000, off: i * 7, del: 0, ins: "abcdefg", origin: "+input", panjang: i * 7 });
+  const kecilMaks = rekamanAman("", besar, [], MAKS_REKAMAN_JALANKAN);
+  cek("rekaman Jalankan yang terlalu besar dibuang (pola tetap ada)", kecilMaks === null && MAKS_REKAMAN_JALANKAN < MAKS_REKAMAN);
+
+  const r1 = { awal: "a", e: [["e", 100, 1, 0, "b", 1, 0], ["e", 100, 2, 0, "c", 1, 0]] };
+  const r2 = { awal: "abc", e: [["e", 50, 3, 0, "d", 1, 0]] };
+  const g = gabungRekaman([r1, r2]);
+  cek("rekaman berantai digabung menjadi satu", g.awal === "a" && g.e.length === 3 && susunUlang(g).at(-1).teks === "abcd");
+  const r3 = { awal: "XYZ", e: [["e", 50, 3, 0, "!", 1, 0]] };
+  const g2 = gabungRekaman([r1, r3]);
+  cek("kode yang diganti di luar rekaman disisipi satu penggantian utuh", susunUlang(g2).some((x) => x.teks === "XYZ") && susunUlang(g2).at(-1).teks === "XYZ!", JSON.stringify(susunUlang(g2).map((x) => x.teks)));
+  cek("rekaman kosong atau hilang dilewati", susunUlang(gabungRekaman([null, r1, undefined, r2])).at(-1).teks === "abcd" && gabungRekaman([null]) === null && gabungRekaman([]) === null);
+  cek("gabungRekaman tidak mengubah masukan", r1.e.length === 2 && r2.e.length === 1);
+}
 console.log(gagal ? "\n" + gagal + " uji GAGAL." : "\nSemua uji lulus.");
 process.exit(gagal ? 1 : 0);

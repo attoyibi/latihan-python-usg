@@ -6,6 +6,7 @@ import * as Rekam from "./rekam.js";
 import { laporanCard } from "./laporan.js";
 import * as Konsep from "./konsep.js";
 import * as Sesi from "./sesi.js";
+import { klasifikasiGalat } from "./galat.js";
 import { idPerangkat, agenRingkas } from "./perangkat.js";
 import { grade } from "./grader.js";
 import * as Auth from "./auth.js";
@@ -375,7 +376,7 @@ function konsepCard(m, ch) {
       if (em) em.className = "st selesai";
     }
     store.set(key("kirimTerakhir", m.bab), { konsep: true, lulus: nilai.lulus, persen, kasus_lulus: nilai.benar, kasus_total: nilai.total, waktu: new Date().toISOString() });
-    Sinkron.catat(COURSE.id, m.bab, { lulus: nilai.lulus, kasus_lulus: nilai.benar, kasus_total: nilai.total, kasus_gagal: nilai.butirSalah, kode: JSON.stringify(jawaban), pola: { jenis: "konsep", butir: butir.length, durasi_s: Math.round((Date.now() - mulai) / 1000), petunjuk: hintShown, percobaan_ke: tries } });
+    Sinkron.catat(COURSE.id, m.bab, { lulus: nilai.lulus, kasus_lulus: nilai.benar, kasus_total: nilai.total, kasus_gagal: nilai.butirSalah, hasil: nilai.lulus ? "lulus" : "gagal", petunjuk: hintShown, kode: JSON.stringify(jawaban), pola: { jenis: "konsep", butir: butir.length, durasi_s: Math.round((Date.now() - mulai) / 1000), petunjuk: hintShown, percobaan_ke: tries } });
     sinkronBab(m.bab);
   });
   kosongkan.addEventListener("click", () => {
@@ -502,6 +503,8 @@ function challengeCard(m, ch) {
   runBtn.addEventListener("click", async () => {
     markStarted(m.bab);
     if (rekam) rekam.jalankan();
+    // Cuplikan cara menulis sampai tombol ini ditekan; tidak memutus rantai rekaman Kirim.
+    const lihatJalan = rekam ? rekam.lihat() : null;
     store.set(key("runs", m.bab), store.get(key("runs", m.bab), 0) + 1);
     sinkronBab(m.bab);
     runBtn.disabled = true;
@@ -519,6 +522,8 @@ function challengeCard(m, ch) {
     const berhenti = Kemajuan.hitungBatas(BATAS_DETIK(), (t) => (out.textContent = t));
     const r = await run(kodeJalan, lines, true, LANG);
     berhenti();
+    const galatJalan = r.timeout ? { jenis: "Timeout", pesan: "Berjalan terlalu lama dan dihentikan" } : klasifikasiGalat(LANG, r.error);
+    let cocokContoh = null;
     if (r.timeout) {
       out.className = "out err";
       out.textContent = "Program berjalan terlalu lama dan dihentikan. Periksa perulangan yang tidak pernah berhenti.";
@@ -536,10 +541,13 @@ function challengeCard(m, ch) {
         const murni = await run(kodeJalan, lines, false, LANG);
         out.textContent = teksHasil;
         const cocok = !murni.error && !murni.timeout && normOut(murni.stdout) === normOut(t.expected);
+        cocokContoh = cocok;
         banding.append(h("div", { class: "verdict " + (cocok ? "pass" : "fail") }, cocok ? "Cocok dengan keluaran yang diharapkan untuk masukan ini." : "Belum cocok dengan keluaran yang diharapkan."));
         if (!cocok) banding.append(h("div", { class: "muted" }, "Yang diharapkan"), h("pre", {}, t.expected), h("div", { class: "muted" }, "Keluaran programmu"), h("pre", {}, normOut(murni.stdout || murni.error || "") || "(kosong)"));
       }
     }
+    // Setiap Jalankan dicatat (hasil, jenis galat, kode, cara menulis) untuk jejak peserta. Keluaran program tidak disimpan.
+    Sinkron.catat(COURSE.id, m.bab, { jenis: "jalankan", hasil: r.timeout ? "timeout" : r.error ? "galat" : "jalan", galat_jenis: galatJalan && galatJalan.jenis, galat_pesan: galatJalan && galatJalan.pesan, cocok_contoh: cocokContoh, petunjuk: store.get(key("hint", m.bab), 0), kode: kodeJalan, pola: lihatJalan && lihatJalan.pola, rekaman: lihatJalan && lihatJalan.rekaman });
     runBtn.disabled = false;
   });
 
@@ -572,7 +580,7 @@ function challengeCard(m, ch) {
     const tries = store.get(key("tries", m.bab), 0) + 1;
     store.set(key("tries", m.bab), tries);
     store.set(key("kirimTerakhir", m.bab), { kode: kodeKirim, lulus: all, kasus_lulus: passed, kasus_total: ch.tests.length, waktu: new Date().toISOString() });
-    Sinkron.catat(COURSE.id, m.bab, { lulus: all, kasus_lulus: passed, kasus_total: ch.tests.length, kasus_gagal: res.map((r, i) => (r.status === "pass" ? 0 : i + 1)).filter((x) => x > 0), kode: kodeKirim, pola: rk && rk.pola, rekaman: rk && rk.rekaman });
+    Sinkron.catat(COURSE.id, m.bab, { lulus: all, kasus_lulus: passed, kasus_total: ch.tests.length, kasus_gagal: res.map((r, i) => (r.status === "pass" ? 0 : i + 1)).filter((x) => x > 0), hasil: all ? "lulus" : "gagal", petunjuk: store.get(key("hint", m.bab), 0), kode: kodeKirim, pola: rk && rk.pola, rekaman: rk && rk.rekaman });
     result.replaceChildren(
       h("div", { class: "verdict " + (all ? "pass" : "fail") }, all ? "Lulus. Semua " + ch.tests.length + " kasus cocok." : "Belum lulus: " + passed + " dari " + ch.tests.length + " kasus cocok."),
       ...res.map(caseView)
@@ -690,10 +698,10 @@ async function renderBab(n) {
   Tata.bersihkan();
   TATA = Tata.baru(store);
   // Pemberitahuan sekali per akun: apa yang dicatat situs.
-  const perluInfo = !store.get("info-pencatatan-2", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
+  const perluInfo = !store.get("info-pencatatan-3", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
   const infoBar = perluInfo
-    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, percobaan menempel, serta jam dan lama kamu aktif belajar di situs ini (dipakai sebagai kehadiran dan keaktifan). Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
-        store.set("info-pencatatan-2", true);
+    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, percobaan menempel, jam dan lama kamu aktif belajar di situs ini (dipakai sebagai kehadiran dan keaktifan), serta setiap kali kamu menekan Jalankan atau Kirim beserta hasilnya dan jenis kesalahannya (bukan keluaran programmu). Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
+        store.set("info-pencatatan-3", true);
         e.target.closest(".info-bar").remove();
       } }, "Mengerti"))
     : null;
@@ -733,6 +741,7 @@ async function renderBab(n) {
   ].filter(Boolean));
   main.scrollTop = 0;
   window.scrollTo(0, 0);
+  tanyaRiset(main);
 }
 
 function babGrid() {
@@ -940,7 +949,7 @@ function renderPanduan() {
       h("h3", { style: "margin-top:16px" }, "Catatan"),
       h("ul", {}, li("Program yang berjalan terlalu lama dihentikan otomatis: 5 detik untuk Python, 8 detik untuk Java. Selama program berjalan ada hitungan waktunya."), li("Java perlu disiapkan dulu saat bab dibuka (sekitar 20 detik pertama kali). Bilah kemajuan di atas editor menunjukkan sisa waktunya; sambil menunggu, baca soalnya. Bila muncul pesan gagal, tekan Coba lagi; kodemu tidak hilang."),
       li("Di ponsel: gunakan Wi-Fi untuk membuka bab pertama (pengunduhan awal cukup besar, setelah itu tersimpan). Java butuh memori cukup besar; bila terus gagal di ponselmu, kerjakan bab Java di laptop. Memegang ponsel secara mendatar membuat editor lebih lega."), li("Saat dinilai, teks di dalam input(...) tidak dihitung; yang dibandingkan hanya hasil print."), li("Salin dan tempel dimatikan di halaman latihan. Ketik sendiri kodemu: justru mengetik yang membuatmu paham."),
-      li("Yang dicatat situs (diumumkan terbuka): kapan dan bagaimana kamu mengetik di editor latihan (waktu dan perubahan kode, bukan tombol di luar editor), kode tiap kali kamu mengirim jawaban, perangkat yang dipakai masuk (ID acak di browser ini, bukan alamat atau data perangkat kerasmu), jumlah percobaan menempel, serta jam dan lama kamu aktif di situs beserta bab yang kamu buka (aktif berarti tab terlihat dan ada gerakan; dipakai untuk kehadiran dan keaktifan, tanpa isi apa pun dan tanpa melihat tab atau aplikasi lain). Data ini hanya dibaca dosen pengampu untuk memastikan latihan dikerjakan sendiri, tidak dipakai sebagai satu-satunya dasar tuduhan, dan dihapus di akhir semester."), li("Tampilan bisa diatur: geser garis antara video dan soal, tarik pegangan di bawah editor untuk menambah tinggi, sembunyikan video, atau pakai Mode fokus (Esc untuk keluar)."), li("Progres tersimpan di akunmu, jadi tetap ada saat kamu masuk dari perangkat lain."))
+      li("Yang dicatat situs (diumumkan terbuka): kapan dan bagaimana kamu mengetik di editor latihan (waktu dan perubahan kode, bukan tombol di luar editor), kode tiap kali kamu mengirim jawaban, perangkat yang dipakai masuk (ID acak di browser ini, bukan alamat atau data perangkat kerasmu), jumlah percobaan menempel, jam dan lama kamu aktif di situs beserta bab yang kamu buka, serta setiap kali kamu menekan Jalankan atau Kirim beserta hasilnya dan jenis kesalahannya (bukan keluaran programmu) (aktif berarti tab terlihat dan ada gerakan; dipakai untuk kehadiran dan keaktifan, tanpa isi apa pun dan tanpa melihat tab atau aplikasi lain). Data ini hanya dibaca dosen pengampu untuk memastikan latihan dikerjakan sendiri, tidak dipakai sebagai satu-satunya dasar tuduhan, dan dihapus di akhir semester."), li("Tampilan bisa diatur: geser garis antara video dan soal, tarik pegangan di bawah editor untuk menambah tinggi, sembunyikan video, atau pakai Mode fokus (Esc untuk keluar)."), li("Progres tersimpan di akunmu, jadi tetap ada saat kamu masuk dari perangkat lain."))
     )
   );
 }
@@ -1288,6 +1297,56 @@ function renderProfilForm() {
   fn.input.focus();
 }
 
+const TEKS_RISET = "Dosen pengampu sedang meneliti bagaimana mahasiswa belajar memrogram memakai situs ini. Bila kamu setuju, catatan belajarmu (waktu, hasil tiap percobaan, jenis kesalahan, dan cara menulis kode) boleh dipakai dalam laporan penelitian tanpa nama, dengan kode acak sebagai pengganti identitas. Menolak tidak berpengaruh apa pun pada nilai, akses, atau perlakuan dosen. Kamu bisa mengubah pilihan kapan saja di halaman Profil; ekspor berikutnya mengikuti pilihan terbaru.";
+
+// Bagian "Penelitian" di Profil: peserta menyetujui atau menolak datanya dipakai untuk penelitian (anonim). Tidak berpengaruh ke nilai.
+function risetProfilKartu() {
+  const kotak = h("div", { class: "riset-profil" }, h("h3", {}, "Penelitian"), h("p", { class: "muted" }, "Memuat pilihanmu"));
+  Auth.ambilPersetujuanRiset().then((r) => {
+    if (!r.ada) {
+      kotak.replaceChildren(h("h3", {}, "Penelitian"), h("p", { class: "muted" }, "Pilihan ini belum tersedia. Coba lagi nanti."));
+      return;
+    }
+    const pesan = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+    const pilih = async (nilai) => {
+      pesan.textContent = "Menyimpan";
+      const hasil = await Auth.setPersetujuanRiset(nilai);
+      pesan.textContent = hasil.ok ? (nilai ? "Terima kasih. Datamu boleh dipakai untuk penelitian secara anonim." : "Tercatat: datamu tidak dipakai untuk penelitian.") : hasil.galat;
+      if (hasil.ok) {
+        store.set("riset-nanti", 0);
+        document.querySelectorAll(".riset-bar").forEach((x) => x.remove());
+      }
+    };
+    const radio = (nilai, teks) => {
+      const id = "riset-" + String(nilai);
+      const input = h("input", { type: "radio", name: "riset", id, checked: r.nilai === nilai ? "" : false });
+      input.addEventListener("change", () => pilih(nilai));
+      return h("label", { for: id, class: "riset-pilihan" }, input, " " + teks);
+    };
+    kotak.replaceChildren(h("h3", {}, "Penelitian"), h("p", { class: "muted" }, TEKS_RISET), radio(true, "Saya setuju datanya dipakai untuk penelitian (anonim)"), radio(false, "Saya tidak setuju"), r.nilai === null ? h("p", { class: "muted" }, "Kamu belum menjawab. Sampai kamu menjawab, datamu tidak dipakai.") : null, pesan);
+  });
+  return kotak;
+}
+
+// Pertanyaan persetujuan sekali di halaman bab, sampai dijawab (Nanti menundanya tiga hari di browser ini).
+function tanyaRiset(main) {
+  const p = Auth.getProfile();
+  if (!p || p.peran === "instruktur") return;
+  const nanti = store.get("riset-nanti", 0);
+  if (nanti && Date.now() - nanti < 3 * 86400000) return;
+  Auth.ambilPersetujuanRiset().then((r) => {
+    if (!r.ada || r.nilai !== null || document.querySelector(".riset-bar") || !document.querySelector("#main .bab-intro")) return;
+    const pesan = h("span", { class: "muted", role: "status" });
+    const jawab = async (nilai) => {
+      const hasil = await Auth.setPersetujuanRiset(nilai);
+      if (hasil.ok) bar.remove();
+      else pesan.textContent = hasil.galat;
+    };
+    const bar = h("div", { class: "info-bar riset-bar", role: "note" }, h("p", {}, h("strong", {}, "Penelitian. "), TEKS_RISET), h("div", { class: "actions" }, h("button", { type: "button", class: "btn btn-sm btn-primary", onclick: () => jawab(true) }, "Setuju"), h("button", { type: "button", class: "btn btn-sm", onclick: () => jawab(false) }, "Tidak setuju"), h("button", { type: "button", class: "btn btn-sm btn-ghost", onclick: () => { store.set("riset-nanti", Date.now()); bar.remove(); } }, "Nanti"), pesan));
+    main.prepend(bar);
+  });
+}
+
 function initials(name) {
   const w = (name || "?").trim().split(/\s+/).filter(Boolean);
   return ((w[0] || "?")[0] + (w.length > 1 ? w[w.length - 1][0] : "")).toUpperCase();
@@ -1377,7 +1436,7 @@ function renderProfil() {
     }
   });
   $("#main").replaceChildren(
-    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, progres, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."), formSandi, h("p", { class: "muted" }, "Email tidak bisa diubah di sini. Bila perlu email lain, daftar ulang dengan email baru atau hubungi dosen."))
+    h("section", { class: "card gate-card prof-card" }, h("h2", {}, "Profil"), head, stats, progres, form, h("p", { class: "muted" }, "NIM dipakai sebagai identitas di laporan dan penilaian. Hubungi dosen bila NIM-mu ditolak karena sudah terpakai."), risetProfilKartu(), formSandi, h("p", { class: "muted" }, "Email tidak bisa diubah di sini. Bila perlu email lain, daftar ulang dengan email baru atau hubungi dosen."))
   );
 }
 

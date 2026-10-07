@@ -24,6 +24,8 @@
     save();
     listeners.forEach((l) => l(ev, s));
   };
+  // ?tanpa0007=1: meniru database yang belum menjalankan migrasi 0007 (kolom hasil, galat, dan persetujuan riset belum ada).
+  const TANPA_0007 = /[?&]tanpa0007=1/.test(location.search);
   const TERBUKA = /[?&]terbuka=1/.test(location.search);
   // ?tanpakonfirmasi=1: meniru Supabase dengan "Confirm email" dimatikan (pendaftaran langsung masuk, tanpa email). Menyertakan terbuka=1.
   const TANPA_KONFIRMASI = /[?&]tanpakonfirmasi=1/.test(location.search);
@@ -159,6 +161,88 @@
     save();
   }
 
+  // Data contoh Jejak peserta dan Riset: riwayat Jalankan dan Kirim lengkap dengan hasil, galat, dan rekaman menulis,
+  // serta persetujuan penelitian sebagian peserta.
+  if (!db.seed7) {
+    db.seed7 = true;
+    let acak = 987654;
+    const rnd = () => ((acak = (acak * 1103515245 + 12345) % 2147483648) / 2147483648);
+    const PROGRAM = {
+      1: ['nama = input()', 'print("Halo, " + nama)'],
+      4: ["jumlah = int(input())", "if jumlah >= 100:", "    diskon = 0.12", "elif jumlah >= 50:", "    diskon = 0.08", "else:", "    diskon = 0", "print(jumlah * diskon)"],
+      5: ["total = 0", "for i in range(1, 6):", "    total += i", "print(total)"],
+    };
+    const GALAT = [["SyntaxError", "expected ':'"], ["NameError", "name 'jumlh' is not defined"], ["IndentationError", "expected an indented block"], ["TypeError", "can only concatenate str"]];
+    db.percobaan = db.percobaan || [];
+    let pid = 6000;
+    for (let i = 1; i <= 26; i++) {
+      const uid = "u-seed" + i;
+      const q = [0.95, 0.9, 0.85, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3][(i * 3) % 9];
+      if (i % 9 === 0) continue; // sebagian peserta belum pernah mengerjakan apa pun
+      const babs = [1, 4, 5].slice(0, 1 + Math.round(q * 2.2));
+      let waktu = Date.parse("2026-09-29T12:00:00Z") + (i % 6) * 86400000 + Math.floor(rnd() * 8) * 3600000;
+      for (const bab of babs) {
+        const baris = PROGRAM[bab];
+        let kode = "";
+        let dasar = ""; // kode saat Kirim terakhir (awal rantai rekaman)
+        let ops = []; // peristiwa sejak Kirim terakhir
+        let jalan = 0;
+        let hint = 0;
+        let babLulus = false;
+        for (let langkah = 0; langkah <= baris.length + 3 && !babLulus; langkah++) {
+          const tambah = langkah < baris.length ? baris[langkah] + "\n" : "";
+          if (tambah) {
+            const salah = rnd() < (1 - q) * 0.6 && langkah > 0;
+            const teks = salah ? tambah.replace(/[a-z]/, "x") : tambah;
+            ops.push(["e", 2000 + Math.floor(rnd() * 20000), kode.length, 0, teks, teks.length, 3000 + Math.floor(rnd() * 15000)]);
+            kode += teks;
+            if (salah && rnd() < 0.8) {
+              ops.push(["e", 4000, kode.length - teks.length, teks.length, tambah, tambah.length, 2000]);
+              kode = kode.slice(0, kode.length - teks.length) + tambah;
+            }
+          }
+          if (rnd() < 0.25 && hint < 3) hint++;
+          waktu += (2 + Math.floor(rnd() * 25)) * 60000;
+          const kirim = langkah >= baris.length - 1 && rnd() < 0.7;
+          const salahKode = rnd() < (1 - q) * 0.5;
+          const polaDasar = { cps: Math.round((1.5 + rnd() * 3) * 10) / 10, cps_puncak: Math.round((4 + rnd() * 3) * 10) / 10, rasio_hapus: Math.round(rnd() * (0.15 + (1 - q) * 0.4) * 100) / 100, linier: Math.round((0.4 + q * 0.5 - rnd() * 0.2) * 100) / 100, lompat: Math.floor(rnd() * (3 + (1 - q) * 8)), panjang_akhir: kode.length };
+          if (!kirim) {
+            jalan++;
+            ops.push(["j", 500]);
+            const g = salahKode ? GALAT[Math.floor(rnd() * GALAT.length)] : null;
+            const rek = JSON.stringify({ awal: dasar, e: ops }).length < 20000 ? { awal: dasar, e: ops.slice() } : null;
+            db.percobaan.push({ id: ++pid, user_id: uid, matakuliah_id: "algoritma-python", bab, jenis: "jalankan", lulus: null, kasus_lulus: null, kasus_total: null, kasus_gagal: null, kode, hasil: g ? "galat" : "jalan", galat_jenis: g ? g[0] : null, galat_pesan: g ? g[1] : null, cocok_contoh: g ? null : rnd() < q, petunjuk: hint, pola: Object.assign({ jalankan: jalan }, polaDasar), rekaman: rek, dibuat_pada: new Date(waktu).toISOString(), diterima_pada: new Date(waktu + 2000).toISOString() });
+          } else {
+            const lulus = !salahKode && langkah >= baris.length - 1;
+            babLulus = lulus;
+            const total = 7;
+            const benar = lulus ? total : 2 + Math.floor(rnd() * 4);
+            db.percobaan.push({ id: ++pid, user_id: uid, matakuliah_id: "algoritma-python", bab, jenis: "kirim", lulus, kasus_lulus: benar, kasus_total: total, kasus_gagal: lulus ? [] : [total], kode, hasil: lulus ? "lulus" : "gagal", galat_jenis: null, galat_pesan: null, cocok_contoh: null, petunjuk: hint, pola: Object.assign({ jalankan: jalan }, polaDasar), rekaman: { awal: dasar, e: ops.slice() }, dibuat_pada: new Date(waktu).toISOString(), diterima_pada: new Date(waktu + 2000).toISOString() });
+            dasar = kode;
+            ops = [];
+            jalan = 0;
+          }
+        }
+        waktu += 3600000;
+      }
+    }
+    // persetujuan penelitian: sebagian setuju, sebagian menolak, sebagian belum menjawab
+    for (let i = 1; i <= 26; i++) {
+      const p = db.profiles["u-seed" + i];
+      if (!p) continue;
+      if (i % 3 !== 0 && i % 7 !== 0) {
+        p.riset_setuju = true;
+        p.kode_riset = "R-" + (0x1000a000 + i * 7919).toString(16).slice(-8);
+        p.riset_setuju_pada = "2026-09-30T02:00:00Z";
+      } else if (i % 7 === 0) {
+        p.riset_setuju = false;
+        p.riset_setuju_pada = "2026-09-30T02:00:00Z";
+      } else p.riset_setuju = null;
+    }
+    db.riset_ekspor_log = [];
+    save();
+  }
+
   function klikTautan() {
     const p = db.pending;
     if (!p) return;
@@ -215,14 +299,15 @@
   const TABEL_DATA = { progres: ["user_id", "matakuliah_id", "bab"], laporan: ["user_id", "matakuliah_id", "bab"], percobaan: null };
   const kunci = (nama, r) => TABEL_DATA[nama].map((k) => r[k]).join("|");
   const bisaBaca = (nama, r) => {
-    if (nama === "perangkat_bersama" || nama === "penilaian_laporan" || ["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran"].includes(nama)) return instruktur();
+    if (nama === "perangkat_bersama" || nama === "penilaian_laporan" || ["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran", "riset_ekspor_log"].includes(nama)) return instruktur();
     return instruktur() || (nama === "profiles" ? r.id === uidSaya() : r.user_id === uidSaya());
   };
 
   const query = (nama) => {
     const q = { f: {}, op: "select", rows: null, urut: [], dari: null, sampai: null, opsi: {} };
     const chain = {
-      select() {
+      select(kolom) {
+        q.kolom = kolom || "*";
         return chain;
       },
       eq(k, v) {
@@ -265,12 +350,35 @@
         q.op = "delete";
         return chain;
       },
+      update(vals) {
+        q.op = "update";
+        q.vals = vals;
+        return chain;
+      },
       then(res) {
         return run().then(res);
       },
     };
     async function run() {
       if (!db.session) return { data: null, error: { code: "42501", message: "permission denied" } };
+      if (TANPA_0007) {
+        const kolomHilang = (c) => ({ data: null, error: { code: "42703", message: "column " + c + " does not exist" } });
+        if (nama === "profiles" && ((q.op === "select" && /riset/.test(q.kolom || "")) || (q.op === "update" && "riset_setuju" in (q.vals || {})))) return kolomHilang("profiles.riset_setuju");
+        if (nama === "percobaan" && q.op === "select" && /hasil|galat|petunjuk|cocok/.test(q.kolom || "")) return kolomHilang("percobaan.hasil");
+        if (nama === "percobaan" && q.op === "insert" && (Array.isArray(q.rows) ? q.rows : [q.rows]).some((r) => "hasil" in r)) return { data: null, error: { code: "PGRST204", message: "Could not find the 'hasil' column of 'percobaan' in the schema cache" } };
+      }
+      if (nama === "profiles" && q.op === "update") {
+        const sasaran = Object.values(db.profiles).filter((p) => Object.keys(q.f).every((k) => String(p[k]) === String(q.f[k])) && (p.id === uidSaya() || instruktur()));
+        for (const p of sasaran) {
+          const lama = p.riset_setuju;
+          Object.assign(p, q.vals);
+          if (!instruktur()) p.kode_riset = p.kode_riset || null;
+          if (q.vals.riset_setuju !== undefined && q.vals.riset_setuju !== lama) p.riset_setuju_pada = new Date().toISOString();
+          if (p.riset_setuju === true && !p.kode_riset) p.kode_riset = "R-" + Math.random().toString(16).slice(2, 10).padEnd(8, "0");
+        }
+        save();
+        return { data: null, error: null };
+      }
       if (nama === "profiles") {
         if (q.op === "upsert") {
           const row = q.rows;
@@ -295,7 +403,7 @@
         return { data: null, error: null };
       }
       if (nama === "sesi_belajar" && q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table sesi_belajar" } };
-      if (["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran"].includes(nama) && q.op !== "select") {
+      if (["jadwal_kelas", "jadwal_riwayat", "koreksi_kehadiran", "riset_ekspor_log"].includes(nama) && q.op !== "select") {
         if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
         const tabel = (db[nama] = db[nama] || []);
         const kunciTabel = { jadwal_kelas: ["matakuliah_id", "kelas", "pertemuan"], koreksi_kehadiran: ["matakuliah_id", "user_id", "pertemuan"] }[nama];
@@ -336,7 +444,7 @@
             if (ada >= 0) tabelData[ada] = baru;
             else tabelData.push(baru);
           } else {
-            tabelData.push(Object.assign({ id: tabelData.length + 1 }, r));
+            tabelData.push(Object.assign({ id: tabelData.length + 1 }, r, nama === "percobaan" ? { diterima_pada: new Date().toISOString() } : {}));
           }
         }
         save();

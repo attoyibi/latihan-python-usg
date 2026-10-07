@@ -17,6 +17,10 @@
 -- delete from public.sesi_belajar;       -- jam dan lama aktif belajar (kehadiran dan keaktifan)
 -- delete from public.koreksi_kehadiran;  -- koreksi manual kehadiran
 -- Jadwal (jadwal_kelas, jadwal_riwayat) boleh disimpan atau dihapus sesuai kebutuhan.
+-- Untuk penelitian: ekspor dulu data anonim dari tab Riset (CSV atau JSON beserta kamus data) dan simpan di tempat aman,
+-- baru hapus percobaan di atas. Kunci pemetaan kode_riset ke peserta ada di kolom profiles.kode_riset; hapus kunci itu
+-- (update public.profiles set kode_riset = null, riset_setuju = null;) bila datanya tidak perlu bisa ditelusuri lagi.
+-- delete from public.riset_ekspor_log;
 
 -- Contoh: hapus seluruh data peserta semester ini (akun, progres, laporan, unggahan).
 -- Berkas di Storage ('tugas') harus dihapus terpisah lewat dashboard Storage.

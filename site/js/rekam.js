@@ -160,13 +160,39 @@ export function susunUlang({ awal, e: rekaman }) {
 
 // Menjaga ukuran rekaman: coba gabung lebih longgar, lalu menyerah (pola tetap tersimpan, rekaman dibuang).
 export const MAKS_REKAMAN = 100000;
-export function rekamanAman(awal, ev, jalankan) {
+export function rekamanAman(awal, ev, jalankan, maks = MAKS_REKAMAN) {
   for (const jeda of [600, 2000, 8000]) {
     const e = padatkan(ev, jalankan, jeda);
     const r = { awal, e };
-    if (JSON.stringify(r).length <= MAKS_REKAMAN) return r;
+    if (JSON.stringify(r).length <= maks) return r;
   }
   return null;
+}
+// Rekaman yang disimpan di setiap baris Jalankan lebih kecil daripada milik Kirim, supaya database tidak menggembung.
+export const MAKS_REKAMAN_JALANKAN = 20000;
+
+/**
+ * Menggabungkan rekaman berantai (tiap rekaman dimulai dari kode akhir rekaman sebelumnya) menjadi satu rekaman utuh
+ * supaya bisa diputar dari awal bab. Bila kode awal sebuah rekaman tidak sama dengan hasil akhir sebelumnya (kode diganti
+ * di luar rekaman, mis. "Kembalikan kode awal"), disisipkan satu penggantian utuh. Elemen kosong (rekaman hilang) dilewati.
+ */
+export function gabungRekaman(daftar) {
+  const ada = daftar.filter((r) => r && Array.isArray(r.e));
+  if (!ada.length) return null;
+  const awal = ada[0].awal;
+  let teks = awal;
+  const e = [];
+  ada.forEach((r, i) => {
+    if (i > 0 && r.awal !== teks) {
+      e.push(["e", 600, 0, teks.length, r.awal, 1, 0]);
+      teks = r.awal;
+    }
+    for (const x of r.e) {
+      e.push(x);
+      if (x[0] === "e") teks = teks.slice(0, x[2]) + x[4] + teks.slice(x[2] + x[3]);
+    }
+  });
+  return { awal, e };
 }
 
 /**
@@ -211,6 +237,14 @@ export function pasangRekam(editor, awal, { sekarang = () => performance.now() }
       jalan = [];
       panjang = kodeAwal.length;
       return hasil;
+    },
+    /** Seperti ambil() tetapi TIDAK memulai catatan baru: dipakai saat tombol Jalankan agar rantai rekaman Kirim tidak berubah. */
+    lihat() {
+      return {
+        awal: kodeAwal,
+        pola: hitungPola(ev, { waktuMuat, jalankan: jalan, waktuKirim: sekarang(), panjangAkhir: panjang }),
+        rekaman: rekamanAman(kodeAwal, ev, jalan, MAKS_REKAMAN_JALANKAN),
+      };
     },
     setAwal(teks) {
       ev = [];

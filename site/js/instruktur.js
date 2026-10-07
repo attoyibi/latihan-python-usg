@@ -6,6 +6,9 @@ import * as Auth from "./auth.js";
 import * as IntegUI from "./integritas-ui.js";
 import * as LaporanUI from "./laporan-ui.js";
 import * as KehadiranUI from "./kehadiran-ui.js";
+import * as JejakUI from "./jejak-ui.js";
+import * as RisetUI from "./riset-ui.js";
+import { kolomBelumAda } from "./sinkron.js";
 import { SEL, SEL_TEKS, susunRekap, saringPeserta, pilihanSaringan, buatCsv, ambilSemua, AMBANG_TERSANGKUT } from "./rekap.js";
 
 const LAMBANG = { "selesai-langsung": "✓", "selesai-bantuan": "✓*", sedang: "◐", belum: "○", unggah: "–" };
@@ -24,8 +27,13 @@ async function muat(cid) {
   keadaan.muat = true;
   keadaan.galat = "";
   try {
+    // Kolom persetujuan penelitian (migrasi 0007) dicoba dulu; bila belum ada, dashboard tetap jalan tanpanya.
+    const ambilPeserta = (kolom) => ambilSemua(() => client.from("profiles").select(kolom).eq("peran", "peserta").order("id"));
     const [peserta, progres, tempel] = await Promise.all([
-      ambilSemua(() => client.from("profiles").select("id,nama,nim,kelas,prodi,angkatan,rombel,peran").eq("peran", "peserta").order("id")),
+      ambilPeserta("id,nama,nim,kelas,prodi,angkatan,rombel,peran,riset_setuju,kode_riset").catch((e) => {
+        if (!kolomBelumAda(e)) throw e;
+        return ambilPeserta("id,nama,nim,kelas,prodi,angkatan,rombel,peran");
+      }),
       ambilSemua(() => client.from("progres").select("*").eq("matakuliah_id", cid).order("user_id").order("bab")),
       ambilSemua(() => client.from("aktivitas").select("user_id,bab,detail").eq("matakuliah_id", cid).eq("jenis", "tempel_diblokir").order("id")),
     ]);
@@ -74,6 +82,8 @@ function tampilkan(main, kuliahAktif, kuliah) {
     IntegUI.reset();
     LaporanUI.reset();
     KehadiranUI.reset();
+    JejakUI.reset();
+    RisetUI.reset();
     await muat(keadaan.cid);
     tampilkan(main, kuliahAktif, kuliah);
   };
@@ -85,6 +95,8 @@ function tampilkan(main, kuliahAktif, kuliah) {
     IntegUI.reset();
     LaporanUI.reset();
     KehadiranUI.reset();
+    JejakUI.reset();
+    RisetUI.reset();
     keadaan.saring = { prodi: "", angkatan: "", rombel: "", cari: "" };
     renderInstruktur({ kuliahAktif });
   });
@@ -98,11 +110,19 @@ function tampilkan(main, kuliahAktif, kuliah) {
     "section",
     { class: "card" },
     h("h2", {}, "Dashboard instruktur"),
-    h("p", { class: "muted" }, keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
-    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran")),
+    h("p", { class: "muted" }, keadaan.tab === "jejak" ? "Semua peserta yang masuk, apa yang mereka kerjakan (berhasil maupun gagal), dan putar ulang cara mereka menulis." : keadaan.tab === "riset" ? "Perilaku belajar peserta yang menyetujui, dan ekspor data anonim untuk penelitian." : keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
+    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran"), tab("jejak", "Jejak peserta"), tab("riset", "Riset")),
     h("div", { class: "filters" }, h("label", {}, "Mata kuliah ", selKuliah), h("button", { type: "button", class: "btn btn-sm", onclick: baru }, "Muat ulang"))
   );
 
+  if (keadaan.tab === "jejak") {
+    JejakUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null });
+    return;
+  }
+  if (keadaan.tab === "riset") {
+    RisetUI.render({ main, kepala, kuliah, peserta: keadaan.data ? keadaan.data.peserta : null, progres: keadaan.data ? keadaan.data.progres : [] });
+    return;
+  }
   if (keadaan.tab === "kehadiran") {
     KehadiranUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null, progres: keadaan.data ? keadaan.data.progres : [] });
     return;
