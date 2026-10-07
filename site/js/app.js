@@ -1342,7 +1342,7 @@ function tanyaRiset(main) {
       if (hasil.ok) bar.remove();
       else pesan.textContent = hasil.galat;
     };
-    const bar = h("div", { class: "info-bar riset-bar", role: "note" }, h("p", {}, h("strong", {}, "Penelitian. "), TEKS_RISET), h("div", { class: "actions" }, h("button", { type: "button", class: "btn btn-sm btn-primary", onclick: () => jawab(true) }, "Setuju"), h("button", { type: "button", class: "btn btn-sm", onclick: () => jawab(false) }, "Tidak setuju"), h("button", { type: "button", class: "btn btn-sm btn-ghost", onclick: () => { store.set("riset-nanti", Date.now()); bar.remove(); } }, "Nanti"), pesan));
+    const bar = h("div", { class: "info-bar riset-bar", role: "note" }, h("p", {}, h("strong", {}, "Penelitian. "), "Dosen sedang meneliti cara mahasiswa belajar memrogram di situs ini. Bolehkah catatan belajarmu dipakai untuk penelitian, tanpa nama? Menolak tidak berpengaruh pada nilai."), h("details", { class: "riset-rinci" }, h("summary", {}, "Selengkapnya"), h("p", { class: "muted" }, TEKS_RISET)), h("div", { class: "actions" }, h("button", { type: "button", class: "btn btn-sm btn-primary", onclick: () => jawab(true) }, "Setuju"), h("button", { type: "button", class: "btn btn-sm", onclick: () => jawab(false) }, "Tidak setuju"), h("button", { type: "button", class: "btn btn-sm btn-ghost", onclick: () => { store.set("riset-nanti", Date.now()); bar.remove(); } }, "Nanti"), pesan));
     main.prepend(bar);
   });
 }

@@ -510,3 +510,6 @@ tr.klik:hover{background:var(--soft)}
 .riset-pilihan{display:flex;gap:8px;align-items:center;margin:6px 0;cursor:pointer}
 .riset-bar p{margin:0 0 8px}
 @media (max-width:640px){.rs-dua{grid-template-columns:minmax(0,1fr)}.rs-bar{grid-template-columns:minmax(0,1fr) minmax(0,auto);row-gap:2px}.rs-bar .rs-t{grid-column:1 / -1;order:3}.rs-n{white-space:normal}}
+@media (max-width:640px){.filters>*,.filters select,.filters input{max-width:100%;min-width:0}.filters select{flex:1 1 140px;text-overflow:ellipsis}.filters input[type=search]{flex:1 1 100%}}
+.riset-rinci{margin:0 0 8px}.riset-rinci summary{cursor:pointer;color:var(--brand-strong);font-size:13.5px;padding:6px 0}.riset-rinci p{margin:4px 0 0}
+@media (max-width:640px){.riset-pilihan,.rs-cek,.kh-pilkol label{min-height:40px;align-items:center}.riset-pilihan input,.rs-cek input,.kh-pilkol input{width:20px;height:20px}}
