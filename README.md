@@ -78,6 +78,7 @@ kunci/                Kunci jawaban (TIDAK diterbitkan, ada di .gitignore)
 - [Analisis dan rencana](docs/ANALISIS-DAN-RENCANA.md)
 - [Riset video pengganti](docs/RISET-VIDEO-PENGGANTI.md)
 - [Praktikum proyek berantai](docs/PRAKTIKUM.md)
+- [Rubrik tugas akhir PBO (usulan)](docs/RUBRIK-PBO.md)
 
 ## Keterbatasan yang perlu diketahui
 

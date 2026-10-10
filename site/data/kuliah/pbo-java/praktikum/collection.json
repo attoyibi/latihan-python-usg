@@ -1,0 +1,122 @@
+{
+ "id": "collection",
+ "judul": "Latihan bab 9: collection dan generics",
+ "deskripsi": "List, Map, dan Set untuk menyimpan dan mengolah banyak data.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 9,
+ "tahap": [
+  {
+   "id": "daftar-nama",
+   "judul": "Daftar nama dengan List",
+   "bab": [
+    9
+   ],
+   "tujuan": "Menyimpan, mencari, dan mengurutkan nama dengan ArrayList.",
+   "langkah": [
+    "Buat DaftarNama.java dengan List<String> di dalamnya.",
+    "tambah(String nama) menambahkan nama dan mengembalikan true, kecuali nama yang sama (huruf besar/kecil diabaikan) sudah ada: kembalikan false.",
+    "hapus(String nama) mengembalikan true bila ada yang dihapus. jumlah() mengembalikan banyaknya nama.",
+    "urut() mengembalikan salinan terurut (A sampai Z, huruf besar/kecil diabaikan) tanpa mengubah daftar asli. cariAwalan(String awalan) mengembalikan nama yang diawali awalan itu (huruf besar/kecil diabaikan), dengan urutan masuk.",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "DaftarNama.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Collections.sort(salinan, String.CASE_INSENSITIVE_ORDER) mengurutkan tanpa peduli huruf besar/kecil."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 9: List dan ArrayList."
+    }
+   ],
+   "awal": {
+    "DaftarNama.java": "// DaftarNama.java\nimport java.util.List;\n\npublic class DaftarNama {\n    // TODO: simpan nama dalam List<String>\n    // TODO: boolean tambah(String nama)\n    // TODO: boolean hapus(String nama)\n    // TODO: int jumlah()\n    // TODO: List<String> urut()\n    // TODO: List<String> cariAwalan(String awalan)\n}\n"
+   },
+   "contoh": {
+    "DaftarNama.java": "// DaftarNama.java\nimport java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.List;\n\npublic class DaftarNama {\n    private List<String> daftar = new ArrayList<>();\n\n    public boolean tambah(String nama) {\n        for (String n : daftar) {\n            if (n.equalsIgnoreCase(nama)) {\n                return false;\n            }\n        }\n        daftar.add(nama);\n        return true;\n    }\n\n    public boolean hapus(String nama) {\n        return daftar.remove(nama);\n    }\n\n    public int jumlah() {\n        return daftar.size();\n    }\n\n    public List<String> urut() {\n        List<String> salinan = new ArrayList<>(daftar);\n        Collections.sort(salinan, String.CASE_INSENSITIVE_ORDER);\n        return salinan;\n    }\n\n    public List<String> cariAwalan(String awalan) {\n        List<String> hasil = new ArrayList<>();\n        for (String n : daftar) {\n            if (n.toLowerCase().startsWith(awalan.toLowerCase())) {\n                hasil.add(n);\n            }\n        }\n        return hasil;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "tambah dan jumlah",
+     "kode": "DaftarNama d = new DaftarNama();\ncek(d.tambah(\"Sari\"), \"nama baru harus diterima\");\ncek(d.tambah(\"Budi\"), \"nama baru harus diterima\");\nsama(2, d.jumlah());"
+    },
+    {
+     "nama": "nama kembar ditolak",
+     "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\ncek(!d.tambah(\"SARI\"), \"nama kembar (beda huruf besar) harus ditolak\");\nsama(1, d.jumlah());"
+    },
+    {
+     "nama": "hapus",
+     "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\ncek(d.hapus(\"Sari\"), \"hapus nama yang ada harus true\");\ncek(!d.hapus(\"Sari\"), \"hapus nama yang tidak ada harus false\");\nsama(0, d.jumlah());"
+    },
+    {
+     "nama": "urut tanpa mengubah daftar asli",
+     "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"candra\");\nd.tambah(\"Ani\");\nd.tambah(\"Budi\");\nsama(\"[Ani, Budi, candra]\", d.urut().toString());\nsama(\"[candra, Ani]\", d.cariAwalan(\"\").subList(0, 2).toString());"
+    },
+    {
+     "nama": "cari awalan (tersembunyi)",
+     "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\nd.tambah(\"Siti\");\nd.tambah(\"Budi\");\nsama(\"[Sari, Siti]\", d.cariAwalan(\"s\").toString());\nsama(\"[]\", d.cariAwalan(\"z\").toString());",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "frekuensi",
+   "judul": "Menghitung kata dengan Map dan Set",
+   "bab": [
+    9
+   ],
+   "tujuan": "Memakai Map untuk menghitung dan Set untuk membuang duplikat.",
+   "langkah": [
+    "Buat Frekuensi.java dengan static Map<String, Integer> hitung(String kalimat): hitung kemunculan tiap kata (dipisah spasi, huruf kecil semua, abaikan spasi berlebih). Kembalikan TreeMap supaya terurut menurut kata.",
+    "Tulis static Set<String> unik(String[] kata) yang mengembalikan kata unik dengan urutan kemunculan pertama (LinkedHashSet).",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "Frekuensi.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "map.merge(kata, 1, Integer::sum) menambah hitungan tanpa if. split(\"\\\\s+\") memecah di spasi berapa pun."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 9: Map, Set, dan generics."
+    }
+   ],
+   "awal": {
+    "Frekuensi.java": "// Frekuensi.java\nimport java.util.Map;\nimport java.util.Set;\n\npublic class Frekuensi {\n    // TODO: static Map<String, Integer> hitung(String kalimat)   TreeMap\n    // TODO: static Set<String> unik(String[] kata)               LinkedHashSet\n}\n"
+   },
+   "contoh": {
+    "Frekuensi.java": "// Frekuensi.java\nimport java.util.LinkedHashSet;\nimport java.util.Map;\nimport java.util.Set;\nimport java.util.TreeMap;\n\npublic class Frekuensi {\n    public static Map<String, Integer> hitung(String kalimat) {\n        Map<String, Integer> hasil = new TreeMap<>();\n        for (String kata : kalimat.trim().toLowerCase().split(\"\\\\s+\")) {\n            if (!kata.isEmpty()) {\n                hasil.merge(kata, 1, Integer::sum);\n            }\n        }\n        return hasil;\n    }\n\n    public static Set<String> unik(String[] kata) {\n        Set<String> hasil = new LinkedHashSet<>();\n        for (String k : kata) {\n            hasil.add(k);\n        }\n        return hasil;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "hitung kata",
+     "kode": "sama(\"{ikan=2, laut=1, segar=1}\", Frekuensi.hitung(\"ikan segar ikan laut\").toString());"
+    },
+    {
+     "nama": "huruf besar dan spasi berlebih",
+     "kode": "sama(\"{a=3}\", Frekuensi.hitung(\"  A a   A \").toString());"
+    },
+    {
+     "nama": "unik menjaga urutan",
+     "kode": "sama(\"[b, a, c]\", Frekuensi.unik(new String[] { \"b\", \"a\", \"b\", \"c\", \"a\" }).toString());"
+    },
+    {
+     "nama": "kalimat kosong (tersembunyi)",
+     "kode": "sama(\"{}\", Frekuensi.hitung(\"\").toString());\nsama(\"[]\", Frekuensi.unik(new String[0]).toString());",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

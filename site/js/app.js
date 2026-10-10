@@ -1668,8 +1668,9 @@ async function route() {
       renderTidakAda();
       return;
     }
-    $("#pyStatus").hidden = c.bahasa !== "python";
+    $("#pyStatus").hidden = c.bahasa !== "python" && c.bahasa !== "java";
     if (c.bahasa === "python") start();
+    if (c.bahasa === "java") startJava();
     Sesi.catatKonteks(c.id, null);
     window.scrollTo(0, 0);
     $("#main").replaceChildren(...(m[3] ? PraktikumUI.halamanTahap(ctxPraktikum(), pk, idx) : PraktikumUI.halamanPraktikum(ctxPraktikum(), pk)));

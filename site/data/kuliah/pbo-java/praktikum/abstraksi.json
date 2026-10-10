@@ -1,0 +1,142 @@
+{
+ "id": "abstraksi",
+ "judul": "Latihan bab 7: abstraksi",
+ "deskripsi": "Kelas abstrak dan interface untuk memisahkan apa yang dilakukan dari bagaimana melakukannya.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 7,
+ "tahap": [
+  {
+   "id": "pembayaran",
+   "judul": "Pembayaran (kelas abstrak)",
+   "bab": [
+    7
+   ],
+   "tujuan": "Membuat kelas abstrak dengan method abstrak dan satu method berisi yang memanfaatkannya.",
+   "langkah": [
+    "Buat Pembayaran.java: abstract class dengan method abstrak int biayaAdmin(int nilai) dan method berisi int total(int nilai) yang mengembalikan nilai ditambah biayaAdmin(nilai).",
+    "Buat Tunai.java (biaya admin 0), Transfer.java (biaya admin tetap 2500), dan KartuKredit.java (2 persen dari nilai, dibulatkan ke bawah).",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "Pembayaran.java",
+    "Tunai.java",
+    "Transfer.java",
+    "KartuKredit.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Kelas abstrak tidak bisa di-new. total() ditulis sekali di induk dan memakai biayaAdmin() milik turunan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 7: abstract class dan method abstrak."
+    }
+   ],
+   "awal": {
+    "Pembayaran.java": "// Pembayaran.java\npublic class Pembayaran {\n    // TODO: jadikan abstract class\n    // TODO: abstract int biayaAdmin(int nilai)\n    // TODO: int total(int nilai) = nilai + biayaAdmin(nilai)\n}\n",
+    "Tunai.java": "// Tunai.java\npublic class Tunai {\n    // TODO: turunan Pembayaran, biayaAdmin = 0\n}\n",
+    "Transfer.java": "// Transfer.java\npublic class Transfer {\n    // TODO: turunan Pembayaran, biayaAdmin = 2500\n}\n",
+    "KartuKredit.java": "// KartuKredit.java\npublic class KartuKredit {\n    // TODO: turunan Pembayaran, biayaAdmin = nilai * 2 / 100\n}\n"
+   },
+   "contoh": {
+    "Pembayaran.java": "// Pembayaran.java\npublic abstract class Pembayaran {\n    public abstract int biayaAdmin(int nilai);\n\n    public int total(int nilai) {\n        return nilai + biayaAdmin(nilai);\n    }\n}\n",
+    "Tunai.java": "// Tunai.java\npublic class Tunai extends Pembayaran {\n    @Override\n    public int biayaAdmin(int nilai) {\n        return 0;\n    }\n}\n",
+    "Transfer.java": "// Transfer.java\npublic class Transfer extends Pembayaran {\n    @Override\n    public int biayaAdmin(int nilai) {\n        return 2500;\n    }\n}\n",
+    "KartuKredit.java": "// KartuKredit.java\npublic class KartuKredit extends Pembayaran {\n    @Override\n    public int biayaAdmin(int nilai) {\n        return nilai * 2 / 100;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "Pembayaran abstrak",
+     "kode": "cek(abstrak(Pembayaran.class), \"Pembayaran harus abstract class\");"
+    },
+    {
+     "nama": "total tunai",
+     "kode": "Pembayaran p = new Tunai();\nsama(100000, p.total(100000));"
+    },
+    {
+     "nama": "total transfer",
+     "kode": "Pembayaran p = new Transfer();\nsama(102500, p.total(100000));"
+    },
+    {
+     "nama": "total kartu kredit",
+     "kode": "Pembayaran p = new KartuKredit();\nsama(102000, p.total(100000));"
+    },
+    {
+     "nama": "pembulatan kartu kredit (tersembunyi)",
+     "kode": "sama(1101, new KartuKredit().total(1080));\nsama(55, new KartuKredit().total(54));",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "diskon",
+   "judul": "Diskon (interface)",
+   "bab": [
+    7
+   ],
+   "tujuan": "Membuat interface dengan satu method dan beberapa implementasinya, lalu memakainya lewat tipe interface.",
+   "langkah": [
+    "Buat Diskon.java: interface dengan int potong(int harga) yang mengembalikan harga setelah diskon.",
+    "Buat DiskonPersen.java (constructor DiskonPersen(int persen), harga dikurangi persen%, bulatkan ke bawah) dan DiskonTetap.java (constructor DiskonTetap(int jumlah); hasil tidak boleh di bawah 0).",
+    "Buat Kasir.java dengan static int hitung(int harga, Diskon diskon). Kirim jawaban."
+   ],
+   "diminta": [
+    "Diskon.java",
+    "DiskonPersen.java",
+    "DiskonTetap.java",
+    "Kasir.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Kasir hanya bergantung pada interface Diskon, jadi jenis diskon baru tidak mengubah Kasir."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 7: interface."
+    }
+   ],
+   "awal": {
+    "Diskon.java": "// Diskon.java\n// TODO: interface Diskon dengan int potong(int harga)\n",
+    "DiskonPersen.java": "// DiskonPersen.java\npublic class DiskonPersen {\n    // TODO: implements Diskon; constructor DiskonPersen(int persen); potong = harga - harga * persen / 100\n}\n",
+    "DiskonTetap.java": "// DiskonTetap.java\npublic class DiskonTetap {\n    // TODO: implements Diskon; constructor DiskonTetap(int jumlah); potong = harga - jumlah, minimal 0\n}\n",
+    "Kasir.java": "// Kasir.java\npublic class Kasir {\n    // TODO: static int hitung(int harga, Diskon diskon)\n}\n"
+   },
+   "contoh": {
+    "Diskon.java": "// Diskon.java\npublic interface Diskon {\n    int potong(int harga);\n}\n",
+    "DiskonPersen.java": "// DiskonPersen.java\npublic class DiskonPersen implements Diskon {\n    private int persen;\n\n    public DiskonPersen(int persen) {\n        this.persen = persen;\n    }\n\n    @Override\n    public int potong(int harga) {\n        return harga - harga * persen / 100;\n    }\n}\n",
+    "DiskonTetap.java": "// DiskonTetap.java\npublic class DiskonTetap implements Diskon {\n    private int jumlah;\n\n    public DiskonTetap(int jumlah) {\n        this.jumlah = jumlah;\n    }\n\n    @Override\n    public int potong(int harga) {\n        return Math.max(0, harga - jumlah);\n    }\n}\n",
+    "Kasir.java": "// Kasir.java\npublic class Kasir {\n    public static int hitung(int harga, Diskon diskon) {\n        return diskon.potong(harga);\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "Diskon interface",
+     "kode": "cek(Diskon.class.isInterface(), \"Diskon harus interface\");\ncek(DiskonPersen.class.getInterfaces().length == 1 && DiskonPersen.class.getInterfaces()[0] == Diskon.class, \"DiskonPersen harus implements Diskon\");"
+    },
+    {
+     "nama": "diskon persen",
+     "kode": "sama(80000, Kasir.hitung(100000, new DiskonPersen(20)));\nsama(100000, Kasir.hitung(100000, new DiskonPersen(0)));"
+    },
+    {
+     "nama": "diskon tetap",
+     "kode": "sama(90000, Kasir.hitung(100000, new DiskonTetap(10000)));"
+    },
+    {
+     "nama": "diskon tetap tidak negatif",
+     "kode": "sama(0, Kasir.hitung(5000, new DiskonTetap(9000)));"
+    },
+    {
+     "nama": "jenis diskon baru tanpa mengubah Kasir (tersembunyi)",
+     "kode": "Diskon gratis = h -> 0;\nsama(0, Kasir.hitung(12345, gratis));",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

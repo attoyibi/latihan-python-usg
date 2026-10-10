@@ -391,3 +391,13 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [x] `tools/buat_sql_kunci.py` membuat `kunci/kunci_jawaban.sql` dari kunci lokal (24 kunci; folder kunci/ tidak terbit)
 - [x] Tombol *Isi kunci (instruktur)* di soal kode Python dan Java, soal konsep, dan praktikum; diuji di browser
 - [ ] Setelah dipush: jalankan 0009 lalu `kunci/kunci_jawaban.sql` di Supabase SQL Editor
+
+## Praktikum Java (PBO)
+
+- [x] JavaRun menerima paket beberapa berkas `.java` sekaligus (`tools/java-runner/JavaRun.java`, jar dibangun ulang); mode satu `Main.java` untuk soal bab tetap bekerja
+- [x] Penyusun pekerjaan dan pembaca hasil (`site/js/praktikum-java.js`), kelas penguji `Uji`, dan `runProyekJava`; terbukti di CheerpJ nyata (baca-tulis berkas, batas waktu perulangan tak berujung, kode Swing dan JDBC dapat dikompilasi)
+- [x] 10 latihan mandiri per bab (20 tahap) dengan contoh dan kerangka; diuji dengan JVM sungguhan (`node tools/uji_praktikum_java.mjs`)
+- [x] Tugas akhir: ruang kerja multi-berkas, unggah dari laptop, periksa kompilasi, penanda kelengkapan otomatis, laporan, ekspor kode, dinilai dosen (`docs/RUBRIK-PBO.md`)
+- [x] Kunci jawaban: latihan per bab (contoh di JSON), tugas akhir (tabel `kunci_jawaban` bab 99, `kunci/pbo-java/tugas-akhir.json`), tombol Jawab otomatis (instruktur) termasuk Jawab semua praktikum
+- [x] Dashboard: ringkasan semua praktikum, lihat berkas, penanda kelengkapan, laporan, jumlah unggah
+- [ ] Belum diuji di Supabase sungguhan dan ponsel sungguhan; GUI/JDBC tidak dapat dijalankan di browser

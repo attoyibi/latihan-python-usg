@@ -107,7 +107,7 @@ for (const { nama, p } of daftar) {
   for (const t of p.tahap) for (const n of Object.keys(t.contoh || {})) seen.set(n, (seen.get(n) || 0) + 1);
   const berulang = [...seen].filter(([, c]) => c > 1).map(([n]) => n);
   cek(nama + ": berkas contoh yang muncul di beberapa tahap tercantum di 'ubah' tahap yang merevisinya", berulang.every((n) => p.tahap.filter((t) => (t.contoh || {})[n]).slice(1).every((t) => (t.ubah || []).includes(n))), berulang);
-  cek(nama + ": entri ada di tahap terakhir yang bercontoh", p.tahap.some((t) => (t.contoh || {})[p.entri]));
+  if (p.entri) cek(nama + ": entri ada di contoh atau kerangka salah satu tahap", p.tahap.some((t) => (t.contoh || {})[p.entri] || (t.awal || {})[p.entri]));
   for (const t of p.tahap) {
     const pre = nama + " " + t.id + ": ";
     cek(pre + "punya judul, tujuan, dan langkah", !!t.judul && !!t.tujuan && t.langkah.length > 0);
@@ -115,8 +115,8 @@ for (const { nama, p } of daftar) {
     cek(pre + "nama berkas aman, kelas Java bernama sesuai kelasnya, dan ukuran wajar", [...Object.entries(t.contoh || {}), ...Object.entries(t.awal || {})].every(([n, i]) => POLA_NAMA.test(n) && (!n.endsWith(".java") || POLA_JAVA.test(n)) && i.length <= 20000));
     cek(pre + "jenis petunjuk sah", (t.petunjuk || []).every((h) => ["soal", "buku", "video"].includes(h.jenis) && h.isi));
     if (!t.kasus || !t.kasus.length) {
-      cek(pre + "tahap tanpa uji otomatis: opsional dan jalurnya jelas", t.opsional === true && ["web", "laptop"].includes(t.jalur), { opsional: t.opsional, jalur: t.jalur });
-      cek(pre + "tahap tanpa uji tidak memuat kasus", true);
+      cek(pre + "tahap tanpa uji otomatis bertanda dinilaiDosen", t.dinilaiDosen === true);
+      cek(pre + "kerangka awal tahap yang dinilai dosen dapat dikompilasi bersama (Uji kosong)", kasus(Object.assign({}, t.awal || {}), [{ nama: "kompilasi", kode: "" }])[0].lulus);
       continue;
     }
     const namaKasus = t.kasus.map((k) => k.nama);
@@ -136,9 +136,25 @@ for (const { nama, p } of daftar) {
     cek(pre + "tanpa berkas tahap ini, kasus tidak lulus semua", tanpa.some((h) => !h.lulus));
     // tiap kasus harus membedakan: dengan salah satu berkas diminta dikosongkan, minimal satu kasus gagal (sudah diwakili di atas)
   }
-  // seluruh rantai: jalankan entri dengan berkas contoh semua tahap
-  const akhir = jalankan(gabung(p.tahap, p.tahap.length), p.entri, ["1", "Bumi", "3", "0"]);
-  cek(nama + ": produk akhir berjalan dari awal sampai akhir tanpa galat", akhir.galat === null && akhir.keluaran.includes("Terima kasih"), akhir);
+  if (p.entri && p.jalankanAkhir) {
+    // seluruh rantai: jalankan entri dengan berkas contoh semua tahap
+    const akhir = jalankan(gabung(p.tahap, p.tahap.length), p.entri, p.jalankanAkhir.masukan);
+    cek(nama + ": produk akhir berjalan tanpa galat", akhir.galat === null && akhir.keluaran.includes(p.jalankanAkhir.memuat), akhir);
+  }
+}
+
+// ---- kunci tugas akhir (hanya ada di komputer pemilik; folder kunci/ tidak diterbitkan)
+const kunciTA = join(root, "kunci", "pbo-java", "tugas-akhir.json");
+if (existsSync(kunciTA)) {
+  console.log("\n== kunci tugas akhir (lokal) ==");
+  const peta = JSON.parse(readFileSync(kunciTA, "utf8"));
+  const comp = kasus(peta, [{ nama: "kompilasi", kode: "" }]);
+  cek("kunci tugas akhir dikompilasi", comp[0].lulus, comp[0]);
+  const run = jalankan(peta, "Main.java", ["1", "Bumi", "3", "0"]);
+  cek("kunci tugas akhir berjalan sebagai aplikasi menu", run.galat === null && run.keluaran.includes("Dipinjam: Bumi") && run.keluaran.includes("Terima kasih"), run);
+  const { analisisJava } = await import("../site/js/praktikum-java.js");
+  const a = analisisJava(peta).filter((x) => !x.tambahan);
+  cek("kunci tugas akhir memenuhi semua penanda kelengkapan wajib", a.every((x) => x.ada), a.filter((x) => !x.ada).map((x) => x.label));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

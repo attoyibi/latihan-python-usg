@@ -1,0 +1,127 @@
+{
+ "id": "pewarisan",
+ "judul": "Latihan bab 5: pewarisan",
+ "deskripsi": "Kelas turunan yang memakai ulang dan mengubah perilaku kelas induk.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 5,
+ "tahap": [
+  {
+   "id": "kendaraan",
+   "judul": "Kendaraan, Motor, dan Mobil",
+   "bab": [
+    5
+   ],
+   "tujuan": "Membuat satu induk dan dua turunan yang memanggil constructor induk dan menimpa info().",
+   "langkah": [
+    "Buat Kendaraan.java: atribut private merek dan roda, constructor Kendaraan(String merek, int roda), getMerek(), getRoda(), dan info() yang mengembalikan \"Honda (2 roda)\".",
+    "Buat Motor.java turunan Kendaraan dengan constructor Motor(String merek) yang selalu 2 roda.",
+    "Buat Mobil.java turunan Kendaraan dengan constructor Mobil(String merek, int pintu): 4 roda, getPintu(), dan info() yang memakai super.info() lalu menambah \", 4 pintu\".",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "Kendaraan.java",
+    "Motor.java",
+    "Mobil.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Constructor turunan harus memanggil super(...) di baris pertama. Pakai super.info() supaya tidak menulis ulang teks induk."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 5: extends, super, override."
+    }
+   ],
+   "awal": {
+    "Kendaraan.java": "// Kendaraan.java\npublic class Kendaraan {\n    // TODO: atribut private merek (String) dan roda (int)\n    // TODO: constructor, getMerek(), getRoda()\n    // TODO: info() -> \"Honda (2 roda)\"\n}\n",
+    "Motor.java": "// Motor.java\npublic class Motor {\n    // TODO: turunan Kendaraan; constructor Motor(String merek) -> 2 roda\n}\n",
+    "Mobil.java": "// Mobil.java\npublic class Mobil {\n    // TODO: turunan Kendaraan; constructor Mobil(String merek, int pintu) -> 4 roda\n    // TODO: getPintu() dan info() = super.info() + \", <pintu> pintu\"\n}\n"
+   },
+   "contoh": {
+    "Kendaraan.java": "// Kendaraan.java\npublic class Kendaraan {\n    private String merek;\n    private int roda;\n\n    public Kendaraan(String merek, int roda) {\n        this.merek = merek;\n        this.roda = roda;\n    }\n\n    public String getMerek() {\n        return merek;\n    }\n\n    public int getRoda() {\n        return roda;\n    }\n\n    public String info() {\n        return merek + \" (\" + roda + \" roda)\";\n    }\n}\n",
+    "Motor.java": "// Motor.java\npublic class Motor extends Kendaraan {\n    public Motor(String merek) {\n        super(merek, 2);\n    }\n}\n",
+    "Mobil.java": "// Mobil.java\npublic class Mobil extends Kendaraan {\n    private int pintu;\n\n    public Mobil(String merek, int pintu) {\n        super(merek, 4);\n        this.pintu = pintu;\n    }\n\n    public int getPintu() {\n        return pintu;\n    }\n\n    @Override\n    public String info() {\n        return super.info() + \", \" + pintu + \" pintu\";\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "motor",
+     "kode": "Kendaraan k = new Motor(\"Honda\");\nsama(\"Honda (2 roda)\", k.info());\nsama(2, k.getRoda());"
+    },
+    {
+     "nama": "mobil",
+     "kode": "Kendaraan k = new Mobil(\"Toyota\", 4);\nsama(\"Toyota (4 roda), 4 pintu\", k.info());\nsama(4, k.getRoda());"
+    },
+    {
+     "nama": "pewarisan sungguhan",
+     "kode": "sama(Kendaraan.class, Motor.class.getSuperclass());\nsama(Kendaraan.class, Mobil.class.getSuperclass());"
+    },
+    {
+     "nama": "getter diwarisi dan getPintu (tersembunyi)",
+     "kode": "Mobil m = new Mobil(\"Suzuki\", 2);\nsama(\"Suzuki\", m.getMerek());\nsama(2, m.getPintu());",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "pegawai",
+   "judul": "Pegawai dan Manajer",
+   "bab": [
+    5
+   ],
+   "tujuan": "Memakai hasil method induk (super) untuk menghitung perilaku turunan.",
+   "langkah": [
+    "Buat Pegawai.java: atribut private nama dan gajiPokok (int), constructor Pegawai(String nama, int gajiPokok), getNama(), hitungGaji() (sama dengan gaji pokok), dan info() yang mengembalikan \"Sari: Rp3000000\" (nama dan hitungGaji()).",
+    "Buat Manajer.java turunan Pegawai dengan constructor Manajer(String nama, int gajiPokok, int tunjangan).",
+    "Di Manajer, timpa hitungGaji() menjadi gaji induk ditambah tunjangan (pakai super.hitungGaji()). info() tidak perlu ditimpa: ia harus ikut menampilkan gaji versi manajer.",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "Pegawai.java",
+    "Manajer.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "info() di Pegawai memanggil hitungGaji(). Ketika objeknya Manajer, yang dipanggil adalah hitungGaji() milik Manajer."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 5: pemanggilan method induk dengan super."
+    }
+   ],
+   "awal": {
+    "Pegawai.java": "// Pegawai.java\npublic class Pegawai {\n    // TODO: atribut private nama (String), gajiPokok (int)\n    // TODO: constructor, getNama()\n    // TODO: int hitungGaji()  -> gaji pokok\n    // TODO: String info()     -> \"Sari: Rp3000000\" memakai hitungGaji()\n}\n",
+    "Manajer.java": "// Manajer.java\npublic class Manajer {\n    // TODO: turunan Pegawai dengan atribut tunjangan\n    // TODO: timpa hitungGaji() = super.hitungGaji() + tunjangan\n}\n"
+   },
+   "contoh": {
+    "Pegawai.java": "// Pegawai.java\npublic class Pegawai {\n    private String nama;\n    private int gajiPokok;\n\n    public Pegawai(String nama, int gajiPokok) {\n        this.nama = nama;\n        this.gajiPokok = gajiPokok;\n    }\n\n    public String getNama() {\n        return nama;\n    }\n\n    public int hitungGaji() {\n        return gajiPokok;\n    }\n\n    public String info() {\n        return nama + \": Rp\" + hitungGaji();\n    }\n}\n",
+    "Manajer.java": "// Manajer.java\npublic class Manajer extends Pegawai {\n    private int tunjangan;\n\n    public Manajer(String nama, int gajiPokok, int tunjangan) {\n        super(nama, gajiPokok);\n        this.tunjangan = tunjangan;\n    }\n\n    @Override\n    public int hitungGaji() {\n        return super.hitungGaji() + tunjangan;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "pegawai biasa",
+     "kode": "Pegawai p = new Pegawai(\"Sari\", 3000000);\nsama(3000000, p.hitungGaji());\nsama(\"Sari: Rp3000000\", p.info());"
+    },
+    {
+     "nama": "manajer menambah tunjangan",
+     "kode": "Pegawai m = new Manajer(\"Budi\", 5000000, 1500000);\nsama(6500000, m.hitungGaji());"
+    },
+    {
+     "nama": "info manajer ikut gaji manajer",
+     "kode": "Pegawai m = new Manajer(\"Budi\", 5000000, 1500000);\nsama(\"Budi: Rp6500000\", m.info());"
+    },
+    {
+     "nama": "manajer adalah pegawai",
+     "kode": "sama(Pegawai.class, Manajer.class.getSuperclass());\nsama(\"Budi\", new Manajer(\"Budi\", 1, 1).getNama());",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

@@ -23,7 +23,7 @@ Tab **Praktikum** di dashboard: matriks peserta × tahap (lulus, lulus dengan co
 
 Jalankan `supabase/migrations/0008_praktikum.sql` setelah 0001 sampai 0007 (lihat [PEMASANGAN.md](PEMASANGAN.md)). Migrasi hanya **menambah** empat tabel baru (`praktikum_berkas`, `praktikum_tahap`, `praktikum_versi`, `praktikum_laporan`); tabel dan data yang sudah ada tidak diubah.
 
-Situs aman dipasang sebelum atau sesudah migrasi: bila tabel belum ada, pekerjaan peserta tetap tersimpan di browser dan penyusulan ke server berhenti diam-diam; tab Praktikum dosen menampilkan petunjuk menjalankan 0008. Mata kuliah tanpa folder `praktikum/` (mis. PBO) tidak menampilkan apa pun dari fitur ini.
+Situs aman dipasang sebelum atau sesudah migrasi: bila tabel belum ada, pekerjaan peserta tetap tersimpan di browser dan penyusulan ke server berhenti diam-diam; tab Praktikum dosen menampilkan petunjuk menjalankan 0008. Mata kuliah tanpa tanda `"praktikum": true` tidak menampilkan apa pun dari fitur ini dan tidak membuat permintaan jaringan tambahan.
 
 ## Menulis praktikum sendiri
 
@@ -85,3 +85,34 @@ Catatan: laporan praktikum tidak diisi otomatis. Peran instruktur dicek lewat da
 ## Batas fase pertama
 
 Hanya jalur **di website** dan hanya Python. Belum ada: jalur laptop (unggah berkas), jalur ponsel, praktikum Java (butuh penjalan Java multi-berkas), dan penghapusan berkas yang menjalar antar perangkat. Kasus uji berjalan di browser peserta, jadi bukan alat ujian tertutup; pakai bersama laporan dan sinyal tempel untuk menilai.
+
+## Praktikum Java (PBO)
+
+PBO memakai bentuk yang berbeda dari Kasir: **latihan mandiri per bab** dan satu **tugas akhir**.
+
+- **Latihan per bab** (`jenis: "latihan"`): bab 2, 3, 5, 6, 7, 8, 9, 10, 13, dan 14, masing-masing dengan dua tahap kecil. Tiap latihan berdiri sendiri (topik dan kelasnya berbeda dari latihan lain), diuji otomatis seperti Kasir, dan tidak punya laporan atau ekspor. Peserta yang melewatkan satu bab tidak terseret ke bab berikutnya. Berkas contoh tersedia bagi yang tertinggal.
+- **Tugas akhir** (`jenis: "proyek"`, `izinUnggah: true`): satu aplikasi konsol yang menggabungkan semua konsep, dengan ruang kerja multi-berkas, tombol **Unggah berkas dari laptop**, **Periksa kompilasi**, penanda kelengkapan otomatis, laporan 3 kolom, ekspor kode (HTML), dan **Tandai siap dinilai**. Soalnya sama untuk semua peserta: yang berlaptop mengunggah berkas `.java` dan `Rancangan.md` dari laptopnya, yang tidak berlaptop mengerjakannya langsung di sini, dan dosen menilai dari satu tempat dengan tampilan yang sama. Tugas akhir **tidak diuji otomatis** (tahap bertanda `dinilaiDosen`); rubriknya ada di [RUBRIK-PBO.md](RUBRIK-PBO.md) dan tampil juga di halaman daftar tahap.
+
+Penguji Java memakai penjalan multi-berkas ([PENJALAN-JAVA.md](PENJALAN-JAVA.md)). Skema kasus Java:
+
+```json
+{"nama": "info", "kode": "Produk p = new Produk(\"Pudak\", 5000, 20);
+sama(\"Pudak Rp5000 x20\", p.info());"}
+{"nama": "menu", "jalankan": "Main", "masukan": ["1", "Bumi", "0"], "memuat": ["Dipinjam: Bumi"]}
+```
+
+Kasus `kode` adalah isi method `main` kelas penguji `Uji` yang dikompilasi bersama berkas peserta; tersedia `cek(syarat, pesan)`, `sama(diharapkan, nyata)`, `privat(Kelas.class, "atribut")`, `abstrak(Kelas.class)`, dan `import java.util.*`. Bahasa Java dibatasi tingkat Java 8 (tanpa `var`, `record`, dan sejenisnya). Berkas `Uji.java`, `GagalUji.java`, dan `JavaRun.java` tidak boleh dipakai peserta.
+
+Memeriksa isi (butuh `java` di PATH, memakai penyusun dan penjalan yang sama dengan browser):
+
+```bash
+node tools/uji_praktikum_java.mjs   # contoh lulus, kerangka gagal, produk berjalan; juga memeriksa kunci tugas akhir bila ada
+```
+
+### Menambah atau mengubah latihan
+
+Latihan dibangun dari satu berkas JSON per latihan (`site/data/kuliah/pbo-java/praktikum/<id>.json`) yang didaftarkan di `index.json`. Aturannya sama dengan skema di atas, ditambah: `jenis` (`latihan` atau `proyek`), `bab` (nomor bab latihan), `tanpaLaporan` (sembunyikan laporan dan ekspor), `izinUnggah`, `penilaian` (rubrik yang ditampilkan), dan pada tahap: `dinilaiDosen` (tanpa kasus uji) serta `kunciBab` (contoh jawaban diambil dari tabel kunci, bukan dari berkas situs).
+
+### Contoh jawaban tugas akhir (instruktur)
+
+Contoh jawaban tugas akhir **tidak** ada di situs karena nilai peserta ditentukan olehnya. Letakkan sebagai `kunci/pbo-java/tugas-akhir.json` (objek nama berkas -> isi), lalu jalankan `python tools/buat_sql_kunci.py` dan tempel `kunci/kunci_jawaban.sql` di SQL Editor (disimpan sebagai bab 99). Tombol *Jawab otomatis (instruktur)* di tahap tugas akhir mengisi berkas dari tabel itu dan memeriksa kompilasinya. Tombol *Jawab semua praktikum otomatis (instruktur)* di bagian Praktikum halaman mata kuliah menjalankan semua latihan dan tugas akhir sekaligus (sekitar satu menit).

@@ -57,7 +57,7 @@ export function validasiNamaBerkas(nama, ada = [], { jumlah = ada.length, bahasa
   if (!n) return "Tulis nama berkas.";
   if (n.length > 60) return "Nama berkas terlalu panjang (maksimal 60 karakter).";
   if (/[\\/]/.test(n)) return "Nama berkas tidak boleh memuat garis miring (semua berkas ada di satu folder).";
-  if (/\s/.test(n)) return "Nama berkas tidak boleh memuat spasi. Pakai garis bawah, mis. daftar_barang.py.";
+  if (/\s/.test(n)) return bahasa === "java" ? "Nama berkas tidak boleh memuat spasi. Pakai nama kelasnya, mis. DaftarBarang.java." : "Nama berkas tidak boleh memuat spasi. Pakai garis bawah, mis. daftar_barang.py.";
   if (!POLA_NAMA.test(n)) return "Nama berkas hanya boleh huruf, angka, titik, strip, dan garis bawah, dan tidak boleh diawali titik.";
   const ekstensi = bahasa === "java" ? EKSTENSI_JAVA : EKSTENSI;
   if (!ekstensi.some((e) => n.toLowerCase().endsWith(e))) return "Akhiran berkas harus salah satu dari: " + ekstensi.join(", ") + ".";

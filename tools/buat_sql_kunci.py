@@ -2,6 +2,8 @@
 """Membuat SQL untuk memasukkan kunci jawaban ke tabel kunci_jawaban (migrasi 0009).
 
   kunci/<mata-kuliah>/bab-NN.py|java   ->   kunci/kunci_jawaban.sql
+  kunci/<mata-kuliah>/tugas-akhir.json ->   baris bab 99 (contoh jawaban tugas akhir: peta nama berkas -> isi, untuk tombol
+                                            Jawab otomatis instruktur; harus JSON objek berisi nama berkas Java/Markdown)
 
 Berkas hasilnya ada di folder kunci/ (diabaikan git, tidak ikut terbit). Tempel isinya di Supabase SQL Editor dan Run.
 Aman dijalankan ulang: kunci yang sudah ada diperbarui. Sebelum membuat SQL, kunci diuji dulu dengan tools/uji_kunci.py
@@ -16,6 +18,8 @@ ROOT = Path(__file__).resolve().parent.parent
 KUNCI = ROOT / "kunci"
 DATA = ROOT / "site" / "data"
 POLA = re.compile(r"^bab-(\d{2})\.(py|java)$")
+BAB_TUGAS_AKHIR = 99
+NAMA_BERKAS = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$")
 
 
 def kutip_dolar(teks, indeks):
@@ -39,6 +43,23 @@ def main():
             print(f"lewati {folder.name}: tidak ada di matakuliah.json")
             continue
         for f in sorted(folder.iterdir()):
+            if f.name == "tugas-akhir.json":
+                isi = f.read_text(encoding="utf8").replace("\r\n", "\n")
+                try:
+                    peta = json.loads(isi)
+                    assert isinstance(peta, dict) and peta and all(NAMA_BERKAS.match(n) and isinstance(v, str) for n, v in peta.items())
+                except Exception:  # noqa: BLE001
+                    print(f"lewati {folder.name}/{f.name}: harus JSON objek nama berkas -> isi")
+                    continue
+                if len(isi) > 50000:
+                    print(f"lewati {folder.name}/{f.name}: lebih dari 50000 karakter")
+                    continue
+                baris.append(
+                    "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values "
+                    f"('{folder.name}', {BAB_TUGAS_AKHIR}, 'berkas', {kutip_dolar(isi, len(baris))})\n"
+                    "on conflict (matakuliah_id, bab) do update set bahasa = excluded.bahasa, isi = excluded.isi, diperbarui_pada = now();"
+                )
+                continue
             m = POLA.match(f.name)
             if not m:
                 continue

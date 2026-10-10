@@ -128,5 +128,23 @@ cek("CSV: kepala, satu baris per peserta, kutip digandakan", csv.split("\r\n").l
 cek("CSV: awalan rumus Excel dinetralkan", P.csvPraktikum(P.rekapPraktikum({ peserta: [{ id: "x", nim: "9", nama: "=HYPERLINK(1)", kelas: "A" }], praktikum: kasir }), kasir).includes('"\'=HYPERLINK(1)"'));
 cek("CSV: tanpa peserta hanya kepala", P.csvPraktikum(P.rekapPraktikum({ peserta: [], praktikum: kasir }), kasir).split("\r\n").length === 2);
 
+console.log("\n== Java ==");
+const vj = (n, ada = [], o = {}) => P.validasiNamaBerkas(n, ada, Object.assign({ bahasa: "java" }, o));
+cek("nama kelas Java sah", vj("Buku.java") === "" && vj("Daftar_Barang2.java") === "" && vj("catatan.md") === "");
+cek("nama Java tidak sah ditolak", vj("buku-baru.java") !== "" && vj("2Buku.java") !== "" && vj("Buku.py") !== "" && vj("Buku.JAVA") !== "");
+cek("nama yang dipakai penguji ditolak", vj("Uji.java") !== "" && vj("GagalUji.java") !== "");
+cek("spasi pada nama Java disarankan memakai nama kelas", vj("Daftar Barang.java").includes("DaftarBarang.java"));
+cek("aturan Python tidak berubah", P.validasiNamaBerkas("a.py") === "" && P.validasiNamaBerkas("A.java") !== "");
+cek("berkasKode mengenali bahasa", P.berkasKode("java").test("A.java") && !P.berkasKode("java").test("a.py") && P.berkasKode("python").test("a.py"));
+const prak = { tahap: [{ id: "a", contoh: { "X.java": "v1", "Y.java": "y" } }, { id: "b", contoh: { "X.java": "v2" } }, { id: "c", contoh: {} }] };
+const rev = P.lengkapiDariContoh(prak, 2, {});
+cek("contoh yang direvisi tahap berikutnya memakai versi terbaru", rev.berkas["X.java"].isi === "v2" && rev.berkas["Y.java"].isi === "y");
+const revMilik = P.lengkapiDariContoh(prak, 2, { "X.java": { isi: "punyaku", asal: "milik" }, "Y.java": { isi: "lama", asal: "contoh" } });
+cek("berkas milik peserta tidak ditimpa, contoh lama diperbarui", revMilik.berkas["X.java"].isi === "punyaku" && revMilik.berkas["Y.java"].isi === "y");
+cek("tahap tanpa kasus dikenali sebagai dinilai dosen", P.tanpaUji({ kasus: [] }) && P.tanpaUji({}) && !P.tanpaUji({ kasus: [{}] }));
+const htmlJ = P.bangunHtmlEksporJava({ judul: 'Tugas <akhir> "PBO"', deskripsi: "d", berkas: { "Main.java": 'public class Main { String s = "</details><script>x</script>"; }' }, entri: "Main.java", oleh: "Ani <b>" });
+cek("ekspor Java: kode dilolosi dan tidak ada script", !htmlJ.includes("<script") && !htmlJ.includes("</details><script>") && htmlJ.includes("&lt;/details&gt;&lt;script&gt;") && htmlJ.includes("javac *.java") && htmlJ.includes("java Main"));
+cek("ekspor Java: judul dan nama dilolosi", htmlJ.includes("Tugas &lt;akhir&gt; &quot;PBO&quot;") && htmlJ.includes("Ani &lt;b&gt;"));
+
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
 process.exit(gagal ? 1 : 0);

@@ -23,6 +23,12 @@ Pemuatan Java (dan Python) bisa gagal: internet putus atau diblokir, koneksi san
 
 Menguji kegagalan di komputer sendiri (server uji): `/__gagal/java/mati` (skrip gagal dimuat), `/__gagal/java/diam` (tidak pernah siap), dan `/__gagal/java/normal` (pulih); sama untuk `python`. Setelah mengubah mode, muat ulang skrip dengan `fetch('/js/javaworker.js', {cache:'reload'})` karena browser menyimpan skrip worker. Tambahkan `?muatmaks=5000` di alamat untuk memperpendek batas waktu muat.
 
+## Beberapa berkas sekaligus (praktikum)
+
+Selain satu `Main.java`, JavaRun menerima **paket**: beberapa berkas `.java` yang dikompilasi bersama lalu kelas utamanya dijalankan. Dipakai oleh praktikum (lihat [PRAKTIKUM.md](PRAKTIKUM.md)). Pekerjaan paket diawali karakter U+0002; tiap paket (dipisah U+0004) berisi kelas utama, masukan, lalu pasangan nama berkas dan isi (pemisah U+0003 dan U+0005). Penyusun paket dan pembaca hasilnya ada di `site/js/praktikum-java.js` (murni, diuji dengan JVM sungguhan oleh `tools/uji_praktikum_java.mjs`). Satu tahap praktikum memakan sekitar 1 sampai 3 detik setelah pemanasan. Kode antarmuka grafis (Swing) dan JDBC **dapat dikompilasi** di sini tetapi tidak dapat dijalankan.
+
+Setelah mengubah `JavaRun.java`, bangun ulang jar-nya dengan `python tools/java-runner/build.py`.
+
 ## Batasan yang perlu diketahui
 
 - **Kode soal berupa satu berkas `Main.java`** berisi kelas `Main` dengan `public static void main`, ditambah kelas lain di berkas yang sama (tanpa `public`). Masukan dibaca dengan `Scanner(System.in)`.

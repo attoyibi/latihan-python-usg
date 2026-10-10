@@ -135,3 +135,49 @@ export function uraikanHasil(mentah, tafsir) {
     }),
   };
 }
+
+// ---------- pemeriksaan kelengkapan tugas akhir (statis, hanya membaca teks kode) ----------
+/** Membuang komentar dan isi string/karakter supaya kata kunci di dalamnya tidak ikut terhitung. */
+export function bersihkanKode(kode) {
+  return String(kode || "")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/\/\/[^\n]*/g, " ")
+    .replace(/"(?:\.|[^"\\n])*"/g, '""')
+    .replace(/'(?:\.|[^'\\n])'/g, "''");
+}
+const hitung = (teks, re) => (teks.match(re) || []).length;
+
+/**
+ * Ringkasan unsur PBO yang terlihat di kode: hanya penanda untuk membantu dosen dan peserta, bukan penilaian. Kode yang
+ * tidak dikompilasi pun tetap dianalisis. Mengembalikan daftar {kunci, label, ada, rincian}.
+ */
+export function analisisJava(berkas) {
+  const nama = Object.keys(berkas).filter((n) => /\.java$/i.test(n));
+  const gabung = nama.map((n) => bersihkanKode(berkas[n])).join("\n");
+  const kelas = hitung(gabung, /\b(?:class|interface|enum)\s+[A-Za-z_]\w*/g) - hitung(gabung, /\b\.class\b/g);
+  const punyaMain = /\bpublic\s+static\s+void\s+main\s*\(/.test(gabung);
+  const turunan = hitung(gabung, /\bclass\s+[A-Za-z_]\w*(?:\s*<[^>{]*>)?\s+extends\s+[A-Za-z_]\w*/g);
+  const abstrak = hitung(gabung, /\babstract\s+class\b/g) + hitung(gabung, /\binterface\s+[A-Za-z_]\w*/g);
+  const eksepsiSendiri = hitung(gabung, /\bclass\s+[A-Za-z_]\w*\s+extends\s+(?:\w*Exception|Throwable|Error)\b/g);
+  const catchBlok = hitung(gabung, /\bcatch\s*\(/g);
+  const privatCount = hitung(gabung, /\bprivate\s+[\w<>\[\], ?]+\s+[A-Za-z_]\w*\s*[;=]/g);
+  const koleksi = /\b(?:ArrayList|LinkedList|HashMap|TreeMap|LinkedHashMap|HashSet|TreeSet|LinkedHashSet|List\s*<|Map\s*<|Set\s*<|Deque\s*<|Queue\s*<)/.test(gabung);
+  const berkasIo = /\b(?:Files\s*\.|FileReader|FileWriter|BufferedReader|BufferedWriter|FileInputStream|FileOutputStream|PrintWriter)\b/.test(gabung);
+  const gui = /\b(?:javax\.swing|java\.awt|javafx)\b|\bJFrame\b/.test(gabung);
+  const jdbc = /\b(?:java\.sql|DriverManager|PreparedStatement)\b/.test(gabung);
+  const rancangan = Object.entries(berkas).find(([n]) => /\.md$/i.test(n));
+  const panjangRancangan = rancangan ? String(rancangan[1]).replace(/\s+/g, " ").trim().length : 0;
+  return [
+    { kunci: "kelas", label: "Jumlah kelas dan interface", ada: kelas >= 5, rincian: kelas + " (disarankan minimal 5)" },
+    { kunci: "main", label: "Program utama (main)", ada: punyaMain, rincian: punyaMain ? "ada" : "belum ada" },
+    { kunci: "enkapsulasi", label: "Enkapsulasi (atribut private)", ada: privatCount >= 3, rincian: privatCount + " atribut private" },
+    { kunci: "pewarisan", label: "Pewarisan (extends)", ada: turunan >= 1, rincian: turunan + " kelas turunan" },
+    { kunci: "abstraksi", label: "Abstraksi (abstract class atau interface)", ada: abstrak >= 1, rincian: abstrak + " ditemukan" },
+    { kunci: "eksepsi", label: "Eksepsi buatan sendiri dan penanganannya", ada: eksepsiSendiri >= 1 && catchBlok >= 1, rincian: eksepsiSendiri + " eksepsi sendiri, " + catchBlok + " blok catch" },
+    { kunci: "koleksi", label: "Collection (List, Map, atau Set)", ada: koleksi, rincian: koleksi ? "dipakai" : "belum terlihat" },
+    { kunci: "berkas", label: "Penyimpanan ke berkas", ada: berkasIo, rincian: berkasIo ? "dipakai" : "belum terlihat" },
+    { kunci: "rancangan", label: "Dokumen rancangan (.md)", ada: panjangRancangan >= 300, rincian: panjangRancangan + " karakter" },
+    { kunci: "gui", label: "Tambahan: antarmuka grafis", ada: gui, rincian: gui ? "terlihat (tidak dapat dijalankan di website)" : "tidak ada", tambahan: true },
+    { kunci: "jdbc", label: "Tambahan: basis data JDBC", ada: jdbc, rincian: jdbc ? "terlihat (tidak dapat dijalankan di website)" : "tidak ada", tambahan: true },
+  ];
+}

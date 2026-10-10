@@ -375,6 +375,11 @@
         if (TANPA_0009) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public.kunci_jawaban' in the schema cache" } };
         if (q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table kunci_jawaban" } };
         if (!instruktur()) return { data: [], error: null };
+        if (Number(q.f.bab) === 99) {
+          // contoh jawaban tugas akhir (kunci/<mata kuliah>/tugas-akhir.json)
+          const rt = await fetch("/__kunci/" + q.f.matakuliah_id + "/tugas-akhir.json");
+          return rt.ok ? { data: [{ isi: await rt.text(), bahasa: "berkas" }], error: null } : { data: [], error: null };
+        }
         const bab = String(q.f.bab).padStart(2, "0");
         for (const ext of ["py", "java"]) {
           const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/bab-" + bab + "." + ext);
@@ -664,6 +669,31 @@
       });
       db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", nama: "subtotal.py", isi: "def subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n", asal: "milik", diperbarui_pada: "2026-10-03T04:00:00Z" });
       if (n <= 5) db.praktikum_laporan.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", jawaban: { apa: "Saya membangun aplikasi kasir untuk toko oleh-oleh dan belajar memecah masalah menjadi fungsi kecil.", kendala: n % 2 ? "Bingung membedakan return dan print, lalu saya baca ulang bab fungsi." : "" }, jumlah_ketikan: {}, percobaan_tempel: n === 2 ? 4 : 0, durasi_menulis_detik: 300, kode_verifikasi: "PKSEED0" + n, dikumpulkan_pada: n % 2 ? "2026-10-08T04:00:00Z" : null, diperbarui_pada: "2026-10-08T04:00:00Z" });
+    }
+    save();
+  }
+
+  // Data contoh praktikum Java (latihan per bab dan tugas akhir) untuk tab Praktikum dashboard.
+  if (!db.seedPkJava) {
+    db.seedPkJava = true;
+    db.praktikum_tahap = db.praktikum_tahap || [];
+    db.praktikum_berkas = db.praktikum_berkas || [];
+    db.praktikum_laporan = db.praktikum_laporan || [];
+    const latihan = [["kelas-objek", ["produk", "jam"]], ["enkapsulasi", ["rekening", "nilai"]], ["pewarisan", ["kendaraan", "pegawai"]], ["polimorfisme", ["bentuk", "hewan"]], ["abstraksi", ["pembayaran", "diskon"]]];
+    for (let n = 1; n <= 8; n++) {
+      const uid = "u-seed" + n;
+      latihan.slice(0, Math.max(1, 6 - n)).forEach(([pid, tahap], li) => {
+        tahap.forEach((tid, ti) => {
+          if (n > 5 && ti > 0) return;
+          db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "pbo-java", praktikum_id: pid, tahap_id: tid, status: n === 7 && ti === 0 ? "sedang" : "lulus", jalur: "web", jumlah_kirim: 1 + ((n + li + ti) % 4), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: "2026-10-03T03:00:00Z", pakai_contoh: n === 6 && ti === 0, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });
+        });
+      });
+      if (n <= 3) {
+        db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "pbo-java", praktikum_id: "tugas-akhir", tahap_id: "tugas-akhir", status: n === 3 ? "sedang" : "lulus", jalur: "web", jumlah_kirim: n, pertama_dibuka: "2026-10-06T03:00:00Z", lulus_pada: n === 3 ? null : "2026-10-09T03:00:00Z", pakai_contoh: false, centang: {}, diperbarui_pada: "2026-10-09T04:00:00Z" });
+        db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "pbo-java", praktikum_id: "tugas-akhir", nama: "Main.java", isi: "public class Main {\n    public static void main(String[] a) {\n        System.out.println(\"Aplikasi " + n + "\");\n    }\n}\n", asal: "milik", diperbarui_pada: "2026-10-09T04:00:00Z" });
+        db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "pbo-java", praktikum_id: "tugas-akhir", nama: "Rancangan.md", isi: "# Rancangan\n\nSistem sederhana nomor " + n + ".", asal: "milik", diperbarui_pada: "2026-10-09T04:00:00Z" });
+        db.praktikum_laporan.push({ user_id: uid, matakuliah_id: "pbo-java", praktikum_id: "tugas-akhir", jawaban: { apa: "Saya membangun aplikasi konsol dengan beberapa kelas dan belajar memisahkan tanggung jawab antar kelas." }, jumlah_ketikan: { _unggah: n === 2 ? 6 : 0 }, percobaan_tempel: n === 1 ? 2 : 0, durasi_menulis_detik: 600, kode_verifikasi: "TAJAVA0" + n, dikumpulkan_pada: null, diperbarui_pada: "2026-10-09T04:00:00Z" });
+      }
     }
     save();
   }

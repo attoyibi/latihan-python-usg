@@ -166,7 +166,7 @@ def cek_praktikum(c, babs):
 def cek_satu_praktikum(c, babs, e, pk, w):
     if pk.get("id") != e["id"]:
         err(f"{w}: id praktikum ({pk.get('id')!r}) harus sama dengan index.json ({e['id']!r})")
-    for k in ("judul", "deskripsi", "bahasa", "entri", "tahap"):
+    for k in ("judul", "deskripsi", "bahasa", "tahap"):
         if k not in pk:
             err(f"{w}: kolom '{k}' tidak ada")
     if pk.get("bahasa") not in ("python", "java") or pk.get("bahasa") != c.get("bahasa"):
@@ -175,7 +175,7 @@ def cek_satu_praktikum(c, babs, e, pk, w):
     for j in pk.get("jalur", ["web"]):
         if j not in ("web", "laptop"):
             err(f"{w}: 'jalur' hanya boleh 'web' atau 'laptop'")
-    if not isinstance(pk.get("entri"), str) or not NAMA_BERKAS_RE.fullmatch(pk.get("entri", "")):
+    if "entri" in pk and (not isinstance(pk.get("entri"), str) or not NAMA_BERKAS_RE.fullmatch(pk.get("entri", ""))):
         err(f"{w}: 'entri' bukan nama berkas yang sah")
     tahap = pk.get("tahap")
     if not isinstance(tahap, list) or not tahap:
@@ -194,8 +194,8 @@ def cek_satu_praktikum(c, babs, e, pk, w):
             err(f"{x}: id tahap '{tid}' kembar")
         ada_id.add(tid)
         tanpa_uji = not t.get("kasus")
-        if tanpa_uji and (t.get("opsional") is not True or t.get("jalur", "web") not in ("web", "laptop")):
-            err(f"{x}: tahap tanpa kasus uji harus opsional (\"opsional\": true) dengan jalur web atau laptop")
+        if tanpa_uji and t.get("dinilaiDosen") is not True:
+            err(f"{x}: tahap tanpa kasus uji harus bertanda \"dinilaiDosen\": true (dinilai dosen dengan rubrik)")
         for k in ("judul", "tujuan", "langkah", "diminta", "awal", "contoh", "kasus"):
             if k not in t:
                 err(f"{x}: kolom '{k}' tidak ada")
@@ -223,7 +223,7 @@ def cek_satu_praktikum(c, babs, e, pk, w):
         for n in ([] if tanpa_uji else t.get("diminta", [])):
             if n not in sedia:
                 err(f"{x}: berkas diminta {n!r} tidak ada di 'awal' maupun 'contoh'")
-        if not t.get("kasus") and not t.get("opsional"):
+        if not t.get("kasus") and not t.get("dinilaiDosen"):
             err(f"{x}: minimal satu kasus uji")
         for j, k in enumerate(t.get("kasus", [])):
             y = f"{x}.kasus[{j}]"
@@ -238,8 +238,10 @@ def cek_satu_praktikum(c, babs, e, pk, w):
         for pj in t.get("petunjuk", []):
             if pj.get("jenis") not in ("soal", "buku", "kode", "kata") or not pj.get("isi"):
                 err(f"{x}: petunjuk harus berisi jenis (soal, buku, kode, kata) dan isi")
-    if pk.get("entri") not in nama_contoh:
-        err(f"{w}: berkas entri {pk.get('entri')!r} tidak ada di contoh tahap mana pun")
+    if pk.get("entri") and pk.get("entri") not in nama_contoh and not any(pk.get("entri") in t.get("awal", {}) for t in tahap):
+        err(f"{w}: berkas entri {pk.get('entri')!r} tidak ada di contoh atau kerangka tahap mana pun")
+    if pk.get("izinUnggah") and pk.get("jenis") != "proyek":
+        err(f"{w}: izinUnggah hanya untuk praktikum bertipe proyek (tugas akhir)")
 
 
 def cek_konsep(w, ch):

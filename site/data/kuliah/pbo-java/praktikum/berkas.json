@@ -1,0 +1,116 @@
+{
+ "id": "berkas",
+ "judul": "Latihan bab 10: operasi berkas",
+ "deskripsi": "Menulis dan membaca berkas teks.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 10,
+ "tahap": [
+  {
+   "id": "catatan",
+   "judul": "Catatan teks",
+   "bab": [
+    10
+   ],
+   "tujuan": "Menulis, membaca, dan menambah baris pada berkas teks.",
+   "langkah": [
+    "Buat Catatan.java dengan static void tulis(String berkas, List<String> baris) yang menulis satu baris per elemen (Files.write).",
+    "Tulis static List<String> baca(String berkas): isi berkas sebagai daftar baris, atau daftar kosong bila berkas belum ada.",
+    "Tulis static void tambah(String berkas, String baris) yang menambah satu baris di akhir berkas (baca dulu, tambah, tulis ulang). Kirim jawaban."
+   ],
+   "diminta": [
+    "Catatan.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Files.write(Paths.get(nama), daftarBaris) dan Files.readAllLines(Paths.get(nama)) menangani baris untukmu. Files.exists memeriksa keberadaan berkas."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 10: Files, Path, dan penyimpanan teks."
+    }
+   ],
+   "awal": {
+    "Catatan.java": "// Catatan.java\nimport java.io.IOException;\nimport java.util.List;\n\npublic class Catatan {\n    // TODO: static void tulis(String berkas, List<String> baris) throws IOException\n    // TODO: static List<String> baca(String berkas) throws IOException    kosong bila berkas belum ada\n    // TODO: static void tambah(String berkas, String baris) throws IOException\n}\n"
+   },
+   "contoh": {
+    "Catatan.java": "// Catatan.java\nimport java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Catatan {\n    public static void tulis(String berkas, List<String> baris) throws IOException {\n        Files.write(Paths.get(berkas), baris);\n    }\n\n    public static List<String> baca(String berkas) throws IOException {\n        if (!Files.exists(Paths.get(berkas))) {\n            return new ArrayList<>();\n        }\n        return Files.readAllLines(Paths.get(berkas));\n    }\n\n    public static void tambah(String berkas, String baris) throws IOException {\n        List<String> isi = new ArrayList<>(baca(berkas));\n        isi.add(baris);\n        tulis(berkas, isi);\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "tulis lalu baca",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-catatan.txt\"));\nCatatan.tulis(\"uji-catatan.txt\", Arrays.asList(\"satu\", \"dua\"));\nList<String> isi = Catatan.baca(\"uji-catatan.txt\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-catatan.txt\"));\nsama(\"[satu, dua]\", isi.toString());"
+    },
+    {
+     "nama": "berkas belum ada",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"tidak-ada.txt\"));\nsama(0, Catatan.baca(\"tidak-ada.txt\").size());"
+    },
+    {
+     "nama": "tambah baris",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-tambah.txt\"));\nCatatan.tambah(\"uji-tambah.txt\", \"A\");\nCatatan.tambah(\"uji-tambah.txt\", \"B\");\nList<String> isi = Catatan.baca(\"uji-tambah.txt\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-tambah.txt\"));\nsama(\"[A, B]\", isi.toString());"
+    },
+    {
+     "nama": "menulis ulang menggantikan isi lama (tersembunyi)",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-ganti.txt\"));\nCatatan.tulis(\"uji-ganti.txt\", Arrays.asList(\"lama1\", \"lama2\", \"lama3\"));\nCatatan.tulis(\"uji-ganti.txt\", Arrays.asList(\"baru\"));\nList<String> isi = Catatan.baca(\"uji-ganti.txt\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-ganti.txt\"));\nsama(\"[baru]\", isi.toString());",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "nilai-csv",
+   "judul": "Rata-rata dari berkas CSV",
+   "bab": [
+    10
+   ],
+   "tujuan": "Membaca berkas berformat nama,nilai dan menghitung statistik sederhana.",
+   "langkah": [
+    "Buat NilaiCsv.java dengan static double rataRata(String berkas) throws IOException.",
+    "Setiap baris berformat nama,nilai (mis. Sari,80). Baris kosong atau yang nilainya bukan angka dilewati. Bila tidak ada nilai sah, hasilnya 0.",
+    "Tulis static String tertinggi(String berkas) throws IOException yang mengembalikan nama dengan nilai tertinggi (yang pertama bila seri), atau \"-\" bila tidak ada nilai sah. Kirim jawaban."
+   ],
+   "diminta": [
+    "NilaiCsv.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Pecah baris dengan split(\",\"), ubah dengan Integer.parseInt di dalam try-catch NumberFormatException untuk melewati baris rusak."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 10: membaca berkas dan memecah baris."
+    }
+   ],
+   "awal": {
+    "NilaiCsv.java": "// NilaiCsv.java\nimport java.io.IOException;\n\npublic class NilaiCsv {\n    // TODO: static double rataRata(String berkas) throws IOException\n    // TODO: static String tertinggi(String berkas) throws IOException\n}\n"
+   },
+   "contoh": {
+    "NilaiCsv.java": "// NilaiCsv.java\nimport java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\n\npublic class NilaiCsv {\n    public static double rataRata(String berkas) throws IOException {\n        int jumlah = 0;\n        int banyak = 0;\n        for (String baris : Files.readAllLines(Paths.get(berkas))) {\n            String[] bagian = baris.split(\",\");\n            if (bagian.length < 2) {\n                continue;\n            }\n            try {\n                jumlah += Integer.parseInt(bagian[1].trim());\n                banyak++;\n            } catch (NumberFormatException e) {\n                // baris rusak dilewati\n            }\n        }\n        return banyak == 0 ? 0 : (double) jumlah / banyak;\n    }\n\n    public static String tertinggi(String berkas) throws IOException {\n        String nama = \"-\";\n        int terbaik = Integer.MIN_VALUE;\n        for (String baris : Files.readAllLines(Paths.get(berkas))) {\n            String[] bagian = baris.split(\",\");\n            if (bagian.length < 2) {\n                continue;\n            }\n            try {\n                int nilai = Integer.parseInt(bagian[1].trim());\n                if (nilai > terbaik) {\n                    terbaik = nilai;\n                    nama = bagian[0].trim();\n                }\n            } catch (NumberFormatException e) {\n                // baris rusak dilewati\n            }\n        }\n        return nama;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "rata-rata",
+     "kode": "java.nio.file.Files.write(java.nio.file.Paths.get(\"uji-nilai.csv\"), Arrays.asList(\"Sari,80\", \"Budi,60\", \"Ani,100\"));\ndouble r = NilaiCsv.rataRata(\"uji-nilai.csv\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-nilai.csv\"));\ncek(Math.abs(r - 80.0) < 0.001, \"rata-rata harus 80, hasilnya \" + r);"
+    },
+    {
+     "nama": "baris rusak dilewati",
+     "kode": "java.nio.file.Files.write(java.nio.file.Paths.get(\"uji-rusak.csv\"), Arrays.asList(\"Sari,80\", \"\", \"Budi,abc\", \"tanpa-koma\", \"Ani,60\"));\ndouble r = NilaiCsv.rataRata(\"uji-rusak.csv\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-rusak.csv\"));\ncek(Math.abs(r - 70.0) < 0.001, \"rata-rata harus 70, hasilnya \" + r);"
+    },
+    {
+     "nama": "nama tertinggi",
+     "kode": "java.nio.file.Files.write(java.nio.file.Paths.get(\"uji-top.csv\"), Arrays.asList(\"Sari,80\", \"Budi,95\", \"Ani,95\"));\nString t = NilaiCsv.tertinggi(\"uji-top.csv\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-top.csv\"));\nsama(\"Budi\", t);"
+    },
+    {
+     "nama": "tidak ada nilai sah (tersembunyi)",
+     "kode": "java.nio.file.Files.write(java.nio.file.Paths.get(\"uji-kosong.csv\"), Arrays.asList(\"\", \"x,y\"));\ndouble r = NilaiCsv.rataRata(\"uji-kosong.csv\");\nString t = NilaiCsv.tertinggi(\"uji-kosong.csv\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-kosong.csv\"));\ncek(r == 0.0, \"rata-rata tanpa nilai sah harus 0\");\nsama(\"-\", t);",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

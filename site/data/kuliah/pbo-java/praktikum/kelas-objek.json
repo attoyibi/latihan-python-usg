@@ -1,0 +1,122 @@
+{
+ "id": "kelas-objek",
+ "judul": "Latihan bab 2: kelas dan objek",
+ "deskripsi": "Dua kelas kecil untuk membiasakan atribut, constructor, dan method.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 2,
+ "tahap": [
+  {
+   "id": "produk",
+   "judul": "Kelas Produk",
+   "bab": [
+    2
+   ],
+   "tujuan": "Membuat kelas dengan atribut, constructor, dan dua method.",
+   "langkah": [
+    "Buat Produk.java dengan atribut nama (String), harga (int), dan stok (int).",
+    "Tulis constructor Produk(String nama, int harga, int stok).",
+    "Tulis nilaiStok() yang mengembalikan harga dikali stok, dan info() yang mengembalikan teks seperti \"Pudak Rp5000 x20\".",
+    "Coba di Main.java, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "Produk.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Atribut ditulis di dalam kelas, di luar method. Di constructor, this.nama = nama memisahkan atribut dari parameter."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 2: kelas, objek, atribut, method, constructor."
+    }
+   ],
+   "awal": {
+    "Produk.java": "// Produk.java\npublic class Produk {\n    // TODO: atribut nama (String), harga (int), stok (int)\n\n    // TODO: constructor Produk(String nama, int harga, int stok)\n\n    // TODO: int nilaiStok()   harga * stok\n\n    // TODO: String info()     contoh \"Pudak Rp5000 x20\"\n}\n"
+   },
+   "contoh": {
+    "Produk.java": "// Produk.java\npublic class Produk {\n    String nama;\n    int harga;\n    int stok;\n\n    Produk(String nama, int harga, int stok) {\n        this.nama = nama;\n        this.harga = harga;\n        this.stok = stok;\n    }\n\n    int nilaiStok() {\n        return harga * stok;\n    }\n\n    String info() {\n        return nama + \" Rp\" + harga + \" x\" + stok;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "info",
+     "kode": "Produk p = new Produk(\"Pudak\", 5000, 20);\nsama(\"Pudak Rp5000 x20\", p.info());"
+    },
+    {
+     "nama": "nilai stok",
+     "kode": "Produk p = new Produk(\"Petis\", 12000, 3);\nsama(36000, p.nilaiStok());"
+    },
+    {
+     "nama": "atribut terisi",
+     "kode": "Produk p = new Produk(\"Dodol\", 25000, 4);\nsama(\"Dodol\", p.nama);\nsama(25000, p.harga);\nsama(4, p.stok);"
+    },
+    {
+     "nama": "dua objek tidak saling memengaruhi (tersembunyi)",
+     "kode": "Produk a = new Produk(\"A\", 10, 1);\nProduk b = new Produk(\"B\", 20, 2);\na.stok = 9;\nsama(2, b.stok);\nsama(40, b.nilaiStok());",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "jam",
+   "judul": "Kelas Jam dengan constructor ganda",
+   "bab": [
+    2
+   ],
+   "tujuan": "Membuat dua constructor (overloading) dan method yang mengubah keadaan objek.",
+   "langkah": [
+    "Buat Jam.java dengan atribut jam dan menit (int).",
+    "Tulis constructor Jam() untuk 00:00 (panggil constructor lain dengan this(0, 0)) dan Jam(int jam, int menit).",
+    "Tulis tambahMenit(int tambah): waktu maju sebanyak itu dan kembali ke 00:00 setelah 23:59.",
+    "Tulis teks() yang mengembalikan \"07:05\" (dua digit untuk jam dan menit). Kirim jawaban."
+   ],
+   "diminta": [
+    "Jam.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "String.format(\"%02d:%02d\", jam, menit) menghasilkan dua digit. Hitung dalam menit total lalu bagi dengan 60 untuk jam."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 2: constructor dan overloading."
+    }
+   ],
+   "awal": {
+    "Jam.java": "// Jam.java\npublic class Jam {\n    // TODO: atribut jam dan menit (int)\n\n    // TODO: constructor Jam()  -> 00:00\n    // TODO: constructor Jam(int jam, int menit)\n\n    // TODO: void tambahMenit(int tambah)\n\n    // TODO: String teks()   contoh \"07:05\"\n}\n"
+   },
+   "contoh": {
+    "Jam.java": "// Jam.java\npublic class Jam {\n    int jam;\n    int menit;\n\n    Jam() {\n        this(0, 0);\n    }\n\n    Jam(int jam, int menit) {\n        this.jam = jam;\n        this.menit = menit;\n    }\n\n    void tambahMenit(int tambah) {\n        int hari = 24 * 60;\n        int total = (jam * 60 + menit + tambah) % hari;\n        if (total < 0) {\n            total += hari;\n        }\n        jam = total / 60;\n        menit = total % 60;\n    }\n\n    String teks() {\n        return String.format(\"%02d:%02d\", jam, menit);\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "jam biasa",
+     "kode": "sama(\"07:05\", new Jam(7, 5).teks());"
+    },
+    {
+     "nama": "constructor tanpa argumen",
+     "kode": "sama(\"00:00\", new Jam().teks());"
+    },
+    {
+     "nama": "tambah menit melewati tengah malam",
+     "kode": "Jam j = new Jam(23, 30);\nj.tambahMenit(70);\nsama(\"00:40\", j.teks());"
+    },
+    {
+     "nama": "tambah menit dalam satu jam",
+     "kode": "Jam j = new Jam(8, 15);\nj.tambahMenit(20);\nsama(\"08:35\", j.teks());"
+    },
+    {
+     "nama": "satu hari penuh kembali sama (tersembunyi)",
+     "kode": "Jam j = new Jam(13, 7);\nj.tambahMenit(1440);\nsama(\"13:07\", j.teks());",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

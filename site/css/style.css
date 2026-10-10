@@ -586,3 +586,20 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
   .pk-editor .CodeMirror{height:300px}
   .pk-nav .btn,.pk-aksi .btn{flex:1 1 100%}
 }
+
+/* Praktikum Java: latihan per bab, tugas akhir, unggah, penanda kelengkapan */
+.pk-sub{margin:18px 0 4px}
+.pk-lat-daftar{list-style:none;margin:8px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.pk-lat{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);background:var(--card);min-height:44px}
+.pk-lat:hover{border-color:var(--brand)}
+.pk-lat .num{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.pk-dosen{margin:10px 0;border-left-color:var(--warn);background:var(--warn-bg)}
+.pk-periksa{margin:10px 0}
+.pk-analisis{list-style:none;margin:6px 0;padding:0}
+.pk-analisis li{padding:4px 0;border-bottom:1px solid var(--line)}
+.pk-analisis li.ok strong{color:var(--ok)}
+.pk-nilai-blok h4{margin:10px 0 2px}
+.pk-nilai-blok ul{margin:2px 0 6px;padding-left:20px}
+.pk-kerja-grid>*{min-width:0}
+.pk-nama{overflow-wrap:anywhere;min-width:0}
+@media (max-width:760px){.pk-berkas{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}}

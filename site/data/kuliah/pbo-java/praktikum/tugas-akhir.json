@@ -1,0 +1,104 @@
+{
+ "id": "tugas-akhir",
+ "judul": "Tugas akhir PBO",
+ "deskripsi": "Satu aplikasi konsol Java yang menggabungkan semua konsep PBO. Soalnya sama untuk semua peserta: yang punya laptop boleh mengerjakannya di laptop lalu mengunggah berkasnya ke sini, yang tidak punya laptop mengerjakannya langsung di sini.",
+ "bahasa": "java",
+ "jenis": "proyek",
+ "izinUnggah": true,
+ "jalur": [
+  "web"
+ ],
+ "entri": "Main.java",
+ "gambaran": [
+  "Soal: buat aplikasi konsol berbasis menu untuk satu topik, misalnya sistem perpustakaan, kasir toko, atau reservasi ruang kelas. Topik diumumkan dosen; bila belum, pilih satu yang sederhana dan konsultasikan.",
+  "Wajib: minimal 5 kelas selain Main, pewarisan dan polimorfisme, abstract class atau interface, eksepsi buatan sendiri yang benar-benar dilempar dan ditangkap, Collection (List atau Map), penyimpanan data ke berkas teks, dan Main berupa menu.",
+  "Dokumen Rancangan.md berisi diagram kelas (teks), satu fitur yang kamu rancang sendiri, prinsip desain yang kamu terapkan, dan satu keputusan desain beserta alternatifnya.",
+  "Tambahan yang boleh dipilih untuk menambah nilai: antarmuka grafis (Swing) dan basis data (JDBC). Keduanya butuh laptop, JDK, dan layar sungguhan, jadi website tidak bisa menjalankannya; tulis kodenya dan jelaskan di laporan, dosen akan membacanya."
+ ],
+ "penilaian": [
+  {
+   "judul": "Fungsi dan kebenaran (30)",
+   "butir": [
+    "Kode dikompilasi dan menu berjalan tanpa galat yang tidak tertangani.",
+    "Semua fitur wajib bekerja sesuai penjelasanmu."
+   ]
+  },
+  {
+   "judul": "Penerapan konsep PBO (30)",
+   "butir": [
+    "Enkapsulasi, pewarisan, polimorfisme, dan abstraksi dipakai karena perlu, bukan sekadar hiasan.",
+    "Polimorfisme terlihat nyata: pemanggilan lewat tipe induk atau interface."
+   ]
+  },
+  {
+   "judul": "Kualitas desain (20)",
+   "butir": [
+    "Tiap kelas punya satu tanggung jawab yang jelas dan nama yang bermakna.",
+    "Rancangan.md lengkap dan sesuai dengan kodenya.",
+    "Minimal dua prinsip SOLID dijelaskan dengan contoh dari kodemu."
+   ]
+  },
+  {
+   "judul": "Penanganan kesalahan dan data (10)",
+   "butir": [
+    "Masukan salah tidak membuat program berhenti.",
+    "Data tersimpan ke berkas dan dapat dimuat kembali."
+   ]
+  },
+  {
+   "judul": "Laporan dan penjelasan (10)",
+   "butir": [
+    "Laporan jujur dan jelas dengan kalimatmu sendiri.",
+    "Kamu mampu menjelaskan bagian kodemu bila ditanya dosen."
+   ]
+  },
+  {
+   "judul": "Tambahan (sampai +10)",
+   "butir": [
+    "Antarmuka grafis, basis data, pola desain lain, pengujian, atau fitur kreatif.",
+    "Tambahan dinilai dari kualitasnya, bukan dari perangkat yang dipakai: peserta tanpa laptop dapat memperoleh nilai tambahan dengan fitur dan desain yang lebih dalam."
+   ]
+  }
+ ],
+ "tahap": [
+  {
+   "id": "tugas-akhir",
+   "judul": "Aplikasi akhir dan rancangannya",
+   "bab": [
+    4,
+    15
+   ],
+   "tujuan": "Membangun aplikasi konsol Java yang menggabungkan konsep PBO dan menjelaskan rancangannya. Dinilai dosen dengan rubrik, bukan oleh pengujian otomatis.",
+   "langkah": [
+    "Pilih topik (sesuai pengumuman dosen) dan tuliskan fitur utamanya di Rancangan.md.",
+    "Gambarkan diagram kelas di Rancangan.md sebelum menulis kode.",
+    "Tulis kelas-kelasnya, satu berkas per kelas, nama berkas sama dengan nama kelas. Pakai Periksa kompilasi sesering mungkin.",
+    "Isi Main.java dengan menu konsol dan coba dengan Jalankan (isi kotak masukan sesuai pertanyaan program).",
+    "Bila mengerjakan di laptop: unggah semua berkas .java dan Rancangan.md lewat Unggah berkas, lalu periksa kompilasi di sini.",
+    "Isi laporan di halaman daftar tahap, lalu tekan Tandai siap dinilai."
+   ],
+   "diminta": [
+    "Main.java",
+    "Rancangan.md"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Mulai dari kerangka kecil yang jalan, lalu tambahkan satu kelas dan satu fitur setiap kali. Aplikasi yang kecil tetapi rapi lebih baik daripada yang besar dan berantakan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 15 merangkum integrasi konsep. Bab 4 untuk diagram kelas, bab 13 dan 14 untuk SOLID dan pola desain."
+    }
+   ],
+   "awal": {
+    "Main.java": "// Main.java\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        // TODO: menu konsol aplikasimu\n    }\n}\n",
+    "Rancangan.md": "# Rancangan aplikasi akhir\n\nIsi dengan kalimat dan gambar teksmu sendiri. Dosen membaca berkas ini bersama kodemu.\n\n## Topik dan fitur utama\n(Tulis topik aplikasimu dan daftar fitur yang bisa dilakukan penggunanya.)\n\n\n\n## Diagram kelas\n(Gambarkan dengan teks. Contoh bentuk sederhana:)\n\n    Item <<abstract>>\n      - judul : String\n      + pinjam() : boolean\n         ^\n         |\n      Buku    Majalah\n\n(Tulis diagrammu: semua kelas, atribut penting, dan hubungannya: pewarisan, implementasi, keterkaitan.)\n\n\n\n## Fitur yang saya rancang sendiri\n(Satu fitur di luar daftar wajib: apa fungsinya, kelas yang ditambah atau diubah.)\n\n\n\n## Prinsip desain yang saya terapkan\n(Pilih minimal dua dari SOLID, tunjuk kelas atau method yang menerapkannya, dan jelaskan alasannya.)\n\n\n\n## Pertimbangan dan alternatif\n(Satu keputusan desain, pilihan lain yang kamu timbang, dan mengapa kamu memilih yang ini.)\n\n"
+   },
+   "contoh": {},
+   "kasus": [],
+   "dinilaiDosen": true,
+   "kunciBab": 99
+  }
+ ]
+}

@@ -11,9 +11,18 @@ import { buatPdfBlok } from "./pdf.js";
 import { kodeVerifikasiBaru, laporanKosong } from "./laporan.js";
 import * as P from "./praktikum.js";
 import * as D from "./praktikum-data.js";
+import { runProyekJava } from "./javarunner.js";
+import { analisisJava } from "./praktikum-java.js";
+import * as Kunci from "./kunci.js";
 
 const sekarang = () => new Date().toISOString();
 const NAMA_STATUS = P.STATUS;
+/** Menjalankan atau menguji proyek di penjalan yang sesuai bahasa praktikum (Python atau Java). */
+const jalankanProyek = (pk, berkas, perintah) => (pk.bahasa === "java" ? runProyekJava(berkas, perintah) : runProyek(berkas, perintah));
+const ekstensiKode = (pk) => P.berkasKode(pk.bahasa);
+/** Nama status yang ditampilkan: tahap yang dinilai dosen disebut "Siap dinilai", bukan "Lulus". */
+const namaStatus = (tahap, st) => (P.tanpaUji(tahap) && st === "lulus" ? "Siap dinilai" : NAMA_STATUS[st]);
+const adaMain = (isi) => /\bstatic\s+void\s+main\s*\(/.test(String(isi || ""));
 const babHref = (ctx, n) => "#k/" + ctx.kuliah.id + "/bab-" + n;
 export const hrefPraktikum = (ctx, pid, tid) => "#k/" + ctx.kuliah.id + "/praktikum/" + pid + (tid ? "/" + tid : "");
 
@@ -142,25 +151,64 @@ export const tandaAdaPraktik = () => h("span", { class: "pk-chip", title: "Ada p
 /** Bagian "Praktikum" di paling bawah halaman mata kuliah. null bila mata kuliah tidak punya praktikum. */
 export function bagianPraktikum(ctx, daftar) {
   if (!daftar || !daftar.length) return null;
+  const proyek = daftar.filter((p) => p.jenis !== "latihan");
+  const latihan = daftar.filter((p) => p.jenis === "latihan");
+  const kartu = (pk) => {
+    const k = kelola(ctx, pk);
+    const ring = P.ringkasPraktikum(pk, k.peta());
+    const berikut = P.tahapBerikut(pk, k.peta());
+    return h(
+      "article",
+      { class: "card pk-kartu" },
+      h("h3", {}, pk.judul),
+      h("p", {}, pk.deskripsi),
+      bar(ring.lulus + ring.dilewati, ring.total, "Tahap praktikum selesai atau dilewati"),
+      h("p", { class: "muted" }, ring.lulus + " lulus, " + ring.dilewati + " dilewati, " + (ring.total - ring.lulus - ring.dilewati) + " belum, dari " + ring.total + " tahap."),
+      h("div", { class: "cta" }, h("a", { class: "btn btn-primary", href: hrefPraktikum(ctx, pk.id, berikut >= 0 && ring.lulus + ring.dilewati > 0 ? pk.tahap[berikut].id : "") }, ring.lulus + ring.dilewati === 0 ? "Mulai" : berikut >= 0 ? "Lanjutkan" : "Lihat"), " ", h("a", { class: "btn", href: hrefPraktikum(ctx, pk.id) }, "Daftar tahap"))
+    );
+  };
+  const baris = (pk) => {
+    const k = kelola(ctx, pk);
+    const ring = P.ringkasPraktikum(pk, k.peta());
+    return h("li", {}, h("a", { class: "pk-lat", href: hrefPraktikum(ctx, pk.id) }, h("span", { class: "num" }, "BAB " + String(pk.bab || "").padStart(2, "0")), h("strong", {}, pk.judul.replace(/^Latihan bab \d+: /, "")), h("span", { class: "muted" }, ring.lulus + " dari " + ring.total + " tahap lulus")));
+  };
+  const otoSemua = ctx.instruktur() ? h("button", { type: "button", class: "btn pk-oto" }, "Jawab semua praktikum otomatis (instruktur)") : null;
+  const pesanOto = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  if (otoSemua)
+    otoSemua.addEventListener("click", async () => {
+      otoSemua.disabled = true;
+      let lulus = 0;
+      let total = 0;
+      try {
+        for (const pk of daftar) {
+          const hasil = await jawabOtomatis(ctx, pk, pk.tahap.map((x, i) => i), (i) => (pesanOto.textContent = pk.judul + ": tahap " + (i + 1) + " dari " + pk.tahap.length));
+          lulus += hasil.filter((r) => r.lulus).length;
+          total += hasil.length;
+          const gagal = hasil.filter((r) => !r.lulus);
+          if (gagal.length) {
+            pesanOto.textContent = pk.judul + ": tahap " + (gagal[0].idx + 1) + " tidak lulus (" + (gagal[0].galat || "") + "). Berhenti.";
+            otoSemua.disabled = false;
+            return;
+          }
+        }
+        pesanOto.textContent = lulus + " dari " + total + " tahap lulus.";
+        ctx.ulang();
+      } catch (e) {
+        pesanOto.textContent = "Gagal: " + e.message;
+        otoSemua.disabled = false;
+      }
+    });
   return h(
     "section",
     { class: "pk-bagian", "aria-labelledby": "pk-judul" },
     h("div", { class: "section-title" }, h("h2", { id: "pk-judul" }, "Praktikum")),
-    h("p", { class: "free-note" }, "Latihan membangun satu proyek utuh dari bab ke bab. Tidak wajib dan tidak terkunci: lewati yang sudah kamu kuasai, dan tersedia berkas contoh bila kamu tertinggal."),
-    ...daftar.map((pk) => {
-      const k = kelola(ctx, pk);
-      const ring = P.ringkasPraktikum(pk, k.peta());
-      const berikut = P.tahapBerikut(pk, k.peta());
-      return h(
-        "article",
-        { class: "card pk-kartu" },
-        h("h3", {}, pk.judul),
-        h("p", {}, pk.deskripsi),
-        bar(ring.lulus + ring.dilewati, ring.total, "Tahap praktikum selesai atau dilewati"),
-        h("p", { class: "muted" }, ring.lulus + " lulus, " + ring.dilewati + " dilewati, " + (ring.total - ring.lulus - ring.dilewati) + " belum, dari " + ring.total + " tahap."),
-        h("div", { class: "cta" }, h("a", { class: "btn btn-primary", href: hrefPraktikum(ctx, pk.id, berikut >= 0 && ring.lulus + ring.dilewati > 0 ? pk.tahap[berikut].id : "") }, ring.lulus + ring.dilewati === 0 ? "Mulai praktikum" : berikut >= 0 ? "Lanjutkan praktikum" : "Lihat praktikum"), " ", h("a", { class: "btn", href: hrefPraktikum(ctx, pk.id) }, "Daftar tahap"))
-      );
-    })
+    h("p", { class: "free-note" }, "Latihan tambahan di luar soal bab. Tidak wajib dan tidak terkunci: lewati yang sudah kamu kuasai, dan tersedia berkas contoh bila kamu tertinggal."),
+    ...proyek.map(kartu),
+    latihan.length ? h("h3", { class: "pk-sub" }, "Latihan per bab") : null,
+    latihan.length ? h("p", { class: "muted" }, "Tiap latihan berdiri sendiri dan berfokus pada satu bab. Kerjakan yang kamu perlukan, dalam urutan apa saja.") : null,
+    latihan.length ? h("ul", { class: "pk-lat-daftar" }, latihan.map(baris)) : null,
+    otoSemua ? h("div", { class: "pk-aksi" }, otoSemua) : null,
+    pesanOto
   );
 }
 
@@ -188,7 +236,7 @@ export function notifBab(ctx, daftar, bab) {
 }
 
 // ---------- editor berkas ----------
-const modeDari = (nama) => (/\.py$/i.test(nama) ? "python" : "text/plain");
+const modeDari = (nama) => (/\.py$/i.test(nama) ? "python" : /\.java$/i.test(nama) ? "text/x-java" : "text/plain");
 function pasangEditor(holder, nama, isi, saatUbah, jaga) {
   let aktif = nama;
   if (typeof CodeMirror === "undefined") {
@@ -235,23 +283,44 @@ export async function jawabOtomatis(ctx, pk, indeks, saatProgres = () => {}) {
   for (const idx of indeks) {
     const tahap = pk.tahap[idx];
     saatProgres(idx);
-    const lengkap = P.lengkapiDariContoh(pk, idx, k.kerja.berkas);
-    k.ganti(lengkap.berkas);
-    k.ganti(P.terapkanContoh(pk, idx, k.kerja.berkas));
+    if (tahap.kunciBab) {
+      // Contoh jawaban tahap ini tidak ada di situs (agar peserta tidak bisa melihatnya): diambil dari tabel kunci, khusus instruktur.
+      const kk = await Kunci.ambilKunci(ctx.kuliah.id, tahap.kunciBab);
+      if (kk.galat) {
+        hasil.push({ idx, lulus: false, galat: kk.galat });
+        continue;
+      }
+      let peta = null;
+      try {
+        peta = JSON.parse(kk.isi);
+      } catch (e) {}
+      if (!peta || typeof peta !== "object") {
+        hasil.push({ idx, lulus: false, galat: "Format kunci tidak sah." });
+        continue;
+      }
+      const baru = {};
+      for (const [n, i] of Object.entries(peta)) if (P.POLA_NAMA.test(n) && typeof i === "string" && i.length <= P.MAKS_UKURAN) baru[n] = { isi: i, asal: "milik" };
+      k.ganti(baru);
+    } else {
+      const lengkap = P.lengkapiDariContoh(pk, idx, k.kerja.berkas);
+      k.ganti(lengkap.berkas);
+      k.ganti(P.terapkanContoh(pk, idx, k.kerja.berkas));
+    }
     const isi = k.isi();
-    const r = await runProyek(isi, { aksi: "kasus", kasus: tahap.kasus });
+    const lama = k.baris(tahap.id);
+    const kasus = P.tanpaUji(tahap) ? [{ nama: "kompilasi", kode: "" }] : tahap.kasus;
+    const r = await jalankanProyek(pk, isi, { aksi: "kasus", kasus });
     if (r.timeout || r.error || !r.proyek) {
       hasil.push({ idx, lulus: false, galat: r.error || "waktu habis" });
       continue;
     }
     const ring = P.ringkasHasil(r.proyek.kasus || []);
-    const lama = k.baris(tahap.id);
     const patch = { jumlah_kirim: (lama.jumlah_kirim || 0) + 1, pakai_contoh: true, pertama_dibuka: lama.pertama_dibuka || sekarang() };
     if (ring.lulus) Object.assign(patch, { status: "lulus", lulus_pada: lama.lulus_pada || sekarang() });
     else if (lama.status !== "lulus") patch.status = "sedang";
     k.ubahTahap(tahap.id, patch);
     D.antreVersi(k.mk, k.pid, tahap.id, isi, P.hasilUntukRiwayat(ring), ring.lulus);
-    hasil.push({ idx, lulus: ring.lulus, benar: ring.benar, total: ring.total });
+    hasil.push({ idx, lulus: ring.lulus, benar: ring.benar, total: ring.total, galat: ring.lulus ? null : ring.tampil.filter((c) => !c.lulus).map((c) => c.nama + ": " + c.pesan).join("; ") });
   }
   return hasil;
 }
@@ -279,7 +348,7 @@ export function halamanTahap(ctx, pk, idx) {
   const statusChip = h("span", { class: "pk-status" });
   const segarStatus = () => {
     const st = k.baris(tahap.id).status;
-    statusChip.textContent = NAMA_STATUS[st];
+    statusChip.textContent = namaStatus(tahap, st);
     statusChip.className = "pk-status pk-st-" + st;
   };
   segarStatus();
@@ -330,7 +399,10 @@ export function halamanTahap(ctx, pk, idx) {
       segarBanner();
     }
     clearTimeout(timerTulis);
-    timerTulis = setTimeout(() => k.tulis(n, k.kerja.berkas[n].isi, "milik"), 500);
+    timerTulis = setTimeout(() => {
+      k.tulis(n, k.kerja.berkas[n].isi, "milik");
+      segarEntri();
+    }, 500);
   };
   const holder = h("div", { class: "pk-editor" });
   let ed = null;
@@ -343,14 +415,15 @@ export function halamanTahap(ctx, pk, idx) {
     aktif = n;
     if (ed) ed.tampil(n, (k.kerja.berkas[n] || { isi: "" }).isi);
     gambarBerkas();
-    if (/\.py$/i.test(n)) entriPilih.value = n; // yang dijalankan mengikuti berkas yang sedang dibuka
+    if (dapatDijalankan(n)) entriPilih.value = n; // yang dijalankan mengikuti berkas yang sedang dibuka
   };
   const entriPilih = h("select", { class: "pk-entri", "aria-label": "Berkas yang dijalankan" });
+  const dapatDijalankan = (n) => ekstensiKode(pk).test(n) && (pk.bahasa !== "java" || adaMain((k.kerja.berkas[n] || {}).isi));
   const segarEntri = () => {
-    const py = nama().filter((n) => /\.py$/i.test(n));
+    const kode = nama().filter(dapatDijalankan);
     const pilihan = entriPilih.value;
-    entriPilih.replaceChildren(...py.map((n) => h("option", { value: n }, n)));
-    entriPilih.value = py.includes(pilihan) ? pilihan : py.includes(aktif) ? aktif : py.includes(pk.entri) ? pk.entri : py[0] || "";
+    entriPilih.replaceChildren(...kode.map((n) => h("option", { value: n }, n)));
+    entriPilih.value = kode.includes(pilihan) ? pilihan : kode.includes(aktif) ? aktif : kode.includes(pk.entri) ? pk.entri : kode[0] || "";
   };
   function gambarBerkas() {
     daftarBerkas.replaceChildren(
@@ -386,7 +459,7 @@ export function halamanTahap(ctx, pk, idx) {
     };
     const proses = () => {
       const n = input.value.trim();
-      const galat = P.validasiNamaBerkas(n, nama().filter((x) => x !== awal || n !== awal), { jumlah: nama().length - (awal ? 1 : 0) });
+      const galat = P.validasiNamaBerkas(n, nama().filter((x) => x !== awal || n !== awal), { jumlah: nama().length - (awal ? 1 : 0), bahasa: pk.bahasa });
       if (galat) {
         pesan.textContent = galat;
         return;
@@ -436,16 +509,18 @@ export function halamanTahap(ctx, pk, idx) {
   });
 
   // ----- jalankan -----
-  const masukan = h("textarea", { class: "input pk-masukan", rows: "2", placeholder: "Masukan untuk input(), satu baris per pertanyaan (boleh kosong)", "aria-label": "Masukan untuk program", spellcheck: "false" });
+  const masukan = h("textarea", { class: "input pk-masukan", rows: "2", placeholder: pk.bahasa === "java" ? "Masukan untuk Scanner, satu baris per nextLine() (boleh kosong)" : "Masukan untuk input(), satu baris per pertanyaan (boleh kosong)", "aria-label": "Masukan untuk program", spellcheck: "false" });
   const keluaran = h("pre", { class: "pk-keluaran", "aria-live": "polite", tabindex: "0" }, "Keluaran program akan tampil di sini.");
   const hasilBox = h("div", { class: "pk-hasil", "aria-live": "polite" });
   const jalankanBtn = h("button", { type: "button", class: "btn" }, "Jalankan");
-  const kirimBtn = h("button", { type: "button", class: "btn btn-primary" }, "Kirim jawaban");
+  const tanpaUjiTahap = P.tanpaUji(tahap);
+  const kirimBtn = h("button", { type: "button", class: "btn btn-primary" }, tanpaUjiTahap ? (k.baris(tahap.id).status === "lulus" ? "Batalkan tanda siap dinilai" : "Tandai siap dinilai") : "Kirim jawaban");
   let sibuk = false;
   const atur = (b) => {
     sibuk = b;
     jalankanBtn.disabled = b;
     kirimBtn.disabled = b;
+    if (periksaBtn) periksaBtn.disabled = b;
   };
   const siapkanBerkas = () => {
     clearTimeout(timerTulis);
@@ -460,14 +535,14 @@ export function halamanTahap(ctx, pk, idx) {
     if (sibuk) return;
     const entri = entriPilih.value;
     if (!entri) {
-      keluaran.textContent = "Belum ada berkas .py untuk dijalankan. Buat berkas baru dulu.";
+      keluaran.textContent = pk.bahasa === "java" ? "Belum ada berkas dengan method main untuk dijalankan. Tulis public static void main(String[] args) di salah satu kelas." : "Belum ada berkas .py untuk dijalankan. Buat berkas baru dulu.";
       return;
     }
     atur(true);
     jalankanBtn.textContent = "Menjalankan";
     keluaran.textContent = "";
     try {
-      const r = await runProyek(siapkanBerkas(), { aksi: "jalankan", entri, masukan: masukan.value ? masukan.value.split("\n") : [] });
+      const r = await jalankanProyek(pk, siapkanBerkas(), { aksi: "jalankan", entri, masukan: masukan.value ? masukan.value.split("\n") : [] });
       if (r.timeout) keluaran.textContent = "Program berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan.";
       else if (r.error) keluaran.textContent = r.error;
       else if (!r.proyek) keluaran.textContent = "Tidak ada hasil.";
@@ -481,15 +556,35 @@ export function halamanTahap(ctx, pk, idx) {
 
   // ----- kirim -----
   const tautLanjut = h("p", { class: "pk-lanjut", hidden: true });
+  // Tahap tanpa kasus uji (dinilai dosen): tombol ini menandai peserta siap dinilai, bukan menguji.
+  const tandaiSelesai = () => {
+    const lama = k.baris(tahap.id);
+    if (lama.status === "lulus") {
+      k.ubahTahap(tahap.id, { status: "sedang", lulus_pada: null });
+      kirimBtn.textContent = "Tandai siap dinilai";
+      tulisPesan("Tanda siap dinilai dibatalkan.");
+    } else {
+      const isi = siapkanBerkas();
+      k.ubahTahap(tahap.id, { status: "lulus", lulus_pada: sekarang(), jumlah_kirim: (lama.jumlah_kirim || 0) + 1 });
+      D.antreVersi(k.mk, k.pid, tahap.id, isi, {}, true);
+      kirimBtn.textContent = "Batalkan tanda siap dinilai";
+      tulisPesan("Ditandai siap dinilai. Dosen akan membaca berkasmu; kamu tetap boleh memperbaikinya.");
+    }
+    segarStatus();
+  };
   kirimBtn.addEventListener("click", async () => {
     if (sibuk) return;
+    if (tanpaUjiTahap) {
+      tandaiSelesai();
+      return;
+    }
     atur(true);
     kirimBtn.textContent = "Menguji";
     hasilBox.replaceChildren();
     tautLanjut.hidden = true;
     try {
       const isi = siapkanBerkas();
-      const r = await runProyek(isi, { aksi: "kasus", kasus: tahap.kasus });
+      const r = await jalankanProyek(pk, isi, { aksi: "kasus", kasus: tahap.kasus });
       if (r.timeout || r.error || !r.proyek) {
         hasilBox.replaceChildren(h("p", { class: "form-msg" }, r.timeout ? "Pengujian berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan." : r.error || "Pengujian tidak menghasilkan apa-apa. Coba lagi."));
         return;
@@ -530,11 +625,12 @@ export function halamanTahap(ctx, pk, idx) {
     if (aktif && !k.kerja.berkas[aktif]) aktif = nama()[0];
     ed.tampil(aktif || "", aktif ? k.kerja.berkas[aktif].isi : "");
   };
-  const kembaliBtn = tombolKonfirmasi("Kembalikan berkas awal", "Berkas awal tahap ini dikembalikan ke kerangka semula. Perubahanmu pada berkas itu hilang. Lanjutkan?", () => {
+  const kembaliBtn0 = tombolKonfirmasi("Kembalikan berkas awal", "Berkas awal tahap ini dikembalikan ke kerangka semula. Perubahanmu pada berkas itu hilang. Lanjutkan?", () => {
     k.ganti(P.kembalikanAwal(pk, idx, k.kerja.berkas));
     tulisPesan("Berkas awal tahap ini dikembalikan.");
     segarSemua();
   });
+  const kembaliBtn = Object.keys(tahap.awal || {}).length ? kembaliBtn0 : null;
   const contohBtn = (tahap.contoh && Object.keys(tahap.contoh).length)
     ? tombolKonfirmasi("Pakai berkas contoh", "Berkas yang diminta tahap ini diganti dengan contoh jawaban. Tidak apa-apa bila kamu sudah paham dan hanya ingin lanjut. Lanjutkan?", () => {
         k.ganti(P.terapkanContoh(pk, idx, k.kerja.berkas));
@@ -607,22 +703,92 @@ export function halamanTahap(ctx, pk, idx) {
     idx + 1 < pk.tahap.length ? h("a", { class: "btn", href: hrefPraktikum(ctx, pk.id, pk.tahap[idx + 1].id) }, "Tahap berikutnya") : null
   );
 
+  // ----- unggah berkas dari laptop (hanya praktikum yang mengizinkan, mis. tugas akhir) -----
+  const unggahInput = pk.izinUnggah ? h("input", { type: "file", multiple: "", accept: ".java,.md,.txt,.csv,.json", hidden: "" }) : null;
+  const unggahBtn = pk.izinUnggah ? h("button", { type: "button", class: "btn" }, "Unggah berkas dari laptop") : null;
+  if (unggahBtn) {
+    unggahBtn.addEventListener("click", () => unggahInput.click());
+    unggahInput.addEventListener("change", async () => {
+      const diterima = [];
+      const ditolak = [];
+      for (const f of Array.from(unggahInput.files || [])) {
+        const ada = nama().filter((x) => x !== f.name);
+        const galat = P.validasiNamaBerkas(f.name, ada, { jumlah: nama().length - (k.kerja.berkas[f.name] ? 1 : 0), bahasa: pk.bahasa });
+        if (galat) {
+          ditolak.push(f.name + ": " + galat);
+          continue;
+        }
+        if (f.size > P.MAKS_UKURAN) {
+          ditolak.push(f.name + ": lebih dari " + P.MAKS_UKURAN + " karakter");
+          continue;
+        }
+        const isi = (await f.text()).replace(/\r\n/g, "\n").replace(/\u0000/g, "");
+        k.tulis(f.name, isi, "milik");
+        diterima.push(f.name);
+      }
+      unggahInput.value = "";
+      if (diterima.length) {
+        const l = k.laporan();
+        l.ketikan = Object.assign({}, l.ketikan, { _unggah: ((l.ketikan && l.ketikan._unggah) || 0) + diterima.length });
+        k.simpanLaporan();
+        if (!aktif || !k.kerja.berkas[aktif]) aktif = diterima[0];
+        gambarBerkas();
+        segarBanner();
+        if (ed) ed.tampil(aktif, k.kerja.berkas[aktif].isi);
+        tampilAnalisis();
+      }
+      tulisPesan((diterima.length ? "Diunggah: " + diterima.join(", ") + ". " : "") + (ditolak.length ? "Tidak diterima: " + ditolak.join("; ") : ""));
+    });
+  }
+
+  // ----- periksa kompilasi dan penanda kelengkapan (tahap yang dinilai dosen) -----
+  const periksaBox = tahap.dinilaiDosen ? h("div", { class: "pk-periksa", "aria-live": "polite" }) : null;
+  const periksaBtn = tahap.dinilaiDosen && pk.bahasa === "java" ? h("button", { type: "button", class: "btn" }, "Periksa kompilasi") : null;
+  const tampilAnalisis = () => {
+    if (!periksaBox || pk.bahasa !== "java") return;
+    const a = analisisJava(k.isi());
+    periksaBox.replaceChildren(
+      h("h4", {}, "Penanda kelengkapan (otomatis)"),
+      h("p", { class: "muted" }, "Hanya membaca teks kodemu untuk menunjukkan unsur yang sudah terlihat. Ini penanda, bukan nilai: dosen menilai isi dan kualitasnya."),
+      h("ul", { class: "pk-analisis" }, a.map((x) => h("li", { class: x.ada ? "ok" : "belum" }, h("span", { "aria-hidden": "true" }, x.ada ? "✓ " : "○ "), h("strong", {}, x.label), " ", h("span", { class: "muted" }, x.rincian))))
+    );
+  };
+  if (periksaBtn)
+    periksaBtn.addEventListener("click", async () => {
+      if (sibuk) return;
+      atur(true);
+      periksaBtn.textContent = "Memeriksa";
+      try {
+        const isi = siapkanBerkas();
+        tampilAnalisis();
+        const r = await jalankanProyek(pk, isi, { aksi: "kasus", kasus: [{ nama: "kompilasi", kode: "" }] });
+        const c = r.proyek && r.proyek.kasus && r.proyek.kasus[0];
+        const kodeGuiJdbc = /javax\.swing|java\.awt|java\.sql|javafx/.test(Object.values(isi).join("\n"));
+        tulisPesan(r.timeout ? "Pemeriksaan terlalu lama dan dihentikan." : r.error ? r.error : c && c.lulus ? "Semua berkas berhasil dikompilasi." + (kodeGuiJdbc ? " Antarmuka grafis dan JDBC hanya diperiksa kompilasinya; menjalankannya butuh laptop." : "") : "Belum bisa dikompilasi:\n" + (c ? c.pesan : "tidak ada hasil"));
+      } finally {
+        periksaBtn.textContent = "Periksa kompilasi";
+        atur(false);
+      }
+    });
+
   const kerjaBox = h(
     "section",
     { class: "card pk-kerja", "aria-label": "Ruang kerja" },
     h("h3", {}, "Ruang kerja"),
     h("p", { class: "muted" }, "Kamu membuat berkasnya sendiri. Salin dan tempel dimatikan; jumlah percobaan tempel dicatat, isinya tidak. Berkas tersimpan otomatis."),
-    h("div", { class: "pk-kerja-grid" }, h("div", { class: "pk-kolom-berkas" }, daftarBerkas, baruBtn), h("div", { class: "pk-kolom-editor" }, h("div", { class: "pk-bar" }, namaAktif, gantiBtn, hapusBtn), kotakNama, holder)),
-    h("div", { class: "pk-jalan" }, h("label", { class: "pk-label" }, "Jalankan berkas ", entriPilih), jalankanBtn, kirimBtn),
+    h("div", { class: "pk-kerja-grid" }, h("div", { class: "pk-kolom-berkas" }, daftarBerkas, baruBtn, unggahBtn, unggahInput), h("div", { class: "pk-kolom-editor" }, h("div", { class: "pk-bar" }, namaAktif, gantiBtn, hapusBtn), kotakNama, holder)),
+    h("div", { class: "pk-jalan" }, h("label", { class: "pk-label" }, "Jalankan berkas ", entriPilih), jalankanBtn, kirimBtn, periksaBtn),
     masukan,
     keluaran,
     pesanKerja,
     hasilBox,
+    periksaBox,
     tautLanjut
   );
   Anticopas.blokirSalinTempel(kerjaBox, { lokasi: "praktikum", kecualikan: () => instruktur, saatTempel: tempel });
 
   gambarBerkas();
+  tampilAnalisis();
   queueMicrotask(() => {
     ed = pasangEditor(holder, aktif || "", aktif ? k.kerja.berkas[aktif].isi : "", saatUbah, jaga);
   });
@@ -635,6 +801,7 @@ export function halamanTahap(ctx, pk, idx) {
       h("h2", {}, "Tahap " + (idx + 1) + ": " + tahap.judul),
       h("p", { class: "pk-meta" }, baru, statusChip, (tahap.bab || []).length ? h("span", { class: "muted" }, "Bab terkait: ") : null, ...(tahap.bab || []).map((b) => h("a", { class: "pk-bab", href: babHref(ctx, b) }, "Bab " + b))),
       h("p", {}, tahap.tujuan),
+      tanpaUjiTahap ? h("p", { class: "info-bar pk-dosen", role: "note" }, "Tahap ini dinilai dosen dengan rubrik (lihat di halaman daftar tahap), tidak diuji otomatis. Tekan Tandai siap dinilai bila sudah siap; kamu tetap boleh memperbaikinya setelah itu.") : null,
       h("h3", {}, "Langkah"),
       h("p", { class: "muted" }, "Kotak centang hanya penanda untukmu; tidak ada yang memeriksanya."),
       langkah,
@@ -720,7 +887,25 @@ function kartuLaporan(ctx, pk, k) {
   return kartu;
 }
 
+function kartuEksporJava(ctx, pk, k) {
+  const pesan = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  const tombol = h("button", { type: "button", class: "btn btn-primary" }, "Ekspor kode (HTML)");
+  tombol.addEventListener("click", () => {
+    const isi = k.isi();
+    if (!Object.keys(isi).length) {
+      pesan.textContent = "Belum ada berkas. Buat atau unggah dulu.";
+      return;
+    }
+    const profil = Auth.getProfile();
+    const html = P.bangunHtmlEksporJava({ judul: pk.judul, deskripsi: pk.deskripsi, berkas: isi, entri: pk.entri, oleh: profil && profil.nama });
+    unduh(new Blob([html], { type: "text/html;charset=utf-8" }), P.namaBerkasHtml(pk.judul));
+    pesan.textContent = "Berkas HTML diunduh. Isinya seluruh kodemu beserta cara menjalankannya dengan JDK; halaman ini tidak menjalankan programnya.";
+  });
+  return h("section", { class: "card pk-ekspor" }, h("h3", {}, "Ekspor kode"), h("p", {}, "Semua berkas proyekmu dijadikan satu halaman HTML untuk diarsipkan atau dibagikan, lengkap dengan langkah menjalankannya di komputer yang punya JDK."), h("div", { class: "pk-jalan" }, tombol), pesan);
+}
+
 function kartuEkspor(ctx, pk, k) {
+  if (pk.bahasa === "java") return kartuEksporJava(ctx, pk, k);
   const pesan = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const pilih = h("select", { class: "pk-entri", "aria-label": "Berkas yang dijalankan aplikasi" });
   const isiPilihan = () => {
@@ -751,6 +936,16 @@ function kartuEkspor(ctx, pk, k) {
   );
 }
 
+function kartuPenilaian(pk) {
+  return h(
+    "section",
+    { class: "card pk-penilaian" },
+    h("h3", {}, "Cara penilaian"),
+    h("p", { class: "muted" }, "Kriteria ini sama untuk semua peserta dan terbuka sejak awal. Angka dalam kurung adalah bobotnya."),
+    ...pk.penilaian.map((b) => h("div", { class: "pk-nilai-blok" }, h("h4", {}, b.judul), h("ul", {}, b.butir.map((x) => h("li", {}, x)))))
+  );
+}
+
 /** Isi halaman daftar tahap satu praktikum. */
 export function halamanPraktikum(ctx, pk) {
   const k = kelola(ctx, pk);
@@ -769,7 +964,7 @@ export function halamanPraktikum(ctx, pk) {
         h("a", { class: "pk-tahap-tautan", href: hrefPraktikum(ctx, pk.id, t.id) },
           h("span", { class: "pk-no" }, String(i + 1)),
           h("span", { class: "pk-tahap-isi" }, h("strong", {}, t.judul), h("span", { class: "muted" }, (t.bab || []).length ? "Bab " + t.bab.join(", ") : "")),
-          h("span", { class: "pk-status pk-st-" + st }, NAMA_STATUS[st]))
+          h("span", { class: "pk-status pk-st-" + st }, namaStatus(t, st)))
       );
     })
   );
@@ -799,8 +994,9 @@ export function halamanPraktikum(ctx, pk) {
       h("div", { class: "cta" }, berikut >= 0 ? h("a", { class: "btn btn-primary", href: hrefPraktikum(ctx, pk.id, pk.tahap[berikut].id) }, ring.lulus + ring.dilewati === 0 ? "Mulai dari tahap 1" : "Lanjutkan: tahap " + (berikut + 1)) : null, otoSemua),
       pesanOto
     ),
+    pk.penilaian ? kartuPenilaian(pk) : null,
     h("section", { class: "card" }, h("h3", {}, "Tahap"), daftar),
-    kartuEkspor(ctx, pk, k),
-    kartuLaporan(ctx, pk, k),
-  ];
+    pk.tanpaLaporan ? null : kartuEkspor(ctx, pk, k),
+    pk.tanpaLaporan ? null : kartuLaporan(ctx, pk, k),
+  ].filter(Boolean);
 }

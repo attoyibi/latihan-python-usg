@@ -5,6 +5,7 @@ import { h } from "./dom.js";
 import * as Auth from "./auth.js";
 import { ambilSemua } from "./rekap.js";
 import { muatDaftar, tabelBelumAda } from "./praktikum-data.js";
+import { analisisJava } from "./praktikum-java.js";
 import { rekapPraktikum, csvPraktikum, KODE_SEL } from "./praktikum.js";
 
 let cache = null; // { cid, pid, tahap, laporan }
@@ -23,12 +24,12 @@ const waktu = (iso) => {
   return isNaN(d) ? "belum ada" : d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 };
 
-async function muat(cid, pid) {
-  if (cache && cache.cid === cid && cache.pid === pid) return cache;
+async function muat(cid) {
+  if (cache && cache.cid === cid) return cache;
   const c = Auth.getClient();
-  const baca = (t) => ambilSemua(() => c.from(t).select("*").eq("matakuliah_id", cid).eq("praktikum_id", pid).order("user_id"));
+  const baca = (tabel) => ambilSemua(() => c.from(tabel).select("*").eq("matakuliah_id", cid).order("user_id"));
   const [tahap, laporan] = await Promise.all([baca("praktikum_tahap"), baca("praktikum_laporan")]);
-  cache = { cid, pid, tahap, laporan };
+  cache = { cid, tahap, laporan };
   return cache;
 }
 
@@ -55,7 +56,8 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
 
   let data;
   try {
-    data = await muat(kuliah.id, pk.id);
+    const semua = await muat(kuliah.id);
+    data = { tahap: semua.tahap.filter((r) => r.praktikum_id === pk.id), laporan: semua.laporan.filter((r) => r.praktikum_id === pk.id) };
   } catch (e) {
     pesanKartu(tabelBelumAda(e) ? h("p", { class: "kh-peringatan" }, "Fitur praktikum belum dipasang di database. Jalankan supabase/migrations/0008_praktikum.sql di Supabase SQL Editor (setelah 0001 sampai 0007), lalu tekan Muat ulang. Bagian dashboard yang lain tidak terpengaruh.") : h("p", { class: "verdict fail" }, "Gagal memuat: " + (e.message || e)));
     return;
@@ -88,6 +90,36 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
     h("div", { class: "d-stats" }, stat(rekap.baris.length, "peserta"), stat(rekap.mulai, "sudah mulai"), stat(belumMulai, "belum mulai"), stat(rekap.selesai, "selesai semua tahap"), stat(rekap.baris.filter((b) => b.laporan.ada).length, "punya laporan"))
   );
 
+  // Ringkasan semua praktikum (bila lebih dari satu): tahap lulus per peserta
+  let semuaPk = null;
+  if (daftar.length > 1) {
+    const sem = await muat(kuliah.id);
+    const urut = tersaring.slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama), "id"));
+    const per = daftar.map((p) => rekapPraktikum({ peserta: urut, tahap: sem.tahap.filter((r) => r.praktikum_id === p.id), laporan: sem.laporan.filter((r) => r.praktikum_id === p.id), praktikum: p }));
+    const judulSingkat = (p) => (p.jenis === "latihan" ? "B" + p.bab : "TA");
+    semuaPk = h(
+      "section",
+      { class: "card" },
+      h("h3", {}, "Semua praktikum"),
+      h("p", { class: "muted" }, "Banyaknya tahap lulus per peserta. B2, B3, dan seterusnya adalah latihan per bab; TA adalah tugas akhir (✓ berarti sudah ditandai siap dinilai)."),
+      h("div", { class: "tablewrap" }, h("table", { class: "rekap peserta" },
+        h("thead", {}, h("tr", {}, h("th", { scope: "col", class: "nama" }, "Peserta"), daftar.map((p) => h("th", { scope: "col", title: p.judul }, judulSingkat(p))), h("th", { scope: "col" }, "Berkas"))),
+        h("tbody", {}, urut.map((pes, i) => h("tr", {},
+          h("th", { scope: "row", class: "nama" }, pes.nama, h("small", {}, pes.nim + " / " + (pes.kelas || "-"))),
+          daftar.map((p, pi) => {
+            const b = per[pi].baris[i];
+            const adaIsi = b.lulus + b.sedang + b.dilewati > 0;
+            const proyek = p.jenis !== "latihan";
+            const teks = proyek ? (b.lulus ? "✓" : adaIsi ? "◐" : "○") : adaIsi ? b.lulus + "/" + p.tahap.length : "○";
+            const kelas = b.lulus === p.tahap.length ? "selesai-langsung" : adaIsi ? "sedang" : "belum";
+            return h("td", { class: "sel " + kelas, title: p.judul }, teks);
+          }),
+          h("td", {}, per.reduce((a, r) => a + (r.baris[i].mulai ? 1 : 0), 0) ? h("button", { type: "button", class: "btn btn-sm", onclick: () => { ui.pid = daftar[daftar.length - 1].id; ui.lihat = pes.id; ulang(); } }, "Lihat tugas akhir") : null)
+        )))
+      ))
+    );
+  }
+
   const maksMacet = Math.max(1, ...rekap.perTahap.map((t) => t.sedang));
   const perTahap = h(
     "section",
@@ -106,9 +138,16 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
     panelLihat.replaceChildren(h("p", { class: "muted" }, "Memuat berkas " + b.peserta.nama));
     try {
       const berkas = await bacaBerkas(kuliah.id, pk.id, b.peserta.id);
+      const lap = data.laporan.find((r) => r.user_id === b.peserta.id);
+      const unggah = lap && lap.jumlah_ketikan ? lap.jumlah_ketikan._unggah || 0 : 0;
+      const analisis = pk.bahasa === "java" && pk.jenis !== "latihan" ? analisisJava(Object.fromEntries(berkas.map((f) => [f.nama, f.isi]))) : null;
       panelLihat.replaceChildren(
         h("h4", {}, "Berkas kerja " + b.peserta.nama + " (" + berkas.length + ")"),
-        h("p", { class: "muted" }, "Hanya baca. Berkas bertanda 'contoh' belum diubah peserta."),
+        h("p", { class: "muted" }, "Hanya baca. Berkas bertanda 'contoh' belum diubah peserta." + (unggah ? " Peserta mengunggah " + unggah + " berkas dari perangkatnya." : "")),
+        analisis ? h("ul", { class: "pk-analisis" }, analisis.map((x) => h("li", { class: x.ada ? "ok" : "belum" }, h("span", { "aria-hidden": "true" }, x.ada ? "✓ " : "○ "), h("strong", {}, x.label), " ", h("span", { class: "muted" }, x.rincian)))) : null,
+        lap && lap.jawaban && Object.values(lap.jawaban).some((v) => String(v).trim())
+          ? h("details", { class: "lipat", open: "" }, h("summary", {}, "Laporan peserta"), ...Object.entries(lap.jawaban).filter(([, v]) => String(v).trim()).map(([kunci, v]) => h("div", {}, h("strong", {}, kunci), h("p", {}, String(v)))))
+          : null,
         ...(berkas.length ? berkas.map((f) => h("details", { class: "lipat" }, h("summary", {}, f.nama + (f.asal === "contoh" ? " (contoh)" : f.asal === "awal" ? " (kerangka awal)" : "") + " - " + waktu(f.diperbarui_pada)), h("pre", { class: "pk-keluaran" }, f.isi))) : [h("p", { class: "muted" }, "Belum ada berkas.")])
       );
     } catch (e) {
@@ -139,7 +178,7 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
   );
   if (!rekap.baris.length) matriks.append(h("p", { class: "muted" }, "Tidak ada peserta di kelas ini."));
 
-  main.replaceChildren(kepala, ringkas, perTahap, matriks);
+  main.replaceChildren(...[kepala, ringkas, semuaPk, perTahap, matriks].filter(Boolean));
   if (ui.lihat) {
     const b = rekap.baris.find((x) => x.peserta.id === ui.lihat);
     if (b) lihat(b);

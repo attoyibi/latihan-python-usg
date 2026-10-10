@@ -1,0 +1,124 @@
+{
+ "id": "eksepsi",
+ "judul": "Latihan bab 8: penanganan eksepsi",
+ "deskripsi": "Melempar eksepsi buatan sendiri dan menangkap galat agar program tidak berhenti.",
+ "bahasa": "java",
+ "jenis": "latihan",
+ "tanpaLaporan": true,
+ "jalur": [
+  "web"
+ ],
+ "bab": 8,
+ "tahap": [
+  {
+   "id": "umur",
+   "judul": "Eksepsi buatan sendiri",
+   "bab": [
+    8
+   ],
+   "tujuan": "Membuat eksepsi checked dan method yang melemparkannya.",
+   "langkah": [
+    "Buat UmurTidakValidException.java: turunan Exception (checked) dengan constructor yang menerima pesan.",
+    "Buat Validator.java dengan static int periksaUmur(int umur) throws UmurTidakValidException: mengembalikan umur bila 0 sampai 130, selain itu melempar eksepsi dengan pesan \"Umur tidak valid: <umur>\".",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "UmurTidakValidException.java",
+    "Validator.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Method yang melempar eksepsi checked wajib mendeklarasikan throws di tanda tangan method."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 8: throw, throws, dan eksepsi buatan sendiri."
+    }
+   ],
+   "awal": {
+    "UmurTidakValidException.java": "// UmurTidakValidException.java\npublic class UmurTidakValidException {\n    // TODO: extends Exception, constructor menerima pesan dan meneruskannya ke super\n}\n",
+    "Validator.java": "// Validator.java\npublic class Validator {\n    // TODO: static int periksaUmur(int umur) throws UmurTidakValidException\n}\n"
+   },
+   "contoh": {
+    "UmurTidakValidException.java": "// UmurTidakValidException.java\npublic class UmurTidakValidException extends Exception {\n    public UmurTidakValidException(String pesan) {\n        super(pesan);\n    }\n}\n",
+    "Validator.java": "// Validator.java\npublic class Validator {\n    public static int periksaUmur(int umur) throws UmurTidakValidException {\n        if (umur < 0 || umur > 130) {\n            throw new UmurTidakValidException(\"Umur tidak valid: \" + umur);\n        }\n        return umur;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "umur sah",
+     "kode": "sama(20, Validator.periksaUmur(20));\nsama(0, Validator.periksaUmur(0));\nsama(130, Validator.periksaUmur(130));"
+    },
+    {
+     "nama": "umur negatif ditolak",
+     "kode": "try {\n    Validator.periksaUmur(-1);\n    cek(false, \"harus melempar UmurTidakValidException\");\n} catch (UmurTidakValidException e) {\n    sama(\"Umur tidak valid: -1\", e.getMessage());\n}"
+    },
+    {
+     "nama": "umur terlalu besar ditolak",
+     "kode": "try {\n    Validator.periksaUmur(131);\n    cek(false, \"harus melempar UmurTidakValidException\");\n} catch (UmurTidakValidException e) {\n    sama(\"Umur tidak valid: 131\", e.getMessage());\n}"
+    },
+    {
+     "nama": "eksepsi bertipe checked (tersembunyi)",
+     "kode": "cek(Exception.class.isAssignableFrom(UmurTidakValidException.class) && !RuntimeException.class.isAssignableFrom(UmurTidakValidException.class), \"UmurTidakValidException harus turunan Exception, bukan RuntimeException\");",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "parser",
+   "judul": "Menangkap galat dengan try-catch-finally",
+   "bab": [
+    8
+   ],
+   "tujuan": "Mengubah teks menjadi angka tanpa membiarkan program berhenti ketika teksnya salah.",
+   "langkah": [
+    "Buat Parser.java dengan static int keAngka(String teks, int bawaan): mengembalikan angka dari teks (abaikan spasi di tepi), atau bawaan bila teksnya bukan angka.",
+    "Tulis static int jumlahkan(String[] data): menjumlahkan semua data yang berupa angka dan melewati yang bukan angka.",
+    "Tulis static int pemanggilan sebagai penghitung berapa kali keAngka dipanggil, dinaikkan di blok finally.",
+    "Kirim jawaban."
+   ],
+   "diminta": [
+    "Parser.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Integer.parseInt melempar NumberFormatException untuk teks yang bukan angka. Blok finally selalu dijalankan, baik ada galat maupun tidak."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 8: try, catch, finally."
+    }
+   ],
+   "awal": {
+    "Parser.java": "// Parser.java\npublic class Parser {\n    // TODO: static int pemanggilan = 0\n    // TODO: static int keAngka(String teks, int bawaan)   try/catch NumberFormatException, finally pemanggilan++\n    // TODO: static int jumlahkan(String[] data)           jumlah semua data yang berupa angka\n}\n"
+   },
+   "contoh": {
+    "Parser.java": "// Parser.java\npublic class Parser {\n    public static int pemanggilan = 0;\n\n    public static int keAngka(String teks, int bawaan) {\n        try {\n            return Integer.parseInt(teks.trim());\n        } catch (NumberFormatException e) {\n            return bawaan;\n        } finally {\n            pemanggilan++;\n        }\n    }\n\n    public static int jumlahkan(String[] data) {\n        int jumlah = 0;\n        for (String d : data) {\n            jumlah += keAngka(d, 0);\n        }\n        return jumlah;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "teks angka",
+     "kode": "sama(42, Parser.keAngka(\"42\", -1));\nsama(7, Parser.keAngka(\"  7 \", -1));"
+    },
+    {
+     "nama": "teks bukan angka memakai bawaan",
+     "kode": "sama(-1, Parser.keAngka(\"abc\", -1));\nsama(0, Parser.keAngka(\"\", 0));\nsama(-9, Parser.keAngka(\"12x\", -9));"
+    },
+    {
+     "nama": "jumlah dengan data campuran",
+     "kode": "sama(15, Parser.jumlahkan(new String[] { \"5\", \"x\", \"10\", \"?\" }));"
+    },
+    {
+     "nama": "finally selalu dijalankan",
+     "kode": "int awal = Parser.pemanggilan;\nParser.keAngka(\"1\", 0);\nParser.keAngka(\"salah\", 0);\nsama(awal + 2, Parser.pemanggilan);"
+    },
+    {
+     "nama": "data kosong (tersembunyi)",
+     "kode": "sama(0, Parser.jumlahkan(new String[0]));",
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

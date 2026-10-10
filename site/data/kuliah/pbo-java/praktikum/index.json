@@ -1,9 +1,100 @@
 [
  {
-  "id": "perpustakaan",
-  "judul": "Sistem Perpustakaan Kampus USG",
-  "deskripsi": "Satu proyek Java yang tumbuh dari bab ke bab: dari satu kelas Buku sampai aplikasi perpustakaan berbasis menu. Kamu menulis berkasnya sendiri; tiap tahap memakai berkas tahap sebelumnya.",
-  "berkas": "perpustakaan.json",
-  "jumlahTahap": 13
+  "id": "kelas-objek",
+  "judul": "Latihan bab 2: kelas dan objek",
+  "deskripsi": "Dua kelas kecil untuk membiasakan atribut, constructor, dan method.",
+  "berkas": "kelas-objek.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 2
+ },
+ {
+  "id": "enkapsulasi",
+  "judul": "Latihan bab 3: enkapsulasi",
+  "deskripsi": "Menjaga aturan data dengan atribut private dan method.",
+  "berkas": "enkapsulasi.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 3
+ },
+ {
+  "id": "pewarisan",
+  "judul": "Latihan bab 5: pewarisan",
+  "deskripsi": "Kelas turunan yang memakai ulang dan mengubah perilaku kelas induk.",
+  "berkas": "pewarisan.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 5
+ },
+ {
+  "id": "polimorfisme",
+  "judul": "Latihan bab 6: polimorfisme",
+  "deskripsi": "Satu pemanggilan, perilaku berbeda tergantung objek yang sebenarnya.",
+  "berkas": "polimorfisme.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 6
+ },
+ {
+  "id": "abstraksi",
+  "judul": "Latihan bab 7: abstraksi",
+  "deskripsi": "Kelas abstrak dan interface untuk memisahkan apa yang dilakukan dari bagaimana melakukannya.",
+  "berkas": "abstraksi.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 7
+ },
+ {
+  "id": "eksepsi",
+  "judul": "Latihan bab 8: penanganan eksepsi",
+  "deskripsi": "Melempar eksepsi buatan sendiri dan menangkap galat agar program tidak berhenti.",
+  "berkas": "eksepsi.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 8
+ },
+ {
+  "id": "collection",
+  "judul": "Latihan bab 9: collection dan generics",
+  "deskripsi": "List, Map, dan Set untuk menyimpan dan mengolah banyak data.",
+  "berkas": "collection.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 9
+ },
+ {
+  "id": "berkas",
+  "judul": "Latihan bab 10: operasi berkas",
+  "deskripsi": "Menulis dan membaca berkas teks.",
+  "berkas": "berkas.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 10
+ },
+ {
+  "id": "solid",
+  "judul": "Latihan bab 13: prinsip SOLID",
+  "deskripsi": "Memecah tanggung jawab dan bergantung pada abstraksi.",
+  "berkas": "solid.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 13
+ },
+ {
+  "id": "pola-desain",
+  "judul": "Latihan bab 14: design pattern",
+  "deskripsi": "Dua pola yang sering dipakai: Singleton dan Observer.",
+  "berkas": "pola-desain.json",
+  "jumlahTahap": 2,
+  "jenis": "latihan",
+  "bab": 14
+ },
+ {
+  "id": "tugas-akhir",
+  "judul": "Tugas akhir PBO",
+  "deskripsi": "Satu aplikasi konsol Java yang menggabungkan semua konsep PBO. Soalnya sama untuk semua peserta: yang punya laptop boleh mengerjakannya di laptop lalu mengunggah berkasnya ke sini, yang tidak punya laptop mengerjakannya langsung di sini.",
+  "berkas": "tugas-akhir.json",
+  "jumlahTahap": 1,
+  "jenis": "proyek"
  }
 ]
