@@ -58,7 +58,7 @@ export function gabungkan(lokal, baris) {
  * Kartu laporan.
  * @param {object} c
  *   c.store {get,set}; c.kunci (nama kunci penyimpanan); c.mataKuliah {id,nama}; c.bab; c.judul; c.pertanyaan;
- *   c.profil {nama,nim,kelas}; c.lampiran(): {tipe,judul,isi,hasil}|null; c.simpanKeServer(baris); c.catatTempel(); c.instruktur()
+ *   c.profil {nama,nim,kelas}; c.lampiran(): {tipe,judul,isi,hasil}|null; c.lampiranPraktik?(): {judul,isi,hasil}|null; c.simpanKeServer(baris); c.catatTempel(); c.instruktur()
  */
 export function laporanCard(c) {
   let lap = Object.assign(laporanKosong(), c.store.get(c.kunci, null) || {});
@@ -117,7 +117,7 @@ export function laporanCard(c) {
       lap.diekspor = new Date().toISOString();
       clearTimeout(timerSimpan);
       simpan();
-      const data = { matakuliah: c.mataKuliah.nama, matakuliahId: c.mataKuliah.id, nomor: c.bab, judul: c.judul, nama: c.profil.nama, nim: c.profil.nim, kelas: c.profil.kelas, kolom, jawaban: lap.jawaban, kodeVerifikasi: lap.kode, lampiran: c.lampiran(), diekspor: new Date() };
+      const data = { matakuliah: c.mataKuliah.nama, matakuliahId: c.mataKuliah.id, nomor: c.bab, judul: c.judul, nama: c.profil.nama, nim: c.profil.nim, kelas: c.profil.kelas, kolom, jawaban: lap.jawaban, kodeVerifikasi: lap.kode, lampiran: c.lampiran(), lampiranPraktik: c.lampiranPraktik ? c.lampiranPraktik() : null, diekspor: new Date() };
       const blob = await buatPdf(data);
       const a = h("a", { href: URL.createObjectURL(blob), download: namaBerkas(data) });
       document.body.append(a);

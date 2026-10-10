@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Membuat SQL untuk memasukkan kunci jawaban ke tabel kunci_jawaban (migrasi 0009).
 
-  kunci/<mata-kuliah>/bab-NN.py|java   ->   kunci/kunci_jawaban.sql
+  kunci/<mata-kuliah>/bab-NN.py|java   ->   kunci/kunci_jawaban.sql   (soal latihan, nomor bab)
+  kunci/<mata-kuliah>/praktik-NN.py    ->   baris nomor 50 + NN        (contoh jawaban praktik bab NN)
   kunci/<mata-kuliah>/tugas-akhir.json ->   baris bab 99 (contoh jawaban tugas akhir: peta nama berkas -> isi, untuk tombol
                                             Jawab otomatis instruktur; harus JSON objek berisi nama berkas Java/Markdown)
 
@@ -19,6 +20,8 @@ KUNCI = ROOT / "kunci"
 DATA = ROOT / "site" / "data"
 POLA = re.compile(r"^bab-(\d{2})\.(py|java)$")
 BAB_TUGAS_AKHIR = 99
+POLA_PRAKTIK = re.compile(r"^praktik-(\d{2})\.py$")
+GESER_PRAKTIK = 50  # kunci praktik bab N disimpan sebagai bab 50 + N (tabel kunci_jawaban membatasi bab 1 sampai 99)
 NAMA_BERKAS = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$")
 
 
@@ -57,6 +60,18 @@ def main():
                 baris.append(
                     "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values "
                     f"('{folder.name}', {BAB_TUGAS_AKHIR}, 'berkas', {kutip_dolar(isi, len(baris))})\n"
+                    "on conflict (matakuliah_id, bab) do update set bahasa = excluded.bahasa, isi = excluded.isi, diperbarui_pada = now();"
+                )
+                continue
+            mp = POLA_PRAKTIK.match(f.name)
+            if mp:
+                if not (DATA / "kuliah" / folder.name / "praktik" / f"bab-{mp.group(1)}.json").exists():
+                    print(f"lewati {folder.name}/{f.name}: praktiknya tidak ada")
+                    continue
+                isi = f.read_text(encoding="utf8").replace("\r\n", "\n")
+                baris.append(
+                    "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values "
+                    f"('{folder.name}', {GESER_PRAKTIK + int(mp.group(1))}, 'python', {kutip_dolar(isi, len(baris))})\n"
                     "on conflict (matakuliah_id, bab) do update set bahasa = excluded.bahasa, isi = excluded.isi, diperbarui_pada = now();"
                 )
                 continue

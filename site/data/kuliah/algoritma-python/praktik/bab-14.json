@@ -1,0 +1,55 @@
+{
+ "bab": 14,
+ "judul": "Rekursi: faktorial dan jumlah",
+ "tujuan": "Menulis fungsi rekursif dengan kasus dasar yang benar dan langkah rekursif yang mendekati kasus dasar.",
+ "berkas": "rekursi.py",
+ "langkah": [
+  "faktorial(n) dan jumlah_sampai(n) sama-sama memanggil dirinya sendiri dengan nilai yang lebih kecil.",
+  "Di faktorial, ganti dua ____: batas kasus dasar (faktorial 0 dan 1 adalah 1) dan nilai yang dipakai pada pemanggilan berikutnya.",
+  "Di jumlah_sampai, ganti ____ dengan nilai kasus dasarnya.",
+  "Tekan Periksa praktik. Bila kasus dasarnya salah, program berhenti dengan RecursionError."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Kasus dasar faktorial: n sama dengan atau kurang dari 1 mengembalikan 1. Langkah rekursifnya: n dikali faktorial dari n dikurangi 1. Untuk jumlah_sampai, jumlah sampai 0 adalah 0."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 14: kasus dasar dan langkah rekursif. Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "if n <= 1, faktorial(n - 1), dan return 0."
+  }
+ ],
+ "awal": "# rekursi.py\n\ndef faktorial(n):\n    if n <= ____:\n        return 1\n    return n * faktorial(____)\n\n\ndef jumlah_sampai(n):\n    if n == 0:\n        return ____\n    return n + jumlah_sampai(n - 1)\n",
+ "kasus": [
+  {
+   "nama": "faktorial empat",
+   "kode": "from rekursi import faktorial\nassert faktorial(4) == 24"
+  },
+  {
+   "nama": "faktorial nol dan satu",
+   "kode": "from rekursi import faktorial\nassert faktorial(0) == 1\nassert faktorial(1) == 1"
+  },
+  {
+   "nama": "faktorial enam",
+   "kode": "from rekursi import faktorial\nassert faktorial(6) == 720"
+  },
+  {
+   "nama": "jumlah sampai empat",
+   "kode": "from rekursi import jumlah_sampai\nassert jumlah_sampai(4) == 10"
+  },
+  {
+   "nama": "jumlah sampai nol",
+   "kode": "from rekursi import jumlah_sampai\nassert jumlah_sampai(0) == 0"
+  },
+  {
+   "nama": "faktorial sepuluh (tersembunyi)",
+   "kode": "from rekursi import faktorial, jumlah_sampai\nassert faktorial(10) == 3628800\nassert jumlah_sampai(100) == 5050",
+   "tersembunyi": true
+  }
+ ]
+}

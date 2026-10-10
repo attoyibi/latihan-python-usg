@@ -1,0 +1,59 @@
+{
+ "bab": 13,
+ "judul": "Bubble sort dan hitung penukaran",
+ "tujuan": "Melengkapi bubble sort dan menghitung berapa kali penukaran sungguhan terjadi.",
+ "berkas": "urut.py",
+ "langkah": [
+  "Dua fungsi memakai perulangan yang sama: membandingkan pasangan bertetangga dan menukarnya bila urutannya salah.",
+  "Di bubble_sort, ganti ____ dengan indeks tetangga di kanan.",
+  "Di hitung_penukaran, ganti ____ dengan angka yang menambah hitungan satu per penukaran.",
+  "Kedua fungsi tidak boleh mengubah list aslinya (sudah disalin dengan list()). Tekan Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Pasangan yang dibandingkan adalah hasil[j] dan elemen tepat di kanannya. Setiap penukaran menambah hitungan sebanyak satu."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 13: bubble sort dan menghitung penukaran. Soal serupa: Soal 5 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "hasil[j + 1] dan penukaran += 1."
+  }
+ ],
+ "awal": "# urut.py\n\ndef bubble_sort(angka):\n    hasil = list(angka)\n    n = len(hasil)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if hasil[j] > hasil[____]:\n                hasil[j], hasil[j + 1] = hasil[j + 1], hasil[j]\n    return hasil\n\n\ndef hitung_penukaran(angka):\n    hasil = list(angka)\n    n = len(hasil)\n    penukaran = 0\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if hasil[j] > hasil[j + 1]:\n                hasil[j], hasil[j + 1] = hasil[j + 1], hasil[j]\n                penukaran += ____\n    return penukaran\n",
+ "kasus": [
+  {
+   "nama": "mengurutkan tiga angka",
+   "kode": "from urut import bubble_sort\nassert bubble_sort([3, 1, 2]) == [1, 2, 3]"
+  },
+  {
+   "nama": "sudah terurut tetap sama",
+   "kode": "from urut import bubble_sort\nassert bubble_sort([1, 2, 3, 4]) == [1, 2, 3, 4]\nassert bubble_sort([]) == []"
+  },
+  {
+   "nama": "list asli tidak berubah",
+   "kode": "from urut import bubble_sort\na = [3, 1, 2]\nbubble_sort(a)\nassert a == [3, 1, 2]"
+  },
+  {
+   "nama": "penukaran tiga angka",
+   "kode": "from urut import hitung_penukaran\nassert hitung_penukaran([3, 1, 2]) == 2"
+  },
+  {
+   "nama": "tanpa penukaran bila sudah terurut",
+   "kode": "from urut import hitung_penukaran\nassert hitung_penukaran([1, 2, 3]) == 0"
+  },
+  {
+   "nama": "urutan terbalik",
+   "kode": "from urut import hitung_penukaran\nassert hitung_penukaran([4, 3, 2, 1]) == 6"
+  },
+  {
+   "nama": "angka kembar (tersembunyi)",
+   "kode": "from urut import hitung_penukaran, bubble_sort\nassert hitung_penukaran([2, 1, 2, 1]) == 3\nassert bubble_sort([2, 1, 2, 1]) == [1, 1, 2, 2]",
+   "tersembunyi": true
+  }
+ ]
+}

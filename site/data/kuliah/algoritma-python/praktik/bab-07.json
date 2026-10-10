@@ -1,0 +1,79 @@
+{
+ "bab": 7,
+ "judul": "Memecah dan merapikan teks",
+ "tujuan": "Memakai method string split(), strip(), dan title() untuk mengolah teks masukan.",
+ "berkas": "nama.py",
+ "langkah": [
+  "Baris pertama masukan berformat nama:nilai (contoh Andi:85). Pecah menjadi nama dan nilai.",
+  "Baris kedua adalah nama pelanggan yang berantakan (spasi berlebih, huruf campur). Rapikan menjadi format judul.",
+  "Ganti tiga ____ dengan method string yang tepat.",
+  "Jalankan dengan masukan Andi:85 lalu   toko BAROKAH jaya   (dengan spasi di depan dan belakang), lalu Periksa praktik."
+ ],
+ "masukanContoh": "Andi:85\n  toko BAROKAH jaya  ",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "teks.split(\":\") memecah teks pada tanda titik dua menjadi list. strip() membuang spasi di ujung. title() membuat huruf pertama tiap kata besar."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 7: method string split, strip, upper, lower, title. Soal serupa: Soal 5 dan 6 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "baris.split(\":\") lalu pelanggan.strip().title()."
+  }
+ ],
+ "awal": "# nama.py\nbaris = input()\nnama, nilai = baris.____(\":\")\nprint(f\"{nama} mendapat nilai {nilai}\")\n\npelanggan = input()\nprint(pelanggan.____().____())\n",
+ "kasus": [
+  {
+   "nama": "Andi dan toko Barokah",
+   "jalankan": "nama.py",
+   "masukan": [
+    "Andi:85",
+    "  toko BAROKAH jaya  "
+   ],
+   "memuat": [
+    "Andi mendapat nilai 85",
+    "Toko Barokah Jaya"
+   ]
+  },
+  {
+   "nama": "Citra dan UD Rasa Gresik",
+   "jalankan": "nama.py",
+   "masukan": [
+    "Citra:90",
+    "  UD rasa GRESIK "
+   ],
+   "memuat": [
+    "Citra mendapat nilai 90",
+    "Ud Rasa Gresik"
+   ]
+  },
+  {
+   "nama": "tanpa spasi berlebih",
+   "jalankan": "nama.py",
+   "masukan": [
+    "Budi:72",
+    "keripik pak ali"
+   ],
+   "memuat": [
+    "Budi mendapat nilai 72",
+    "Keripik Pak Ali"
+   ]
+  },
+  {
+   "nama": "huruf kapital semua (tersembunyi)",
+   "jalankan": "nama.py",
+   "masukan": [
+    "Dewi:100",
+    "KERIPIK pak ALI"
+   ],
+   "memuat": [
+    "Dewi mendapat nilai 100",
+    "Keripik Pak Ali"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}

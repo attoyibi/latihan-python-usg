@@ -1,0 +1,51 @@
+{
+ "bab": 11,
+ "judul": "Daftar pesanan: tampil dan hapus",
+ "tujuan": "Mengolah daftar kamus: menampilkan isi dan membuang elemen tanpa ada yang terlewat.",
+ "berkas": "daftar.py",
+ "langkah": [
+  "Tiap pesanan berupa kamus dengan kunci nama dan boks. Fungsi tambah sudah ditulis.",
+  "Di tampilkan_semua, ganti ____ dengan kunci yang tepat supaya tiap baris tampil seperti Toko A: 20 boks.",
+  "Di hapus_kecil, kembalikan list baru berisi pesanan dengan boks sama dengan atau lebih dari batas. Ganti kedua ____.",
+  "Tekan Periksa praktik untuk mengujinya."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Mengambil nilai dari kamus: pesanan[\"boks\"]. Membuat list baru dan hanya memasukkan yang lolos syarat lebih aman daripada menghapus dari list yang sedang dijalani."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 11: operasi tambah, tampil, ubah, hapus pada daftar. Soal serupa: Soal 4 dan 5 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "pesanan['boks'] pada print, lalu if pesanan[\"boks\"] >= batas: sisa.append(pesanan)."
+  }
+ ],
+ "awal": "# daftar.py\n\ndef tambah(daftar, nama, boks):\n    daftar.append({\"nama\": nama, \"boks\": boks})\n\n\ndef tampilkan_semua(daftar):\n    for pesanan in daftar:\n        print(f\"{pesanan['nama']}: {pesanan[____]} boks\")\n\n\ndef hapus_kecil(daftar, batas):\n    sisa = []\n    for pesanan in daftar:\n        if pesanan[\"boks\"] >= ____:\n            sisa.append(____)\n    return sisa\n",
+ "kasus": [
+  {
+   "nama": "tambah satu pesanan",
+   "kode": "from daftar import tambah\nd = []\ntambah(d, 'Toko A', 20)\nassert d == [{'nama': 'Toko A', 'boks': 20}]"
+  },
+  {
+   "nama": "tampil semua",
+   "kode": "import io, contextlib\nfrom daftar import tambah, tampilkan_semua\nd = []\ntambah(d, 'Toko A', 20)\ntambah(d, 'Toko B', 5)\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    tampilkan_semua(d)\nassert buf.getvalue().splitlines() == ['Toko A: 20 boks', 'Toko B: 5 boks']"
+  },
+  {
+   "nama": "hapus pesanan kecil",
+   "kode": "from daftar import tambah, hapus_kecil\nd = []\ntambah(d, 'A', 10)\ntambah(d, 'B', 30)\ntambah(d, 'C', 20)\nsisa = hapus_kecil(d, 20)\nassert [p['nama'] for p in sisa] == ['B', 'C']"
+  },
+  {
+   "nama": "semua dibuang",
+   "kode": "from daftar import tambah, hapus_kecil\nd = []\ntambah(d, 'A', 1)\ntambah(d, 'B', 2)\nassert hapus_kecil(d, 100) == []"
+  },
+  {
+   "nama": "dua pesanan kecil berurutan tidak terlewat (tersembunyi)",
+   "kode": "from daftar import tambah, hapus_kecil\nd = []\nfor nama, boks in [('a', 1), ('b', 2), ('c', 3), ('d', 50)]:\n    tambah(d, nama, boks)\nassert [p['nama'] for p in hapus_kecil(d, 10)] == ['d']",
+   "tersembunyi": true
+  }
+ ]
+}

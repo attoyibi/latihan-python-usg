@@ -1,0 +1,98 @@
+{
+ "bab": 6,
+ "judul": "Statistik sederhana dari sebuah list",
+ "tujuan": "Mengisi list dengan append dan memakai fungsi bawaan sum, max, dan min.",
+ "berkas": "statistik.py",
+ "langkah": [
+  "Program membaca lima angka ke dalam list lalu mencetak jumlah, rata-rata, terbesar, dan terkecil.",
+  "Ganti ____ pertama dengan method untuk menambah satu nilai ke akhir list.",
+  "Ganti tiga ____ lainnya dengan fungsi bawaan yang tepat (jumlah, terbesar, terkecil).",
+  "Jalankan dengan masukan 4, 8, 6, 2, 10 (satu angka per baris), lalu Periksa praktik."
+ ],
+ "masukanContoh": "4\n8\n6\n2\n10",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Menambah satu nilai ke akhir list: angka.append(nilai). Fungsi bawaan: sum(list), max(list), min(list)."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 6: append, sum, max, min, dan len. Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "angka.append(nilai), sum(angka), max(angka), min(angka)."
+  }
+ ],
+ "awal": "# statistik.py\nangka = []\nfor i in range(5):\n    nilai = int(input())\n    angka.____(nilai)\n\ntotal = ____(angka)\nprint(f\"Jumlah: {total}\")\nprint(f\"Rata-rata: {total / len(angka)}\")\nprint(f\"Terbesar: {____(angka)}\")\nprint(f\"Terkecil: {____(angka)}\")\n",
+ "kasus": [
+  {
+   "nama": "empat delapan enam dua sepuluh",
+   "jalankan": "statistik.py",
+   "masukan": [
+    "4",
+    "8",
+    "6",
+    "2",
+    "10"
+   ],
+   "memuat": [
+    "Jumlah: 30",
+    "Rata-rata: 6.0",
+    "Terbesar: 10",
+    "Terkecil: 2"
+   ]
+  },
+  {
+   "nama": "semuanya sama",
+   "jalankan": "statistik.py",
+   "masukan": [
+    "1",
+    "1",
+    "1",
+    "1",
+    "1"
+   ],
+   "memuat": [
+    "Jumlah: 5",
+    "Rata-rata: 1.0",
+    "Terbesar: 1",
+    "Terkecil: 1"
+   ]
+  },
+  {
+   "nama": "rata-rata berpecahan",
+   "jalankan": "statistik.py",
+   "masukan": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "51"
+   ],
+   "memuat": [
+    "Jumlah: 151",
+    "Rata-rata: 30.2",
+    "Terbesar: 51",
+    "Terkecil: 10"
+   ]
+  },
+  {
+   "nama": "bilangan negatif (tersembunyi)",
+   "jalankan": "statistik.py",
+   "masukan": [
+    "-3",
+    "-1",
+    "-7",
+    "0",
+    "-2"
+   ],
+   "memuat": [
+    "Jumlah: -13",
+    "Terbesar: 0",
+    "Terkecil: -7"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}

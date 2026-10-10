@@ -1,0 +1,72 @@
+{
+ "bab": 5,
+ "judul": "Tabel perkalian dengan for",
+ "tujuan": "Memakai for dan range() untuk mencetak baris berulang dengan nomor yang berubah.",
+ "berkas": "tabel.py",
+ "langkah": [
+  "Program membaca satu angka lalu mencetak tabel perkaliannya dari 1 sampai 10.",
+  "Ganti ____ di range() dengan angka batas atas yang tepat (ingat: range berhenti SEBELUM angka batas).",
+  "Ganti ____ di dalam f-string dengan variabel yang berubah tiap putaran.",
+  "Jalankan dengan masukan 7, pastikan ada 10 baris (7 x 1 = 7 sampai 7 x 10 = 70), lalu Periksa praktik."
+ ],
+ "masukanContoh": "7",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "range(1, 11) menghasilkan 1 sampai 10. Variabel yang berubah tiap putaran namanya sudah ada di baris for."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 5: for, range, dan batas atas yang tidak ikut. Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "for i in range(1, 11): lalu {angka * i}."
+  }
+ ],
+ "awal": "# tabel.py\nangka = int(input())\n\nfor i in range(1, ____):\n    print(f\"{angka} x {i} = {angka * ____}\")\n",
+ "kasus": [
+  {
+   "nama": "tabel tujuh",
+   "jalankan": "tabel.py",
+   "masukan": [
+    "7"
+   ],
+   "memuat": [
+    "7 x 1 = 7",
+    "7 x 5 = 35",
+    "7 x 10 = 70"
+   ]
+  },
+  {
+   "nama": "tabel tiga",
+   "jalankan": "tabel.py",
+   "masukan": [
+    "3"
+   ],
+   "memuat": [
+    "3 x 1 = 3",
+    "3 x 10 = 30"
+   ]
+  },
+  {
+   "nama": "tabel dua belas",
+   "jalankan": "tabel.py",
+   "masukan": [
+    "12"
+   ],
+   "memuat": [
+    "12 x 1 = 12",
+    "12 x 10 = 120"
+   ]
+  },
+  {
+   "nama": "tepat sepuluh baris",
+   "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('tabel.py', run_name='__main__')\nbaris = [b for b in buf.getvalue().splitlines() if ' x ' in b and ' = ' in b]\nassert len(baris) == 10, 'tabel harus berisi tepat 10 baris, ditemukan %d' % len(baris)",
+   "masukan": [
+    "4"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}

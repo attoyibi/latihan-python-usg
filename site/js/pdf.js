@@ -22,7 +22,7 @@ const TGL = (d) => d.toLocaleDateString("id-ID", { day: "numeric", month: "long"
  * @param {{
  *  matakuliah:string, nomor:number, judul:string, nama:string, nim:string, kelas:string,
  *  kolom:{id:string,label:string,min:number}[], jawaban:Object<string,string>, kodeVerifikasi:string,
- *  lampiran?:{tipe:string,judul:string,isi:string,hasil:string}|null, diekspor?:Date
+ *  lampiran?:{tipe:string,judul:string,isi:string,hasil:string}|null, lampiranPraktik?:{judul:string,isi:string,hasil:string}|null, diekspor?:Date
  * }} d
  */
 export function susunLaporan(d) {
@@ -43,6 +43,11 @@ export function susunLaporan(d) {
     blok.push({ t: "bagian", teks: "Lampiran: " + d.lampiran.judul });
     if (d.lampiran.hasil) blok.push({ t: "paragraf", teks: d.lampiran.hasil });
     if (d.lampiran.isi) blok.push({ t: "kode", teks: d.lampiran.isi });
+  }
+  if (d.lampiranPraktik) {
+    blok.push({ t: "bagian", teks: "Lampiran: " + d.lampiranPraktik.judul });
+    if (d.lampiranPraktik.hasil) blok.push({ t: "paragraf", teks: d.lampiranPraktik.hasil });
+    if (d.lampiranPraktik.isi) blok.push({ t: "kode", teks: d.lampiranPraktik.isi });
   }
   blok.push({ t: "kaki", teks: "Kode verifikasi: " + d.kodeVerifikasi });
   return blok;

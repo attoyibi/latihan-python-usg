@@ -1,0 +1,51 @@
+{
+ "bab": 9,
+ "judul": "Kelas Karyawan",
+ "tujuan": "Menulis kelas dengan constructor, atribut, dan method yang memakai self.",
+ "berkas": "karyawan.py",
+ "langkah": [
+  "Kelas Karyawan menyimpan nama dan jam kerja, lalu bisa menghitung gaji dari upah per jam.",
+  "Di __init__, ganti dua ____ supaya atribut nama dan jam_kerja tersimpan di objek (self).",
+  "Di hitung_gaji, ganti ____ dengan parameter yang tepat.",
+  "Tekan Periksa praktik untuk mengujinya. Kamu juga boleh mencoba sendiri di bagian bawah berkas."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Menyimpan atribut: self.nama = nama. Atribut untuk jam kerja namanya jam_kerja, dan upahnya datang dari parameter method."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 9: kelas, __init__, self, atribut, dan method. Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "self.nama = nama, self.jam_kerja = jam_kerja, dan return self.jam_kerja * upah_per_jam."
+  }
+ ],
+ "awal": "# karyawan.py\n\nclass Karyawan:\n    def __init__(self, nama, jam_kerja):\n        self.nama = ____\n        self.____ = jam_kerja\n\n    def hitung_gaji(self, upah_per_jam):\n        return self.jam_kerja * ____\n\n    def __str__(self):\n        return f\"{self.nama}: {self.jam_kerja} jam\"\n",
+ "kasus": [
+  {
+   "nama": "atribut tersimpan",
+   "kode": "from karyawan import Karyawan\nk = Karyawan('Sari', 40)\nassert k.nama == 'Sari'\nassert k.jam_kerja == 40"
+  },
+  {
+   "nama": "hitung gaji",
+   "kode": "from karyawan import Karyawan\nk = Karyawan('Sari', 40)\nassert k.hitung_gaji(25000) == 1000000"
+  },
+  {
+   "nama": "gaji nol jam",
+   "kode": "from karyawan import Karyawan\nassert Karyawan('Budi', 0).hitung_gaji(30000) == 0"
+  },
+  {
+   "nama": "dua objek berdiri sendiri",
+   "kode": "from karyawan import Karyawan\na = Karyawan('Sari', 40)\nb = Karyawan('Budi', 10)\nassert a.hitung_gaji(1000) == 40000\nassert b.hitung_gaji(1000) == 10000\nassert a.nama != b.nama"
+  },
+  {
+   "nama": "teks objek (tersembunyi)",
+   "kode": "from karyawan import Karyawan\nassert str(Karyawan('Ani', 8)) == 'Ani: 8 jam'",
+   "tersembunyi": true
+  }
+ ]
+}

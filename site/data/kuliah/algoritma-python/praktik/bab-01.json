@@ -1,0 +1,79 @@
+{
+ "bab": 1,
+ "judul": "Program pertamamu: menyapa",
+ "tujuan": "Membaca masukan dengan input() dan mencetak beberapa baris dengan print().",
+ "berkas": "halo.py",
+ "langkah": [
+  "Ganti ____ pertama dengan perintah untuk membaca satu baris masukan.",
+  "Ganti ____ kedua dengan variabel yang menyimpan nama kota.",
+  "Ganti ____ ketiga dengan teks Selamat belajar Python (diapit tanda kutip).",
+  "Tekan Jalankan dengan masukan Sari dan Gresik (satu baris masing-masing), lalu Periksa praktik."
+ ],
+ "masukanContoh": "Sari\nGresik",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Membaca masukan memakai input(). Tanda kurungnya harus tetap ada."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 1: print() untuk keluaran dan input() untuk masukan. Mirip contoh program pertama di bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "print(\"Selamat belajar Python\") mencetak teks apa adanya karena diapit tanda kutip."
+  }
+ ],
+ "awal": "# halo.py\n# Ganti setiap ____ dengan yang tepat, lalu tekan Jalankan.\nnama = ____()\nkota = input()\n\nprint(\"Halo, \" + nama + \"!\")\nprint(\"Kamu belajar di \" + ____)\nprint(____)   # cetak: Selamat belajar Python\n",
+ "kasus": [
+  {
+   "nama": "nama dan kota",
+   "jalankan": "halo.py",
+   "masukan": [
+    "Sari",
+    "Gresik"
+   ],
+   "memuat": [
+    "Halo, Sari!",
+    "Kamu belajar di Gresik",
+    "Selamat belajar Python"
+   ]
+  },
+  {
+   "nama": "nama lain",
+   "jalankan": "halo.py",
+   "masukan": [
+    "Budi",
+    "Lamongan"
+   ],
+   "memuat": [
+    "Halo, Budi!",
+    "Kamu belajar di Lamongan"
+   ]
+  },
+  {
+   "nama": "kalimat penutup",
+   "jalankan": "halo.py",
+   "masukan": [
+    "Ani",
+    "Surabaya"
+   ],
+   "memuat": [
+    "Selamat belajar Python"
+   ]
+  },
+  {
+   "nama": "nama dua kata (tersembunyi)",
+   "jalankan": "halo.py",
+   "masukan": [
+    "Ani Lestari",
+    "Sidoarjo"
+   ],
+   "memuat": [
+    "Halo, Ani Lestari!",
+    "Kamu belajar di Sidoarjo"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}
