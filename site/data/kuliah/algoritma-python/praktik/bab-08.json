@@ -1,0 +1,55 @@
+{
+ "bab": 8,
+ "judul": "Dua fungsi yang berguna",
+ "tujuan": "Menulis fungsi dengan parameter dan return, termasuk menangani kasus list kosong.",
+ "berkas": "fungsi.py",
+ "langkah": [
+  "Berkas ini berisi dua fungsi: hitung_rata_rata(daftar_angka) dan format_rupiah(nilai).",
+  "Di hitung_rata_rata, list kosong harus menghasilkan 0 (bukan galat). Ganti kedua ____ dengan nilai dan fungsi yang tepat.",
+  "Di format_rupiah, ganti ____ dengan method string yang menukar koma menjadi titik.",
+  "Fungsi tidak mencetak apa-apa; keduanya mengembalikan nilai dengan return. Tekan Periksa praktik untuk mengujinya."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Rata-rata = jumlah dibagi banyaknya. Banyaknya elemen list dihitung dengan len(). Untuk menukar koma jadi titik: teks.replace(\",\", \".\")."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 8: def, parameter, return. Soal serupa: Soal 4 dan Soal 6 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "return 0 untuk list kosong, lalu sum(daftar_angka) / len(daftar_angka). Dan .replace(\",\", \".\")."
+  }
+ ],
+ "awal": "# fungsi.py\n\ndef hitung_rata_rata(daftar_angka):\n    if len(daftar_angka) == 0:\n        return ____\n    return sum(daftar_angka) / ____(daftar_angka)\n\n\ndef format_rupiah(nilai):\n    return \"Rp\" + f\"{nilai:,.0f}\".____(\",\", \".\")\n",
+ "kasus": [
+  {
+   "nama": "rata-rata tiga angka",
+   "kode": "from fungsi import hitung_rata_rata\nassert hitung_rata_rata([2, 4, 6]) == 4"
+  },
+  {
+   "nama": "rata-rata satu angka",
+   "kode": "from fungsi import hitung_rata_rata\nassert hitung_rata_rata([5]) == 5"
+  },
+  {
+   "nama": "list kosong menghasilkan 0",
+   "kode": "from fungsi import hitung_rata_rata\nassert hitung_rata_rata([]) == 0"
+  },
+  {
+   "nama": "format jutaan",
+   "kode": "from fungsi import format_rupiah\nassert format_rupiah(1250000) == 'Rp1.250.000'"
+  },
+  {
+   "nama": "format ratusan dan nol",
+   "kode": "from fungsi import format_rupiah\nassert format_rupiah(500) == 'Rp500'\nassert format_rupiah(0) == 'Rp0'"
+  },
+  {
+   "nama": "format angka berpecahan (tersembunyi)",
+   "kode": "from fungsi import format_rupiah\nassert format_rupiah(1440000.0) == 'Rp1.440.000'",
+   "tersembunyi": true
+  }
+ ]
+}

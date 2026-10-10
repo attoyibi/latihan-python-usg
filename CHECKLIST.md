@@ -379,7 +379,7 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 
 - [x] Migrasi `0008_praktikum.sql` (hanya menambah empat tabel; RLS peserta mengelola miliknya, instruktur membaca; jam server; batas 40 berkas); uji PGlite pada data lama
 - [x] Penguji Python bersama browser dan CPython (`praktikum_harness.py`), diuji 117 kasus dengan Python sungguhan (`tools/uji_praktikum.py`)
-- [x] Praktikum Kasir UD Rasa Gresik (11 tahap; tahap 1 sampai 4 berupa skrip, fungsi baru di tahap 5 / bab 8) di Algoritma dan Pemrograman; konfigurasi JSON, tanpa aturan waktu di kode
+- [x] (diganti) Praktikum proyek Kasir berantai dihapus; diganti praktik per bab mandiri (lihat bagian di bawah)
 - [x] Halaman mata kuliah (bagian Praktikum, tanda Ada praktik), notifikasi di bab, daftar tahap, ruang kerja berkas, riwayat versi, laporan 3 kolom dan PDF, ekspor satu halaman HTML
 - [x] Tab Praktikum di dashboard dosen (matriks, per tahap, lihat berkas, CSV)
 - [x] Diuji di browser (Pyodide nyata, ekspor HTML dengan `input()`, ponsel 375 px, tanpa migrasi 0008, PBO tidak berubah)
@@ -391,3 +391,11 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [x] `tools/buat_sql_kunci.py` membuat `kunci/kunci_jawaban.sql` dari kunci lokal (24 kunci; folder kunci/ tidak terbit)
 - [x] Tombol *Isi kunci (instruktur)* di soal kode Python dan Java, soal konsep, dan praktikum; diuji di browser
 - [ ] Setelah dipush: jalankan 0009 lalu `kunci/kunci_jawaban.sql` di Supabase SQL Editor
+
+## Praktik per bab (menggantikan praktikum proyek berantai)
+
+- [x] Praktik mandiri satu berkas di 13 bab kode Algoritma (bab 1, 2, 4 sampai 14); contoh jawaban tidak ada di situs (tabel `kunci_jawaban`, nomor 50 + bab)
+- [x] Kartu Praktik mengecil secara default di halaman bab; titik kecil di sudut lingkaran status (lingkaran hijau latihan tidak berubah)
+- [x] Lampiran PDF laporan bab memuat kode latihan dan kode praktik; tab Praktik di dashboard dosen dengan kode peserta
+- [x] Dihapus: ruang praktikum, daftar tahap, penjelajah berkas, ekspor HTML, laporan praktikum terpisah, proyek Kasir
+- [ ] Praktik PBO (Java) menyusul; laporan akhir satu PDF menyusul

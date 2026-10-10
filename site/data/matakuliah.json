@@ -6,7 +6,7 @@
     "bahasa": "python",
     "jenis": "kode",
     "aktif": true,
-    "praktikum": true,
+    "praktik": true,
     "urutan": 10
   },
   {
@@ -16,7 +16,6 @@
     "bahasa": "java",
     "jenis": "kode",
     "aktif": true,
-    "praktikum": true,
     "urutan": 20
   }
 ]

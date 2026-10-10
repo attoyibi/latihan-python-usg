@@ -1,0 +1,87 @@
+{
+ "bab": 2,
+ "judul": "Enam operasi pada dua bilangan",
+ "tujuan": "Memakai operator aritmetika dan f-string untuk menampilkan hasil enam operasi dari dua bilangan.",
+ "berkas": "hitung.py",
+ "langkah": [
+  "Dua bilangan sudah dibaca dan diubah ke int. Penjumlahan dan pengurangan sudah ditulis sebagai contoh.",
+  "Ganti keempat ____ dengan ekspresi untuk perkalian, pembagian biasa, pembagian bulat, dan sisa bagi.",
+  "Tekan Jalankan dengan masukan 17 lalu 5 (hasil bagi 3.4, bagi bulat 3, sisa 2), lalu Periksa praktik."
+ ],
+ "masukanContoh": "17\n5",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Perkalian *, pembagian biasa /, pembagian bulat //, sisa bagi %. Di dalam f-string, tulis ekspresinya di antara kurung kurawal, misalnya {a + b}."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 2, bagian 2.4 (operator aritmetika). Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "{a * b}, {a / b}, {a // b}, dan {a % b}."
+  }
+ ],
+ "awal": "# hitung.py\na = int(input())\nb = int(input())\n\nprint(f\"Jumlah: {a + b}\")\nprint(f\"Selisih: {a - b}\")\nprint(f\"Kali: {____}\")\nprint(f\"Bagi: {____}\")\nprint(f\"Bagi bulat: {____}\")\nprint(f\"Sisa: {____}\")\n",
+ "kasus": [
+  {
+   "nama": "dua puluh dan lima",
+   "jalankan": "hitung.py",
+   "masukan": [
+    "20",
+    "5"
+   ],
+   "memuat": [
+    "Jumlah: 25",
+    "Selisih: 15",
+    "Kali: 100",
+    "Bagi: 4.0",
+    "Bagi bulat: 4",
+    "Sisa: 0"
+   ]
+  },
+  {
+   "nama": "tujuh belas dan lima",
+   "jalankan": "hitung.py",
+   "masukan": [
+    "17",
+    "5"
+   ],
+   "memuat": [
+    "Kali: 85",
+    "Bagi: 3.4",
+    "Bagi bulat: 3",
+    "Sisa: 2"
+   ]
+  },
+  {
+   "nama": "pembagian berpecahan",
+   "jalankan": "hitung.py",
+   "masukan": [
+    "7",
+    "2"
+   ],
+   "memuat": [
+    "Bagi: 3.5",
+    "Bagi bulat: 3",
+    "Sisa: 1"
+   ]
+  },
+  {
+   "nama": "bilangan negatif (tersembunyi)",
+   "jalankan": "hitung.py",
+   "masukan": [
+    "-9",
+    "2"
+   ],
+   "memuat": [
+    "Kali: -18",
+    "Bagi: -4.5",
+    "Bagi bulat: -5",
+    "Sisa: 1"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}

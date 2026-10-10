@@ -1,0 +1,58 @@
+{
+ "bab": 12,
+ "judul": "Linear dan binary search",
+ "tujuan": "Melengkapi pencarian linear (dengan hitungan langkah) dan pencarian biner pada list terurut.",
+ "berkas": "cari.py",
+ "langkah": [
+  "cari_linear mengembalikan indeks pertama yang cocok, atau -1. hitung_langkah_linear mengembalikan berapa elemen yang diperiksa.",
+  "cari_biner bekerja pada list yang sudah terurut. Ganti dua ____ di dalamnya untuk menggeser kiri dan kanan.",
+  "Ganti semua ____ dengan yang tepat, lalu Periksa praktik. Hati-hati: nilai yang salah bisa membuat perulangan tidak berhenti."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Bila nilai tengah lebih kecil dari target, target ada di sebelah kanan: kiri maju ke tengah + 1. Bila lebih besar, kanan mundur ke tengah - 1."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 12: linear search, binary search, kiri, kanan, tengah. Soal serupa: Soal 4 dan 5 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "== target; return langkah; kiri = tengah + 1; kanan = tengah - 1."
+  }
+ ],
+ "awal": "# cari.py\n\ndef cari_linear(daftar, target):\n    for i in range(len(daftar)):\n        if daftar[i] == ____:\n            return i\n    return -1\n\n\ndef hitung_langkah_linear(daftar, target):\n    langkah = 0\n    for nilai in daftar:\n        langkah += 1\n        if nilai == target:\n            break\n    return ____\n\n\ndef cari_biner(daftar, target):\n    kiri = 0\n    kanan = len(daftar) - 1\n    while kiri <= kanan:\n        tengah = (kiri + kanan) // 2\n        if daftar[tengah] == target:\n            return tengah\n        elif daftar[tengah] < target:\n            kiri = ____\n        else:\n            kanan = ____\n    return -1\n",
+ "kasus": [
+  {
+   "nama": "linear ketemu",
+   "kode": "from cari import cari_linear\nassert cari_linear([5, 3, 9], 9) == 2\nassert cari_linear([5, 3, 9], 5) == 0"
+  },
+  {
+   "nama": "linear tidak ketemu",
+   "kode": "from cari import cari_linear\nassert cari_linear([5, 3, 9], 7) == -1\nassert cari_linear([], 1) == -1"
+  },
+  {
+   "nama": "hitung langkah linear",
+   "kode": "from cari import hitung_langkah_linear\nassert hitung_langkah_linear([4, 8, 15], 8) == 2\nassert hitung_langkah_linear([4, 8, 15], 4) == 1"
+  },
+  {
+   "nama": "langkah bila tidak ditemukan",
+   "kode": "from cari import hitung_langkah_linear\nassert hitung_langkah_linear([4, 8, 15], 99) == 3"
+  },
+  {
+   "nama": "biner ketemu",
+   "kode": "from cari import cari_biner\nd = [2, 5, 8, 12, 16, 23, 38, 45, 56, 72]\nassert cari_biner(d, 23) == 5\nassert cari_biner(d, 2) == 0\nassert cari_biner(d, 72) == 9"
+  },
+  {
+   "nama": "biner tidak ketemu dan list kosong",
+   "kode": "from cari import cari_biner\nassert cari_biner([2, 5, 8], 7) == -1\nassert cari_biner([], 1) == -1"
+  },
+  {
+   "nama": "biner di semua posisi (tersembunyi)",
+   "kode": "from cari import cari_biner\nd = [1, 3, 5, 7, 9, 11]\nfor i, v in enumerate(d):\n    assert cari_biner(d, v) == i",
+   "tersembunyi": true
+  }
+ ]
+}

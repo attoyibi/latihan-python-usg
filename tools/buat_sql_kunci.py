@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Membuat SQL untuk memasukkan kunci jawaban ke tabel kunci_jawaban (migrasi 0009).
 
-  kunci/<mata-kuliah>/bab-NN.py|java   ->   kunci/kunci_jawaban.sql
+  kunci/<mata-kuliah>/bab-NN.py|java   ->   kunci/kunci_jawaban.sql   (soal latihan, nomor bab)
+  kunci/<mata-kuliah>/praktik-NN.py    ->   baris nomor 50 + NN        (contoh jawaban praktik bab NN)
 
 Berkas hasilnya ada di folder kunci/ (diabaikan git, tidak ikut terbit). Tempel isinya di Supabase SQL Editor dan Run.
 Aman dijalankan ulang: kunci yang sudah ada diperbarui. Sebelum membuat SQL, kunci diuji dulu dengan tools/uji_kunci.py
@@ -16,6 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 KUNCI = ROOT / "kunci"
 DATA = ROOT / "site" / "data"
 POLA = re.compile(r"^bab-(\d{2})\.(py|java)$")
+POLA_PRAKTIK = re.compile(r"^praktik-(\d{2})\.py$")
+GESER_PRAKTIK = 50  # kunci praktik bab N disimpan sebagai bab 50 + N (tabel kunci_jawaban membatasi bab 1 sampai 99)
 
 
 def kutip_dolar(teks, indeks):
@@ -39,6 +42,18 @@ def main():
             print(f"lewati {folder.name}: tidak ada di matakuliah.json")
             continue
         for f in sorted(folder.iterdir()):
+            mp = POLA_PRAKTIK.match(f.name)
+            if mp:
+                if not (DATA / "kuliah" / folder.name / "praktik" / f"bab-{mp.group(1)}.json").exists():
+                    print(f"lewati {folder.name}/{f.name}: praktiknya tidak ada")
+                    continue
+                isi = f.read_text(encoding="utf8").replace("\r\n", "\n")
+                baris.append(
+                    "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values "
+                    f"('{folder.name}', {GESER_PRAKTIK + int(mp.group(1))}, 'python', {kutip_dolar(isi, len(baris))})\n"
+                    "on conflict (matakuliah_id, bab) do update set bahasa = excluded.bahasa, isi = excluded.isi, diperbarui_pada = now();"
+                )
+                continue
             m = POLA.match(f.name)
             if not m:
                 continue

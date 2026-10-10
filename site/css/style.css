@@ -525,47 +525,26 @@ tr.klik:hover{background:var(--soft)}
 @media (max-width:640px){.kh-bulan .kh-hbtn{min-height:40px}}
 dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;min-height:40px;max-width:100%}
 
-/* Praktikum: bagian di halaman mata kuliah, daftar tahap, dan ruang kerja berkas */
-.pk-bagian{margin-top:24px}
-.pk-kartu h3,.pk-kepala h3,.pk-kerja h3,.pk-bantu h3,.pk-ekspor h3{margin:0 0 6px}
-.pk-chip{display:inline-block;align-self:flex-start;font-size:11px;font-weight:600;padding:1px 9px;border-radius:var(--r-pill);background:var(--warn-bg);color:var(--warn);margin-top:4px}
-.pk-notif{border-left-color:var(--warn);background:var(--warn-bg)}
-.pk-notif .btn{margin-left:0}
+/* Praktik per bab: titik kecil di sudut lingkaran status, dan kartu Praktik di halaman bab */
+.pm{position:absolute;top:-5px;right:-6px;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);box-sizing:border-box}
+.pm.sedang{border-color:var(--warn);background:linear-gradient(90deg,var(--warn) 50%,var(--card) 50%)}
+.pm.lulus{border-color:var(--accent);background:var(--accent)}
+.praktik-kartu{border-left:3px solid var(--warn);border-radius:0 var(--r-card) var(--r-card) 0;padding:0}
+.praktik-kepala{display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%;padding:12px 18px;border:0;background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-height:44px}
+.praktik-kepala strong{flex:1 1 180px;font-size:15px}
+.praktik-ubah{font-size:12px;font-weight:600;color:var(--brand-strong)}
+.praktik-isi{padding:2px 18px 16px;border-top:1px solid var(--line)}
+.praktik-isi[hidden]{display:none}
 .pk-status{display:inline-block;font-size:12px;font-weight:600;padding:1px 10px;border-radius:var(--r-pill);background:var(--soft);color:var(--muted);white-space:nowrap}
 .pk-status.pk-st-lulus{background:var(--ok-bg);color:var(--ok)}
 .pk-status.pk-st-sedang{background:var(--warn-bg);color:var(--warn)}
-.pk-status.pk-st-dilewati{background:var(--brand-soft);color:var(--brand-strong)}
-.pk-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}
-.pk-meta p{margin:0}
-.pk-bab{font-size:13px}
-.pk-gambaran{margin:6px 0 12px;padding-left:20px}
-.pk-tahap-daftar{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.pk-tahap-tautan{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);background:var(--card)}
-.pk-tahap-tautan:hover{border-color:var(--brand)}
-.pk-no{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--brand-soft);color:var(--brand-strong)}
-.pk-st-lulus .pk-no{background:var(--ok-bg);color:var(--ok)}
-.pk-tahap-isi{flex:1;min-width:0;display:flex;flex-direction:column}
 .pk-langkah{padding-left:22px}
 .pk-langkah li{margin:6px 0}
-.pk-langkah label{cursor:pointer}
-.pk-kerja-grid{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;margin:10px 0}
-.pk-berkas{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:4px}
-.pk-nama{width:100%;text-align:left;font:inherit;font-family:var(--mono);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;min-height:40px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.pk-nama.on{border-color:var(--brand);background:var(--brand-soft);color:var(--brand-strong);font-weight:700}
-.pk-tag{font-family:var(--font);font-size:10px;font-weight:600;padding:0 7px;border-radius:var(--r-pill);background:var(--warn-bg);color:var(--warn)}
-.pk-tag-diminta{background:var(--ok-bg);color:var(--ok)}
-.pk-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
-.pk-bar strong{flex:1 1 140px;font-family:var(--mono);font-size:14px;word-break:break-all}
-.pk-kotak-nama{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;padding:8px;border:1px dashed var(--line);border-radius:10px}
-.pk-kotak-nama .input{flex:1 1 180px;min-width:0}
-.pk-editor{border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.pk-editor .CodeMirror{height:340px;font-size:14px}
+.pk-editor{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:8px 0}
+.pk-editor .CodeMirror{height:300px;font-size:14px}
 .pk-teks{width:100%;font-family:var(--mono);border:0}
-.pk-jalan{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
-.pk-label{display:flex;gap:8px;align-items:center}
-.pk-entri{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;min-height:40px;max-width:100%}
 .pk-masukan{width:100%;font-family:var(--mono)}
-.pk-keluaran{background:var(--code-bg);color:#d9f3f1;padding:12px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word;min-height:80px;font-size:13px;margin:10px 0}
+.pk-keluaran{background:var(--code-bg);color:#d9f3f1;padding:12px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word;min-height:70px;font-size:13px;margin:10px 0}
 .pk-keluaran.pk-galat{color:#ffd7d2}
 .pk-ringkas{font-weight:700}
 .pk-ringkas.ok{color:var(--ok)}
@@ -574,15 +553,10 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 .pk-kasus li.ok strong{color:var(--ok)}
 .pk-kasus li.gagal strong{color:var(--danger)}
 .pk-pesan{margin:4px 0 0;white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--muted)}
-.pk-aksi,.pk-nav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
 .pk-konfirmasi{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
 .pk-tanya{font-size:13px;color:var(--warn);flex:1 1 220px}
-.pk-versi{list-style:none;padding:0}
-.pk-versi li{padding:6px 0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.pk-contoh{margin:12px 0}
 @media (max-width:760px){
-  .pk-kerja-grid{grid-template-columns:1fr}
-  .pk-berkas{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
-  .pk-editor .CodeMirror{height:300px}
-  .pk-nav .btn,.pk-aksi .btn{flex:1 1 100%}
+  .praktik-isi{padding:2px 12px 14px}
+  .praktik-kepala{padding:12px}
+  .pk-editor .CodeMirror{height:260px}
 }

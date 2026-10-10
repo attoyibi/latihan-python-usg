@@ -1,0 +1,46 @@
+{
+ "bab": 10,
+ "judul": "Menulis dan membaca berkas teks",
+ "tujuan": "Memakai with open(), mode berkas yang tepat, dan membuang karakter baris baru saat membaca.",
+ "berkas": "berkas.py",
+ "langkah": [
+  "simpan_nama menulis satu nama per baris. Ganti ____ dengan mode yang menulis berkas baru dari kosong.",
+  "baca_nama membaca semua baris menjadi list. Ganti ____ dengan method string yang membuang baris baru (dan spasi) di ujung.",
+  "Tekan Periksa praktik untuk mengujinya. Berkas percobaan dibuat di ruang uji, bukan di komputermu."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Mode untuk menulis dari kosong (menimpa berkas lama) adalah \"w\". Mode \"a\" akan menambahkan di akhir. Untuk membuang baris baru di ujung teks: strip()."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 10: open, mode r/w/a, with, dan strip. Soal serupa: Soal 4 dan 5 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "open(nama_berkas, \"w\") dan baris.strip()."
+  }
+ ],
+ "awal": "# berkas.py\n\ndef simpan_nama(daftar, nama_berkas):\n    with open(nama_berkas, \"____\") as f:\n        for nama in daftar:\n            f.write(nama + \"\\n\")\n\n\ndef baca_nama(nama_berkas):\n    hasil = []\n    with open(nama_berkas) as f:\n        for baris in f:\n            hasil.append(baris.____())\n    return hasil\n",
+ "kasus": [
+  {
+   "nama": "isi berkas satu nama per baris",
+   "kode": "from berkas import simpan_nama\nsimpan_nama(['Sari', 'Budi', 'Citra'], 'tes1.txt')\nwith open('tes1.txt') as f:\n    assert f.read() == 'Sari\\nBudi\\nCitra\\n'"
+  },
+  {
+   "nama": "membaca kembali tanpa baris baru",
+   "kode": "from berkas import simpan_nama, baca_nama\nsimpan_nama(['Sari', 'Budi'], 'tes2.txt')\nassert baca_nama('tes2.txt') == ['Sari', 'Budi']"
+  },
+  {
+   "nama": "menulis ulang menimpa isi lama",
+   "kode": "from berkas import simpan_nama, baca_nama\nsimpan_nama(['a', 'b', 'c'], 'tes3.txt')\nsimpan_nama(['x'], 'tes3.txt')\nassert baca_nama('tes3.txt') == ['x']"
+  },
+  {
+   "nama": "daftar kosong (tersembunyi)",
+   "kode": "from berkas import simpan_nama, baca_nama\nsimpan_nama([], 'tes4.txt')\nassert baca_nama('tes4.txt') == []",
+   "tersembunyi": true
+  }
+ ]
+}

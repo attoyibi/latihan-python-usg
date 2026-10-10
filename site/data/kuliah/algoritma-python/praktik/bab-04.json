@@ -1,0 +1,90 @@
+{
+ "bab": 4,
+ "judul": "Kategori usia dengan if, elif, else",
+ "tujuan": "Menyusun percabangan bertingkat dan memilih batas yang benar, termasuk kasus batas.",
+ "berkas": "kategori.py",
+ "langkah": [
+  "Aturannya: di bawah 13 tahun anak, 13 sampai 17 tahun remaja, 18 tahun ke atas dewasa.",
+  "Ganti dua ____ dengan angka batas yang tepat.",
+  "Coba tiga angka batas: 12, 13, dan 18 (masing-masing dijalankan sendiri), lalu Periksa praktik."
+ ],
+ "masukanContoh": "13",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Batas pertama: kurang dari berapa disebut anak? Batas kedua: sampai berapa (termasuk) disebut remaja?"
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 4: if, elif, else, dan kasus batas. Soal serupa: Soal 4 di Latihan Bertingkat bab ini."
+  },
+  {
+   "jenis": "soal",
+   "isi": "if usia < 13 lalu elif usia <= 17."
+  }
+ ],
+ "awal": "# kategori.py\nusia = int(input())\n\nif usia < ____:\n    kategori = \"anak\"\nelif usia <= ____:\n    kategori = \"remaja\"\nelse:\n    kategori = \"dewasa\"\n\nprint(f\"Kategori: {kategori}\")\n",
+ "kasus": [
+  {
+   "nama": "dua belas tahun",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "12"
+   ],
+   "memuat": [
+    "Kategori: anak"
+   ]
+  },
+  {
+   "nama": "tiga belas tahun",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "13"
+   ],
+   "memuat": [
+    "Kategori: remaja"
+   ]
+  },
+  {
+   "nama": "tujuh belas tahun",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "17"
+   ],
+   "memuat": [
+    "Kategori: remaja"
+   ]
+  },
+  {
+   "nama": "delapan belas tahun",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "18"
+   ],
+   "memuat": [
+    "Kategori: dewasa"
+   ]
+  },
+  {
+   "nama": "usia nol",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "0"
+   ],
+   "memuat": [
+    "Kategori: anak"
+   ]
+  },
+  {
+   "nama": "usia lanjut (tersembunyi)",
+   "jalankan": "kategori.py",
+   "masukan": [
+    "64"
+   ],
+   "memuat": [
+    "Kategori: dewasa"
+   ],
+   "tersembunyi": true
+  }
+ ]
+}

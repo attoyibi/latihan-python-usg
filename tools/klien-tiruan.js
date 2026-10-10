@@ -375,9 +375,10 @@
         if (TANPA_0009) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public.kunci_jawaban' in the schema cache" } };
         if (q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table kunci_jawaban" } };
         if (!instruktur()) return { data: [], error: null };
-        const bab = String(q.f.bab).padStart(2, "0");
+        const nomor = Number(q.f.bab);
+        const bab = String(nomor > 50 ? nomor - 50 : nomor).padStart(2, "0"); // kunci praktik bab N disimpan sebagai bab 50 + N
         for (const ext of ["py", "java"]) {
-          const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/bab-" + bab + "." + ext);
+          const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/" + (nomor > 50 ? "praktik-" : "bab-") + bab + "." + ext);
           if (r.ok) return { data: [{ isi: await r.text(), bahasa: ext === "py" ? "python" : "java" }], error: null };
         }
         return { data: [], error: null };
@@ -648,22 +649,21 @@
     },
   };
 
-  // Data contoh praktikum untuk dashboard instruktur (tab Praktikum): sebagian peserta contoh sudah mengerjakan beberapa tahap.
-  if (!db.seedPk) {
-    db.seedPk = true;
-    db.praktikum_tahap = db.praktikum_tahap || [];
-    db.praktikum_laporan = db.praktikum_laporan || [];
-    db.praktikum_berkas = db.praktikum_berkas || [];
-    const ids = ["t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10", "t11"];
+  // Data contoh praktik per bab untuk dashboard instruktur (tab Praktik): sebagian peserta contoh sudah mengerjakan beberapa bab.
+  if (!db.seedPk2) {
+    db.seedPk2 = true;
+    db.praktikum_tahap = (db.praktikum_tahap || []).filter((r) => !/^[a-z]+$/.test(r.praktikum_id));
+    db.praktikum_berkas = (db.praktikum_berkas || []).filter((r) => /^bab-\d\d$/.test(r.praktikum_id));
+    const babs = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
     for (let n = 1; n <= 12; n++) {
       const uid = "u-seed" + n;
-      const sampai = n <= 3 ? 11 : n <= 7 ? 4 + (n % 3) : 2;
-      ids.slice(0, sampai).forEach((tid, i) => {
+      const sampai = n <= 3 ? 13 : n <= 7 ? 4 + (n % 3) : 2;
+      babs.slice(0, sampai).forEach((bab, i) => {
         const macet = n > 7 && i === sampai - 1;
-        db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", tahap_id: tid, status: macet ? "sedang" : n % 4 === 0 && i === 1 ? "dilewati" : "lulus", jalur: "web", jumlah_kirim: macet ? 6 + n : 1 + ((n + i) % 3), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: macet ? null : "2026-10-03T03:00:00Z", pakai_contoh: n % 5 === 0 && i === 2, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });
+        const pid = "bab-" + String(bab).padStart(2, "0");
+        db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: pid, tahap_id: "p01", status: macet ? "sedang" : "lulus", jalur: "web", jumlah_kirim: macet ? 6 + n : 1 + ((n + i) % 3), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: macet ? null : "2026-10-03T03:00:00Z", pakai_contoh: false, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });
+        db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: pid, nama: "halo.py", isi: "# kode praktik bab " + bab + " milik peserta contoh\nprint('halo')\n", asal: "milik", diperbarui_pada: "2026-10-03T04:00:00Z" });
       });
-      db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", nama: "subtotal.py", isi: "def subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n", asal: "milik", diperbarui_pada: "2026-10-03T04:00:00Z" });
-      if (n <= 5) db.praktikum_laporan.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", jawaban: { apa: "Saya membangun aplikasi kasir untuk toko oleh-oleh dan belajar memecah masalah menjadi fungsi kecil.", kendala: n % 2 ? "Bingung membedakan return dan print, lalu saya baca ulang bab fungsi." : "" }, jumlah_ketikan: {}, percobaan_tempel: n === 2 ? 4 : 0, durasi_menulis_detik: 300, kode_verifikasi: "PKSEED0" + n, dikumpulkan_pada: n % 2 ? "2026-10-08T04:00:00Z" : null, diperbarui_pada: "2026-10-08T04:00:00Z" });
     }
     save();
   }
