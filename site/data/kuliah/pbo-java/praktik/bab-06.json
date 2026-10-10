@@ -1,0 +1,56 @@
+{
+ "bab": 6,
+ "judul": "Polimorfisme: luas bentuk",
+ "tujuan": "Membuat method yang ditimpa di kelas turunan dan memanggilnya lewat tipe induk.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Bentuk adalah induk; Persegi dan Lingkaran menimpa method luas() dengan rumusnya sendiri.",
+  "Di Persegi, ganti ____ dengan sisi lagi (luas = sisi kali sisi).",
+  "Di Lingkaran, ganti ____ dengan jari-jari lagi (luas = 3.14 kali r kali r).",
+  "Tekan Jalankan: satu pemanggilan luas() di perulangan menghasilkan perilaku berbeda per objek. Lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Luas persegi: sisi * sisi. Luas lingkaran: 3.14 * r * r. Yang ____ adalah pengali kedua."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 6: overriding dan pemanggilan lewat tipe induk (polimorfisme)."
+  },
+  {
+   "jenis": "soal",
+   "isi": "return sisi * sisi; dan return 3.14 * r * r;"
+  }
+ ],
+ "awal": "// Main.java\nclass Bentuk {\n    double luas() {\n        return 0;\n    }\n}\n\nclass Persegi extends Bentuk {\n    double sisi;\n\n    Persegi(double sisi) {\n        this.sisi = sisi;\n    }\n\n    @Override\n    double luas() {\n        return sisi * ____;\n    }\n}\n\nclass Lingkaran extends Bentuk {\n    double r;\n\n    Lingkaran(double r) {\n        this.r = r;\n    }\n\n    @Override\n    double luas() {\n        return 3.14 * r * ____;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Bentuk[] daftar = { new Persegi(3), new Lingkaran(2) };\n        for (Bentuk b : daftar) {\n            System.out.println(\"Luas: \" + b.luas());\n        }\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "luas persegi",
+   "kode": "cek(Math.abs(new Persegi(3).luas() - 9.0) < 0.0001, \"luas persegi sisi 3 harus 9.0\");"
+  },
+  {
+   "nama": "luas lingkaran",
+   "kode": "cek(Math.abs(new Lingkaran(2).luas() - 12.56) < 0.0001, \"luas lingkaran r 2 harus 12.56\");"
+  },
+  {
+   "nama": "dipanggil lewat tipe induk",
+   "kode": "Bentuk b = new Persegi(5);\ncek(Math.abs(b.luas() - 25.0) < 0.0001, \"pemanggilan lewat Bentuk harus memakai luas Persegi\");"
+  },
+  {
+   "nama": "jumlah luas beberapa bentuk (tersembunyi)",
+   "kode": "Bentuk[] d = { new Persegi(2), new Lingkaran(1), new Persegi(1) };\ndouble total = 0;\nfor (Bentuk b : d) total += b.luas();\ncek(Math.abs(total - 8.14) < 0.0001, \"jumlah luas harus 8.14\");",
+   "tersembunyi": true
+  },
+  {
+   "nama": "program mencetak dua luas",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Luas: 9.0",
+    "Luas: 12.56"
+   ]
+  }
+ ]
+}

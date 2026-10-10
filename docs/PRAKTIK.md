@@ -1,6 +1,6 @@
 # Praktik per bab
 
-Setiap bab kode di Algoritma dan Pemrograman punya satu **praktik** di halaman bab itu sendiri, di antara Latihan dan Laporan. Praktik adalah tugas terbimbing yang lebih mudah dari Latihan: kode sudah hampir jadi dan peserta melengkapi bagian bertanda `____`. Tiap praktik berdiri sendiri (tidak berantai), jadi peserta yang melompat bab tetap bisa mengerjakannya. Bab konsep (mis. Bab 3) tidak punya praktik.
+Setiap bab kode di Algoritma dan Pemrograman (Python) dan PBO (Java) punya satu **praktik** di halaman bab itu sendiri, di antara Latihan dan Laporan. Praktik adalah tugas terbimbing yang lebih mudah dari Latihan: kode sudah hampir jadi dan peserta melengkapi bagian bertanda `____`. Tiap praktik berdiri sendiri (tidak berantai), jadi peserta yang melompat bab tetap bisa mengerjakannya. Bab konsep (Algoritma bab 3; PBO bab 4, 11, 12, 15) tidak punya praktik.
 
 ## Alur satu bab
 
@@ -18,9 +18,16 @@ Praktik wajib untuk melengkapi bab, tetapi **tidak terkunci**: urutan bebas, tid
 - Isi kartu: tujuan, langkah, petunjuk bertahap, editor satu berkas, **Jalankan**, **Periksa praktik**, **Kembalikan kerangka**. Pekerjaan tersimpan otomatis dan tidak ada batas percobaan.
 - Salin dan tempel dimatikan; jumlah percobaan tempel dicatat (isinya tidak), seperti di Latihan.
 
+## Laporan akhir (satu PDF)
+
+Di bagian bawah halaman mata kuliah ada kartu **Laporan akhir**. Isinya form akhir (3 kolom yang ditulis peserta sendiri; salin dan tempel dimatikan) dan tombol **Ekspor laporan akhir (PDF)**. PDF-nya menggabungkan, untuk setiap bab: status dan jumlah kirim latihan, **kode latihan** (kiriman lulus terakhir, atau kiriman terakhir bila belum lulus), **kode praktik**, dan refleksi laporan bab, lalu form akhir dan kode verifikasi.
+
+Kode tidak diketik atau ditempel peserta: ia ditarik otomatis dari data yang sudah tersimpan (tabel `percobaan`, `praktikum_*`, `laporan`) digabung dengan keadaan terbaru di browser. Kode yang lebih dari 80 baris dipotong dengan keterangan. Ekspor tidak pernah dikunci. Form akhir disimpan di `praktikum_laporan` dengan `praktikum_id = akhir` (migrasi 0008), jadi tidak perlu migrasi baru; bila tabel itu belum ada, laporan tetap bisa dibuat dari bahan yang ada.
+
 ## Yang dilihat dosen
 
 - Tab **Praktik** di dashboard: matriks peserta × bab (lulus, sedang, belum), rata-rata kirim, bab yang paling sering macet, unduh CSV, dan klik simbol untuk melihat **kode praktik peserta** (hanya baca).
+- Tab **Laporan akhir**: satu baris per peserta (latihan lulus, praktik lulus, refleksi bab, form akhir, sudah diekspor), tombol *Buka laporan* untuk membaca laporan akhir lengkap di layar (kode, refleksi, form akhir) dan *Unduh PDF*, serta CSV.
 - Akun instruktur mendapat tombol **Isi kunci (instruktur)** di kartu praktik (lihat bagian di bawah).
 
 ## Memasang
@@ -31,7 +38,7 @@ Contoh jawaban praktik **tidak ada di situs**. Ia disimpan di tabel `kunci_jawab
 
 ## Menulis praktik sendiri
 
-1. Beri tanda `"praktik": true` pada mata kuliahnya di `site/data/matakuliah.json` (saat ini hanya Python).
+1. Beri tanda `"praktik": true` pada mata kuliahnya di `site/data/matakuliah.json` (Python atau Java).
 2. Buat `site/data/kuliah/<mata kuliah>/praktik/index.json`: `{"bab": [1, 2, 4, ...]}`.
 3. Buat satu berkas per bab, `praktik/bab-NN.json`:
 
@@ -49,13 +56,16 @@ Contoh jawaban praktik **tidak ada di situs**. Ia disimpan di tabel `kunci_jawab
 }
 ```
 
-Aturan: satu berkas `.py` per praktik; `awal` memuat tanda `____`; minimal dua petunjuk dan tiga kasus; kasus `jalankan` menjalankan berkas dengan `masukan` lalu memeriksa bahwa keluaran memuat semua teks di `memuat`; kasus `kode` dijalankan dengan `assert` setelah berkas peserta dimuat. Kasus `tersembunyi` hanya menyembunyikan rincian di layar peserta. **Jangan** menaruh kolom `contoh` (jawaban) di JSON: validator menolaknya.
+Praktik **Java** memakai satu berkas `Main.java` yang berisi kelas-kelas bantu dan `public class Main` (untuk Jalankan); kasus `kode` adalah badan method `main` kelas penguji `Uji` (tersedia `cek(syarat, pesan)`, `sama(diharapkan, nyata)`, `privat(Kelas.class, "atribut")`, `abstrak(Kelas.class)`) dan kasus `jalankan` selalu `"jalankan": "Main"`. Hanya sintaks Java 8 yang didukung penjalan di browser.
 
-4. Simpan contoh jawaban di `kunci/<mata kuliah>/praktik-NN.py` (folder `kunci/` diabaikan git), lalu:
+Aturan: satu berkas per praktik (`.py` atau `Main.java`); `awal` memuat tanda `____`; minimal dua petunjuk dan tiga kasus; kasus `jalankan` menjalankan berkas dengan `masukan` lalu memeriksa bahwa keluaran memuat semua teks di `memuat`; kasus `kode` dijalankan dengan `assert` setelah berkas peserta dimuat. Kasus `tersembunyi` hanya menyembunyikan rincian di layar peserta. **Jangan** menaruh kolom `contoh` (jawaban) di JSON: validator menolaknya.
+
+4. Simpan contoh jawaban di `kunci/<mata kuliah>/praktik-NN.py` atau `praktik-NN.java` (folder `kunci/` diabaikan git), lalu:
 
 ```bash
 python tools/validasi_konten.py   # struktur dan rujukan bab
-python tools/uji_praktik.py       # kerangka harus gagal; contoh harus meluluskan semua kasus
+python tools/uji_praktik.py       # praktik Python: kerangka harus gagal; contoh harus meluluskan semua kasus
+node tools/uji_praktik_java.mjs   # praktik Java, dengan JVM sungguhan (butuh java di PATH)
 python tools/buat_sql_kunci.py    # membuat kunci/kunci_jawaban.sql (termasuk kunci praktik)
 ```
 
@@ -71,4 +81,4 @@ Akun instruktur mendapat tombol **Isi kunci (instruktur)** di soal latihan kode 
 
 ## Batas saat ini
 
-Hanya Algoritma (Python). Praktik Java (PBO) menyusul dengan format yang sama. Kasus uji berjalan di browser peserta, jadi ini bukan ujian tertutup; pakai bersama laporan dan sinyal tempel untuk menilai.
+Tugas akhir PBO (ruang kerja multi-berkas, unggah laptop, rubrik; lihat [RUBRIK-PBO.md](RUBRIK-PBO.md)) masih berupa data dan penjalan tanpa tampilan, karena dibangun di atas ruang praktikum lama yang sudah dihapus. Kasus uji berjalan di browser peserta, jadi ini bukan ujian tertutup; pakai bersama laporan dan sinyal tempel untuk menilai.

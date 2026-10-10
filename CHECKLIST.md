@@ -398,11 +398,11 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [x] Kartu Praktik mengecil secara default di halaman bab; titik kecil di sudut lingkaran status (lingkaran hijau latihan tidak berubah)
 - [x] Lampiran PDF laporan bab memuat kode latihan dan kode praktik; tab Praktik di dashboard dosen dengan kode peserta
 - [x] Dihapus: ruang praktikum, daftar tahap, penjelajah berkas, ekspor HTML, laporan praktikum terpisah, proyek Kasir
-- [ ] Praktik PBO (Java) menyusul; laporan akhir satu PDF menyusul
+- [x] Praktik PBO (Java) dalam format yang sama: 11 praktik `Main.java`, diuji dengan JVM sungguhan (`tools/uji_praktik_java.mjs`) dan di CheerpJ
 
-## Praktikum Java (PBO), DITUNDA
+## Praktikum Java (PBO): sebagian ditunda
 
-Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. Datanya (JSON praktik, tugas akhir, rubrik, penjalan Java multi-berkas) tetap ada, tetapi tampilannya belum ada dan tanda `praktikum` untuk PBO dimatikan sampai praktik PBO dibuat ulang dengan format praktik per bab.
+Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. Latihan per bab sudah digantikan praktik per bab (lihat bagian Praktik per bab). Yang masih berupa data dan penjalan tanpa tampilan: **tugas akhir** (ruang kerja multi-berkas, unggah laptop, rubrik, dashboard) dan penjalan Java multi-berkas.
 
 
 - [x] JavaRun menerima paket beberapa berkas `.java` sekaligus (`tools/java-runner/JavaRun.java`, jar dibangun ulang); mode satu `Main.java` untuk soal bab tetap bekerja
@@ -412,3 +412,10 @@ Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. Da
 - [x] Kunci jawaban: latihan per bab (contoh di JSON), tugas akhir (tabel `kunci_jawaban` bab 99, `kunci/pbo-java/tugas-akhir.json`), tombol Jawab otomatis (instruktur) termasuk Jawab semua praktikum
 - [x] Dashboard: ringkasan semua praktikum, lihat berkas, penanda kelengkapan, laporan, jumlah unggah
 - [ ] Belum diuji di Supabase sungguhan dan ponsel sungguhan; GUI/JDBC tidak dapat dijalankan di browser
+
+## Laporan akhir satu PDF
+
+- [x] Kartu Laporan akhir di halaman mata kuliah: form akhir 3 kolom (tersimpan di `praktikum_laporan`, `praktikum_id = akhir`) dan ekspor PDF gabungan semua bab (status, kode latihan, kode praktik, refleksi bab)
+- [x] Tab Laporan akhir di dashboard dosen: ringkasan per peserta, buka laporan lengkap di layar, unduh PDF dan CSV
+- [x] Diuji: 27 uji paket dan blok PDF, termasuk tabel yang belum ada; di browser (ekspor PDF, tab dosen)
+- [ ] Belum diuji di Supabase sungguhan (kueri `percobaan` dan `praktikum_*` besar), dan di ponsel sungguhan

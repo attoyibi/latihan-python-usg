@@ -1,0 +1,54 @@
+{
+ "bab": 10,
+ "judul": "Menulis dan membaca berkas teks",
+ "tujuan": "Memakai PrintWriter dan BufferedReader dengan try-with-resources untuk menulis dan membaca baris.",
+ "berkas": "Main.java",
+ "langkah": [
+  "simpan menulis tiap elemen list sebagai satu baris. Ganti ____ dengan method PrintWriter yang menulis satu baris lengkap dengan baris baru.",
+  "baca membaca berkas baris demi baris. Ganti ____ dengan method BufferedReader yang membaca satu baris (mengembalikan null di akhir berkas).",
+  "Tekan Jalankan, lalu Periksa praktik. Berkas percobaan dibuat di ruang uji, bukan di komputermu."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Menulis satu baris: println. Membaca satu baris: readLine, yang mengembalikan null bila sudah habis."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 10: FileWriter, PrintWriter, BufferedReader, dan try-with-resources."
+  },
+  {
+   "jenis": "soal",
+   "isi": "w.println(b) dan r.readLine()."
+  }
+ ],
+ "awal": "// Main.java\nimport java.io.*;\nimport java.util.*;\n\nclass Catatan {\n    static void simpan(String nama, List<String> baris) throws IOException {\n        try (PrintWriter w = new PrintWriter(new FileWriter(nama))) {\n            for (String b : baris) {\n                w.____(b);\n            }\n        }\n    }\n\n    static List<String> baca(String nama) throws IOException {\n        List<String> hasil = new ArrayList<>();\n        try (BufferedReader r = new BufferedReader(new FileReader(nama))) {\n            String b;\n            while ((b = r.____()) != null) {\n                hasil.add(b);\n            }\n        }\n        return hasil;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Catatan.simpan(\"contoh.txt\", Arrays.asList(\"satu\", \"dua\"));\n        System.out.println(Catatan.baca(\"contoh.txt\"));\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "simpan lalu baca mengembalikan isi yang sama",
+   "kode": "Catatan.simpan(\"t1.txt\", Arrays.asList(\"Sari\", \"Budi\", \"Citra\"));\nsama(Arrays.asList(\"Sari\", \"Budi\", \"Citra\"), Catatan.baca(\"t1.txt\"));"
+  },
+  {
+   "nama": "satu nama per baris",
+   "kode": "Catatan.simpan(\"t2.txt\", Arrays.asList(\"a\", \"b\"));\njava.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(\"t2.txt\"));\nsama(\"a\", r.readLine());\nsama(\"b\", r.readLine());\nsama(null, r.readLine());\nr.close();"
+  },
+  {
+   "nama": "menulis ulang menimpa isi lama",
+   "kode": "Catatan.simpan(\"t3.txt\", Arrays.asList(\"a\", \"b\", \"c\"));\nCatatan.simpan(\"t3.txt\", Arrays.asList(\"x\"));\nsama(Arrays.asList(\"x\"), Catatan.baca(\"t3.txt\"));"
+  },
+  {
+   "nama": "daftar kosong (tersembunyi)",
+   "kode": "Catatan.simpan(\"t4.txt\", new ArrayList<String>());\nsama(0, Catatan.baca(\"t4.txt\").size());",
+   "tersembunyi": true
+  },
+  {
+   "nama": "program mencetak isi berkas",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "[satu, dua]"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "bab": 1,
+ "judul": "Objek pertamamu: Hewan",
+ "tujuan": "Membuat objek dari sebuah kelas, mengisi atributnya, dan memanggil method.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Kelas Hewan sudah ditulis. Kamu melengkapi program Main yang memakainya.",
+  "Ganti ____ pertama dengan perintah yang membuat objek baru dari kelas Hewan.",
+  "Ganti ____ kedua dengan teks suaranya, yaitu meong (diapit tanda kutip ganda).",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Objek dibuat dengan new diikuti nama kelas dan tanda kurung, mis. new Hewan()."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 1: kelas sebagai cetakan dan objek sebagai hasil cetakannya."
+  },
+  {
+   "jenis": "soal",
+   "isi": "Hewan h = new Hewan(); dan h.suara = \"meong\";"
+  }
+ ],
+ "awal": "// Main.java\nclass Hewan {\n    String nama;\n    String suara;\n\n    String bunyi() {\n        return nama + \" berkata \" + suara;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Hewan h = new ____();\n        h.nama = \"Kucing\";\n        h.suara = ____;\n        System.out.println(h.bunyi());\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "program mencetak sapaan kucing",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Kucing berkata meong"
+   ]
+  },
+  {
+   "nama": "kelas Hewan bisa dipakai objek lain",
+   "kode": "Hewan h = new Hewan();\nh.nama = \"Ayam\";\nh.suara = \"kukuruyuk\";\nsama(\"Ayam berkata kukuruyuk\", h.bunyi());"
+  },
+  {
+   "nama": "objek baru belum berisi apa pun (tersembunyi)",
+   "kode": "Hewan h = new Hewan();\nsama(\"null berkata null\", h.bunyi());",
+   "tersembunyi": true
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "bab": 13,
+ "judul": "SOLID: bergantung pada abstraksi",
+ "tujuan": "Membuat kelas yang memakai interface, bukan kelas konkret (prinsip dependency inversion).",
+ "berkas": "Main.java",
+ "langkah": [
+  "Pengirim adalah interface. EmailPengirim dan SmsPengirim mengimplementasikannya.",
+  "Notifikasi tidak boleh tahu cara mengirim; ia hanya memakai Pengirim yang diberikan padanya. Ganti ____ dengan atribut yang menyimpan pengirim itu.",
+  "Tekan Jalankan, lalu Periksa praktik. Pengujinya juga mencoba pengirim baru yang belum kamu tulis."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Atribut bernama pengirim sudah dibuat dan diisi di constructor. Panggil method kirim milik atribut itu."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 13: prinsip SOLID, khususnya dependency inversion dan open-closed."
+  },
+  {
+   "jenis": "soal",
+   "isi": "return pengirim.kirim(pesan);"
+  }
+ ],
+ "awal": "// Main.java\ninterface Pengirim {\n    String kirim(String pesan);\n}\n\nclass EmailPengirim implements Pengirim {\n    public String kirim(String pesan) {\n        return \"Email: \" + pesan;\n    }\n}\n\nclass SmsPengirim implements Pengirim {\n    public String kirim(String pesan) {\n        return \"SMS: \" + pesan;\n    }\n}\n\nclass Notifikasi {\n    private Pengirim pengirim;\n\n    Notifikasi(Pengirim pengirim) {\n        this.pengirim = pengirim;\n    }\n\n    String beri(String pesan) {\n        return ____.kirim(pesan);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(new Notifikasi(new EmailPengirim()).beri(\"Halo\"));\n        System.out.println(new Notifikasi(new SmsPengirim()).beri(\"Halo\"));\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "lewat email",
+   "kode": "sama(\"Email: Halo\", new Notifikasi(new EmailPengirim()).beri(\"Halo\"));"
+  },
+  {
+   "nama": "lewat SMS",
+   "kode": "sama(\"SMS: Halo\", new Notifikasi(new SmsPengirim()).beri(\"Halo\"));"
+  },
+  {
+   "nama": "pengirim baru tanpa mengubah Notifikasi",
+   "kode": "Pengirim chat = new Pengirim() {\n    public String kirim(String pesan) {\n        return \"Chat: \" + pesan;\n    }\n};\nsama(\"Chat: Hai\", new Notifikasi(chat).beri(\"Hai\"));",
+   "tersembunyi": true
+  },
+  {
+   "nama": "program mencetak dua notifikasi",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Email: Halo",
+    "SMS: Halo"
+   ]
+  }
+ ]
+}

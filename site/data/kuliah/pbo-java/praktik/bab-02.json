@@ -1,0 +1,55 @@
+{
+ "bab": 2,
+ "judul": "Kelas Produk dengan constructor",
+ "tujuan": "Menulis constructor yang mengisi atribut dan method yang memakai atribut itu.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Kelas Produk punya atribut nama dan harga, serta method totalBayar(jumlah).",
+  "Di constructor, ganti dua ____ supaya atribut diisi dari parameter (pakai this.).",
+  "Di totalBayar, ganti ____ dengan atribut yang menjadi harga satuan.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Di dalam constructor, this.nama adalah atribut dan nama (tanpa this) adalah parameter. Isi atribut dengan parameternya."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 2: atribut, constructor, this, dan method."
+  },
+  {
+   "jenis": "soal",
+   "isi": "this.nama = nama; this.harga = harga; dan return harga * jumlah;"
+  }
+ ],
+ "awal": "// Main.java\nclass Produk {\n    String nama;\n    int harga;\n\n    Produk(String nama, int harga) {\n        this.nama = ____;\n        this.harga = ____;\n    }\n\n    int totalBayar(int jumlah) {\n        return ____ * jumlah;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Produk p = new Produk(\"Keripik\", 10000);\n        System.out.println(p.nama + \" x5 = \" + p.totalBayar(5));\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "atribut terisi dari constructor",
+   "kode": "Produk p = new Produk(\"Keripik\", 10000);\nsama(\"Keripik\", p.nama);\nsama(10000, p.harga);"
+  },
+  {
+   "nama": "total bayar",
+   "kode": "sama(50000, new Produk(\"Keripik\", 10000).totalBayar(5));"
+  },
+  {
+   "nama": "dua objek berdiri sendiri",
+   "kode": "Produk a = new Produk(\"A\", 100);\nProduk b = new Produk(\"B\", 250);\nsama(100, a.harga);\nsama(250, b.harga);\nsama(750, b.totalBayar(3));"
+  },
+  {
+   "nama": "program mencetak total",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Keripik x5 = 50000"
+   ]
+  },
+  {
+   "nama": "jumlah nol (tersembunyi)",
+   "kode": "sama(0, new Produk(\"X\", 999).totalBayar(0));",
+   "tersembunyi": true
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "bab": 8,
+ "judul": "Eksepsi: validasi umur",
+ "tujuan": "Melempar eksepsi buatan sendiri dan menangkap eksepsi bawaan dengan try dan catch.",
+ "berkas": "Main.java",
+ "langkah": [
+  "UmurTidakValidException adalah eksepsi buatan sendiri. cekUmur melemparnya bila umur di luar 0 sampai 150.",
+  "Di cekUmur, ganti ____ dengan batas atas umur yang sah.",
+  "Di keAngka, ganti ____ dengan jenis eksepsi yang dilempar Integer.parseInt untuk teks yang bukan angka.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Batas atas umur: 150. Eksepsi dari parseInt untuk teks bukan angka bernama NumberFormatException."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 8: throw, throws, try, catch, dan eksepsi buatan sendiri."
+  },
+  {
+   "jenis": "soal",
+   "isi": "umur > 150 dan catch (NumberFormatException e)."
+  }
+ ],
+ "awal": "// Main.java\nclass UmurTidakValidException extends Exception {\n    UmurTidakValidException(String pesan) {\n        super(pesan);\n    }\n}\n\nclass Validator {\n    static int cekUmur(int umur) throws UmurTidakValidException {\n        if (umur < 0 || umur > ____) {\n            throw new UmurTidakValidException(\"Umur tidak valid: \" + umur);\n        }\n        return umur;\n    }\n\n    static int keAngka(String teks) {\n        try {\n            return Integer.parseInt(teks);\n        } catch (____ e) {\n            return -1;\n        }\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"Umur sah: \" + Validator.cekUmur(20));\n            Validator.cekUmur(200);\n        } catch (UmurTidakValidException e) {\n            System.out.println(e.getMessage());\n        }\n        System.out.println(\"Angka: \" + Validator.keAngka(\"abc\"));\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "umur sah dikembalikan",
+   "kode": "sama(20, Validator.cekUmur(20));\nsama(0, Validator.cekUmur(0));\nsama(150, Validator.cekUmur(150));"
+  },
+  {
+   "nama": "umur negatif melempar eksepsi",
+   "kode": "try {\n    Validator.cekUmur(-1);\n    cek(false, \"umur -1 harus melempar UmurTidakValidException\");\n} catch (UmurTidakValidException e) {\n    sama(\"Umur tidak valid: -1\", e.getMessage());\n}"
+  },
+  {
+   "nama": "umur terlalu besar melempar eksepsi",
+   "kode": "try {\n    Validator.cekUmur(151);\n    cek(false, \"umur 151 harus melempar UmurTidakValidException\");\n} catch (UmurTidakValidException e) {\n}"
+  },
+  {
+   "nama": "teks angka diubah dan teks lain menjadi -1",
+   "kode": "sama(12, Validator.keAngka(\"12\"));\nsama(-1, Validator.keAngka(\"abc\"));"
+  },
+  {
+   "nama": "program menangkap eksepsi",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Umur sah: 20",
+    "Umur tidak valid: 200",
+    "Angka: -1"
+   ]
+  }
+ ]
+}

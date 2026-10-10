@@ -18,6 +18,7 @@ import { renderInstruktur } from "./instruktur.js";
 import * as PraktikUI from "./praktik-ui.js";
 import * as PraktikData from "./praktik-data.js";
 import * as Kunci from "./kunci.js";
+import * as LaporanAkhirUI from "./laporan-akhir-ui.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
 // Progres ditulis ke sini lebih dulu, lalu disusulkan ke Supabase oleh sinkron.js.
@@ -976,7 +977,8 @@ function renderCourse(c) {
     ),
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
-    ready ? babGrid() : null
+    ready ? babGrid() : null,
+    ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
   ].filter(Boolean));
 }
 

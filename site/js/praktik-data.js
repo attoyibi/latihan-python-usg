@@ -60,7 +60,7 @@ export const statusLokal = (store, mk, bab) => statusDari(bacaLokal(store, mk, b
 
 // ---------- antrean ke server ----------
 let uid = null;
-let antre = { berkas: {}, tahap: {}, versi: [] };
+let antre = { berkas: {}, tahap: {}, versi: [], laporan: {} };
 let timer = null;
 let berjalan = false;
 let tabelAda = true;
@@ -72,10 +72,10 @@ function pakaiAkun() {
   const u = Auth.getUserId();
   if (u === uid) return;
   uid = u;
-  antre = { berkas: {}, tahap: {}, versi: [] };
+  antre = { berkas: {}, tahap: {}, versi: [], laporan: {} };
   try {
     const x = JSON.parse(localStorage.getItem(kunciAntrean(u)) || "null");
-    if (x) antre = Object.assign(antre, { berkas: x.berkas || {}, tahap: x.tahap || {}, versi: x.versi || [] });
+    if (x) antre = Object.assign(antre, { berkas: x.berkas || {}, tahap: x.tahap || {}, versi: x.versi || [], laporan: x.laporan || {} });
   } catch (e) {}
 }
 const simpanAntrean = () => {
@@ -103,6 +103,15 @@ export function sinkronkan(mk, bab, def, s, versi = null) {
   jadwalkan(versi ? 0 : JEDA_MS);
 }
 
+/** Form akhir (laporan akhir) disimpan di praktikum_laporan dengan praktikum_id "akhir". baris: kolom tabel tanpa user_id. */
+export function antreLaporanAkhir(mk, baris) {
+  if (!aktif() || !tabelAda) return;
+  pakaiAkun();
+  antre.laporan[mk] = Object.assign({ matakuliah_id: mk, praktikum_id: "akhir" }, baris);
+  simpanAntrean();
+  jadwalkan(JEDA_MS);
+}
+
 // Galat data tidak akan berhasil walau diulang: dibuang supaya tidak menyumbat. Tabel belum ada: berhenti mencoba.
 const galatPermanen = (e) => !!e && typeof e.code === "string" && (e.code.startsWith("22") || e.code === "23514" || e.code === "23502" || e.code === "23503");
 export const tabelBelumAda = (e) => !!e && (e.code === "42P01" || e.code === "PGRST205" || /relation .* does not exist|could not find the table/i.test(String(e.message || "")));
@@ -110,7 +119,7 @@ export const tabelBelumAda = (e) => !!e && (e.code === "42P01" || e.code === "PG
 export async function kirimSekarang() {
   if (berjalan || !aktif() || !tabelAda) return;
   pakaiAkun();
-  const adaIsi = () => Object.keys(antre.berkas).length || Object.keys(antre.tahap).length || antre.versi.length;
+  const adaIsi = () => Object.keys(antre.berkas).length || Object.keys(antre.tahap).length || antre.versi.length || Object.keys(antre.laporan).length;
   if (!adaIsi()) return;
   berjalan = true;
   const klien = Auth.getClient();
@@ -136,6 +145,12 @@ export async function kirimSekarang() {
       const { error } = await klien.from("praktikum_tahap").upsert(tahap.map(([, r]) => dengan(r)), { onConflict: "user_id,matakuliah_id,praktikum_id,tahap_id" });
       periksa(error);
       for (const [k, v] of tahap) if (antre.tahap[k] === v) delete antre.tahap[k];
+    }
+    const lap = Object.entries(antre.laporan);
+    if (lap.length) {
+      const { error } = await klien.from("praktikum_laporan").upsert(lap.map(([, r]) => dengan(r)), { onConflict: "user_id,matakuliah_id,praktikum_id" });
+      periksa(error);
+      for (const [k, v] of lap) if (antre.laporan[k] === v) delete antre.laporan[k];
     }
     while (antre.versi.length) {
       const bagian = antre.versi.slice(0, BATCH_VERSI);

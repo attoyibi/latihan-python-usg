@@ -69,6 +69,10 @@ Perlu migrasi `0006_kehadiran.sql`. Rincian cara kerja, aturan hitung, dan batas
 
 Perlu migrasi `0008_praktikum.sql`. Matriks peserta × bab praktik (lulus, sedang, belum), jumlah kirim, bab yang paling sering macet, klik simbol untuk melihat kode praktik peserta (hanya baca), dan unduh CSV. Rincian di [PRAKTIK.md](PRAKTIK.md).
 
+## Tab Laporan akhir
+
+Satu baris per peserta: latihan lulus, praktik lulus, refleksi bab, form akhir, dan sudah diekspor atau belum. *Buka laporan* menampilkan laporan akhir lengkap (kode latihan dan praktik tiap bab, refleksi, form akhir) dan tombol *Unduh PDF*; ada juga unduh CSV. Hanya dibaca. Rincian di [PRAKTIK.md](PRAKTIK.md).
+
 ## Tab Jejak peserta dan Riset
 
 Perlu migrasi `0007_riset_perilaku.sql`. Rincian ada di [RISET-PERILAKU.md](RISET-PERILAKU.md). **Jejak peserta** menampilkan semua peserta yang masuk (termasuk yang belum mengerjakan apa pun); tiap peserta bisa dibuka menjadi riwayat satu baris per Jalankan atau Kirim dengan kolom yang bisa dipilih (Waktu, Bab, Hasil, Mengetik, Dihapus, Linier, Lompat, Jalankan, dan lainnya) dan dapat diputar ulang cara menulisnya. **Riset** hanya memuat peserta yang menyetujui: ringkasan kohort dan ekspor data anonim (CSV atau JSON, beserta kamus data).

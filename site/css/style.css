@@ -577,3 +577,14 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 .pk-kerja-grid>*{min-width:0}
 .pk-nama{overflow-wrap:anywhere;min-width:0}
 @media (max-width:760px){.pk-berkas{grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr))}}
+
+/* Laporan akhir: kartu di halaman mata kuliah dan pratinjau di dashboard */
+.la-kartu{margin-top:24px}
+.la-dok{margin-top:10px}
+.la-dok h3{margin:0 0 8px}
+.la-dok h4{margin:16px 0 4px;font-size:15px}
+.la-dok p{margin:4px 0}
+.la-dok .pk-keluaran{min-height:0;font-size:12px}
+.la-kv{border-collapse:collapse;font-size:13px;margin:6px 0}
+.la-kv th{text-align:left;padding:2px 14px 2px 0;color:var(--muted);font-weight:500}
+.la-kv td{padding:2px 0}

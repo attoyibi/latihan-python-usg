@@ -96,6 +96,9 @@ def main():
     per_kuliah = {}
     for f in daftar:
         kuliah = os.path.basename(os.path.dirname(os.path.dirname(f)))
+        daftar_mk = json.load(open(os.path.join(RAKAR, "site", "data", "matakuliah.json"), encoding="utf8"))
+        if next((c.get("bahasa") for c in daftar_mk if c["id"] == kuliah), None) != "python":
+            continue  # praktik Java diuji dengan JVM: tools/uji_praktik_java.mjs
         materi = json.load(open(os.path.join(RAKAR, "site", "data", "kuliah", kuliah, "materi.json"), encoding="utf8"))
         babs_kode = {m["bab"] for m in materi if m.get("jenis") == "kode"}
         p = json.load(open(f, encoding="utf8"))
@@ -108,6 +111,8 @@ def main():
         per_kuliah.setdefault(kuliah, []).append(p["bab"])
     for idx in glob.glob(os.path.join(RAKAR, "site", "data", "kuliah", "*", "praktik", "index.json")):
         kuliah = os.path.basename(os.path.dirname(os.path.dirname(idx)))
+        if kuliah not in per_kuliah:
+            continue  # bukan Python (Java diuji tools/uji_praktik_java.mjs)
         data = json.load(open(idx, encoding="utf8"))
         cek(kuliah + "/praktik/index.json cocok dengan berkas bab-NN.json yang ada", sorted(data.get("bab", [])) == sorted(per_kuliah.get(kuliah, [])), (data, per_kuliah.get(kuliah)))
     print(("\n%d dari %d uji GAGAL." % (gagal, total)) if gagal else "\nSemua %d uji lulus." % total)

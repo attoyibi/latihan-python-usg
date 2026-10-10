@@ -1,0 +1,55 @@
+{
+ "bab": 7,
+ "judul": "Abstraksi: cara pembayaran",
+ "tujuan": "Melengkapi kelas abstrak dengan method abstrak yang diimplementasikan kelas turunan.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Pembayaran adalah kelas abstrak: biaya() belum punya isi, total() memakainya.",
+  "Tunai tidak dikenai biaya: ganti ____ dengan nilai yang tepat.",
+  "Transfer dikenai biaya tetap Rp2500: ganti ____ dengan nilainya.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Tunai biayanya 0. Transfer biayanya 2500, berapa pun tagihannya."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 7: abstract class, method abstrak, dan mengapa objeknya tidak bisa dibuat langsung."
+  },
+  {
+   "jenis": "soal",
+   "isi": "return 0; pada Tunai dan return 2500; pada Transfer."
+  }
+ ],
+ "awal": "// Main.java\nabstract class Pembayaran {\n    abstract int biaya(int tagihan);\n\n    int total(int tagihan) {\n        return tagihan + biaya(tagihan);\n    }\n}\n\nclass Tunai extends Pembayaran {\n    @Override\n    int biaya(int tagihan) {\n        return ____;\n    }\n}\n\nclass Transfer extends Pembayaran {\n    @Override\n    int biaya(int tagihan) {\n        return ____;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Pembayaran[] cara = { new Tunai(), new Transfer() };\n        for (Pembayaran p : cara) {\n            System.out.println(\"Total: \" + p.total(10000));\n        }\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "Pembayaran abstrak",
+   "kode": "cek(abstrak(Pembayaran.class), \"Pembayaran harus abstract\");"
+  },
+  {
+   "nama": "tunai tanpa biaya",
+   "kode": "sama(10000, new Tunai().total(10000));"
+  },
+  {
+   "nama": "transfer dengan biaya tetap",
+   "kode": "sama(12500, new Transfer().total(10000));"
+  },
+  {
+   "nama": "dipakai lewat tipe abstrak",
+   "kode": "Pembayaran p = new Transfer();\nsama(2500, p.biaya(1));\nsama(7500 + 2500, p.total(7500));"
+  },
+  {
+   "nama": "program mencetak dua total",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Total: 10000",
+    "Total: 12500"
+   ]
+  }
+ ]
+}

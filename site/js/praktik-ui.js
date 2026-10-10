@@ -7,6 +7,7 @@ import { h } from "./dom.js";
 import * as Anticopas from "./anticopas.js";
 import * as Sinkron from "./sinkron.js";
 import { runProyek } from "./runner.js";
+import { runProyekJava } from "./javarunner.js";
 import { ambilKunci } from "./kunci.js";
 import * as P from "./praktik.js";
 import * as D from "./praktik-data.js";
@@ -39,7 +40,7 @@ function tombolKonfirmasi(label, tanya, aksi) {
   return kotak;
 }
 
-function pasangEditor(holder, isi, saatUbah, jaga) {
+function pasangEditor(holder, isi, saatUbah, jaga, java) {
   if (typeof CodeMirror === "undefined") {
     const ta = h("textarea", { class: "input pk-teks", rows: "14", spellcheck: "false", "aria-label": "Kode praktik" });
     ta.value = isi;
@@ -55,7 +56,7 @@ function pasangEditor(holder, isi, saatUbah, jaga) {
   }
   const cm = CodeMirror(holder, {
     value: isi,
-    mode: "python",
+    mode: java ? "text/x-java" : "python",
     lineNumbers: true,
     lineWrapping: typeof matchMedia !== "undefined" && matchMedia("(max-width: 900px)").matches,
     indentUnit: 4,
@@ -81,7 +82,9 @@ export function kartuPraktik(ctx, def) {
   let ed = null;
   let kotor = false; // peserta sudah mengetik di sesi ini: penyusulan dari server tidak boleh menimpa
   const simpan = () => D.simpanLokal(ctx.store, mk, bab, s);
-  const bisaJalan = def.kasus.some((k) => k.jalankan);
+  const java = ctx.kuliah.bahasa === "java";
+  const jalankanProyek = java ? runProyekJava : runProyek;
+  const bisaJalan = java || def.kasus.some((k) => k.jalankan);
 
   const statusChip = h("span", { class: "pk-status" });
   const segarStatus = () => {
@@ -112,7 +115,7 @@ export function kartuPraktik(ctx, def) {
   gambarHint();
 
   const holder = h("div", { class: "pk-editor" });
-  const stdin = h("textarea", { class: "input pk-masukan", rows: "2", "aria-label": "Masukan untuk program", spellcheck: "false", placeholder: "Masukan untuk input(), satu baris per pertanyaan" });
+  const stdin = h("textarea", { class: "input pk-masukan", rows: "2", "aria-label": "Masukan untuk program", spellcheck: "false", placeholder: java ? "Masukan untuk Scanner, satu baris per pertanyaan (boleh kosong)" : "Masukan untuk input(), satu baris per pertanyaan" });
   stdin.value = def.masukanContoh || "";
   const keluaran = h("pre", { class: "pk-keluaran", "aria-live": "polite", tabindex: "0" }, "Keluaran program akan tampil di sini.");
   const hasilBox = h("div", { class: "pk-hasil", "aria-live": "polite" });
@@ -147,7 +150,7 @@ export function kartuPraktik(ctx, def) {
   const jaga = { kecualikan: () => instruktur, saatTempel: () => Sinkron.aktivitas(mk, bab, "tempel_diblokir", { lokasi: "praktik" }) };
   const siapkanEditor = () => {
     if (ed) return;
-    ed = pasangEditor(holder, s.isi !== null ? s.isi : def.awal, saatUbah, jaga);
+    ed = pasangEditor(holder, s.isi !== null ? s.isi : def.awal, saatUbah, jaga, java);
   };
   const isiSaatIni = () => (ed ? ed.nilai() : s.isi !== null ? s.isi : def.awal);
 
@@ -157,7 +160,7 @@ export function kartuPraktik(ctx, def) {
     jalanBtn.textContent = "Menjalankan";
     keluaran.textContent = "";
     try {
-      const r = await runProyek({ [def.berkas]: isiSaatIni() }, { aksi: "jalankan", entri: def.berkas, masukan: stdin.value ? stdin.value.split("\n") : [] });
+      const r = await jalankanProyek({ [def.berkas]: isiSaatIni() }, { aksi: "jalankan", entri: def.berkas, masukan: stdin.value ? stdin.value.split("\n") : [] });
       let teks;
       if (r.timeout) teks = "Program berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan.";
       else if (r.error) teks = r.error;
@@ -178,7 +181,7 @@ export function kartuPraktik(ctx, def) {
     hasilBox.replaceChildren();
     try {
       const isi = isiSaatIni();
-      const r = await runProyek({ [def.berkas]: isi }, { aksi: "kasus", kasus: def.kasus });
+      const r = await jalankanProyek({ [def.berkas]: isi }, { aksi: "kasus", kasus: def.kasus });
       if (r.timeout || r.error || !r.proyek) {
         hasilBox.replaceChildren(h("p", { class: "form-msg" }, r.timeout ? "Pemeriksaan berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan." : r.error || "Pemeriksaan tidak menghasilkan apa-apa. Coba lagi."));
         return;
@@ -240,7 +243,7 @@ export function kartuPraktik(ctx, def) {
     langkah,
     h("p", { class: "muted" }, "Berkas: " + def.berkas),
     holder,
-    bisaJalan ? h("label", { for: "pk-masukan-" + bab, class: "muted" }, "Masukan untuk tombol Jalankan (satu baris untuk setiap input)") : null,
+    bisaJalan ? h("label", { for: "pk-masukan-" + bab, class: "muted" }, java ? "Masukan untuk tombol Jalankan (satu baris untuk setiap pembacaan Scanner)" : "Masukan untuk tombol Jalankan (satu baris untuk setiap input)") : null,
     bisaJalan ? stdin : null,
     h("div", { class: "actions" }, jalanBtn, periksaBtn, kembaliBtn, kunciBtn),
     keluaran,

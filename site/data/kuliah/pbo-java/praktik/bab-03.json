@@ -1,0 +1,58 @@
+{
+ "bab": 3,
+ "judul": "Enkapsulasi: Rekening yang aman",
+ "tujuan": "Menyembunyikan atribut dengan private dan menjaga aturan data lewat method.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Atribut saldo sudah private; ia hanya boleh berubah lewat method setor dan tarik.",
+  "Di setor, ganti ____ dengan batas yang membuat setoran nol atau negatif ditolak.",
+  "Di tarik, ganti ____ dengan nilai yang dikembalikan bila penarikan berhasil.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Setoran hanya sah bila jumlahnya lebih besar dari 0. tarik mengembalikan true bila berhasil, false bila saldo tidak cukup."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 3: private, getter, dan validasi di dalam method."
+  },
+  {
+   "jenis": "soal",
+   "isi": "if (jumlah > 0) pada setor dan return true; pada tarik."
+  }
+ ],
+ "awal": "// Main.java\nclass Rekening {\n    private int saldo;\n\n    Rekening(int saldoAwal) {\n        this.saldo = saldoAwal;\n    }\n\n    int getSaldo() {\n        return saldo;\n    }\n\n    void setor(int jumlah) {\n        if (jumlah > ____) {\n            saldo += jumlah;\n        }\n    }\n\n    boolean tarik(int jumlah) {\n        if (jumlah > 0 && jumlah <= saldo) {\n            saldo -= jumlah;\n            return ____;\n        }\n        return false;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Rekening r = new Rekening(1000);\n        r.setor(500);\n        System.out.println(\"Saldo: \" + r.getSaldo());\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "saldo private",
+   "kode": "cek(privat(Rekening.class, \"saldo\"), \"atribut saldo harus private\");"
+  },
+  {
+   "nama": "setor menambah saldo",
+   "kode": "Rekening r = new Rekening(1000);\nr.setor(500);\nsama(1500, r.getSaldo());"
+  },
+  {
+   "nama": "setoran nol atau negatif ditolak",
+   "kode": "Rekening r = new Rekening(1000);\nr.setor(0);\nr.setor(-50);\nsama(1000, r.getSaldo());"
+  },
+  {
+   "nama": "tarik berhasil",
+   "kode": "Rekening r = new Rekening(1000);\ncek(r.tarik(400), \"penarikan 400 dari 1000 harus berhasil\");\nsama(600, r.getSaldo());"
+  },
+  {
+   "nama": "tarik melebihi saldo gagal dan saldo tetap",
+   "kode": "Rekening r = new Rekening(100);\ncek(!r.tarik(500), \"penarikan melebihi saldo harus gagal\");\nsama(100, r.getSaldo());"
+  },
+  {
+   "nama": "program mencetak saldo",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Saldo: 1500"
+   ]
+  }
+ ]
+}

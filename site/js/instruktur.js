@@ -9,6 +9,7 @@ import * as KehadiranUI from "./kehadiran-ui.js";
 import * as JejakUI from "./jejak-ui.js";
 import * as RisetUI from "./riset-ui.js";
 import * as PraktikDash from "./praktik-dash-ui.js";
+import * as LaporanAkhirDash from "./laporan-akhir-ui.js";
 import { kolomBelumAda } from "./sinkron.js";
 import { SEL, SEL_TEKS, susunRekap, saringPeserta, pilihanSaringan, buatCsv, ambilSemua, AMBANG_TERSANGKUT } from "./rekap.js";
 
@@ -86,6 +87,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     JejakUI.reset();
     RisetUI.reset();
     PraktikDash.reset();
+    LaporanAkhirDash.reset();
     await muat(keadaan.cid);
     tampilkan(main, kuliahAktif, kuliah);
   };
@@ -100,6 +102,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     JejakUI.reset();
     RisetUI.reset();
     PraktikDash.reset();
+    LaporanAkhirDash.reset();
     keadaan.saring = { prodi: "", angkatan: "", rombel: "", cari: "" };
     renderInstruktur({ kuliahAktif });
   });
@@ -113,13 +116,17 @@ function tampilkan(main, kuliahAktif, kuliah) {
     "section",
     { class: "card" },
     h("h2", {}, "Dashboard instruktur"),
-    h("p", { class: "muted" }, keadaan.tab === "jejak" ? "Semua peserta yang masuk, apa yang mereka kerjakan (berhasil maupun gagal), dan putar ulang cara mereka menulis." : keadaan.tab === "praktik" ? "Kemajuan peserta pada praktik tiap bab: yang sudah lulus, yang macet, dan kode praktik mereka." : keadaan.tab === "riset" ? "Perilaku belajar peserta yang menyetujui, dan ekspor data anonim untuk penelitian." : keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
-    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran"), tab("jejak", "Jejak peserta"), tab("riset", "Riset"), tab("praktik", "Praktik")),
+    h("p", { class: "muted" }, keadaan.tab === "jejak" ? "Semua peserta yang masuk, apa yang mereka kerjakan (berhasil maupun gagal), dan putar ulang cara mereka menulis." : keadaan.tab === "akhir" ? "Laporan akhir tiap peserta: gabungan semua bab (kode latihan, kode praktik, refleksi) dan form akhir, bisa dibuka dan diunduh sebagai PDF." : keadaan.tab === "praktik" ? "Kemajuan peserta pada praktik tiap bab: yang sudah lulus, yang macet, dan kode praktik mereka." : keadaan.tab === "riset" ? "Perilaku belajar peserta yang menyetujui, dan ekspor data anonim untuk penelitian." : keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
+    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran"), tab("jejak", "Jejak peserta"), tab("riset", "Riset"), tab("praktik", "Praktik"), tab("akhir", "Laporan akhir")),
     h("div", { class: "filters" }, h("label", {}, "Mata kuliah ", selKuliah), h("button", { type: "button", class: "btn btn-sm", onclick: baru }, "Muat ulang"))
   );
 
   if (keadaan.tab === "jejak") {
     JejakUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null });
+    return;
+  }
+  if (keadaan.tab === "akhir") {
+    LaporanAkhirDash.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null });
     return;
   }
   if (keadaan.tab === "praktik") {

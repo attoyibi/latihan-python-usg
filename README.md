@@ -77,7 +77,8 @@ kunci/                Kunci jawaban (TIDAK diterbitkan, ada di .gitignore)
 - [Sistem desain](docs/DESIGN.md)
 - [Analisis dan rencana](docs/ANALISIS-DAN-RENCANA.md)
 - [Riset video pengganti](docs/RISET-VIDEO-PENGGANTI.md)
-- [Praktik per bab](docs/PRAKTIK.md)
+- [Praktik per bab dan laporan akhir](docs/PRAKTIK.md)
+- [Uji lapangan (Supabase dan ponsel sungguhan)](docs/UJI-LAPANGAN.md)
 - [Rubrik tugas akhir PBO (usulan)](docs/RUBRIK-PBO.md)
 
 ## Keterbatasan yang perlu diketahui

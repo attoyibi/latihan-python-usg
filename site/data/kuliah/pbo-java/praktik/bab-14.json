@@ -1,0 +1,51 @@
+{
+ "bab": 14,
+ "judul": "Design pattern: Singleton",
+ "tujuan": "Menulis kelas yang hanya boleh punya satu objek: constructor private dan satu instance bersama.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Konfigurasi hanya boleh punya satu objek. Constructornya private, dan objek dibuat lewat get().",
+  "Di get(), ganti ____ dengan kelas yang dibuat saat instance masih kosong.",
+  "Tekan Jalankan, lalu Periksa praktik. Pengujinya memastikan dua pemanggilan get() memberi objek yang sama."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Setelah new, tulis nama kelasnya sendiri dengan tanda kurung. Constructor private hanya bisa dipanggil dari dalam kelas itu."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 14: pola Singleton, atribut static, dan constructor private."
+  },
+  {
+   "jenis": "soal",
+   "isi": "instance = new Konfigurasi();"
+  }
+ ],
+ "awal": "// Main.java\nclass Konfigurasi {\n    private static Konfigurasi instance;\n    private String nama = \"default\";\n\n    private Konfigurasi() {\n    }\n\n    static Konfigurasi get() {\n        if (instance == null) {\n            instance = new ____();\n        }\n        return instance;\n    }\n\n    String getNama() {\n        return nama;\n    }\n\n    void setNama(String nama) {\n        this.nama = nama;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Konfigurasi.get().setNama(\"Gresik\");\n        System.out.println(Konfigurasi.get().getNama());\n        System.out.println(Konfigurasi.get() == Konfigurasi.get());\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "dua pemanggilan memberi objek yang sama",
+   "kode": "cek(Konfigurasi.get() == Konfigurasi.get(), \"get() harus mengembalikan objek yang sama\");"
+  },
+  {
+   "nama": "perubahan terlihat dari mana saja",
+   "kode": "Konfigurasi.get().setNama(\"Surabaya\");\nsama(\"Surabaya\", Konfigurasi.get().getNama());"
+  },
+  {
+   "nama": "constructor private",
+   "kode": "cek(java.lang.reflect.Modifier.isPrivate(Konfigurasi.class.getDeclaredConstructor().getModifiers()), \"constructor harus private\");",
+   "tersembunyi": true
+  },
+  {
+   "nama": "program mencetak nama dan kesamaan",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Gresik",
+    "true"
+   ]
+  }
+ ]
+}

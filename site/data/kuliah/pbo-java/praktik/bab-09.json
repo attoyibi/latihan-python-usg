@@ -1,0 +1,55 @@
+{
+ "bab": 9,
+ "judul": "Collection: daftar dan penghitung kata",
+ "tujuan": "Memakai ArrayList dan HashMap dengan generics.",
+ "berkas": "Main.java",
+ "langkah": [
+  "DaftarNama menyimpan nama dalam ArrayList. Ganti dua ____ dengan method list untuk menambah elemen dan menghitung banyaknya.",
+  "Frekuensi.hitung menghitung berapa kali tiap kata muncul dengan HashMap. Ganti ____ dengan angka yang menambah hitungan.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "Method list: add(elemen) menambah dan size() memberi banyaknya. Setiap kemunculan kata menambah hitungannya satu."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 9: ArrayList, HashMap, getOrDefault, dan tipe generics."
+  },
+  {
+   "jenis": "soal",
+   "isi": "daftar.add(nama), daftar.size(), dan getOrDefault(k, 0) + 1."
+  }
+ ],
+ "awal": "// Main.java\nimport java.util.*;\n\nclass DaftarNama {\n    private List<String> daftar = new ArrayList<>();\n\n    void tambah(String nama) {\n        daftar.____(nama);\n    }\n\n    int banyak() {\n        return daftar.____();\n    }\n\n    boolean ada(String nama) {\n        return daftar.contains(nama);\n    }\n}\n\nclass Frekuensi {\n    static Map<String, Integer> hitung(List<String> kata) {\n        Map<String, Integer> hasil = new HashMap<>();\n        for (String k : kata) {\n            hasil.put(k, hasil.getOrDefault(k, 0) + ____);\n        }\n        return hasil;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        DaftarNama d = new DaftarNama();\n        d.tambah(\"Sari\");\n        d.tambah(\"Budi\");\n        System.out.println(\"Banyak: \" + d.banyak());\n        System.out.println(Frekuensi.hitung(Arrays.asList(\"a\", \"b\", \"a\")).get(\"a\"));\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "tambah dan banyak",
+   "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\nd.tambah(\"Budi\");\nsama(2, d.banyak());\ncek(d.ada(\"Sari\"), \"Sari harus ada\");\ncek(!d.ada(\"Ani\"), \"Ani tidak ada\");"
+  },
+  {
+   "nama": "daftar kosong",
+   "kode": "sama(0, new DaftarNama().banyak());"
+  },
+  {
+   "nama": "frekuensi kata",
+   "kode": "Map<String, Integer> m = Frekuensi.hitung(Arrays.asList(\"a\", \"b\", \"a\", \"c\", \"a\"));\nsama(3, m.get(\"a\"));\nsama(1, m.get(\"b\"));\nsama(1, m.get(\"c\"));"
+  },
+  {
+   "nama": "frekuensi tanpa kata (tersembunyi)",
+   "kode": "sama(0, Frekuensi.hitung(new ArrayList<String>()).size());",
+   "tersembunyi": true
+  },
+  {
+   "nama": "program mencetak banyak dan hitungan",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Banyak: 2",
+    "2"
+   ]
+  }
+ ]
+}

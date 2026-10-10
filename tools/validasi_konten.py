@@ -124,6 +124,7 @@ def cek_materi(c):
 
 
 NAMA_BERKAS_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}\.py$")
+NAMA_JAVA_RE = re.compile(r"^Main\.java$")  # praktik Java: satu berkas Main.java (kelas bantu boleh di dalamnya, kelas publiknya Main)
 
 
 def cek_praktik(c, materi):
@@ -138,8 +139,8 @@ def cek_praktik(c, materi):
     if not folder.exists():
         return
     pre = f"kuliah/{cid}/praktik"
-    if c.get("bahasa") != "python":
-        err(f"{pre}: saat ini praktik hanya didukung untuk mata kuliah berbahasa python")
+    if c.get("bahasa") not in ("python", "java"):
+        err(f"{pre}: praktik hanya didukung untuk mata kuliah berbahasa python atau java")
     babs_kode = {m.get("bab") for m in materi if m.get("jenis") == "kode"}
     indeks = load(folder / "index.json")
     daftar = []
@@ -155,10 +156,10 @@ def cek_praktik(c, materi):
         w = f"{pre}/bab-{b:02d}.json"
         pk = load(folder / f"bab-{b:02d}.json")
         if pk is not None:
-            cek_satu_praktik(b, pk, babs_kode, w)
+            cek_satu_praktik(b, pk, babs_kode, w, c.get("bahasa"))
 
 
-def cek_satu_praktik(bab, pk, babs_kode, w):
+def cek_satu_praktik(bab, pk, babs_kode, w, bahasa="python"):
     if pk.get("bab") != bab:
         err(f"{w}: kolom bab ({pk.get('bab')!r}) harus sama dengan nomor pada nama berkas ({bab})")
     if bab not in babs_kode:
@@ -167,9 +168,10 @@ def cek_satu_praktik(bab, pk, babs_kode, w):
         if not pk.get(k):
             err(f"{w}: kolom '{k}' tidak ada atau kosong")
     if "contoh" in pk:
-        err(f"{w}: contoh jawaban tidak boleh ada di situs (publik); simpan di kunci/<mata kuliah>/praktik-{bab:02d}.py")
-    if not isinstance(pk.get("berkas"), str) or not NAMA_BERKAS_RE.fullmatch(pk.get("berkas", "")):
-        err(f"{w}: 'berkas' harus nama berkas .py yang sah (huruf, angka, titik, strip, garis bawah)")
+        err(f"{w}: contoh jawaban tidak boleh ada di situs (publik); simpan di kunci/<mata kuliah>/praktik-{bab:02d}.{'java' if bahasa == 'java' else 'py'}")
+    pola = NAMA_JAVA_RE if bahasa == "java" else NAMA_BERKAS_RE
+    if not isinstance(pk.get("berkas"), str) or not pola.fullmatch(pk.get("berkas", "")):
+        err(f"{w}: 'berkas' harus " + ("Main.java" if bahasa == "java" else "nama berkas .py yang sah (huruf, angka, titik, strip, garis bawah)"))
     if not isinstance(pk.get("awal"), str) or "____" not in pk.get("awal", "") or len(pk.get("awal", "")) > 8000:
         err(f"{w}: 'awal' harus kerangka kode (teks, maksimal 8000 karakter) yang memuat tanda ____")
     if not isinstance(pk.get("masukanContoh", ""), str):
@@ -188,8 +190,9 @@ def cek_satu_praktik(bab, pk, babs_kode, w):
         y = f"{w}.kasus[{j}]"
         if ("kode" in k) == ("jalankan" in k):
             err(f"{y}: isi tepat salah satu dari 'kode' atau 'jalankan'")
-        if "jalankan" in k and k["jalankan"] != pk.get("berkas"):
-            err(f"{y}: 'jalankan' harus berkas praktik ini ({pk.get('berkas')})")
+        alvo = "Main" if bahasa == "java" else pk.get("berkas")
+        if "jalankan" in k and k["jalankan"] != alvo:
+            err(f"{y}: 'jalankan' harus {alvo}")
 
 
 def cek_konsep(w, ch):

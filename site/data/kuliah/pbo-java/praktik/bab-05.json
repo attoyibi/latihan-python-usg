@@ -1,0 +1,54 @@
+{
+ "bab": 5,
+ "judul": "Pewarisan: Kendaraan dan Motor",
+ "tujuan": "Membuat kelas turunan yang memanggil constructor induk dan memakai method induk.",
+ "berkas": "Main.java",
+ "langkah": [
+  "Kendaraan adalah kelas induk. Motor mewarisinya (extends) dan selalu punya 2 roda.",
+  "Di constructor Motor, ganti ____ dengan jumlah roda yang dikirim ke constructor induk.",
+  "Di info() milik Motor, ganti ____ dengan kata kunci untuk memanggil method milik induk.",
+  "Tekan Jalankan, lalu Periksa praktik."
+ ],
+ "masukanContoh": "",
+ "petunjuk": [
+  {
+   "jenis": "soal",
+   "isi": "super(...) memanggil constructor induk. Untuk memanggil method induk yang sama namanya, awali dengan super diikuti titik."
+  },
+  {
+   "jenis": "buku",
+   "isi": "Buku Bab 5: extends, super, dan overriding."
+  },
+  {
+   "jenis": "soal",
+   "isi": "super(2); dan super.info()."
+  }
+ ],
+ "awal": "// Main.java\nclass Kendaraan {\n    protected int roda;\n\n    Kendaraan(int roda) {\n        this.roda = roda;\n    }\n\n    String info() {\n        return roda + \" roda\";\n    }\n}\n\nclass Motor extends Kendaraan {\n    Motor() {\n        super(____);\n    }\n\n    @Override\n    String info() {\n        return \"Motor: \" + ____.info();\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Kendaraan k = new Motor();\n        System.out.println(k.info());\n    }\n}\n",
+ "kasus": [
+  {
+   "nama": "motor punya dua roda",
+   "kode": "sama(2, new Motor().roda);"
+  },
+  {
+   "nama": "info motor memakai info induk",
+   "kode": "sama(\"Motor: 2 roda\", new Motor().info());"
+  },
+  {
+   "nama": "motor adalah kendaraan",
+   "kode": "Kendaraan k = new Motor();\ncek(k instanceof Motor, \"objek harus bertipe Motor\");\nsama(\"Motor: 2 roda\", k.info());"
+  },
+  {
+   "nama": "kendaraan biasa tetap bekerja",
+   "kode": "sama(\"4 roda\", new Kendaraan(4).info());"
+  },
+  {
+   "nama": "program mencetak info",
+   "jalankan": "Main",
+   "masukan": [],
+   "memuat": [
+    "Motor: 2 roda"
+   ]
+  }
+ ]
+}
