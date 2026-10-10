@@ -599,3 +599,50 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 /* Kredit pembuat (footer semua halaman) */
 footer.pembuat{border-top:1px solid var(--line);padding:14px 16px 22px;text-align:center;font-size:13px;color:var(--muted)}
 footer.pembuat a{color:var(--brand-strong);font-weight:600}
+
+/* Promo silang ke situs pembuat: maskot kurir + kotak hook (site/js/promo.js). Kecil, di pojok, hilang sendiri. */
+.promo{position:fixed;right:14px;bottom:14px;z-index:60;display:flex;align-items:flex-end;gap:6px;max-width:calc(100vw - 28px);pointer-events:none}
+.promo-maskot{flex:0 0 auto;width:58px;height:58px;transform:translateX(130px);opacity:0;transition:transform .7s cubic-bezier(.2,1.25,.4,1),opacity .3s;filter:drop-shadow(0 6px 10px rgba(8,60,60,.3))}
+.promo-maskot svg{width:100%;height:100%;overflow:visible}
+.promo.datang .promo-maskot{transform:none;opacity:1;animation:mk-lompat 1.1s .7s ease-in-out 2}
+.mk-tutup{transform-origin:50px 40px;transition:transform .35s}
+.promo.buka .mk-tutup{transform:scaleY(-.9) translateY(-1px)}
+.promo.buka .mk-amplop{animation:mk-goyang .5s ease-in-out 2}
+.mk-antena{animation:mk-kedip 1.2s ease-in-out infinite}
+.mk-mata{transform-origin:center;transform-box:fill-box;animation:mk-kedip-mata 3.2s infinite}
+.promo-kotak{position:relative;overflow:hidden;width:min(272px,calc(100vw - 108px));background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);transform-origin:100% 100%;transform:scale(.4);opacity:0;visibility:hidden;transition:transform .45s cubic-bezier(.2,1.3,.4,1),opacity .25s,visibility 0s .45s;pointer-events:none}
+.promo.kotak .promo-kotak{transform:none;opacity:1;visibility:visible;transition-delay:0s;pointer-events:auto}
+.promo-kotak::before{content:"";position:absolute;inset:0;border-radius:14px;padding:2px;background:linear-gradient(110deg,var(--brand),var(--accent),var(--brand));background-size:250% 100%;animation:pr-garis 2.4s linear infinite;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.promo-tautan{display:flex;flex-direction:column;gap:3px;padding:12px 30px 22px 14px;color:inherit;text-decoration:none}
+.promo-tautan:focus-visible{outline:2px solid var(--brand);outline-offset:-4px;border-radius:12px}
+.promo-kel{font-size:11px;font-weight:700;letter-spacing:.02em;color:var(--brand-strong)}
+.promo-hook{font-size:14px;line-height:1.4;font-weight:600;opacity:0;transform:translateY(6px)}
+.promo.kotak .promo-hook{animation:pr-teks .5s .15s ease-out forwards}
+.promo-ajak{font-size:12px;font-weight:700;color:var(--brand-strong);margin-top:3px}
+.promo.kotak .promo-ajak{animation:pr-ajak 1.6s 1s ease-in-out infinite}
+.promo-tautan:hover .promo-hook{color:var(--brand-strong)}
+.promo-tutup{position:absolute;top:4px;right:5px;width:26px;height:26px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:20px;line-height:1;cursor:pointer}
+.promo-tutup:hover,.promo-tutup:focus-visible{background:var(--soft);color:var(--ink)}
+.promo-mati{position:absolute;right:8px;bottom:5px;border:0;background:none;padding:0;font:inherit;font-size:10.5px;color:var(--muted);text-decoration:underline;cursor:pointer}
+.promo-waktu{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--accent);transform-origin:left;transform:scaleX(1);opacity:.85}
+.promo.kotak .promo-waktu{animation:pr-waktu linear forwards}
+.promo.jeda .promo-waktu{animation-play-state:paused}
+.promo.pergi .promo-maskot{transform:translateX(130px);opacity:0;transition:transform .5s ease-in,opacity .4s}
+.promo.pergi .promo-kotak{transform:scale(.6);opacity:0;visibility:hidden;transition:transform .3s,opacity .25s,visibility 0s .3s}
+@keyframes mk-lompat{0%,100%{transform:translateY(0)}40%{transform:translateY(-9px)}}
+@keyframes mk-goyang{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}70%{transform:rotate(7deg)}}
+@keyframes mk-kedip{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes mk-kedip-mata{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes pr-garis{to{background-position:-250% 0}}
+@keyframes pr-teks{to{opacity:1;transform:none}}
+@keyframes pr-ajak{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@keyframes pr-waktu{to{transform:scaleX(0)}}
+@media (prefers-reduced-motion:reduce){
+  .promo-maskot,.promo-kotak,.promo.pergi .promo-maskot,.promo.pergi .promo-kotak{transition:opacity .2s}
+  .promo-maskot{transform:none}
+  .promo.datang .promo-maskot,.promo.buka .mk-amplop,.promo.kotak .promo-hook,.promo.kotak .promo-ajak,.mk-antena,.mk-mata,.promo-kotak::before{animation:none}
+  .promo.kotak .promo-hook{opacity:1;transform:none}
+  .promo-kotak{transform:none}
+}
+@media (max-width:560px){.promo{right:10px;bottom:10px}.promo-maskot{width:48px;height:48px}}
+@media print{.promo{display:none}}

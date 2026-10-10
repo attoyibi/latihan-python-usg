@@ -20,6 +20,8 @@ jobs:
         run: python tools/validasi_konten.py
       - name: Periksa halaman publik (SEO dan AI) sesuai data
         run: node tools/buat_halaman_publik.mjs --periksa
+      - name: Uji promo silang (data, aturan kemunculan, pemilihan)
+        run: node tools/uji_promo.mjs
       - name: Uji pembuat konfigurasi (menolak kunci service_role)
         run: node tools/uji_buat_config.mjs
       - name: Uji skrip pendaftaran peserta (server Supabase tiruan)
@@ -70,7 +72,7 @@ jobs:
         run: |
           node --check site/js/pyworker.js
           node --check site/js/javaworker.js
-          for f in site/js/app.js site/js/runner.js site/js/grader.js site/js/javarunner.js site/js/sinkron.js site/js/rekap.js site/js/instruktur.js site/js/dom.js site/js/tata.js site/js/kemajuan.js site/js/anticopas.js site/js/rekam.js site/js/perangkat.js site/js/integritas.js site/js/integritas-ui.js site/js/penjalan.js site/js/laporan.js site/js/pdf.js site/js/konsep.js site/js/laporan-ui.js site/js/penilaian.js site/js/kehadiran.js site/js/kehadiran-ui.js site/js/sesi.js site/js/pencatat.js site/js/galat.js site/js/jejak.js site/js/jejak-ui.js site/js/riset.js site/js/riset-ui.js site/js/putar-ui.js site/js/praktik.js site/js/praktik-data.js site/js/praktik-ui.js site/js/praktik-dash-ui.js site/js/laporan-akhir.js site/js/laporan-akhir-data.js site/js/laporan-akhir-ui.js site/js/praktikum-java.js site/js/kunci.js; do
+          for f in site/js/app.js site/js/runner.js site/js/grader.js site/js/javarunner.js site/js/sinkron.js site/js/rekap.js site/js/instruktur.js site/js/dom.js site/js/tata.js site/js/kemajuan.js site/js/anticopas.js site/js/rekam.js site/js/perangkat.js site/js/integritas.js site/js/integritas-ui.js site/js/penjalan.js site/js/laporan.js site/js/pdf.js site/js/konsep.js site/js/laporan-ui.js site/js/penilaian.js site/js/kehadiran.js site/js/kehadiran-ui.js site/js/sesi.js site/js/pencatat.js site/js/galat.js site/js/jejak.js site/js/jejak-ui.js site/js/riset.js site/js/riset-ui.js site/js/putar-ui.js site/js/praktik.js site/js/praktik-data.js site/js/praktik-ui.js site/js/praktik-dash-ui.js site/js/laporan-akhir.js site/js/laporan-akhir-data.js site/js/laporan-akhir-ui.js site/js/praktikum-java.js site/js/kunci.js site/js/promo.js site/js/promo-data.js site/js/promo-logika.js; do
             node --input-type=module --check < "$f"
           done
       - name: Periksa sintaks SQL

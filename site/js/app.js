@@ -19,6 +19,7 @@ import * as PraktikUI from "./praktik-ui.js";
 import * as PraktikData from "./praktik-data.js";
 import * as Kunci from "./kunci.js";
 import * as LaporanAkhirUI from "./laporan-akhir-ui.js";
+import * as Promo from "./promo.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
 // Progres ditulis ke sini lebih dulu, lalu disusulkan ke Supabase oleh sinkron.js.
@@ -1547,6 +1548,7 @@ function afterAuthChange(fallback) {
 
 function setPage(kind) {
   const gate = kind === "gate";
+  Promo.halaman(kind === "bab");
   document.body.classList.toggle("gate", gate);
   document.body.classList.toggle("home", kind !== "bab");
   $("#navHome").classList.toggle("on", kind === "beranda");
@@ -1750,6 +1752,7 @@ async function init() {
     document.title = CFG.namaSitus || "Latihan";
   } catch (e) {}
   window.addEventListener("hashchange", route);
+  Promo.mulai(() => !(Auth.getProfile() && Auth.getProfile().peran === "instruktur"));
   $("#logoutBtn").addEventListener("click", keluar);
   $("#menuBtn").addEventListener("click", () => {
     const open = $("#sidebar").classList.toggle("open");
