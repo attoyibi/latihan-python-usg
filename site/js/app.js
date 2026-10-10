@@ -747,14 +747,7 @@ async function renderBab(n) {
   }
   Tata.bersihkan();
   TATA = Tata.baru(store);
-  // Pemberitahuan sekali per akun: apa yang dicatat situs.
-  const perluInfo = !store.get("info-pencatatan-3", false) && !(Auth.getProfile() && Auth.getProfile().peran === "instruktur");
-  const infoBar = perluInfo
-    ? h("div", { class: "info-bar", role: "note" }, h("p", {}, "Supaya latihan adil, situs mencatat cara kamu mengerjakan: kapan dan bagaimana kode diketik, perangkat yang dipakai masuk, percobaan menempel, jam dan lama kamu aktif belajar di situs ini (dipakai sebagai kehadiran dan keaktifan), serta setiap kali kamu menekan Jalankan atau Kirim beserta hasilnya dan jenis kesalahannya (bukan keluaran programmu). Isi yang ditempel tidak dicatat. Selengkapnya di ", h("a", { href: "#panduan" }, "Panduan"), "."), h("button", { type: "button", class: "btn btn-sm", onclick: (e) => {
-        store.set("info-pencatatan-3", true);
-        e.target.closest(".info-bar").remove();
-      } }, "Mengerti"))
-    : null;
+  // Pencatatan cara mengerjakan tidak lagi diumumkan lewat bilah di halaman bab; peserta sudah diberi tahu langsung oleh dosen, dan rinciannya tetap ada di Panduan.
   const defPraktik = PRAKTIK.has(m.bab) ? await PraktikData.muatPraktik(COURSE.id, m.bab) : null;
   const kartuPraktik = defPraktik ? PraktikUI.kartuPraktik(ctxPraktik(), defPraktik) : null;
   const vc = videoCard(m);
@@ -778,7 +771,6 @@ async function renderBab(n) {
   Sinkron.ambilLaporan(COURSE.id, m.bab).then((baris) => baris && laporan.terapkanServer(baris));
   const bar = Tata.pasang(cols, vc, TATA, { punyaVideo: !!(m.video && m.video.length), punyaEditor: m.jenis === "kode", ambilEditor: () => editor });
   main.replaceChildren(...[
-    infoBar,
     h(
       "section",
       { class: "card bab-intro" },
@@ -795,7 +787,6 @@ async function renderBab(n) {
   ].filter(Boolean));
   main.scrollTop = 0;
   window.scrollTo(0, 0);
-  tanyaRiset(main);
 }
 
 function babGrid() {
@@ -1390,25 +1381,6 @@ function risetProfilKartu() {
     kotak.replaceChildren(h("h3", {}, "Penelitian"), h("p", { class: "muted" }, TEKS_RISET), radio(true, "Saya setuju datanya dipakai untuk penelitian (anonim)"), radio(false, "Saya tidak setuju"), r.nilai === null ? h("p", { class: "muted" }, "Kamu belum menjawab. Sampai kamu menjawab, datamu tidak dipakai.") : null, pesan);
   });
   return kotak;
-}
-
-// Pertanyaan persetujuan sekali di halaman bab, sampai dijawab (Nanti menundanya tiga hari di browser ini).
-function tanyaRiset(main) {
-  const p = Auth.getProfile();
-  if (!p || p.peran === "instruktur") return;
-  const nanti = store.get("riset-nanti", 0);
-  if (nanti && Date.now() - nanti < 3 * 86400000) return;
-  Auth.ambilPersetujuanRiset().then((r) => {
-    if (!r.ada || r.nilai !== null || document.querySelector(".riset-bar") || !document.querySelector("#main .bab-intro")) return;
-    const pesan = h("span", { class: "muted", role: "status" });
-    const jawab = async (nilai) => {
-      const hasil = await Auth.setPersetujuanRiset(nilai);
-      if (hasil.ok) bar.remove();
-      else pesan.textContent = hasil.galat;
-    };
-    const bar = h("div", { class: "info-bar riset-bar", role: "note" }, h("p", {}, h("strong", {}, "Penelitian. "), "Dosen sedang meneliti cara mahasiswa belajar memrogram di situs ini. Bolehkah catatan belajarmu dipakai untuk penelitian, tanpa nama? Menolak tidak berpengaruh pada nilai."), h("details", { class: "riset-rinci" }, h("summary", {}, "Selengkapnya"), h("p", { class: "muted" }, TEKS_RISET)), h("div", { class: "actions" }, h("button", { type: "button", class: "btn btn-sm btn-primary", onclick: () => jawab(true) }, "Setuju"), h("button", { type: "button", class: "btn btn-sm", onclick: () => jawab(false) }, "Tidak setuju"), h("button", { type: "button", class: "btn btn-sm btn-ghost", onclick: () => { store.set("riset-nanti", Date.now()); bar.remove(); } }, "Nanti"), pesan));
-    main.prepend(bar);
-  });
 }
 
 function initials(name) {

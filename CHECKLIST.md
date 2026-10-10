@@ -431,3 +431,5 @@ Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. La
 
 - [x] Tab Progres: titik kecil praktik di tiap sel (hijau bila A dan B lulus), kolom Praktik lulus dan sedang di tabel Per bab, kartu ringkasan, dan penyaring "Tampilkan peserta yang belum ... di bab ..." (tantangan, praktik, atau salah satunya)
 - [x] Diuji: logika penyaring (6 uji) dan di browser (titik, kolom, filter, pesan bila migrasi 0008 belum ada)
+
+- Bilah pemberitahuan pencatatan dan bilah pertanyaan persetujuan penelitian di halaman bab DIHAPUS atas keputusan dosen (peserta sudah diberi tahu dan setuju langsung). Pencatatan tetap berjalan seperti sebelumnya. Rincian pencatatan tetap ada di Panduan, dan pilihan penelitian tetap bisa diubah peserta di halaman Profil. Ekspor riset tetap hanya memuat peserta dengan riset_setuju = true.
