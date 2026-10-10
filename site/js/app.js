@@ -17,6 +17,7 @@ import * as Tata from "./tata.js";
 import { renderInstruktur } from "./instruktur.js";
 import * as PraktikumUI from "./praktikum-ui.js";
 import * as PraktikumData from "./praktikum-data.js";
+import * as Kunci from "./kunci.js";
 import { babBerpraktik } from "./praktikum.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
@@ -331,6 +332,8 @@ function konsepCard(m, ch) {
   const hasilBox = h("div", { "aria-live": "polite" });
   const periksa = h("button", { type: "button", class: "btn btn-primary" }, "Periksa jawaban");
   const kosongkan = h("button", { type: "button", class: "btn btn-ghost" }, "Kosongkan jawaban");
+  // Khusus instruktur: mengisi semua butir dengan jawaban benar (dari berkas soal) lalu memeriksanya.
+  const kunciBtn = Kunci.adalahInstruktur() ? h("button", { type: "button", class: "btn", title: "Khusus instruktur: isi jawaban benar lalu periksa" }, "Isi kunci (instruktur)") : null;
   const simpanDraf = () => {
     clearTimeout(timerDraf);
     timerDraf = setTimeout(() => store.set(key("konsepDraf", m.bab), items.map((x) => x.ambil())), 400);
@@ -383,6 +386,13 @@ function konsepCard(m, ch) {
     Sinkron.catat(COURSE.id, m.bab, { lulus: nilai.lulus, kasus_lulus: nilai.benar, kasus_total: nilai.total, kasus_gagal: nilai.butirSalah, hasil: nilai.lulus ? "lulus" : "gagal", petunjuk: hintShown, kode: JSON.stringify(jawaban), pola: { jenis: "konsep", butir: butir.length, durasi_s: Math.round((Date.now() - mulai) / 1000), petunjuk: hintShown, percobaan_ke: tries } });
     sinkronBab(m.bab);
   });
+  if (kunciBtn)
+    kunciBtn.addEventListener("click", async () => {
+      store.set(key("konsepDraf", m.bab), butir.map(Konsep.jawabanBenar));
+      await renderBab(m.bab);
+      const tombol = [...document.querySelectorAll(".soal .btn-primary")].find((b) => b.textContent === "Periksa jawaban");
+      if (tombol) tombol.click();
+    });
   kosongkan.addEventListener("click", () => {
     if (!confirm("Semua jawabanmu di soal ini akan dikosongkan. Lanjutkan?")) return;
     store.set(key("konsepDraf", m.bab), []);
@@ -397,7 +407,7 @@ function konsepCard(m, ch) {
     ch.soal.map((p) => h("p", {}, p)),
     rujukanBox(ch.rujukan),
     ...items.map((x) => x.el),
-    h("div", { class: "actions" }, periksa, kosongkan),
+    h("div", { class: "actions" }, periksa, kosongkan, kunciBtn),
     hasilBox,
     h("div", { class: "actions" }, hintBtn),
     hintBox
@@ -498,6 +508,8 @@ function challengeCard(m, ch) {
 
   const runBtn = h("button", { type: "button", class: "btn btn-primary" }, "Jalankan");
   const sendBtn = h("button", { type: "button", class: "btn" }, "Kirim jawaban");
+  // Khusus instruktur: mengisi kunci jawaban dari database (tabel kunci_jawaban) lalu mengirimnya.
+  const kunciBtn = ch && Kunci.adalahInstruktur() ? h("button", { type: "button", class: "btn", title: "Khusus instruktur: isi kunci jawaban lalu kirim" }, "Isi kunci (instruktur)") : null;
   const resetBtn = h("button", { type: "button", class: "btn btn-ghost" }, "Kembalikan kode awal");
   if (!bisa) {
     runBtn.disabled = true;
@@ -562,6 +574,19 @@ function challengeCard(m, ch) {
       result.replaceChildren();
     }
   });
+
+  if (kunciBtn)
+    kunciBtn.addEventListener("click", async () => {
+      kunciBtn.disabled = true;
+      const k = await Kunci.ambilKunci(COURSE.id, m.bab);
+      kunciBtn.disabled = false;
+      if (k.galat) {
+        result.replaceChildren(h("div", { class: "verdict fail" }, k.galat));
+        return;
+      }
+      editor.setValue(k.isi);
+      sendBtn.click();
+    });
 
   sendBtn.addEventListener("click", async () => {
     markStarted(m.bab);
@@ -628,7 +653,7 @@ function challengeCard(m, ch) {
       Tata.gripTinggi(TATA, () => editor),
       h("label", { for: "stdin", class: "muted" }, "Masukan untuk tombol Jalankan (satu baris untuk setiap input)"),
       stdin,
-      h("div", { class: "actions" }, runBtn, ch ? sendBtn : null, ch ? resetBtn : null),
+      h("div", { class: "actions" }, runBtn, ch ? sendBtn : null, ch ? resetBtn : null, kunciBtn),
       out,
       banding,
       result

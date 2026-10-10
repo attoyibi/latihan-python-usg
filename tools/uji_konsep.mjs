@@ -7,7 +7,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 globalThis.document = { createElement: () => ({}) };
-const { nilaiButir, nilaiSemua, kunciTeks, AMBANG_LULUS } = await import("../site/js/konsep.js");
+const { nilaiButir, nilaiSemua, kunciTeks, jawabanBenar, AMBANG_LULUS } = await import("../site/js/konsep.js");
 
 let gagal = 0;
 function cek(nama, ok, detail = "") {
@@ -15,28 +15,6 @@ function cek(nama, ok, detail = "") {
   console.log((ok ? "OK    " : "GAGAL ") + nama + (ok ? "" : "  " + detail));
 }
 const akar = join(dirname(fileURLToPath(import.meta.url)), "..", "site", "data", "kuliah");
-
-// Menyusun jawaban yang benar dari kunci butir (sama seperti peserta yang tahu semuanya).
-function jawabanBenar(b) {
-  switch (b.tipe) {
-    case "pilgan":
-      return b.opsi[b.benar];
-    case "banyak":
-      return b.benar.map((i) => b.opsi[i]);
-    case "urutkan":
-      return b.langkah.slice();
-    case "cocokkan":
-      return Object.fromEntries(b.pasangan);
-    case "seret":
-      return Object.fromEntries(b.butir.map((x) => [x.teks, x.wadah]));
-    case "isian":
-      return b.jawaban[0];
-    case "tabel":
-      return b.baris.map((br) => br.sel.slice());
-    case "relasi":
-      return b.pasangan.map((p) => ({ relasi: p.benar, a: p.a, b: p.b }));
-  }
-}
 
 // ---- penilaian per tipe ----
 const pg = { tipe: "pilgan", tanya: "?", opsi: ["a", "b", "c"], benar: 1 };

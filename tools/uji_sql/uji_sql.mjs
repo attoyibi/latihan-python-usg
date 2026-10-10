@@ -7,7 +7,7 @@
 // Jalankan:  cd tools/uji_sql && npm install && npm run uji
 
 import { PGlite } from "@electric-sql/pglite";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -624,14 +624,44 @@ console.log("\n== Tahap L: migrasi 0008 (praktikum) pada data yang sudah ada =="
   cek("tabel lama tetap sama setelah semua uji praktikum", (await hitung("percobaan")) === sebelum.percobaan + 0 || (await hitung("percobaan")) >= sebelum.percobaan);
 }
 
+console.log("\n== Tahap M: migrasi 0009 (kunci jawaban, hanya dibaca instruktur) ==");
+{
+  const hitung = async (t) => (await q("select count(*)::int as n from public." + t)).rows[0].n;
+  const sebelum = { percobaan: await hitung("percobaan"), progres: await hitung("progres"), laporan: await hitung("laporan"), profiles: await hitung("profiles"), praktikum_berkas: await hitung("praktikum_berkas") };
+  if (!(await jalankan("0009_kunci_jawaban.sql berjalan di atas data lama", migrasi("0009_kunci_jawaban.sql")))) process.exit(1);
+  cek("0009 aman dijalankan ulang", await jalankan("0009 diulang", migrasi("0009_kunci_jawaban.sql")));
+  cek("data yang sudah ada tidak berubah", (await hitung("percobaan")) === sebelum.percobaan && (await hitung("progres")) === sebelum.progres && (await hitung("laporan")) === sebelum.laporan && (await hitung("profiles")) === sebelum.profiles && (await hitung("praktikum_berkas")) === sebelum.praktikum_berkas);
+  // pemilik proyek memasukkan kunci lewat SQL Editor (tanpa lewat API)
+  const isi = "jumlah = int(input())\nprint(jumlah * 2)\n";
+  await q("insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values ('algoritma-python', 2, 'python', $1) on conflict (matakuliah_id, bab) do update set isi = excluded.isi", [isi]);
+  cek("peserta tidak bisa membaca kunci", (await sisip(U1, "select * from public.kunci_jawaban")).rows.length === 0);
+  cek("peserta tidak bisa membaca kunci walau menyebut barisnya", (await sisip(U1, "select isi from public.kunci_jawaban where matakuliah_id = 'algoritma-python' and bab = 2")).rows.length === 0);
+  const ins = await sisip(IN, "select isi, bahasa from public.kunci_jawaban where matakuliah_id = 'algoritma-python' and bab = 2");
+  cek("instruktur membaca kunci", ins.rows.length === 1 && ins.rows[0].isi === isi && ins.rows[0].bahasa === "python", JSON.stringify(ins.rows));
+  cek("pengunjung (anon) tidak bisa membaca kunci", ditolak(await sebagai("anon", null, () => q("select * from public.kunci_jawaban")), "42501"));
+  cek("peserta tidak bisa menulis kunci", ditolak(await sisip(U1, "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values ('algoritma-python', 3, 'python', 'x')"), "42501"));
+  cek("instruktur tidak bisa menulis kunci lewat API", ditolak(await sisip(IN, "insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values ('algoritma-python', 3, 'python', 'x')"), "42501"));
+  cek("instruktur tidak bisa mengubah atau menghapus kunci lewat API", ditolak(await sisip(IN, "update public.kunci_jawaban set isi = 'x'"), "42501") && ditolak(await sisip(IN, "delete from public.kunci_jawaban"), "42501"));
+  cek("bab di luar 1 sampai 99 ditolak", ditolak(await q("insert into public.kunci_jawaban (matakuliah_id, bab, bahasa, isi) values ('algoritma-python', 0, 'python', 'x')").catch((e) => ({ error: e, code: e.code })), "23514"));
+  // SQL buatan tools/buat_sql_kunci.py (hanya ada di komputer pemilik; folder kunci/ tidak ikut terbit)
+  const berkasKunci = join(root, "kunci", "kunci_jawaban.sql");
+  if (existsSync(berkasKunci)) {
+    const sqlKunci = readFileSync(berkasKunci, "utf8");
+    cek("kunci_jawaban.sql buatan alat berjalan", await jalankan("kunci_jawaban.sql", sqlKunci));
+    cek("dan aman dijalankan ulang", await jalankan("kunci_jawaban.sql diulang", sqlKunci));
+    const n = (await q("select count(*)::int as n from public.kunci_jawaban")).rows[0].n;
+    cek("semua kunci masuk (" + n + ")", n >= 20, String(n));
+  } else console.log("LEWAT kunci/kunci_jawaban.sql tidak ada (normal di CI)");
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat delapan kolom", !r.error && kolom.length === 8, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0008 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat sembilan kolom", !r.error && kolom.length === 9, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0009 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

@@ -73,6 +73,33 @@ export function nilaiSemua(butir, jawaban) {
   return { benar, total, persen: total ? benar / total : 0, per, lulus: total > 0 && benar / total >= AMBANG_LULUS, butirSalah: per.map((x, i) => (x.benar === x.total ? 0 : i + 1)).filter((x) => x > 0) };
 }
 
+/**
+ * Jawaban yang benar untuk satu butir, dalam bentuk yang sama dengan jawaban peserta (masukan nilaiButir).
+ * Dipakai tombol "Isi kunci" khusus instruktur. Kuncinya memang ada di berkas soal (dinilai di browser), bukan rahasia.
+ */
+export function jawabanBenar(b) {
+  switch (b.tipe) {
+    case "pilgan":
+      return b.opsi[b.benar];
+    case "banyak":
+      return b.benar.map((i) => b.opsi[i]);
+    case "urutkan":
+      return b.langkah.slice();
+    case "cocokkan":
+      return Object.fromEntries(b.pasangan.map(([k, v]) => [k, v]));
+    case "seret":
+      return Object.fromEntries(b.butir.map((x) => [x.teks, x.wadah]));
+    case "isian":
+      return b.jawaban[0];
+    case "tabel":
+      return b.baris.map((br) => br.sel.slice());
+    case "relasi":
+      return b.pasangan.map((p) => ({ relasi: p.benar, a: p.a, b: p.b }));
+    default:
+      throw new Error("Tipe butir tidak dikenal: " + b.tipe);
+  }
+}
+
 /** Teks jawaban yang benar, untuk ditampilkan setelah peserta lulus. */
 export function kunciTeks(b) {
   switch (b.tipe) {

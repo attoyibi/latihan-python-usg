@@ -59,6 +59,25 @@ python tools/validasi_konten.py     # struktur dan rujukan bab
 python tools/uji_praktikum.py       # semua kasus: kerangka awal harus gagal, contoh jawaban harus lulus
 ```
 
+## Jawab otomatis (khusus instruktur)
+
+Untuk mencoba atau memperagakan situs, akun **instruktur** mendapat tombol pengisi jawaban. Peserta tidak melihatnya.
+
+- **Praktikum**: *Jawab semua tahap otomatis* di daftar tahap, dan *Jawab otomatis* di tiap tahap. Mengisi berkas contoh lalu mengujinya; hasilnya masuk ke akun instruktur saja dan tidak ikut hitungan kelas.
+- **Soal latihan kode** (Python dan Java): *Isi kunci* di bab. Mengisi editor dengan kunci lalu menekan Kirim jawaban.
+- **Soal konsep**: *Isi kunci* mengisi semua butir dengan jawaban benar (dari berkas soal) lalu memeriksanya.
+
+Kunci soal kode **tidak ada di situs maupun di GitHub**. Ia disimpan di tabel `kunci_jawaban` (migrasi `0009`) yang hanya bisa dibaca instruktur lewat aturan keamanan database; tidak seorang pun bisa menulisnya lewat API. Memasukkan atau memperbarui kunci:
+
+```bash
+python tools/uji_kunci.py        # pastikan semua kunci cocok dengan kasus uji
+python tools/buat_sql_kunci.py   # membuat kunci/kunci_jawaban.sql (folder kunci/ diabaikan git)
+```
+
+lalu tempel isi `kunci/kunci_jawaban.sql` di Supabase SQL Editor dan Run (aman diulang). Setelah menambah kunci baru atau mengubah soal, ulangi dua langkah itu.
+
+Catatan: laporan praktikum tidak diisi otomatis. Peran instruktur dicek lewat database; menyembunyikan tombol di browser hanyalah kemudahan, bukan pengaman.
+
 ## Mencoba di komputer
 
 `python tools/server_uji.py`, buka `http://localhost:8124/`, masuk sebagai `siti@kampus.ac.id` (kata sandi awal `Sandi-Awal-1`, lalu buat yang baru) atau dosen `dosen@kampus.ac.id` / `Dosen-Uji123`. Tambahkan `?tanpa0008=1` untuk meniru database yang belum menjalankan migrasi.

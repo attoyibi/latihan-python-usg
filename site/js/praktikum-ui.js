@@ -222,6 +222,40 @@ function pasangEditor(holder, nama, isi, saatUbah, jaga) {
   };
 }
 
+// ---------- jawab otomatis (khusus instruktur) ----------
+/**
+ * Mengisi berkas contoh jawaban lalu mengirim (menguji) tiap tahap secara berurutan. Hanya untuk akun instruktur: untuk
+ * mencoba atau memperagakan praktikum. Contoh jawaban memang sudah ada di berkas JSON situs; ini hanya mengisinya ke ruang kerja.
+ * @param {number[]} indeks tahap yang dijawab
+ */
+export async function jawabOtomatis(ctx, pk, indeks, saatProgres = () => {}) {
+  if (!ctx.instruktur()) throw new Error("Khusus instruktur.");
+  const k = kelola(ctx, pk);
+  const hasil = [];
+  for (const idx of indeks) {
+    const tahap = pk.tahap[idx];
+    saatProgres(idx);
+    const lengkap = P.lengkapiDariContoh(pk, idx, k.kerja.berkas);
+    k.ganti(lengkap.berkas);
+    k.ganti(P.terapkanContoh(pk, idx, k.kerja.berkas));
+    const isi = k.isi();
+    const r = await runProyek(isi, { aksi: "kasus", kasus: tahap.kasus });
+    if (r.timeout || r.error || !r.proyek) {
+      hasil.push({ idx, lulus: false, galat: r.error || "waktu habis" });
+      continue;
+    }
+    const ring = P.ringkasHasil(r.proyek.kasus || []);
+    const lama = k.baris(tahap.id);
+    const patch = { jumlah_kirim: (lama.jumlah_kirim || 0) + 1, pakai_contoh: true, pertama_dibuka: lama.pertama_dibuka || sekarang() };
+    if (ring.lulus) Object.assign(patch, { status: "lulus", lulus_pada: lama.lulus_pada || sekarang() });
+    else if (lama.status !== "lulus") patch.status = "sedang";
+    k.ubahTahap(tahap.id, patch);
+    D.antreVersi(k.mk, k.pid, tahap.id, isi, P.hasilUntukRiwayat(ring), ring.lulus);
+    hasil.push({ idx, lulus: ring.lulus, benar: ring.benar, total: ring.total });
+  }
+  return hasil;
+}
+
 // ---------- halaman tahap ----------
 const JENIS_PETUNJUK = { soal: "Petunjuk", buku: "Di buku", kode: "Contoh kecil", kata: "Istilah" };
 
@@ -516,6 +550,23 @@ export function halamanTahap(ctx, pk, idx) {
     segarStatus();
     location.hash = idx + 1 < pk.tahap.length ? hrefPraktikum(ctx, pk.id, pk.tahap[idx + 1].id) : hrefPraktikum(ctx, pk.id);
   });
+  const otoBtn = instruktur ? h("button", { type: "button", class: "btn pk-oto", title: "Khusus instruktur: isi contoh jawaban lalu kirim" }, "Jawab otomatis (instruktur)") : null;
+  if (otoBtn)
+    otoBtn.addEventListener("click", async () => {
+      if (sibuk) return;
+      atur(true);
+      otoBtn.disabled = true;
+      try {
+        const [r] = await jawabOtomatis(ctx, pk, [idx]);
+        tulisPesan(r.lulus ? "Terjawab otomatis dan lulus (" + r.benar + "/" + r.total + ")." : "Terisi, tetapi pengujian belum lulus: " + (r.galat || r.benar + "/" + r.total));
+        ctx.ulang();
+      } catch (e) {
+        tulisPesan("Gagal: " + e.message);
+      } finally {
+        otoBtn.disabled = false;
+        atur(false);
+      }
+    });
   const riwayatBox = h("div", { class: "pk-riwayat" });
   const riwayatBtn = h("button", { type: "button", class: "btn" }, "Riwayat versi");
   riwayatBtn.addEventListener("click", async () => {
@@ -592,7 +643,7 @@ export function halamanTahap(ctx, pk, idx) {
     ),
     bannerContoh,
     kerjaBox,
-    h("section", { class: "card pk-bantu" }, h("h3", {}, "Bantuan dan pilihan"), h("div", { class: "pk-aksi" }, kembaliBtn, contohBtn, lewatiBtn, riwayatBtn), riwayatBox),
+    h("section", { class: "card pk-bantu" }, h("h3", {}, "Bantuan dan pilihan"), h("div", { class: "pk-aksi" }, kembaliBtn, contohBtn, lewatiBtn, riwayatBtn, otoBtn), riwayatBox),
     nav,
   ];
 }
@@ -722,6 +773,21 @@ export function halamanPraktikum(ctx, pk) {
       );
     })
   );
+  const otoSemua = ctx.instruktur() ? h("button", { type: "button", class: "btn pk-oto" }, "Jawab semua tahap otomatis (instruktur)") : null;
+  const pesanOto = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
+  if (otoSemua)
+    otoSemua.addEventListener("click", async () => {
+      otoSemua.disabled = true;
+      try {
+        const hasil = await jawabOtomatis(ctx, pk, pk.tahap.map((x, i) => i), (i) => (pesanOto.textContent = "Menjawab tahap " + (i + 1) + " dari " + pk.tahap.length));
+        const lulus = hasil.filter((r) => r.lulus).length;
+        pesanOto.textContent = lulus + " dari " + hasil.length + " tahap lulus.";
+        ctx.ulang();
+      } catch (e) {
+        pesanOto.textContent = "Gagal: " + e.message;
+        otoSemua.disabled = false;
+      }
+    });
   return [
     h("section", { class: "card pk-kepala" },
       h("p", { class: "eyebrow" }, h("a", { href: "#k/" + ctx.kuliah.id }, ctx.kuliah.nama), " / Praktikum"),
@@ -730,7 +796,8 @@ export function halamanPraktikum(ctx, pk) {
       (pk.gambaran || []).length ? h("ul", { class: "pk-gambaran" }, pk.gambaran.map((g) => h("li", {}, g))) : null,
       bar(ring.lulus + ring.dilewati, ring.total, "Tahap selesai atau dilewati"),
       h("p", { class: "muted" }, ring.lulus + " lulus, " + ring.dilewati + " dilewati, " + (ring.total - ring.lulus - ring.dilewati) + " belum, dari " + ring.total + " tahap. Urutan boleh bebas dan tidak ada yang terkunci."),
-      h("div", { class: "cta" }, berikut >= 0 ? h("a", { class: "btn btn-primary", href: hrefPraktikum(ctx, pk.id, pk.tahap[berikut].id) }, ring.lulus + ring.dilewati === 0 ? "Mulai dari tahap 1" : "Lanjutkan: tahap " + (berikut + 1)) : null)
+      h("div", { class: "cta" }, berikut >= 0 ? h("a", { class: "btn btn-primary", href: hrefPraktikum(ctx, pk.id, pk.tahap[berikut].id) }, ring.lulus + ring.dilewati === 0 ? "Mulai dari tahap 1" : "Lanjutkan: tahap " + (berikut + 1)) : null, otoSemua),
+      pesanOto
     ),
     h("section", { class: "card" }, h("h3", {}, "Tahap"), daftar),
     kartuEkspor(ctx, pk, k),

@@ -54,6 +54,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if jalur in WORKER and GAGAL[WORKER[jalur]] != "normal":
             self.kirim_skrip('throw new Error("simulasi: skrip penjalan gagal diunduh");' if GAGAL[WORKER[jalur]] == "mati" else "self.onmessage = function () {};")
             return
+        if jalur.startswith("/__kunci/"):
+            # Hanya untuk uji lokal: membaca kunci dari folder kunci/ (tidak pernah ikut terbit).
+            bagian = jalur.split("/")
+            berkas = ROOT / "kunci" / bagian[2] / bagian[3] if len(bagian) == 4 and ".." not in jalur else None
+            if berkas is not None and berkas.is_file():
+                self.kirim_skrip(berkas.read_text(encoding="utf8"))
+            else:
+                self.send_error(404)
+            return
         if self.path.split("?")[0] == "/config.js":
             data = FAKE.read_bytes()
             self.send_response(200)

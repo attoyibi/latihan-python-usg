@@ -384,3 +384,10 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [x] Tab Praktikum di dashboard dosen (matriks, per tahap, lihat berkas, CSV)
 - [x] Diuji di browser (Pyodide nyata, ekspor HTML dengan `input()`, ponsel 375 px, tanpa migrasi 0008, PBO tidak berubah)
 - [ ] Belum diuji di Supabase sungguhan dan ponsel sungguhan; jalur laptop, jalur ponsel, dan praktikum Java belum ada
+
+## Jawab otomatis untuk instruktur (migrasi 0009)
+
+- [x] Migrasi `0009_kunci_jawaban.sql`: tabel hanya dibaca instruktur, tanpa tulis lewat API; uji PGlite (337 uji)
+- [x] `tools/buat_sql_kunci.py` membuat `kunci/kunci_jawaban.sql` dari kunci lokal (24 kunci; folder kunci/ tidak terbit)
+- [x] Tombol *Isi kunci (instruktur)* di soal kode Python dan Java, soal konsep, dan praktikum; diuji di browser
+- [ ] Setelah dipush: jalankan 0009 lalu `kunci/kunci_jawaban.sql` di Supabase SQL Editor

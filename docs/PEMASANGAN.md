@@ -46,16 +46,15 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 
 Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersifat menambah dan aman untuk data yang sudah ada.
 
-1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan delapan kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
+1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan sembilan kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
 
-   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | `0005_integritas` | `0006_kehadiran` | `0007_riset_perilaku` | `0008_praktikum` | Yang perlu dijalankan |
-   |---|---|---|---|---|---|---|---|---|
-   | false | false | false | false | false | false | false | false | `0001` sampai `0008`, berurutan |
-   | true | true | true | true | true | true | true | false | **hanya `0008`** |
-   | true | true | true | true | true | true | false | false | `0007`, lalu `0008` |
-   | true | true | true | true | true | false | false | false | `0006`, `0007`, lalu `0008` |
-   | true | true | true | true | false | false | false | false | `0005` sampai `0008`, berurutan |
-   | true | true | true | true | true | true | true | true | tidak ada, sudah mutakhir |
+   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | `0005_integritas` | `0006_kehadiran` | `0007_riset_perilaku` | `0008_praktikum` | `0009_kunci_jawaban` | Yang perlu dijalankan |
+   |---|---|---|---|---|---|---|---|---|---|
+   | false | false | false | false | false | false | false | false | false | `0001` sampai `0009`, berurutan |
+   | true | true | true | true | true | true | true | true | false | **hanya `0009`** |
+   | true | true | true | true | true | true | true | false | false | `0008`, lalu `0009` |
+   | true | true | true | true | true | true | false | false | false | `0007` sampai `0009`, berurutan |
+   | true | true | true | true | true | true | true | true | true | tidak ada, sudah mutakhir |
 
    `0005` menambah pelacakan keaslian pengerjaan (perangkat dan cara menulis); lihat [DASHBOARD-INSTRUKTUR.md](DASHBOARD-INSTRUKTUR.md). Tanpa `0005`, situs tetap berjalan, tetapi tab Sinyal integritas kosong dan dashboard menampilkan galat saat memuatnya.
 
@@ -64,6 +63,8 @@ Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersi
    `0007` menambah jejak peserta dan riset: setiap Jalankan dan Kirim dicatat dengan hasil dan jenis galat, serta persetujuan penelitian peserta; lihat [RISET-PERILAKU.md](RISET-PERILAKU.md). Migrasinya hanya menambah. Bila situs baru tayang sebelum `0007` dijalankan, Kirim tetap tersimpan seperti biasa (tanpa kolom baru), baris Jalankan dilewati, dan tab Riset serta pilihan persetujuan menampilkan pesan belum dipasang.
 
    `0008` menambah praktikum proyek (empat tabel baru untuk berkas kerja, status tahap, riwayat versi, dan laporan praktikum); lihat [PRAKTIKUM.md](PRAKTIKUM.md). Migrasinya hanya menambah tabel baru dan tidak menyentuh data peserta yang sudah ada. Situs aman dipasang sebelum atau sesudahnya: tanpa `0008`, pekerjaan praktikum peserta tetap tersimpan di browser dan tab Praktikum dosen menampilkan petunjuk.
+
+   `0009` menambah tabel `kunci_jawaban` untuk tombol **Isi kunci (instruktur)**: kunci jawaban soal latihan hanya bisa dibaca akun instruktur. Setelah migrasinya, jalankan `python tools/buat_sql_kunci.py` di komputer Anda lalu tempel `kunci/kunci_jawaban.sql` di SQL Editor (kunci tidak pernah masuk repositori atau situs). Lihat [PRAKTIKUM.md](PRAKTIKUM.md#jawab-otomatis-khusus-instruktur). Tanpa `0009`, tombolnya hanya menampilkan petunjuk dan bagian situs lain tidak terpengaruh.
 
 2. Jalankan masing-masing di query baru, **berurutan**.
 3. Menjalankan ulang migrasi yang sudah terpasang juga aman, dalam urutan apa pun (sudah diuji), tetapi tidak perlu.

@@ -28,6 +28,8 @@
   const TANPA_0007 = /[?&]tanpa0007=1/.test(location.search);
   // ?tanpa0008=1: meniru database yang belum menjalankan migrasi 0008 (tabel praktikum_* belum ada).
   const TANPA_0008 = /[?&]tanpa0008=1/.test(location.search);
+  // ?tanpa0009=1: meniru database tanpa tabel kunci_jawaban. Bila ada, kunci dibaca dari folder kunci/ lewat server_uji.py (lokal saja).
+  const TANPA_0009 = /[?&]tanpa0009=1/.test(location.search);
   const TERBUKA = /[?&]terbuka=1/.test(location.search);
   // ?tanpakonfirmasi=1: meniru Supabase dengan "Confirm email" dimatikan (pendaftaran langsung masuk, tanpa email). Menyertakan terbuka=1.
   const TANPA_KONFIRMASI = /[?&]tanpakonfirmasi=1/.test(location.search);
@@ -368,6 +370,17 @@
         if (nama === "profiles" && ((q.op === "select" && /riset/.test(q.kolom || "")) || (q.op === "update" && "riset_setuju" in (q.vals || {})))) return kolomHilang("profiles.riset_setuju");
         if (nama === "percobaan" && q.op === "select" && /hasil|galat|petunjuk|cocok/.test(q.kolom || "")) return kolomHilang("percobaan.hasil");
         if (nama === "percobaan" && q.op === "insert" && (Array.isArray(q.rows) ? q.rows : [q.rows]).some((r) => "hasil" in r)) return { data: null, error: { code: "PGRST204", message: "Could not find the 'hasil' column of 'percobaan' in the schema cache" } };
+      }
+      if (nama === "kunci_jawaban") {
+        if (TANPA_0009) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public.kunci_jawaban' in the schema cache" } };
+        if (q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table kunci_jawaban" } };
+        if (!instruktur()) return { data: [], error: null };
+        const bab = String(q.f.bab).padStart(2, "0");
+        for (const ext of ["py", "java"]) {
+          const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/bab-" + bab + "." + ext);
+          if (r.ok) return { data: [{ isi: await r.text(), bahasa: ext === "py" ? "python" : "java" }], error: null };
+        }
+        return { data: [], error: null };
       }
       if (nama.startsWith("praktikum_")) {
         if (TANPA_0008) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public." + nama + "' in the schema cache" } };
