@@ -1520,7 +1520,6 @@ function afterAuthChange(fallback) {
 
 function setPage(kind) {
   const gate = kind === "gate";
-  Promo.halaman(kind === "bab");
   document.body.classList.toggle("gate", gate);
   document.body.classList.toggle("home", kind !== "bab");
   $("#navHome").classList.toggle("on", kind === "beranda");
@@ -1724,7 +1723,7 @@ async function init() {
     document.title = CFG.namaSitus || "Latihan";
   } catch (e) {}
   window.addEventListener("hashchange", route);
-  Promo.mulai(() => !(Auth.getProfile() && Auth.getProfile().peran === "instruktur"));
+  Promo.mulai();
   $("#logoutBtn").addEventListener("click", keluar);
   $("#menuBtn").addEventListener("click", () => {
     const open = $("#sidebar").classList.toggle("open");

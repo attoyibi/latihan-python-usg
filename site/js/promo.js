@@ -2,10 +2,11 @@
 // Hanya muncul di halaman bab, kadang-kadang, saat peserta sedang diam, dan hilang sendiri. Aturan ada di promo-logika.js,
 // isi promo ada di promo-data.js. Tanpa database dan tanpa pelacakan.
 import { PROMO, PEMBUAT } from "./promo-data.js";
-import { ATURAN, tundaAwal, jedaBerikut, pilihPromo, undi } from "./promo-logika.js";
+import { ATURAN, tundaAwal, jedaBerikut, pilihPromo, undi, tanggalLokal, pertamaHariIni } from "./promo-logika.js";
 
 const KUNCI_MATI = "promo:mati";
-const KUNCI_SESI = "promo:sesi";
+const KUNCI_SESI = "promo:sesi"; // sessionStorage: jumlah tampil, promo yang sudah tampil, sisa jeda
+const KUNCI_HARI = "promo:hari"; // localStorage: tanggal terakhir promo muncul (kunjungan pertama hari ini pasti dapat promo)
 
 const aman = (f, kalau) => {
   try {
@@ -37,11 +38,10 @@ let kontainer = null;
 let timerTutup = 0;
 let sisaMs = 0;
 let mulaiMs = 0;
-let status = { halamanBab: false, mati: false, jumlah: 0, sedangTampil: false, menunggu: 0, diamMs: 0 };
+let status = { mati: false, jumlah: 0, sedangTampil: false, menunggu: 0, diamMs: 0 };
 let sudahId = [];
 let aktivitasTerakhir = Date.now();
 let berjalan = false;
-let lewati = () => false;
 
 function muatSesi() {
   const s = aman(() => JSON.parse(sessionStorage.getItem(KUNCI_SESI) || "null"), null);
@@ -132,6 +132,7 @@ function tampilkan() {
   sudahId.push(p.id);
   status.menunggu = jedaBerikut();
   simpanSesi();
+  aman(() => localStorage.setItem(KUNCI_HARI, tanggalLokal()));
   kontainer = bangun(p);
   document.body.appendChild(kontainer);
   // 1) maskot datang membawa amplop, 2) amplop dibuka, 3) kotak hook muncul dan hitungan tutup dimulai
@@ -160,17 +161,16 @@ function detik() {
   if (!berjalan) return;
   const terlihat = document.visibilityState === "visible";
   status.diamMs = Date.now() - aktivitasTerakhir;
-  if (status.halamanBab && terlihat && !status.sedangTampil) {
+  if (terlihat && !status.sedangTampil) {
     status.menunggu = Math.max(0, status.menunggu - ATURAN.periksaMs);
     simpanSesi();
   }
   if (undi({ ...status, terlihat, adaDialog: adaDialog() })) tampilkan();
 }
 
-// kosong() dipanggil dari app.js; `izinkan` mengembalikan false untuk peran yang tidak perlu melihat promo (mis. instruktur).
-export function mulai(izinkan) {
+// Dipanggil sekali dari app.js, jadi berlaku di halaman mana pun (beranda, masuk, mata kuliah, bab, dashboard).
+export function mulai() {
   if (berjalan) return;
-  if (typeof izinkan === "function") lewati = () => !izinkan();
   status.mati = aman(() => localStorage.getItem(KUNCI_MATI) === "1", false);
   if (status.mati) return;
   muatSesi();
@@ -180,10 +180,19 @@ export function mulai(izinkan) {
   ["keydown", "input", "pointerdown", "wheel", "touchstart"].forEach((e) => window.addEventListener(e, catat, { passive: true, capture: true }));
   berjalan = true;
   setInterval(detik, ATURAN.periksaMs);
+  // Pertama kali hari ini: promo pasti muncul di awal (sesudah halaman tenang sebentar), lalu aturan acak berlaku seperti biasa.
+  if (pertamaHariIni(aman(() => localStorage.getItem(KUNCI_HARI), null))) setTimeout(coba, 2500);
 }
 
-// Dipanggil tiap pindah halaman: promo hanya boleh muncul saat peserta ada di halaman bab.
-export function halaman(adalahBab) {
-  status.halamanBab = !!adalahBab && !lewati();
-  if (!adalahBab && kontainer) tutup();
+function coba() {
+  if (kontainer || status.mati || status.sedangTampil) return;
+  if (document.visibilityState !== "visible") {
+    document.addEventListener("visibilitychange", coba, { once: true });
+    return;
+  }
+  if (adaDialog()) {
+    setTimeout(coba, 4000);
+    return;
+  }
+  tampilkan();
 }

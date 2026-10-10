@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Menguji data dan aturan promo silang ke muchson.web.id (site/js/promo-data.js, promo-logika.js).
 import { PROMO, SITUS_UTAMA } from "../site/js/promo-data.js";
-import { ATURAN, layak, undi, pilihPromo, tundaAwal, jedaBerikut } from "../site/js/promo-logika.js";
+import { ATURAN, layak, undi, pilihPromo, tundaAwal, jedaBerikut, tanggalLokal, pertamaHariIni } from "../site/js/promo-logika.js";
 
 let total = 0;
 let gagal = 0;
@@ -26,9 +26,9 @@ cek("halaman utama ada (#about, #teaching, #projects, #contact, #/latihan)", ["#
 cek("hanya Latihan Python yang dilewati dari undian", PROMO.filter((p) => p.lewati).map((p) => p.id).join() === "latihan");
 
 console.log("\n== aturan ==");
-const dasar = { halamanBab: true, terlihat: true, mati: false, jumlah: 0, sedangTampil: false, menunggu: 0, diamMs: 6000, adaDialog: false };
+const dasar = { terlihat: true, mati: false, jumlah: 0, sedangTampil: false, menunggu: 0, diamMs: 6000, adaDialog: false };
 cek("layak bila semua syarat terpenuhi", layak(dasar) === true);
-cek("tidak di luar halaman bab", layak({ ...dasar, halamanBab: false }) === false);
+cek("layak di halaman mana pun (tidak lagi dibatasi halaman bab)", layak({ ...dasar, halamanBab: false }) === true);
 cek("tidak saat tab tersembunyi", layak({ ...dasar, terlihat: false }) === false);
 cek("tidak bila dimatikan peserta", layak({ ...dasar, mati: true }) === false);
 cek("tidak bila masih ada yang tampil (tidak ditumpuk)", layak({ ...dasar, sedangTampil: true }) === false);
@@ -37,9 +37,17 @@ cek("tidak melebihi batas per sesi", layak({ ...dasar, jumlah: ATURAN.maksPerSes
 cek("tidak sebelum jeda habis", layak({ ...dasar, menunggu: 1 }) === false);
 cek("tidak saat baru mengetik atau menyentuh layar", layak({ ...dasar, diamMs: 1000 }) === false && layak({ ...dasar, diamMs: ATURAN.diamMinDetik * 1000 }) === true);
 cek("undi: kadang muncul, kadang tidak", undi(dasar, () => 0.1) === true && undi(dasar, () => 0.9) === false);
-cek("undi tidak pernah lolos bila tidak layak", undi({ ...dasar, halamanBab: false }, () => 0) === false);
+cek("undi tidak pernah lolos bila tidak layak", undi({ ...dasar, terlihat: false }, () => 0) === false);
 cek("tampil 9 detik dan di bawah 10 detik", ATURAN.tampilMs === 9000 && ATURAN.tampilMs <= 10000);
 cek("jeda awal dan antar kemunculan dalam rentang", tundaAwal(() => 0) === 120000 && tundaAwal(() => 1) === 240000 && jedaBerikut(() => 0) === 300000 && jedaBerikut(() => 1) === 600000);
+
+console.log("\n== kunjungan pertama hari ini ==");
+const hariIni = new Date(2026, 9, 10, 8, 30);
+cek("tanggalLokal berbentuk YYYY-MM-DD dengan nol di depan", tanggalLokal(new Date(2026, 0, 5)) === "2026-01-05" && tanggalLokal(hariIni) === "2026-10-10");
+cek("penanda kosong atau rusak: dianggap pertama hari ini", pertamaHariIni(null, hariIni) === true && pertamaHariIni("", hariIni) === true && pertamaHariIni("abc", hariIni) === true);
+cek("penanda tanggal lain (kemarin): pertama hari ini", pertamaHariIni("2026-10-09", hariIni) === true);
+cek("penanda tanggal hari ini: bukan pertama lagi", pertamaHariIni("2026-10-10", hariIni) === false);
+cek("lewat tengah malam jadi pertama lagi", pertamaHariIni("2026-10-10", new Date(2026, 9, 11, 0, 5)) === true);
 
 console.log("\n== pemilihan ==");
 const p1 = pilihPromo(PROMO, [], () => 0);
