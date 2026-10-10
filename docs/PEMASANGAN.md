@@ -46,21 +46,24 @@ Prinsipnya: **Anda tidak mengedit berkas apa pun di repositori.** URL dan kunci 
 
 Tidak perlu membuat proyek baru dan tidak perlu menghapus apa pun. Migrasi bersifat menambah dan aman untuk data yang sudah ada.
 
-1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan tujuh kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
+1. Di **SQL Editor**, jalankan `supabase/periksa_migrasi.sql`. Hasilnya satu baris dengan delapan kolom. Jalankan hanya migrasi yang masih `false`, berurutan:
 
-   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | `0005_integritas` | `0006_kehadiran` | `0007_riset_perilaku` | Yang perlu dijalankan |
-   |---|---|---|---|---|---|---|---|
-   | false | false | false | false | false | false | false | `0001` sampai `0007`, berurutan |
-   | true | true | true | true | true | true | false | **hanya `0007`** |
-   | true | true | true | true | true | false | false | `0006`, lalu `0007` |
-   | true | true | true | true | false | false | false | `0005`, `0006`, lalu `0007` |
-   | true | true | true | true | true | true | true | tidak ada, sudah mutakhir |
+   | `0001_skema` | `0002_keamanan` | `0003_matakuliah` | `0004_kelas` | `0005_integritas` | `0006_kehadiran` | `0007_riset_perilaku` | `0008_praktikum` | Yang perlu dijalankan |
+   |---|---|---|---|---|---|---|---|---|
+   | false | false | false | false | false | false | false | false | `0001` sampai `0008`, berurutan |
+   | true | true | true | true | true | true | true | false | **hanya `0008`** |
+   | true | true | true | true | true | true | false | false | `0007`, lalu `0008` |
+   | true | true | true | true | true | false | false | false | `0006`, `0007`, lalu `0008` |
+   | true | true | true | true | false | false | false | false | `0005` sampai `0008`, berurutan |
+   | true | true | true | true | true | true | true | true | tidak ada, sudah mutakhir |
 
    `0005` menambah pelacakan keaslian pengerjaan (perangkat dan cara menulis); lihat [DASHBOARD-INSTRUKTUR.md](DASHBOARD-INSTRUKTUR.md). Tanpa `0005`, situs tetap berjalan, tetapi tab Sinyal integritas kosong dan dashboard menampilkan galat saat memuatnya.
 
    `0006` menambah kehadiran dan keaktifan (jadwal per kelas, sesi belajar, jam server, koreksi); lihat [KEHADIRAN.md](KEHADIRAN.md). Migrasinya hanya menambah dan tidak mengubah data peserta yang sudah ada. **Jalankan `0006` di Supabase lebih dulu, baru pasang versi situs yang baru**; bila terbalik, jam belajar yang terkirim pada selang itu hilang (peserta tetap bisa belajar seperti biasa). Tanpa `0006`, hanya tab Kehadiran yang menampilkan pesan belum dipasang; tab lain tetap jalan.
 
    `0007` menambah jejak peserta dan riset: setiap Jalankan dan Kirim dicatat dengan hasil dan jenis galat, serta persetujuan penelitian peserta; lihat [RISET-PERILAKU.md](RISET-PERILAKU.md). Migrasinya hanya menambah. Bila situs baru tayang sebelum `0007` dijalankan, Kirim tetap tersimpan seperti biasa (tanpa kolom baru), baris Jalankan dilewati, dan tab Riset serta pilihan persetujuan menampilkan pesan belum dipasang.
+
+   `0008` menambah praktikum proyek (empat tabel baru untuk berkas kerja, status tahap, riwayat versi, dan laporan praktikum); lihat [PRAKTIKUM.md](PRAKTIKUM.md). Migrasinya hanya menambah tabel baru dan tidak menyentuh data peserta yang sudah ada. Situs aman dipasang sebelum atau sesudahnya: tanpa `0008`, pekerjaan praktikum peserta tetap tersimpan di browser dan tab Praktikum dosen menampilkan petunjuk.
 
 2. Jalankan masing-masing di query baru, **berurutan**.
 3. Menjalankan ulang migrasi yang sudah terpasang juga aman, dalam urutan apa pun (sudah diuji), tetapi tidak perlu.

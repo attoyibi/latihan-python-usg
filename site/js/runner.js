@@ -18,6 +18,17 @@ export const onReadyChange = (cb) => py.langgan(cb);
 // Bahasa yang sudah punya penjalan: Python (Pyodide) dan Java (CheerpJ + ECJ, lihat javarunner.js).
 export const supports = (lang) => lang === "python" || lang === "java";
 
+// Praktikum: menguji atau menjalankan proyek berisi beberapa berkas (lihat praktikum.js dan praktikum_harness.py).
+// perintah: {aksi: "kasus", kasus: [...]} atau {aksi: "jalankan", entri, masukan}. batasMs: batas waktu seluruh pekerjaan.
+export async function runProyek(berkas, perintah, batasMs = TIMEOUT_MS * 2) {
+  try {
+    await py.tunggu();
+  } catch (e) {
+    return { timeout: false, error: e.message + " Tekan Coba lagi di atas editor.", proyek: null };
+  }
+  return py.jalankan({ mode: "proyek", berkas, perintah }, batasMs, (m) => ({ timeout: false, error: m.error, proyek: m.proyek || null }));
+}
+
 // Menjalankan kode. echo=true menampilkan teks prompt dan masukan di keluaran (mode coba bebas).
 export async function run(code, inputs, echo, lang = "python") {
   if (!supports(lang)) {

@@ -120,6 +120,118 @@ def cek_materi(c):
     for m in materi:
         if m.get("challenge"):
             cek_challenge(cid, m["bab"])
+    cek_praktikum(c, [m.get("bab") for m in materi])
+
+
+NAMA_BERKAS_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$")
+EKSTENSI_PRAKTIKUM = (".py", ".txt", ".json", ".csv", ".md")
+
+
+def cek_praktikum(c, babs):
+    """Praktikum bersifat opsional: tanpa folder praktikum/ tidak ada yang diperiksa."""
+    cid = c["id"]
+    folder = KULIAH / cid / "praktikum"
+    bendera = c.get("praktikum") is True
+    if folder.exists() and not bendera:
+        err(f"matakuliah.json[{cid}]: ada folder praktikum/, tambahkan \"praktikum\": true agar situs memuatnya")
+    if bendera and not folder.exists():
+        err(f"matakuliah.json[{cid}]: \"praktikum\": true, tetapi folder kuliah/{cid}/praktikum/ tidak ada")
+    if not folder.exists():
+        return
+    indeks = load(folder / "index.json")
+    if indeks is None:
+        return
+    pre = f"kuliah/{cid}/praktikum"
+    if not isinstance(indeks, list) or not indeks:
+        err(f"{pre}/index.json: harus berupa daftar berisi minimal satu praktikum")
+        return
+    ids = set()
+    for i, e in enumerate(indeks):
+        w = f"{pre}/index.json[{i}]"
+        if not isinstance(e, dict) or not ID_RE.fullmatch(str(e.get("id", ""))) or len(e["id"]) > 60:
+            err(f"{w}: 'id' wajib huruf kecil, angka, dan strip (maksimal 60 karakter)")
+            continue
+        if e["id"] in ids:
+            err(f"{w}: id '{e['id']}' kembar")
+        ids.add(e["id"])
+        if not e.get("berkas"):
+            err(f"{w}: kolom 'berkas' tidak ada")
+            continue
+        pk = load(folder / e["berkas"])
+        if pk is not None:
+            cek_satu_praktikum(c, babs, e, pk, f"{pre}/{e['berkas']}")
+
+
+def cek_satu_praktikum(c, babs, e, pk, w):
+    if pk.get("id") != e["id"]:
+        err(f"{w}: id praktikum ({pk.get('id')!r}) harus sama dengan index.json ({e['id']!r})")
+    for k in ("judul", "deskripsi", "bahasa", "entri", "tahap"):
+        if k not in pk:
+            err(f"{w}: kolom '{k}' tidak ada")
+    if pk.get("bahasa") != "python" or c.get("bahasa") != "python":
+        err(f"{w}: saat ini praktikum hanya didukung untuk bahasa python (mata kuliah dan praktikum)")
+    if pk.get("jalur") not in (None, ["web"]):
+        err(f"{w}: 'jalur' pada fase ini hanya boleh ['web']")
+    if not isinstance(pk.get("entri"), str) or not NAMA_BERKAS_RE.fullmatch(pk.get("entri", "")):
+        err(f"{w}: 'entri' bukan nama berkas yang sah")
+    tahap = pk.get("tahap")
+    if not isinstance(tahap, list) or not tahap:
+        err(f"{w}: 'tahap' harus berupa daftar berisi minimal satu tahap")
+        return
+    if e.get("jumlahTahap") not in (None, len(tahap)):
+        err(f"{w}: jumlahTahap di index.json ({e.get('jumlahTahap')}) tidak sama dengan jumlah tahap ({len(tahap)})")
+    ada_id = set()
+    nama_contoh = {}
+    for i, t in enumerate(tahap):
+        x = f"{w}.tahap[{i}]"
+        tid = str(t.get("id", ""))
+        if not ID_RE.fullmatch(tid) or len(tid) > 40:
+            err(f"{x}: 'id' wajib huruf kecil, angka, dan strip (maksimal 40 karakter)")
+        if tid in ada_id:
+            err(f"{x}: id tahap '{tid}' kembar")
+        ada_id.add(tid)
+        for k in ("judul", "tujuan", "langkah", "diminta", "awal", "contoh", "kasus"):
+            if k not in t:
+                err(f"{x}: kolom '{k}' tidak ada")
+        for b in t.get("bab", []):
+            if b not in babs:
+                err(f"{x}: bab {b} tidak ada di materi.json")
+        if not t.get("langkah") or not all(isinstance(l, str) and l.strip() for l in t.get("langkah", [])):
+            err(f"{x}: 'langkah' harus daftar teks tidak kosong")
+        for jenis, kamus in (("awal", t.get("awal", {})), ("contoh", t.get("contoh", {}))):
+            if not isinstance(kamus, dict):
+                err(f"{x}: '{jenis}' harus berupa kamus nama berkas -> isi")
+                continue
+            for n, isi in kamus.items():
+                if not NAMA_BERKAS_RE.fullmatch(n) or not n.lower().endswith(EKSTENSI_PRAKTIKUM):
+                    err(f"{x}.{jenis}: nama berkas tidak sah: {n!r}")
+                if not isinstance(isi, str) or len(isi) > 100000:
+                    err(f"{x}.{jenis}.{n}: isi harus teks (maksimal 100000 karakter)")
+        for n in t.get("contoh", {}):
+            nama_contoh[n] = nama_contoh.get(n, 0) + 1
+        sedia = set(t.get("awal", {})) | set(t.get("contoh", {}))
+        for n in t.get("diminta", []):
+            if n not in sedia:
+                err(f"{x}: berkas diminta {n!r} tidak ada di 'awal' maupun 'contoh'")
+        if not t.get("kasus"):
+            err(f"{x}: minimal satu kasus uji")
+        for j, k in enumerate(t.get("kasus", [])):
+            y = f"{x}.kasus[{j}]"
+            if not k.get("nama"):
+                err(f"{y}: 'nama' tidak ada")
+            if ("kode" in k) == ("jalankan" in k):
+                err(f"{y}: isi tepat salah satu dari 'kode' atau 'jalankan'")
+            if "jalankan" in k and not NAMA_BERKAS_RE.fullmatch(str(k["jalankan"])):
+                err(f"{y}: 'jalankan' bukan nama berkas yang sah")
+        for pj in t.get("petunjuk", []):
+            if pj.get("jenis") not in ("soal", "buku", "kode", "kata") or not pj.get("isi"):
+                err(f"{x}: petunjuk harus berisi jenis (soal, buku, kode, kata) dan isi")
+    # Berkas contoh milik satu tahap saja: dua tahap tidak boleh memberi contoh untuk nama berkas yang sama
+    for n, jumlah in nama_contoh.items():
+        if jumlah > 1:
+            err(f"{w}: berkas contoh {n!r} muncul di {jumlah} tahap (tiap berkas dimiliki satu tahap)")
+    if pk.get("entri") not in nama_contoh:
+        err(f"{w}: berkas entri {pk.get('entri')!r} tidak ada di contoh tahap mana pun")
 
 
 def cek_konsep(w, ch):

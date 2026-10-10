@@ -15,6 +15,9 @@ import { $, h } from "./dom.js";
 import * as Sinkron from "./sinkron.js";
 import * as Tata from "./tata.js";
 import { renderInstruktur } from "./instruktur.js";
+import * as PraktikumUI from "./praktikum-ui.js";
+import * as PraktikumData from "./praktikum-data.js";
+import { babBerpraktik } from "./praktikum.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
 // Progres ditulis ke sini lebih dulu, lalu disusulkan ke Supabase oleh sinkron.js.
@@ -43,6 +46,7 @@ let current = 0;
 let editor = null;
 let TATA = null; // pilihan tata letak halaman bab (lihat tata.js)
 let LANG = "python";
+let PRAKTIKUM = []; // praktikum mata kuliah yang sedang dibuka (kosong bila tidak ada; fitur tidak muncul)
 
 const LANG_LABEL = { python: "Python", java: "Java" };
 const CM_MODE = { python: "python", java: "text/x-java" };
@@ -726,6 +730,7 @@ async function renderBab(n) {
   const bar = Tata.pasang(cols, vc, TATA, { punyaVideo: !!(m.video && m.video.length), punyaEditor: m.jenis === "kode", ambilEditor: () => editor });
   main.replaceChildren(...[
     infoBar,
+    PraktikumUI.notifBab(ctxPraktikum(), PRAKTIKUM, m.bab),
     h(
       "section",
       { class: "card bab-intro" },
@@ -745,6 +750,7 @@ async function renderBab(n) {
 }
 
 function babGrid() {
+  const berpraktik = babBerpraktik(PRAKTIKUM);
   return h(
     "div",
     { class: "grid" },
@@ -758,7 +764,8 @@ function babGrid() {
           {},
           h("span", { class: "num" }, "BAB " + String(m.bab).padStart(2, "0") + (m.jenis === "unggah" ? " / UNGGAH TUGAS" : m.jenis === "konsep" ? " / KONSEP" : " / KODE")),
           h("strong", {}, m.judul),
-          h("span", { class: "muted" }, STATUS_TEXT[statusOf(m.bab)])
+          h("span", { class: "muted" }, STATUS_TEXT[statusOf(m.bab)]),
+          berpraktik.has(m.bab) ? PraktikumUI.tandaAdaPraktik() : null
         )
       )
     )
@@ -928,9 +935,12 @@ function renderCourse(c) {
     ),
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
-    ready ? babGrid() : null
+    ready ? babGrid() : null,
+    ready ? PraktikumUI.bagianPraktikum(ctxPraktikum(), PRAKTIKUM) : null
   ].filter(Boolean));
 }
+
+const ctxPraktikum = () => ({ store, kuliah: COURSE, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur", ulang: () => route() });
 
 function renderTidakAda() {
   $("#main").replaceChildren(gateCard("Halaman tidak ditemukan", "Mata kuliah atau bab yang kamu cari belum ada.", h("div", { class: "actions" }, h("a", { class: "btn btn-primary", href: "#kuliah" }, "Lihat mata kuliah"))));
@@ -1615,6 +1625,31 @@ async function route() {
     return;
   }
 
+  if ((m = /^#k\/([a-z0-9-]+)\/praktikum\/([a-z0-9-]+)(?:\/([a-z0-9-]+))?$/.exec(hash))) {
+    const c = await loadCourse(m[1]);
+    if (stale()) return;
+    if (!c || !c.aktif) {
+      setPage("kuliah");
+      renderTidakAda();
+      return;
+    }
+    useCourse(c, true);
+    PRAKTIKUM = await PraktikumData.muatDaftar(c.id, c.praktikum === true);
+    if (stale()) return;
+    const pk = PRAKTIKUM.find((x) => x.id === m[2]);
+    const idx = pk && m[3] ? pk.tahap.findIndex((t) => t.id === m[3]) : -1;
+    setPage("course");
+    if (!pk || (m[3] && idx < 0)) {
+      renderTidakAda();
+      return;
+    }
+    $("#pyStatus").hidden = c.bahasa !== "python";
+    if (c.bahasa === "python") start();
+    Sesi.catatKonteks(c.id, null);
+    window.scrollTo(0, 0);
+    $("#main").replaceChildren(...(m[3] ? PraktikumUI.halamanTahap(ctxPraktikum(), pk, idx) : PraktikumUI.halamanPraktikum(ctxPraktikum(), pk)));
+    return;
+  }
   if ((m = /^#k\/([a-z0-9-]+)\/bab-(\d+)$/.exec(hash))) {
     const c = await loadCourse(m[1]);
     if (stale()) return;
@@ -1625,6 +1660,8 @@ async function route() {
       return;
     }
     useCourse(c, true);
+    PRAKTIKUM = await PraktikumData.muatDaftar(c.id, c.praktikum === true);
+    if (stale()) return;
     setPage("bab");
     $("#pyStatus").hidden = c.bahasa !== "python" && c.bahasa !== "java";
     if (c.bahasa === "python") start();
@@ -1642,6 +1679,8 @@ async function route() {
     }
     const ready = c.aktif && c.materi.length > 0;
     useCourse(c, ready);
+    PRAKTIKUM = ready ? await PraktikumData.muatDaftar(c.id, c.praktikum === true) : [];
+    if (stale()) return;
     setPage("course");
     $("#pyStatus").hidden = c.bahasa !== "python";
     window.scrollTo(0, 0);

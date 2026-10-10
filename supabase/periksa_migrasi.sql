@@ -7,7 +7,8 @@
 -- 0005 = sinyal keaslian pengerjaan (perangkat, pola dan rekaman menulis).
 -- 0006 = kehadiran dan keaktifan (jadwal per kelas, sesi belajar, jam server, koreksi).
 -- 0007 = jejak peserta dan riset (setiap Jalankan, hasil, jenis galat, persetujuan penelitian).
--- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0007).
+-- 0008 = praktikum (berkas kerja, status tahap, riwayat versi, laporan praktikum).
+-- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0008).
 
 select
   to_regclass('public.profiles') is not null as "0001_skema",
@@ -38,4 +39,8 @@ select
     select 1 from information_schema.columns
     where table_schema = 'public' and table_name = 'profiles' and column_name = 'riset_setuju'
   )
-    and to_regclass('public.riset_ekspor_log') is not null as "0007_riset_perilaku";
+    and to_regclass('public.riset_ekspor_log') is not null as "0007_riset_perilaku",
+  to_regclass('public.praktikum_berkas') is not null
+    and to_regclass('public.praktikum_tahap') is not null
+    and to_regclass('public.praktikum_versi') is not null
+    and to_regclass('public.praktikum_laporan') is not null as "0008_praktikum";

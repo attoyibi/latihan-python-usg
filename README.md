@@ -77,6 +77,7 @@ kunci/                Kunci jawaban (TIDAK diterbitkan, ada di .gitignore)
 - [Sistem desain](docs/DESIGN.md)
 - [Analisis dan rencana](docs/ANALISIS-DAN-RENCANA.md)
 - [Riset video pengganti](docs/RISET-VIDEO-PENGGANTI.md)
+- [Praktikum proyek berantai](docs/PRAKTIKUM.md)
 
 ## Keterbatasan yang perlu diketahui
 

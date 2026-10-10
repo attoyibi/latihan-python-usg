@@ -374,3 +374,13 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - Tab Aktivitas: Per bulan dan Semester (periode otomatis dari jadwal kelas lewat `periodeSemester`, `daftarMinggu`, `daftarBulan`, `ringkasRentang`, `kurvaMingguan`, `rataRingkas`, `csvSemester` di `kehadiran.js`; tanpa tabel baru). Daftar dan kalender, urut kolom, rata-rata per kelas, CSV, kurva mingguan di rincian peserta.
 - Sesi yang melewati tengah malam kini dihitung pada hari ia dimulai (sebelumnya terhitung aktif di dua hari). Waktu Jalankan dicatat terpisah di `kejadian.jalan`.
 - Perbaikan: urutan nama pada klik pertama di Jejak peserta dan Semester kini A ke Z. Uji kehadiran 111.
+
+## Praktikum proyek berantai (migrasi 0008)
+
+- [x] Migrasi `0008_praktikum.sql` (hanya menambah empat tabel; RLS peserta mengelola miliknya, instruktur membaca; jam server; batas 40 berkas); uji PGlite pada data lama
+- [x] Penguji Python bersama browser dan CPython (`praktikum_harness.py`), diuji 117 kasus dengan Python sungguhan (`tools/uji_praktikum.py`)
+- [x] Praktikum Kasir UD Rasa Gresik (10 tahap) di Algoritma dan Pemrograman; konfigurasi JSON, tanpa aturan waktu di kode
+- [x] Halaman mata kuliah (bagian Praktikum, tanda Ada praktik), notifikasi di bab, daftar tahap, ruang kerja berkas, riwayat versi, laporan 3 kolom dan PDF, ekspor satu halaman HTML
+- [x] Tab Praktikum di dashboard dosen (matriks, per tahap, lihat berkas, CSV)
+- [x] Diuji di browser (Pyodide nyata, ekspor HTML dengan `input()`, ponsel 375 px, tanpa migrasi 0008, PBO tidak berubah)
+- [ ] Belum diuji di Supabase sungguhan dan ponsel sungguhan; jalur laptop, jalur ponsel, dan praktikum Java belum ada

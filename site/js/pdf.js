@@ -49,7 +49,7 @@ export function susunLaporan(d) {
 }
 
 let jspdfJanji = null;
-function muatJsPdf() {
+export function muatJsPdf() {
   if (globalThis.jspdf && globalThis.jspdf.jsPDF) return Promise.resolve(globalThis.jspdf.jsPDF);
   if (!jspdfJanji) {
     jspdfJanji = new Promise((resolve, reject) => {
@@ -149,6 +149,12 @@ export async function buatPdf(d) {
   const JsPDF = await muatJsPdf();
   const doc = gambarPdf(JsPDF, susunLaporan(d), d.kodeVerifikasi);
   return doc.output("blob");
+}
+
+/** PDF dari blok yang sudah disusun (dipakai laporan praktikum, yang menyusun bloknya sendiri). */
+export async function buatPdfBlok(blok, kodeVerifikasi) {
+  const JsPDF = await muatJsPdf();
+  return gambarPdf(JsPDF, blok, kodeVerifikasi).output("blob");
 }
 
 export function namaBerkas(d) {

@@ -65,6 +65,10 @@ Tekan "Baca dan nilai" untuk membaca lima kolom (tujuan, pertanyaan konsep, lang
 
 Perlu migrasi `0006_kehadiran.sql`. Rincian cara kerja, aturan hitung, dan batasnya ada di [KEHADIRAN.md](KEHADIRAN.md). Ringkasnya, tab ini punya enam bagian: **Kesiapan** (siapa sudah menyiapkan diri sebelum kelas berikutnya), **Per pertemuan** (kesiapan, keterlibatan saat kelas, dan status hadir, dengan koreksi manual), **Semua pertemuan** (matriks dan CSV), **Aktivitas** (per hari atau per minggu, daftar atau kalender), **Keaktifan** (skor 0 sampai 100 beserta rinciannya), dan **Jadwal** (jadwal tiap kelas, bisa diubah, digeser, atau ditandai libur). Absensi resmi tetap SIAKAD.
 
+## Tab Praktikum
+
+Perlu migrasi `0008_praktikum.sql`. Matriks peserta × tahap praktikum proyek (lulus, lulus dengan berkas contoh, sedang, dilewati), jumlah kirim, status laporan, percobaan tempel, ringkasan per tahap, *Lihat berkas* (hanya baca), dan unduh CSV. Rincian di [PRAKTIKUM.md](PRAKTIKUM.md).
+
 ## Tab Jejak peserta dan Riset
 
 Perlu migrasi `0007_riset_perilaku.sql`. Rincian ada di [RISET-PERILAKU.md](RISET-PERILAKU.md). **Jejak peserta** menampilkan semua peserta yang masuk (termasuk yang belum mengerjakan apa pun); tiap peserta bisa dibuka menjadi riwayat satu baris per Jalankan atau Kirim dengan kolom yang bisa dipilih (Waktu, Bab, Hasil, Mengetik, Dihapus, Linier, Lompat, Jalankan, dan lainnya) dan dapat diputar ulang cara menulisnya. **Riset** hanya memuat peserta yang menyetujui: ringkasan kohort dan ekspor data anonim (CSV atau JSON, beserta kamus data).

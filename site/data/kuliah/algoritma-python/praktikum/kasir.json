@@ -1,0 +1,831 @@
+{
+ "id": "kasir",
+ "judul": "Kasir UD Rasa Gresik",
+ "deskripsi": "Satu proyek yang tumbuh dari bab ke bab dan berakhir pada aplikasi kasir yang bisa dijalankan. Kamu menulis berkasnya sendiri; tiap tahap memakai berkas tahap sebelumnya.",
+ "bahasa": "python",
+ "jalur": [
+  "web"
+ ],
+ "entri": "kasir.py",
+ "gambaran": [
+  "UD Rasa Gresik menjual oleh-oleh dalam boks: keripik, petis, dan dodol. Pak Fauzan memberi potongan bila pelanggan membeli banyak, dan Bu Ida ingin kasir yang menghitung tagihan, mencetak struk, dan menyimpan belanjaan.",
+  "Praktikum ini membangun kasir itu sedikit demi sedikit. Tahap 1 sampai 9 masing-masing menambah satu berkas yang dipakai tahap berikutnya, dan tahap 10 menyatukan semuanya menjadi aplikasi yang bisa dijalankan.",
+  "Tidak ada tahap yang terkunci dan semua boleh dilewati. Bila kamu melewati satu tahap, tahap berikutnya otomatis memakai berkas contoh dari tahap itu supaya proyekmu tetap bisa jalan; kamu bisa kembali mengerjakannya kapan saja.",
+  "Ruang kerjanya bebas: kamu boleh membuat berkas baru untuk mencoba apa saja, menjalankan berkas mana pun, dan membuat salah. Yang dinilai hanya berkas yang diminta di tiap tahap."
+ ],
+ "tahap": [
+  {
+   "id": "t01",
+   "judul": "Hitung subtotal dan format rupiah",
+   "bab": [
+    2
+   ],
+   "tujuan": "Membuat dua fungsi kecil yang dipakai di seluruh aplikasi kasir: menghitung subtotal dan menulis angka sebagai rupiah.",
+   "langkah": [
+    "Buat berkas subtotal.py (sudah ada kerangkanya di editor).",
+    "Tulis subtotal(jumlah, harga_satuan) yang mengembalikan jumlah dikali harga satuan.",
+    "Tulis format_rupiah(angka) yang mengembalikan teks seperti \"Rp1.250.000\": awalan Rp, titik sebagai pemisah ribuan, tanpa desimal.",
+    "Coba di berkas coba.py (boleh kamu buat sendiri): print(format_rupiah(subtotal(3, 25000))). Lalu tekan Kirim jawaban."
+   ],
+   "diminta": [
+    "subtotal.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Subtotal hanya perkalian. Untuk format_rupiah, f\"{angka:,.0f}\" memberi 1,250,000 dengan koma sebagai pemisah ribuan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Baca lagi bagian f-string dan format angka di bab 2, lalu ingat replace() milik teks untuk mengganti koma dengan titik."
+    },
+    {
+     "jenis": "soal",
+     "isi": "return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")"
+    }
+   ],
+   "awal": {
+    "subtotal.py": "# subtotal.py\n\ndef subtotal(jumlah, harga_satuan):\n    # kembalikan jumlah dikali harga satuan\n    pass\n\n\ndef format_rupiah(angka):\n    # kembalikan teks seperti \"Rp1.250.000\"\n    pass\n"
+   },
+   "contoh": {
+    "subtotal.py": "# subtotal.py\n\ndef subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n\n\ndef format_rupiah(angka):\n    return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")\n"
+   },
+   "kasus": [
+    {
+     "nama": "subtotal 3 boks harga 25.000",
+     "kode": "from subtotal import subtotal\nassert subtotal(3, 25000) == 75000"
+    },
+    {
+     "nama": "subtotal nol boks",
+     "kode": "from subtotal import subtotal\nassert subtotal(0, 25000) == 0"
+    },
+    {
+     "nama": "subtotal harga bukan bulat",
+     "kode": "from subtotal import subtotal\nassert subtotal(4, 12500) == 50000"
+    },
+    {
+     "nama": "format jutaan",
+     "kode": "from subtotal import format_rupiah\nassert format_rupiah(1250000) == \"Rp1.250.000\""
+    },
+    {
+     "nama": "format ribuan",
+     "kode": "from subtotal import format_rupiah\nassert format_rupiah(75000) == \"Rp75.000\""
+    },
+    {
+     "nama": "format di bawah seribu",
+     "kode": "from subtotal import format_rupiah\nassert format_rupiah(500) == \"Rp500\""
+    },
+    {
+     "nama": "format nol",
+     "kode": "from subtotal import format_rupiah\nassert format_rupiah(0) == \"Rp0\""
+    },
+    {
+     "nama": "hasil format berupa teks",
+     "kode": "from subtotal import format_rupiah\nassert isinstance(format_rupiah(1000), str)"
+    },
+    {
+     "nama": "gabungan (tersembunyi)",
+     "kode": "from subtotal import subtotal, format_rupiah\nassert format_rupiah(subtotal(7, 12500)) == \"Rp87.500\"\nassert format_rupiah(1440000.0) == \"Rp1.440.000\"",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t02",
+   "judul": "Potongan harga bertingkat",
+   "bab": [
+    4
+   ],
+   "tujuan": "Menerapkan aturan potongan UD Rasa Gresik dan menghitung total bayar dengan memakai fungsi dari tahap 1.",
+   "langkah": [
+    "Buat berkas harga.py. Baris pertamanya mengimpor subtotal dari subtotal.py milikmu.",
+    "Tulis potongan(jumlah_boks): 100 boks atau lebih mengembalikan 0.12, 50 sampai 99 boks mengembalikan 0.08, selain itu 0.0.",
+    "Tulis total_bayar(jumlah_boks, harga_satuan): subtotal dikurangi potongannya. Pakai subtotal() dan potongan(), jangan menulis ulang rumusnya.",
+    "Uji di coba.py, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "harga.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Periksa dari batas yang paling besar dulu: if jumlah_boks >= 100, elif jumlah_boks >= 50, else."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 4 membahas if, elif, else dan urutan memeriksa kondisi."
+    }
+   ],
+   "awal": {
+    "harga.py": "# harga.py\nfrom subtotal import subtotal\n\n\ndef potongan(jumlah_boks):\n    # 100 atau lebih -> 0.12, 50 sampai 99 -> 0.08, selain itu 0.0\n    pass\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    # subtotal dikurangi potongan\n    pass\n"
+   },
+   "contoh": {
+    "harga.py": "# harga.py\nfrom subtotal import subtotal\n\n\ndef potongan(jumlah_boks):\n    if jumlah_boks >= 100:\n        return 0.12\n    elif jumlah_boks >= 50:\n        return 0.08\n    else:\n        return 0.0\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    kotor = subtotal(jumlah_boks, harga_satuan)\n    return kotor - kotor * potongan(jumlah_boks)\n"
+   },
+   "kasus": [
+    {
+     "nama": "potongan 100 boks",
+     "kode": "from harga import potongan\nassert potongan(100) == 0.12"
+    },
+    {
+     "nama": "potongan di atas 100 boks",
+     "kode": "from harga import potongan\nassert potongan(250) == 0.12"
+    },
+    {
+     "nama": "potongan tepat 50 boks",
+     "kode": "from harga import potongan\nassert potongan(50) == 0.08"
+    },
+    {
+     "nama": "potongan 99 boks",
+     "kode": "from harga import potongan\nassert potongan(99) == 0.08"
+    },
+    {
+     "nama": "tanpa potongan 49 boks",
+     "kode": "from harga import potongan\nassert potongan(49) == 0.0"
+    },
+    {
+     "nama": "tanpa potongan nol boks",
+     "kode": "from harga import potongan\nassert potongan(0) == 0.0"
+    },
+    {
+     "nama": "total 100 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(100, 10000) - 880000) < 0.01"
+    },
+    {
+     "nama": "total 60 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(60, 10000) - 552000) < 0.01"
+    },
+    {
+     "nama": "total 10 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(10, 25000) - 250000) < 0.01"
+    },
+    {
+     "nama": "harga.py memakai subtotal dari tahap 1 (tersembunyi)",
+     "kode": "import harga\nassert hasattr(harga, 'subtotal'), 'harga.py harus mengimpor subtotal dari subtotal.py'",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t03",
+   "judul": "Banyak pesanan dengan perulangan",
+   "bab": [
+    5
+   ],
+   "tujuan": "Membaca beberapa pesanan sekaligus dan menghitung tagihan tiap pesanan serta jumlah seluruhnya.",
+   "langkah": [
+    "Buat berkas menu.py dengan fungsi hitung_semua().",
+    "Baca n (banyak pesanan) dengan input(). Lalu ulangi n kali: baca jumlah boks dan harga satuan (dua input() terpisah).",
+    "Tiap pesanan cetak persis: Pesanan 1: Rp880.000 (nomor mulai dari 1, jumlahnya dari total_bayar dan format_rupiah).",
+    "Setelah semua pesanan cetak: Total semua: Rp930.000. Panggil hitung_semua() di bagian paling bawah berkas.",
+    "Jalankan menu.py dengan masukan 2, 100, 10000, 10, 5000 untuk memeriksa, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "menu.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "for i in range(1, n + 1): memberi nomor pesanan dari 1."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 5 menjelaskan for, range, dan akumulator (variabel yang dijumlahkan di tiap putaran)."
+    }
+   ],
+   "awal": {
+    "menu.py": "# menu.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef hitung_semua():\n    # baca n, lalu ulangi n kali membaca jumlah boks dan harga satuan\n    pass\n\n\nhitung_semua()\n"
+   },
+   "contoh": {
+    "menu.py": "# menu.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef hitung_semua():\n    n = int(input())\n    jumlah_total = 0\n    for i in range(1, n + 1):\n        jumlah_boks = int(input())\n        harga_satuan = int(input())\n        tagihan = total_bayar(jumlah_boks, harga_satuan)\n        print(f\"Pesanan {i}: {format_rupiah(tagihan)}\")\n        jumlah_total += tagihan\n    print(f\"Total semua: {format_rupiah(jumlah_total)}\")\n\n\nhitung_semua()\n"
+   },
+   "kasus": [
+    {
+     "nama": "dua pesanan",
+     "jalankan": "menu.py",
+     "masukan": [
+      "2",
+      "100",
+      "10000",
+      "10",
+      "5000"
+     ],
+     "memuat": [
+      "Pesanan 1: Rp880.000",
+      "Pesanan 2: Rp50.000",
+      "Total semua: Rp930.000"
+     ]
+    },
+    {
+     "nama": "satu pesanan",
+     "jalankan": "menu.py",
+     "masukan": [
+      "1",
+      "60",
+      "10000"
+     ],
+     "memuat": [
+      "Pesanan 1: Rp552.000",
+      "Total semua: Rp552.000"
+     ]
+    },
+    {
+     "nama": "tanpa pesanan",
+     "jalankan": "menu.py",
+     "masukan": [
+      "0"
+     ],
+     "memuat": [
+      "Total semua: Rp0"
+     ]
+    },
+    {
+     "nama": "tiga pesanan",
+     "jalankan": "menu.py",
+     "masukan": [
+      "3",
+      "50",
+      "20000",
+      "49",
+      "20000",
+      "100",
+      "1000"
+     ],
+     "memuat": [
+      "Pesanan 1: Rp920.000",
+      "Pesanan 2: Rp980.000",
+      "Pesanan 3: Rp88.000",
+      "Total semua: Rp1.988.000"
+     ]
+    },
+    {
+     "nama": "lima pesanan (tersembunyi)",
+     "jalankan": "menu.py",
+     "masukan": [
+      "5",
+      "1",
+      "1000",
+      "2",
+      "1000",
+      "3",
+      "1000",
+      "4",
+      "1000",
+      "5",
+      "1000"
+     ],
+     "memuat": [
+      "Pesanan 5: Rp5.000",
+      "Total semua: Rp15.000"
+     ],
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t04",
+   "judul": "Keranjang belanja dengan list",
+   "bab": [
+    6
+   ],
+   "tujuan": "Menyimpan barang yang dibeli dalam sebuah list dan menghitung total keranjang memakai total_bayar dari tahap 2.",
+   "langkah": [
+    "Buat berkas keranjang.py dengan list bernama isi di tingkat modul (di luar fungsi).",
+    "Tulis kosongkan(), tambah(nama, jumlah, harga_satuan), dan hapus(nama). hapus() mengembalikan True bila barangnya ada lalu dihapus, selain itu False.",
+    "Tulis total() yang menjumlahkan total_bayar() tiap barang di isi, dan banyak_jenis() yang mengembalikan banyaknya barang berbeda di keranjang.",
+    "Coba tambah dua barang di coba.py dan cetak total(). Lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "keranjang.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Simpan tiap barang sebagai list kecil [nama, jumlah, harga_satuan] lalu isi.append(...)."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 6: append, del, len, dan perulangan atas isi list."
+    }
+   ],
+   "awal": {
+    "keranjang.py": "# keranjang.py\nfrom harga import total_bayar\n\nisi = []\n\n\ndef kosongkan():\n    pass\n\n\ndef tambah(nama, jumlah, harga_satuan):\n    pass\n\n\ndef hapus(nama):\n    # True bila ada dan dihapus, False bila tidak ada\n    pass\n\n\ndef total():\n    pass\n\n\ndef banyak_jenis():\n    pass\n"
+   },
+   "contoh": {
+    "keranjang.py": "# keranjang.py\nfrom harga import total_bayar\n\nisi = []\n\n\ndef kosongkan():\n    isi.clear()\n\n\ndef tambah(nama, jumlah, harga_satuan):\n    isi.append([nama, jumlah, harga_satuan])\n\n\ndef hapus(nama):\n    for i in range(len(isi)):\n        if isi[i][0] == nama:\n            del isi[i]\n            return True\n    return False\n\n\ndef total():\n    jumlah = 0\n    for nama, banyak, harga in isi:\n        jumlah += total_bayar(banyak, harga)\n    return jumlah\n\n\ndef banyak_jenis():\n    return len(isi)\n"
+   },
+   "kasus": [
+    {
+     "nama": "keranjang kosong",
+     "kode": "import keranjang as k\nk.kosongkan()\nassert k.total() == 0\nassert k.banyak_jenis() == 0"
+    },
+    {
+     "nama": "tambah dua barang",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 100, 10000)\nk.tambah('petis', 10, 5000)\nassert k.banyak_jenis() == 2\nassert abs(k.total() - 930000) < 0.01"
+    },
+    {
+     "nama": "hapus barang yang ada",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 100, 10000)\nk.tambah('petis', 10, 5000)\nassert k.hapus('petis') is True\nassert abs(k.total() - 880000) < 0.01"
+    },
+    {
+     "nama": "hapus barang yang tidak ada",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 1, 1000)\nassert k.hapus('dodol') is False\nassert k.banyak_jenis() == 1"
+    },
+    {
+     "nama": "hapus dua kali",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('petis', 10, 5000)\nassert k.hapus('petis') is True\nassert k.hapus('petis') is False"
+    },
+    {
+     "nama": "kosongkan setelah diisi",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('petis', 10, 5000)\nk.kosongkan()\nassert k.banyak_jenis() == 0\nassert k.total() == 0"
+    },
+    {
+     "nama": "potongan dihitung per barang (tersembunyi)",
+     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('a', 60, 10000)\nk.tambah('b', 49, 10000)\nassert abs(k.total() - (552000 + 490000)) < 0.01",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t05",
+   "judul": "Struk belanja dengan fungsi",
+   "bab": [
+    8
+   ],
+   "tujuan": "Memecah pekerjaan menjadi fungsi-fungsi kecil yang masing-masing mengembalikan nilai, dan memakainya untuk menyusun struk.",
+   "langkah": [
+    "Buat berkas struk.py. Impor total_bayar dari harga.py dan format_rupiah dari subtotal.py.",
+    "Tulis baris_struk(nama, jumlah, harga_satuan) yang mengembalikan teks seperti: keripik x100 Rp880.000 (nama, spasi, x, jumlah, spasi, total rupiah).",
+    "Tulis buat_struk(isi) dengan isi berupa list [nama, jumlah, harga]. Hasilnya satu teks bersambung baris baru: baris pertama STRUK UD RASA GRESIK, satu baris per barang (dari baris_struk), baris terakhir TOTAL diikuti jumlah rupiah, misalnya TOTAL Rp930.000.",
+    "Cetak buat_struk([[\"keripik\", 100, 10000]]) di coba.py untuk memeriksa, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "struk.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Kumpulkan baris-barisnya dalam sebuah list, lalu gabungkan dengan \"\\n\".join(baris)."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 8: fungsi dengan parameter dan return, serta memanggil fungsi dari fungsi lain."
+    }
+   ],
+   "awal": {
+    "struk.py": "# struk.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    pass\n\n\ndef buat_struk(isi):\n    pass\n"
+   },
+   "contoh": {
+    "struk.py": "# struk.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    return f\"{nama} x{jumlah} {format_rupiah(total_bayar(jumlah, harga_satuan))}\"\n\n\ndef buat_struk(isi):\n    baris = [\"STRUK UD RASA GRESIK\"]\n    total = 0\n    for nama, jumlah, harga in isi:\n        baris.append(baris_struk(nama, jumlah, harga))\n        total += total_bayar(jumlah, harga)\n    baris.append(\"TOTAL \" + format_rupiah(total))\n    return \"\\n\".join(baris)\n"
+   },
+   "kasus": [
+    {
+     "nama": "satu baris struk",
+     "kode": "from struk import baris_struk\nassert baris_struk('keripik', 100, 10000) == 'keripik x100 Rp880.000'"
+    },
+    {
+     "nama": "baris tanpa potongan",
+     "kode": "from struk import baris_struk\nassert baris_struk('petis', 10, 5000) == 'petis x10 Rp50.000'"
+    },
+    {
+     "nama": "struk dua barang",
+     "kode": "from struk import buat_struk\nassert buat_struk([['keripik', 100, 10000], ['petis', 10, 5000]]).split('\\n') == ['STRUK UD RASA GRESIK', 'keripik x100 Rp880.000', 'petis x10 Rp50.000', 'TOTAL Rp930.000']"
+    },
+    {
+     "nama": "struk kosong",
+     "kode": "from struk import buat_struk\nassert buat_struk([]).split('\\n') == ['STRUK UD RASA GRESIK', 'TOTAL Rp0']"
+    },
+    {
+     "nama": "hasil berupa satu teks",
+     "kode": "from struk import buat_struk\nassert isinstance(buat_struk([['a', 1, 1000]]), str)"
+    },
+    {
+     "nama": "struk satu barang (tersembunyi)",
+     "kode": "from struk import buat_struk\nassert buat_struk([['dodol', 60, 10000]]) == 'STRUK UD RASA GRESIK\\ndodol x60 Rp552.000\\nTOTAL Rp552.000'",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t06",
+   "judul": "Kelas Barang dan Keranjang",
+   "bab": [
+    9
+   ],
+   "tujuan": "Mengubah keranjang menjadi objek: satu kelas untuk barang dan satu kelas untuk keranjang yang punya aksinya sendiri.",
+   "langkah": [
+    "Buat berkas model.py dan impor total_bayar dari harga.py.",
+    "Tulis kelas Barang dengan constructor Barang(nama, harga) yang menyimpan atribut nama dan harga.",
+    "Tulis kelas Keranjang dengan atribut isi (list pasangan (barang, jumlah)) yang dibuat di dalam __init__, supaya tiap keranjang punya isinya sendiri.",
+    "Beri Keranjang method tambah(barang, jumlah), hapus(nama) (True bila ada, False bila tidak), total() (jumlahkan total_bayar tiap pasangan), dan __len__ yang mengembalikan banyaknya pasangan.",
+    "Uji di coba.py, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "model.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "self.isi = [] harus ada di dalam __init__, bukan di tingkat kelas, supaya dua keranjang tidak berbagi satu list."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 9: kelas, constructor __init__, self, dan atribut objek."
+    }
+   ],
+   "awal": {
+    "model.py": "# model.py\nfrom harga import total_bayar\n\n\nclass Barang:\n    def __init__(self, nama, harga):\n        pass\n\n\nclass Keranjang:\n    def __init__(self):\n        pass\n\n    def tambah(self, barang, jumlah):\n        pass\n\n    def hapus(self, nama):\n        pass\n\n    def total(self):\n        pass\n\n    def __len__(self):\n        pass\n"
+   },
+   "contoh": {
+    "model.py": "# model.py\nfrom harga import total_bayar\n\n\nclass Barang:\n    def __init__(self, nama, harga):\n        self.nama = nama\n        self.harga = harga\n\n\nclass Keranjang:\n    def __init__(self):\n        self.isi = []\n\n    def tambah(self, barang, jumlah):\n        self.isi.append((barang, jumlah))\n\n    def hapus(self, nama):\n        for i, (barang, jumlah) in enumerate(self.isi):\n            if barang.nama == nama:\n                del self.isi[i]\n                return True\n        return False\n\n    def total(self):\n        jumlah_total = 0\n        for barang, jumlah in self.isi:\n            jumlah_total += total_bayar(jumlah, barang.harga)\n        return jumlah_total\n\n    def __len__(self):\n        return len(self.isi)\n"
+   },
+   "kasus": [
+    {
+     "nama": "atribut Barang",
+     "kode": "from model import Barang\nb = Barang('keripik', 10000)\nassert b.nama == 'keripik'\nassert b.harga == 10000"
+    },
+    {
+     "nama": "keranjang baru kosong",
+     "kode": "from model import Keranjang\nk = Keranjang()\nassert len(k) == 0\nassert k.total() == 0"
+    },
+    {
+     "nama": "tambah dan total",
+     "kode": "from model import Barang, Keranjang\nk = Keranjang()\nk.tambah(Barang('keripik', 10000), 100)\nk.tambah(Barang('petis', 5000), 10)\nassert len(k) == 2\nassert abs(k.total() - 930000) < 0.01"
+    },
+    {
+     "nama": "hapus barang",
+     "kode": "from model import Barang, Keranjang\nk = Keranjang()\nk.tambah(Barang('petis', 5000), 10)\nassert k.hapus('petis') is True\nassert k.hapus('petis') is False\nassert len(k) == 0"
+    },
+    {
+     "nama": "atribut isi berupa pasangan",
+     "kode": "from model import Barang, Keranjang\nk = Keranjang()\nb = Barang('dodol', 25000)\nk.tambah(b, 3)\nassert k.isi[0][0] is b\nassert k.isi[0][1] == 3"
+    },
+    {
+     "nama": "dua keranjang tidak berbagi isi (tersembunyi)",
+     "kode": "from model import Barang, Keranjang\na = Keranjang()\nb = Keranjang()\na.tambah(Barang('x', 1000), 1)\nassert len(a) == 1\nassert len(b) == 0",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t07",
+   "judul": "Simpan dan muat keranjang",
+   "bab": [
+    10
+   ],
+   "tujuan": "Menyimpan isi keranjang ke berkas JSON dan memuatnya kembali, supaya belanja tidak hilang.",
+   "langkah": [
+    "Buat berkas penyimpanan.py. Impor json, serta Barang dan Keranjang dari model.py.",
+    "Tulis simpan(keranjang, nama_berkas): tulis list kamus {\"nama\": ..., \"harga\": ..., \"jumlah\": ...} ke berkas dengan json.dump.",
+    "Tulis muat(nama_berkas): baca berkas, lalu bangun Keranjang berisi Barang yang sama. Bila berkasnya tidak ada, kembalikan Keranjang kosong.",
+    "Coba simpan lalu muat di coba.py, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "penyimpanan.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Pakai with open(nama_berkas, \"w\") as f: json.dump(data, f). Untuk berkas yang tidak ada, tangkap FileNotFoundError."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 10: membuka berkas dengan with, dan pustaka json."
+    }
+   ],
+   "awal": {
+    "penyimpanan.py": "# penyimpanan.py\nimport json\nfrom model import Barang, Keranjang\n\n\ndef simpan(keranjang, nama_berkas):\n    pass\n\n\ndef muat(nama_berkas):\n    pass\n"
+   },
+   "contoh": {
+    "penyimpanan.py": "# penyimpanan.py\nimport json\nfrom model import Barang, Keranjang\n\n\ndef simpan(keranjang, nama_berkas):\n    data = []\n    for barang, jumlah in keranjang.isi:\n        data.append({\"nama\": barang.nama, \"harga\": barang.harga, \"jumlah\": jumlah})\n    with open(nama_berkas, \"w\") as f:\n        json.dump(data, f)\n\n\ndef muat(nama_berkas):\n    keranjang = Keranjang()\n    try:\n        with open(nama_berkas) as f:\n            data = json.load(f)\n    except FileNotFoundError:\n        return keranjang\n    for d in data:\n        keranjang.tambah(Barang(d[\"nama\"], d[\"harga\"]), d[\"jumlah\"])\n    return keranjang\n"
+   },
+   "kasus": [
+    {
+     "nama": "simpan menulis JSON yang sah",
+     "kode": "import json\nfrom model import Barang, Keranjang\nfrom penyimpanan import simpan\nk = Keranjang()\nk.tambah(Barang('keripik', 10000), 100)\nsimpan(k, 'tes1.json')\nwith open('tes1.json') as f:\n    data = json.load(f)\nassert isinstance(data, list)\nassert len(data) == 1"
+    },
+    {
+     "nama": "simpan lalu muat mengembalikan isi yang sama",
+     "kode": "from model import Barang, Keranjang\nfrom penyimpanan import simpan, muat\nk = Keranjang()\nk.tambah(Barang('keripik', 10000), 100)\nk.tambah(Barang('petis', 5000), 10)\nsimpan(k, 'tes2.json')\nk2 = muat('tes2.json')\nassert len(k2) == 2\nassert abs(k2.total() - 930000) < 0.01"
+    },
+    {
+     "nama": "nama dan harga ikut tersimpan",
+     "kode": "from model import Barang, Keranjang\nfrom penyimpanan import simpan, muat\nk = Keranjang()\nk.tambah(Barang('dodol', 25000), 3)\nsimpan(k, 'tes3.json')\nk2 = muat('tes3.json')\nassert k2.isi[0][0].nama == 'dodol'\nassert k2.isi[0][0].harga == 25000\nassert k2.isi[0][1] == 3"
+    },
+    {
+     "nama": "berkas yang tidak ada memberi keranjang kosong",
+     "kode": "from penyimpanan import muat\nk = muat('tidak_ada.json')\nassert len(k) == 0"
+    },
+    {
+     "nama": "keranjang kosong bisa disimpan dan dimuat (tersembunyi)",
+     "kode": "from model import Keranjang\nfrom penyimpanan import simpan, muat\nsimpan(Keranjang(), 'tes4.json')\nassert len(muat('tes4.json')) == 0",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t08",
+   "judul": "Daftar barang (CRUD sederhana)",
+   "bab": [
+    11
+   ],
+   "tujuan": "Mengelola katalog barang toko dengan kamus: tambah, lihat, ubah harga, dan hapus.",
+   "langkah": [
+    "Buat berkas katalog.py. Katalog adalah kamus yang kuncinya kode barang dan nilainya kamus kecil {\"nama\": ..., \"harga\": ...}.",
+    "Tulis buat_katalog() yang mengembalikan kamus kosong.",
+    "Tulis tambah_barang(katalog, kode, nama, harga): kembalikan True bila berhasil, False bila kode itu sudah ada (katalog tidak berubah).",
+    "Tulis ubah_harga(katalog, kode, harga_baru) dan hapus_barang(katalog, kode): keduanya mengembalikan True bila kodenya ada, False bila tidak ada.",
+    "Tulis cari(katalog, kode) yang mengembalikan kamus barangnya atau None, dan daftar_nama(katalog) yang mengembalikan list nama barang terurut abjad.",
+    "Uji di coba.py, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "katalog.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "katalog.get(kode) mengembalikan None bila kunci tidak ada; katalog.pop(kode, None) menghapus tanpa galat."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 11: operasi create, read, update, delete pada kamus."
+    }
+   ],
+   "awal": {
+    "katalog.py": "# katalog.py\n\ndef buat_katalog():\n    pass\n\n\ndef tambah_barang(katalog, kode, nama, harga):\n    pass\n\n\ndef ubah_harga(katalog, kode, harga_baru):\n    pass\n\n\ndef hapus_barang(katalog, kode):\n    pass\n\n\ndef cari(katalog, kode):\n    pass\n\n\ndef daftar_nama(katalog):\n    pass\n"
+   },
+   "contoh": {
+    "katalog.py": "# katalog.py\n\ndef buat_katalog():\n    return {}\n\n\ndef tambah_barang(katalog, kode, nama, harga):\n    if kode in katalog:\n        return False\n    katalog[kode] = {\"nama\": nama, \"harga\": harga}\n    return True\n\n\ndef ubah_harga(katalog, kode, harga_baru):\n    if kode not in katalog:\n        return False\n    katalog[kode][\"harga\"] = harga_baru\n    return True\n\n\ndef hapus_barang(katalog, kode):\n    if kode not in katalog:\n        return False\n    del katalog[kode]\n    return True\n\n\ndef cari(katalog, kode):\n    return katalog.get(kode)\n\n\ndef daftar_nama(katalog):\n    return sorted(b[\"nama\"] for b in katalog.values())\n"
+   },
+   "kasus": [
+    {
+     "nama": "katalog baru kosong",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nassert len(c) == 0"
+    },
+    {
+     "nama": "tambah barang baru",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nassert k.tambah_barang(c, 'K1', 'keripik', 10000) is True\nassert c['K1']['nama'] == 'keripik'\nassert c['K1']['harga'] == 10000"
+    },
+    {
+     "nama": "kode ganda ditolak",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nk.tambah_barang(c, 'K1', 'keripik', 10000)\nassert k.tambah_barang(c, 'K1', 'petis', 5000) is False\nassert c['K1']['nama'] == 'keripik'"
+    },
+    {
+     "nama": "ubah harga",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nk.tambah_barang(c, 'K1', 'keripik', 10000)\nassert k.ubah_harga(c, 'K1', 12000) is True\nassert c['K1']['harga'] == 12000\nassert k.ubah_harga(c, 'Z9', 1) is False"
+    },
+    {
+     "nama": "hapus barang",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nk.tambah_barang(c, 'K1', 'keripik', 10000)\nassert k.hapus_barang(c, 'K1') is True\nassert k.hapus_barang(c, 'K1') is False\nassert len(c) == 0"
+    },
+    {
+     "nama": "cari barang",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nk.tambah_barang(c, 'K1', 'keripik', 10000)\nassert k.cari(c, 'K1')['nama'] == 'keripik'\nassert k.cari(c, 'K9') is None"
+    },
+    {
+     "nama": "daftar nama terurut",
+     "kode": "import katalog as k\nc = k.buat_katalog()\nk.tambah_barang(c, 'K2', 'petis', 5000)\nk.tambah_barang(c, 'K1', 'keripik', 10000)\nk.tambah_barang(c, 'K3', 'dodol', 25000)\nassert k.daftar_nama(c) == ['dodol', 'keripik', 'petis']"
+    },
+    {
+     "nama": "dua katalog berdiri sendiri (tersembunyi)",
+     "kode": "import katalog as k\na = k.buat_katalog()\nb = k.buat_katalog()\nk.tambah_barang(a, 'K1', 'x', 1)\nassert len(b) == 0",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t09",
+   "judul": "Cari dan urutkan barang",
+   "bab": [
+    12,
+    13
+   ],
+   "tujuan": "Mengurutkan daftar barang menurut harga dan mencarinya dengan pencarian linear dan biner.",
+   "langkah": [
+    "Buat berkas cari_urut.py. Daftar barang berupa list pasangan (nama, harga), misalnya [(\"keripik\", 10000), (\"petis\", 5000)].",
+    "Tulis urutkan_harga(daftar) yang mengembalikan list BARU terurut dari harga terkecil. Daftar aslinya tidak boleh berubah. Tulis algoritmanya sendiri (misalnya bubble sort), jangan memakai sorted().",
+    "Tulis cari_linear(daftar, nama) yang mengembalikan indeks pertama barang bernama itu, atau -1.",
+    "Tulis cari_biner(daftar_terurut, harga) yang mencari harga pada daftar yang sudah terurut menurut harga, mengembalikan indeksnya atau -1. Pakai pencarian biner (kiri, kanan, tengah).",
+    "Uji di coba.py, lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "cari_urut.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Salin dulu: hasil = list(daftar). Lalu dua perulangan bersarang yang menukar pasangan bertetangga bila harga kiri lebih besar."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 12 dan 13: linear search, binary search, dan bubble atau selection sort."
+    }
+   ],
+   "awal": {
+    "cari_urut.py": "# cari_urut.py\n\ndef urutkan_harga(daftar):\n    pass\n\n\ndef cari_linear(daftar, nama):\n    pass\n\n\ndef cari_biner(daftar_terurut, harga):\n    pass\n"
+   },
+   "contoh": {
+    "cari_urut.py": "# cari_urut.py\n\ndef urutkan_harga(daftar):\n    hasil = list(daftar)\n    n = len(hasil)\n    for i in range(n):\n        for j in range(n - 1 - i):\n            if hasil[j][1] > hasil[j + 1][1]:\n                hasil[j], hasil[j + 1] = hasil[j + 1], hasil[j]\n    return hasil\n\n\ndef cari_linear(daftar, nama):\n    for i in range(len(daftar)):\n        if daftar[i][0] == nama:\n            return i\n    return -1\n\n\ndef cari_biner(daftar_terurut, harga):\n    kiri = 0\n    kanan = len(daftar_terurut) - 1\n    while kiri <= kanan:\n        tengah = (kiri + kanan) // 2\n        h = daftar_terurut[tengah][1]\n        if h == harga:\n            return tengah\n        elif h < harga:\n            kiri = tengah + 1\n        else:\n            kanan = tengah - 1\n    return -1\n"
+   },
+   "kasus": [
+    {
+     "nama": "urutkan menurut harga",
+     "kode": "from cari_urut import urutkan_harga\nassert urutkan_harga([('a', 30), ('b', 10), ('c', 20)]) == [('b', 10), ('c', 20), ('a', 30)]"
+    },
+    {
+     "nama": "daftar asli tidak berubah",
+     "kode": "from cari_urut import urutkan_harga\nd = [('a', 30), ('b', 10)]\nurutkan_harga(d)\nassert d == [('a', 30), ('b', 10)]"
+    },
+    {
+     "nama": "urutkan daftar kosong dan satu barang",
+     "kode": "from cari_urut import urutkan_harga\nassert urutkan_harga([]) == []\nassert urutkan_harga([('a', 5)]) == [('a', 5)]"
+    },
+    {
+     "nama": "cari linear ketemu",
+     "kode": "from cari_urut import cari_linear\nd = [('keripik', 10000), ('petis', 5000), ('dodol', 25000)]\nassert cari_linear(d, 'petis') == 1\nassert cari_linear(d, 'dodol') == 2"
+    },
+    {
+     "nama": "cari linear tidak ketemu",
+     "kode": "from cari_urut import cari_linear\nassert cari_linear([('a', 1)], 'z') == -1\nassert cari_linear([], 'z') == -1"
+    },
+    {
+     "nama": "cari biner ketemu",
+     "kode": "from cari_urut import cari_biner\nd = [('a', 5), ('b', 10), ('c', 20), ('d', 30), ('e', 40)]\nassert cari_biner(d, 5) == 0\nassert cari_biner(d, 20) == 2\nassert cari_biner(d, 40) == 4"
+    },
+    {
+     "nama": "cari biner tidak ketemu",
+     "kode": "from cari_urut import cari_biner\nd = [('a', 5), ('b', 10), ('c', 20)]\nassert cari_biner(d, 15) == -1\nassert cari_biner([], 5) == -1"
+    },
+    {
+     "nama": "tidak memakai sorted() (tersembunyi)",
+     "kode": "import builtins\nimport cari_urut\ndef _terlarang(*a, **k):\n    raise AssertionError('urutkan_harga tidak boleh memakai sorted()')\nbuiltins.sorted = _terlarang\ncari_urut.urutkan_harga([('a', 3), ('b', 1)])",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t10",
+   "judul": "Produk akhir: aplikasi kasir",
+   "bab": [
+    14
+   ],
+   "tujuan": "Menyatukan semua modul menjadi satu aplikasi kasir berbasis teks yang bisa dijalankan dari awal sampai akhir.",
+   "langkah": [
+    "Buat berkas kasir.py. Impor Barang dan Keranjang dari model.py, buat_struk dari struk.py, dan penyimpanan.",
+    "Buat katalog tetap di dalam kasir.py: kode K1 keripik 10000, K2 petis 5000, K3 dodol 25000 (kamus kode ke Barang).",
+    "Tulis fungsi jalankan() berisi perulangan menu. Tiap putaran cetak persis MENU: 1 tambah, 2 hapus, 3 struk, 4 simpan, 0 keluar lalu baca pilihan dengan input().",
+    "Pilihan 1: baca kode lalu jumlah (dua input()). Bila kode ada, tambahkan ke keranjang dan cetak Ditambah: keripik x100 (nama, spasi, x, jumlah); bila tidak ada cetak Kode tidak dikenal.",
+    "Pilihan 2: baca nama barang; cetak Dihapus bila ada, Tidak ada bila tidak. Pilihan 3: cetak struk dari buat_struk(). Pilihan 4: simpan ke keranjang.json lalu cetak Tersimpan.",
+    "Pilihan 0: cetak Terima kasih lalu berhenti. Pilihan lain: cetak Pilihan tidak dikenal. Panggil jalankan() di bagian paling bawah berkas.",
+    "Jalankan kasir.py dan coba semua menu, lalu Kirim jawaban. Setelah lulus, kamu bisa mengekspor aplikasimu sebagai satu halaman HTML dari halaman praktikum."
+   ],
+   "diminta": [
+    "kasir.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "while True: ... dan break pada pilihan 0. Untuk struk: isi = [[b.nama, j, b.harga] for b, j in keranjang.isi]."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 14 menyatukan semuanya: modul, kelas, berkas, dan perulangan menu."
+    }
+   ],
+   "awal": {
+    "kasir.py": "# kasir.py\nfrom model import Barang, Keranjang\nfrom struk import buat_struk\nimport penyimpanan\n\nKATALOG = {\n    \"K1\": Barang(\"keripik\", 10000),\n    \"K2\": Barang(\"petis\", 5000),\n    \"K3\": Barang(\"dodol\", 25000),\n}\n\n\ndef jalankan():\n    keranjang = Keranjang()\n    # tulis perulangan menu di sini\n    pass\n\n\njalankan()\n"
+   },
+   "contoh": {
+    "kasir.py": "# kasir.py\nfrom model import Barang, Keranjang\nfrom struk import buat_struk\nimport penyimpanan\n\nKATALOG = {\n    \"K1\": Barang(\"keripik\", 10000),\n    \"K2\": Barang(\"petis\", 5000),\n    \"K3\": Barang(\"dodol\", 25000),\n}\n\n\ndef jalankan():\n    keranjang = Keranjang()\n    while True:\n        print(\"MENU: 1 tambah, 2 hapus, 3 struk, 4 simpan, 0 keluar\")\n        pilihan = input()\n        if pilihan == \"1\":\n            kode = input()\n            jumlah = int(input())\n            if kode in KATALOG:\n                keranjang.tambah(KATALOG[kode], jumlah)\n                print(f\"Ditambah: {KATALOG[kode].nama} x{jumlah}\")\n            else:\n                print(\"Kode tidak dikenal\")\n        elif pilihan == \"2\":\n            nama = input()\n            if keranjang.hapus(nama):\n                print(\"Dihapus\")\n            else:\n                print(\"Tidak ada\")\n        elif pilihan == \"3\":\n            isi = [[b.nama, j, b.harga] for b, j in keranjang.isi]\n            print(buat_struk(isi))\n        elif pilihan == \"4\":\n            penyimpanan.simpan(keranjang, \"keranjang.json\")\n            print(\"Tersimpan\")\n        elif pilihan == \"0\":\n            print(\"Terima kasih\")\n            break\n        else:\n            print(\"Pilihan tidak dikenal\")\n\n\njalankan()\n"
+   },
+   "kasus": [
+    {
+     "nama": "menu keluar langsung",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "0"
+     ],
+     "memuat": [
+      "MENU: 1 tambah, 2 hapus, 3 struk, 4 simpan, 0 keluar",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "tambah dua barang lalu struk",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "1",
+      "K1",
+      "100",
+      "1",
+      "K2",
+      "10",
+      "3",
+      "0"
+     ],
+     "memuat": [
+      "Ditambah: keripik x100",
+      "Ditambah: petis x10",
+      "STRUK UD RASA GRESIK",
+      "keripik x100 Rp880.000",
+      "TOTAL Rp930.000",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "kode tidak dikenal",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "1",
+      "Z9",
+      "5",
+      "0"
+     ],
+     "memuat": [
+      "Kode tidak dikenal",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "hapus barang",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "1",
+      "K3",
+      "2",
+      "2",
+      "dodol",
+      "2",
+      "dodol",
+      "0"
+     ],
+     "memuat": [
+      "Ditambah: dodol x2",
+      "Dihapus",
+      "Tidak ada"
+     ]
+    },
+    {
+     "nama": "simpan keranjang",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "1",
+      "K1",
+      "1",
+      "4",
+      "0"
+     ],
+     "memuat": [
+      "Tersimpan",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "pilihan tidak dikenal",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "9",
+      "0"
+     ],
+     "memuat": [
+      "Pilihan tidak dikenal",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "struk keranjang kosong (tersembunyi)",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "3",
+      "0"
+     ],
+     "memuat": [
+      "STRUK UD RASA GRESIK",
+      "TOTAL Rp0"
+     ],
+     "tersembunyi": true
+    },
+    {
+     "nama": "belanja besar dengan potongan (tersembunyi)",
+     "jalankan": "kasir.py",
+     "masukan": [
+      "1",
+      "K3",
+      "100",
+      "1",
+      "K1",
+      "50",
+      "3",
+      "0"
+     ],
+     "memuat": [
+      "dodol x100 Rp2.200.000",
+      "keripik x50 Rp460.000",
+      "TOTAL Rp2.660.000"
+     ],
+     "tersembunyi": true
+    }
+   ]
+  }
+ ]
+}

@@ -26,6 +26,8 @@
   };
   // ?tanpa0007=1: meniru database yang belum menjalankan migrasi 0007 (kolom hasil, galat, dan persetujuan riset belum ada).
   const TANPA_0007 = /[?&]tanpa0007=1/.test(location.search);
+  // ?tanpa0008=1: meniru database yang belum menjalankan migrasi 0008 (tabel praktikum_* belum ada).
+  const TANPA_0008 = /[?&]tanpa0008=1/.test(location.search);
   const TERBUKA = /[?&]terbuka=1/.test(location.search);
   // ?tanpakonfirmasi=1: meniru Supabase dengan "Confirm email" dimatikan (pendaftaran langsung masuk, tanpa email). Menyertakan terbuka=1.
   const TANPA_KONFIRMASI = /[?&]tanpakonfirmasi=1/.test(location.search);
@@ -367,6 +369,36 @@
         if (nama === "percobaan" && q.op === "select" && /hasil|galat|petunjuk|cocok/.test(q.kolom || "")) return kolomHilang("percobaan.hasil");
         if (nama === "percobaan" && q.op === "insert" && (Array.isArray(q.rows) ? q.rows : [q.rows]).some((r) => "hasil" in r)) return { data: null, error: { code: "PGRST204", message: "Could not find the 'hasil' column of 'percobaan' in the schema cache" } };
       }
+      if (nama.startsWith("praktikum_")) {
+        if (TANPA_0008) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public." + nama + "' in the schema cache" } };
+        const kunciPk = { praktikum_berkas: ["user_id", "matakuliah_id", "praktikum_id", "nama"], praktikum_tahap: ["user_id", "matakuliah_id", "praktikum_id", "tahap_id"], praktikum_laporan: ["user_id", "matakuliah_id", "praktikum_id"] }[nama];
+        const tabelPk = (db[nama] = db[nama] || []);
+        const nowPk = new Date().toISOString();
+        if (q.op === "delete") {
+          if (nama === "praktikum_versi") return { data: null, error: { code: "42501", message: "permission denied" } };
+          db[nama] = tabelPk.filter((r) => !(r.user_id === uidSaya() && Object.keys(q.f).every((k) => String(r[k]) === String(q.f[k]))));
+          save();
+          return { data: null, error: null };
+        }
+        if (q.op === "upsert" || q.op === "insert") {
+          const daftarPk = Array.isArray(q.rows) ? q.rows : [q.rows];
+          if (daftarPk.some((r) => r.user_id !== uidSaya())) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
+          for (const r of daftarPk) {
+            if (nama === "praktikum_versi") {
+              tabelPk.push(Object.assign({ id: tabelPk.length + 1 }, r, { diterima_pada: nowPk }));
+              continue;
+            }
+            const i = tabelPk.findIndex((x) => kunciPk.every((k) => x[k] === r[k]));
+            if (i >= 0) tabelPk[i] = Object.assign({}, tabelPk[i], r, { diperbarui_pada: nowPk });
+            else {
+              if (nama === "praktikum_berkas" && tabelPk.filter((x) => x.user_id === r.user_id && x.matakuliah_id === r.matakuliah_id && x.praktikum_id === r.praktikum_id).length >= 40) return { data: null, error: { code: "23514", message: "terlalu banyak berkas (maksimal 40 per praktikum)" } };
+              tabelPk.push(Object.assign({}, r, { diperbarui_pada: nowPk }));
+            }
+          }
+          save();
+          return { data: null, error: null };
+        }
+      }
       if (nama === "profiles" && q.op === "update") {
         const sasaran = Object.values(db.profiles).filter((p) => Object.keys(q.f).every((k) => String(p[k]) === String(q.f[k])) && (p.id === uidSaya() || instruktur()));
         for (const p of sasaran) {
@@ -602,6 +634,26 @@
       from: (nama) => query(nama),
     },
   };
+
+  // Data contoh praktikum untuk dashboard instruktur (tab Praktikum): sebagian peserta contoh sudah mengerjakan beberapa tahap.
+  if (!db.seedPk) {
+    db.seedPk = true;
+    db.praktikum_tahap = db.praktikum_tahap || [];
+    db.praktikum_laporan = db.praktikum_laporan || [];
+    db.praktikum_berkas = db.praktikum_berkas || [];
+    const ids = ["t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10"];
+    for (let n = 1; n <= 12; n++) {
+      const uid = "u-seed" + n;
+      const sampai = n <= 3 ? 10 : n <= 7 ? 4 + (n % 3) : 2;
+      ids.slice(0, sampai).forEach((tid, i) => {
+        const macet = n > 7 && i === sampai - 1;
+        db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", tahap_id: tid, status: macet ? "sedang" : n % 4 === 0 && i === 1 ? "dilewati" : "lulus", jalur: "web", jumlah_kirim: macet ? 6 + n : 1 + ((n + i) % 3), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: macet ? null : "2026-10-03T03:00:00Z", pakai_contoh: n % 5 === 0 && i === 2, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });
+      });
+      db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", nama: "subtotal.py", isi: "def subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n", asal: "milik", diperbarui_pada: "2026-10-03T04:00:00Z" });
+      if (n <= 5) db.praktikum_laporan.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", jawaban: { apa: "Saya membangun aplikasi kasir untuk toko oleh-oleh dan belajar memecah masalah menjadi fungsi kecil.", kendala: n % 2 ? "Bingung membedakan return dan print, lalu saya baca ulang bab fungsi." : "" }, jumlah_ketikan: {}, percobaan_tempel: n === 2 ? 4 : 0, durasi_menulis_detik: 300, kode_verifikasi: "PKSEED0" + n, dikumpulkan_pada: n % 2 ? "2026-10-08T04:00:00Z" : null, diperbarui_pada: "2026-10-08T04:00:00Z" });
+    }
+    save();
+  }
 
   if (db.pending) document.addEventListener("DOMContentLoaded", tampilkanKotakEmail);
 })();

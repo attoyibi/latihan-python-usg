@@ -39,8 +39,57 @@ const ready = (async () => {
   postMessage({ type: "ready" });
 })();
 
+// Praktikum: proyek berisi beberapa berkas. Berkas ditulis ke sistem berkas virtual Pyodide lalu diuji atau dijalankan oleh
+// praktikum_harness.py (berkas yang sama dipakai tools/uji_praktikum.py dengan Python biasa).
+const DIR_PROYEK = "/home/pyodide/proyek";
+let harness = null;
+function muatHarness() {
+  if (!harness) {
+    harness = (async () => {
+      const r = await fetch(new URL("praktikum_harness.py", self.location.href).href, { cache: "no-cache" });
+      if (!r.ok) throw new Error("Penguji praktikum tidak bisa dimuat (" + r.status + ").");
+      py.runPython(await r.text(), { globals: py.globals });
+    })().catch((err) => {
+      harness = null;
+      throw err;
+    });
+  }
+  return harness;
+}
+function tulisProyek(berkas) {
+  const FS = py.FS;
+  try {
+    FS.mkdir(DIR_PROYEK);
+  } catch (err) {}
+  for (const nama of FS.readdir(DIR_PROYEK)) {
+    if (nama === "." || nama === "..") continue;
+    try {
+      FS.unlink(DIR_PROYEK + "/" + nama);
+    } catch (err) {}
+  }
+  for (const [nama, isi] of Object.entries(berkas || {})) {
+    if (!/^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$/.test(nama)) continue; // nama tidak aman dilewati (tidak boleh keluar dari folder proyek)
+    FS.writeFile(DIR_PROYEK + "/" + nama, String(isi));
+  }
+}
+
 onmessage = async (e) => {
   await ready;
+  if (e.data && e.data.mode === "proyek") {
+    const { id } = e.data;
+    postMessage({ type: "started", id });
+    try {
+      await muatHarness();
+      tulisProyek(e.data.berkas);
+      const jalan = py.globals.get("praktikum_jalankan");
+      const hasil = jalan(JSON.stringify(Object.assign({ dir: DIR_PROYEK }, e.data.perintah)));
+      jalan.destroy();
+      postMessage({ type: "done", id, stdout: "", error: null, proyek: JSON.parse(hasil) });
+    } catch (err) {
+      postMessage({ type: "done", id, stdout: "", error: cleanError(String((err && err.message) || err)), proyek: null });
+    }
+    return;
+  }
   const { id, code, inputs, echo } = e.data;
   out = [];
   outLen = 0;

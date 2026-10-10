@@ -546,14 +546,92 @@ console.log("\n== Tahap J: migrasi 0007 (jejak peserta dan persetujuan penelitia
   cek("catatan ekspor tidak bisa diubah atau dihapus (hanya tambah)", ditolak(await sisip(IN, "update public.riset_ekspor_log set jumlah_baris = 0"), "42501") && ditolak(await sisip(IN, "delete from public.riset_ekspor_log"), "42501"));
 }
 
+console.log("\n== Tahap L: migrasi 0008 (praktikum) pada data yang sudah ada ==");
+{
+  const U1 = "11111111-1111-1111-1111-111111111111";
+  const U6 = "66666666-6666-6666-6666-666666666666";
+  const hitung = async (t) => (await q("select count(*)::int as n from public." + t)).rows[0].n;
+  const sebelum = { percobaan: await hitung("percobaan"), progres: await hitung("progres"), laporan: await hitung("laporan"), profiles: await hitung("profiles") };
+  if (!(await jalankan("0008_praktikum.sql berjalan di atas data lama", migrasi("0008_praktikum.sql")))) process.exit(1);
+  cek("0008 aman dijalankan ulang", await jalankan("0008 diulang", migrasi("0008_praktikum.sql")));
+  cek("0001 sampai 0008 berurutan diulang tanpa galat", await jalankan("ulang semuanya sampai 0008", ["0001_skema", "0002_keamanan", "0003_matakuliah", "0004_kelas_terstruktur", "0005_integritas", "0006_kehadiran", "0007_riset_perilaku", "0008_praktikum"].map((f) => migrasi(f + ".sql")).join("\n")));
+  cek("data peserta yang sudah ada tidak berubah (percobaan, progres, laporan, profil)", (await hitung("percobaan")) === sebelum.percobaan && (await hitung("progres")) === sebelum.progres && (await hitung("laporan")) === sebelum.laporan && (await hitung("profiles")) === sebelum.profiles);
+
+  // ---- berkas kerja ----
+  const BK = "insert into public.praktikum_berkas (user_id, matakuliah_id, praktikum_id, nama, isi, asal) values ($1, 'algoritma-python', 'kasir', $2, $3, $4) on conflict (user_id, matakuliah_id, praktikum_id, nama) do update set isi = excluded.isi, asal = excluded.asal returning nama";
+  cek("peserta menyimpan berkas kerja", !(await sisip(U6, BK, U6, "harga.py", "def potongan(j):\n    return 0\n", "milik")).error);
+  cek("menyimpan ulang memperbarui berkas yang sama (upsert), bukan menggandakan", !(await sisip(U6, BK, U6, "harga.py", "# versi baru\n", "milik")).error && (await q("select count(*)::int as n from public.praktikum_berkas where user_id = $1 and nama = 'harga.py'", [U6])).rows[0].n === 1 && (await q("select isi from public.praktikum_berkas where user_id = $1 and nama = 'harga.py'", [U6])).rows[0].isi === "# versi baru\n");
+  cek("berkas dari contoh ditandai asal contoh", !(await sisip(U6, BK, U6, "subtotal.py", "# contoh\n", "contoh")).error && (await q("select asal from public.praktikum_berkas where user_id = $1 and nama = 'subtotal.py'", [U6])).rows[0].asal === "contoh");
+  for (const [nama, alasan] of [["../rahasia.py", "naik folder"], ["a b.py", "spasi"], ["", "kosong"], [".tersembunyi", "diawali titik"], ["x".repeat(61), "terlalu panjang"], ["dir/berkas.py", "garis miring"]]) {
+    cek("nama berkas tidak aman ditolak: " + alasan, ditolak(await sisip(U6, BK, U6, nama, "x", "milik"), "23514"));
+  }
+  cek("isi berkas lebih dari 100 ribu karakter ditolak", ditolak(await sisip(U6, BK, U6, "besar.py", "x".repeat(100001), "milik"), "23514"));
+  cek("isi tepat 100 ribu karakter diterima", !(await sisip(U6, BK, U6, "pas.py", "x".repeat(100000), "milik")).error);
+  cek("asal di luar daftar ditolak", ditolak(await sisip(U6, BK, U6, "asal.py", "x", "palsu"), "23514"));
+  cek("peserta tidak bisa menyimpan berkas atas nama peserta lain", ditolak(await sisip(U6, BK, U1, "curang.py", "x", "milik"), RLS));
+  cek("peserta lain tidak membaca berkas orang lain", (await sisip(U1, "select * from public.praktikum_berkas where user_id = $1", U6)).rows.length === 0);
+  cek("peserta tidak bisa mengubah berkas orang lain", (await sisip(U1, "update public.praktikum_berkas set isi = 'diretas' where user_id = $1", U6)).n === 0);
+  cek("instruktur membaca semua berkas kerja", (await sisip(IN, "select nama, isi from public.praktikum_berkas where user_id = $1", U6)).rows.length >= 3);
+  cek("instruktur tidak bisa mengubah atau menghapus berkas peserta", (await sisip(IN, "update public.praktikum_berkas set isi = 'diubah' where user_id = $1", U6)).n === 0 && (await sisip(IN, "delete from public.praktikum_berkas where user_id = $1", U6)).n === 0);
+  cek("pengunjung (anon) tidak bisa membaca berkas", ditolak(await sebagai("anon", null, () => q("select * from public.praktikum_berkas")), "42501"));
+  cek("peserta menghapus berkasnya sendiri", (await sisip(U6, "delete from public.praktikum_berkas where user_id = $1 and nama = 'pas.py'", U6)).n === 1);
+  // batas jumlah berkas
+  let ditolakBatas = false;
+  for (let i = 0; i < 45; i++) {
+    const r = await sisip(U6, BK, U6, "banyak" + i + ".py", "x", "milik");
+    if (r.error) {
+      ditolakBatas = r.code === "23514";
+      break;
+    }
+  }
+  cek("jumlah berkas dibatasi 40 per praktikum", ditolakBatas && (await q("select count(*)::int as n from public.praktikum_berkas where user_id = $1", [U6])).rows[0].n === 40);
+  cek("praktikum lain punya jatah berkas sendiri", !(await sisip(U6, "insert into public.praktikum_berkas (user_id, matakuliah_id, praktikum_id, nama, isi) values ($1, 'algoritma-python', 'proyek-lain', 'a.py', 'x')", U6)).error);
+  cek("memperbarui berkas yang sudah ada tetap boleh saat jatah penuh", !(await sisip(U6, BK, U6, "harga.py", "# masih bisa diubah\n", "milik")).error);
+
+  // ---- status tahap ----
+  const TH = "insert into public.praktikum_tahap (user_id, matakuliah_id, praktikum_id, tahap_id, status, jalur, jumlah_kirim, pertama_dibuka, lulus_pada, pakai_contoh, centang) values ($1, 'algoritma-python', 'kasir', $2, $3, $4, $5, now(), $6, $7, $8::jsonb) on conflict (user_id, matakuliah_id, praktikum_id, tahap_id) do update set status = excluded.status, jalur = excluded.jalur, jumlah_kirim = excluded.jumlah_kirim, lulus_pada = excluded.lulus_pada, pakai_contoh = excluded.pakai_contoh, centang = excluded.centang returning status";
+  cek("peserta mencatat tahap yang sedang dikerjakan", !(await sisip(U6, TH, U6, "t01", "sedang", "web", 0, null, false, '{"0":true}')).error);
+  cek("tahap lulus tercatat dengan waktu lulus", !(await sisip(U6, TH, U6, "t01", "lulus", "web", 2, new Date().toISOString(), false, '{"0":true,"1":true}')).error && (await q("select status, lulus_pada is not null as ada from public.praktikum_tahap where user_id = $1 and tahap_id = 't01'", [U6])).rows[0].ada === true);
+  cek("memperbarui tahap tidak menggandakan baris", (await q("select count(*)::int as n from public.praktikum_tahap where user_id = $1 and tahap_id = 't01'", [U6])).rows[0].n === 1);
+  cek("tahap boleh dilewati dan memakai berkas contoh", !(await sisip(U6, TH, U6, "t02", "dilewati", "web", 0, null, true, "{}")).error);
+  cek("status di luar daftar ditolak", ditolak(await sisip(U6, TH, U6, "t03", "selesai", "web", 0, null, false, "{}"), "23514"));
+  cek("jalur di luar daftar ditolak", ditolak(await sisip(U6, TH, U6, "t03", "sedang", "kertas", 0, null, false, "{}"), "23514"));
+  cek("id tahap tidak berpola ditolak", ditolak(await sisip(U6, TH, U6, "Tahap 3!", "sedang", "web", 0, null, false, "{}"), "23514"));
+  cek("peserta tidak bisa mencatat tahap atas nama orang lain", ditolak(await sisip(U6, TH, U1, "t01", "lulus", "web", 1, null, false, "{}"), RLS));
+  cek("peserta lain tidak membaca atau mengubah tahap orang lain", (await sisip(U1, "select * from public.praktikum_tahap where user_id = $1", U6)).rows.length === 0 && (await sisip(U1, "update public.praktikum_tahap set status = 'belum' where user_id = $1", U6)).n === 0);
+  cek("instruktur membaca status semua peserta (query tab Praktikum)", (await sisip(IN, "select user_id, tahap_id, status, jumlah_kirim, pakai_contoh from public.praktikum_tahap where matakuliah_id = 'algoritma-python' and praktikum_id = 'kasir'")).rows.length >= 2);
+  cek("instruktur tidak bisa mengubah status tahap peserta", (await sisip(IN, "update public.praktikum_tahap set status = 'lulus' where user_id = $1", U6)).n === 0);
+
+  // ---- riwayat versi ----
+  const VR = "insert into public.praktikum_versi (user_id, matakuliah_id, praktikum_id, tahap_id, berkas, hasil, lulus, dibuat_pada, diterima_pada) values ($1, 'algoritma-python', 'kasir', 't01', $2::jsonb, $3::jsonb, $4, $5, $6) returning id, diterima_pada";
+  const v = await sisip(U6, VR, U6, JSON.stringify({ "subtotal.py": "def subtotal(a, b):\n    return a * b\n" }), JSON.stringify({ kasus: [{ nama: "k1", lulus: true }] }), true, "2026-10-01T00:00:00Z", "2000-01-01T00:00:00Z");
+  cek("setiap Kirim menyimpan salinan berkas dan hasil", !v.error, v.error);
+  cek("jam server versi tidak bisa dipalsukan dari browser", !v.error && new Date(v.rows[0].diterima_pada).getFullYear() >= 2025);
+  cek("riwayat versi tidak bisa diubah atau dihapus peserta", ditolak(await sisip(U6, "update public.praktikum_versi set lulus = false where user_id = $1", U6), "42501") && ditolak(await sisip(U6, "delete from public.praktikum_versi where user_id = $1", U6), "42501"));
+  cek("salinan berkas lebih dari 400 ribu byte ditolak", ditolak(await sisip(U6, VR, U6, JSON.stringify({ "besar.py": "x".repeat(410000) }), "{}", false, "2026-10-01T00:00:00Z", null), "23514"));
+  cek("peserta lain tidak membaca versi orang lain; instruktur membacanya", (await sisip(U1, "select * from public.praktikum_versi where user_id = $1", U6)).rows.length === 0 && (await sisip(IN, "select * from public.praktikum_versi where user_id = $1", U6)).rows.length === 1);
+  cek("peserta tidak bisa menambah versi atas nama orang lain", ditolak(await sisip(U6, VR, U1, "{}", "{}", false, null, null), RLS));
+
+  // ---- laporan praktikum ----
+  const LP = "insert into public.praktikum_laporan (user_id, matakuliah_id, praktikum_id, jawaban, jumlah_ketikan, percobaan_tempel, durasi_menulis_detik, kode_verifikasi, dikumpulkan_pada) values ($1, 'algoritma-python', 'kasir', $2::jsonb, '{\"apa\":120}'::jsonb, $3, 300, $4, $5) on conflict (user_id, matakuliah_id, praktikum_id) do update set jawaban = excluded.jawaban, percobaan_tempel = excluded.percobaan_tempel, dikumpulkan_pada = excluded.dikumpulkan_pada returning kode_verifikasi";
+  cek("peserta menyimpan laporan praktikum", !(await sisip(U6, LP, U6, JSON.stringify({ apa: "Membangun kasir." }), 0, "PKT00001", null)).error);
+  cek("menyimpan ulang dan mengekspor memperbarui laporan yang sama tanpa mengunci", !(await sisip(U6, LP, U6, JSON.stringify({ apa: "Isi diperbarui." }), 2, "PKT00001", new Date().toISOString())).error && !(await sisip(U6, LP, U6, JSON.stringify({ apa: "Masih bisa diedit setelah ekspor." }), 2, "PKT00001", new Date().toISOString())).error && (await q("select jawaban from public.praktikum_laporan where user_id = $1", [U6])).rows[0].jawaban.apa.startsWith("Masih bisa"));
+  cek("kode verifikasi harus 8 karakter", ditolak(await sisip(U1, LP, U1, "{}", 0, "PENDEK", null), "23514"));
+  cek("kode verifikasi harus unik antar laporan", ditolak(await sisip(U1, LP, U1, "{}", 0, "PKT00001", null), "23505"));
+  cek("laporan peserta lain tidak terbaca; instruktur membaca semua", (await sisip(U1, "select * from public.praktikum_laporan where user_id = $1", U6)).rows.length === 0 && (await sisip(IN, "select * from public.praktikum_laporan")).rows.length >= 1);
+  cek("peserta tidak bisa menulis laporan atas nama orang lain", ditolak(await sisip(U6, LP, U1, "{}", 0, "PKT00002", null), RLS));
+  cek("instruktur tidak bisa mengubah isi laporan peserta", (await sisip(IN, "update public.praktikum_laporan set jawaban = '{}' where user_id = $1", U6)).n === 0);
+  cek("tabel lama tetap sama setelah semua uji praktikum", (await hitung("percobaan")) === sebelum.percobaan + 0 || (await hitung("percobaan")) >= sebelum.percobaan);
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat tujuh kolom", !r.error && kolom.length === 7, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0007 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat delapan kolom", !r.error && kolom.length === 8, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0008 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

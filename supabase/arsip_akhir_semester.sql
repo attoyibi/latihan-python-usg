@@ -21,6 +21,11 @@
 -- baru hapus percobaan di atas. Kunci pemetaan kode_riset ke peserta ada di kolom profiles.kode_riset; hapus kunci itu
 -- (update public.profiles set kode_riset = null, riset_setuju = null;) bila datanya tidak perlu bisa ditelusuri lagi.
 -- delete from public.riset_ekspor_log;
+-- Praktikum (pekerjaan peserta): berkas kerja, status tahap, riwayat versi, dan laporan praktikum.
+-- delete from public.praktikum_versi;
+-- delete from public.praktikum_berkas;
+-- delete from public.praktikum_tahap;
+-- delete from public.praktikum_laporan;
 
 -- Contoh: hapus seluruh data peserta semester ini (akun, progres, laporan, unggahan).
 -- Berkas di Storage ('tugas') harus dihapus terpisah lewat dashboard Storage.
