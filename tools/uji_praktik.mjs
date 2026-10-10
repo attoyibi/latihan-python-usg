@@ -187,6 +187,18 @@ cek("statusGabungan: tanpa B hanya A; dengan B", P.statusGabungan(false, "lulus"
 const csv = P.csvPraktik(rk, babs);
 cek("CSV: kepala, satu baris per peserta, awalan rumus Excel dinetralkan", csv.split("\r\n").length === 5 && csv.startsWith('"NIM","Nama","Kelas","Praktik bab 1"') && csv.includes("\"'=Budi\""));
 
+console.log("\n== penyaring belum mengerjakan (dashboard) ==");
+const lat = { 1: { kode: "selesai-langsung" }, 2: { kode: "selesai-bantuan" }, 4: { kode: "sedang" }, 5: { kode: "belum" }, 6: { kode: "unggah" } };
+const pra = { 2: { kode: "lulus" }, 4: { kode: "sedang" }, 5: { kode: "belum" } };
+const kodeB = [1, 2, 4, 5];
+const praB = [2, 4, 5];
+cek("tanpa status: semua peserta lolos saringan", P.masihBelum(lat, pra, { status: "" }, kodeB, praB) === true && P.masihBelum(lat, pra, {}, kodeB, praB) === true);
+cek("tantangan belum: ada bab sedang atau belum; unggah tidak dihitung", P.masihBelum(lat, pra, { status: "tantangan" }, kodeB, praB) === true && P.masihBelum({ 1: { kode: "selesai-langsung" }, 6: { kode: "unggah" } }, pra, { status: "tantangan" }, [1], praB) === false);
+cek("praktik belum: ada bab sedang atau belum; semua lulus = tidak", P.masihBelum(lat, pra, { status: "praktik" }, kodeB, praB) === true && P.masihBelum(lat, { 2: { kode: "lulus" }, 4: { kode: "lulus" }, 5: { kode: "lulus" } }, { status: "praktik" }, kodeB, praB) === false);
+cek("untuk satu bab saja", P.masihBelum(lat, pra, { status: "salah", bab: "1" }, kodeB, praB) === false && P.masihBelum(lat, pra, { status: "tantangan", bab: 4 }, kodeB, praB) === true && P.masihBelum(lat, pra, { status: "praktik", bab: "2" }, kodeB, praB) === false && P.masihBelum(lat, pra, { status: "praktik", bab: "5" }, kodeB, praB) === true);
+cek("tantangan atau praktik: salah satu cukup", P.masihBelum({ 1: { kode: "selesai-langsung" } }, { 2: { kode: "sedang" } }, { status: "salah" }, [1], [2]) === true && P.masihBelum({ 1: { kode: "selesai-langsung" } }, { 2: { kode: "lulus" } }, { status: "salah" }, [1], [2]) === false);
+cek("kuliah tanpa praktik (selPraktik null): hanya tantangan yang dinilai", P.masihBelum(lat, null, { status: "praktik" }, kodeB, praB) === false && P.masihBelum(lat, null, { status: "salah" }, kodeB, praB) === true);
+
 console.log("\n== lampiran praktik di laporan PDF ==");
 const dasar = { matakuliah: "Algoritma", nomor: 6, judul: "List", nama: "Ani", nim: "1", kelas: "A", kolom: [{ id: "tujuan", label: "Tujuan", min: 10 }], jawaban: { tujuan: "x".repeat(20) }, kodeVerifikasi: "ABCD2345" };
 const tanpa = susunLaporan(dasar);

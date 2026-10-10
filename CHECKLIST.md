@@ -426,3 +426,8 @@ Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. La
 - [x] Bagian B untuk semua bab berpraktik: Algoritma 13 bab (Python) dan PBO 11 bab (Java, `MainB.java`); jawabannya di `kunci/` dan `kunci_jawaban` nomor 70 + bab; validator, uji Python, dan uji JVM memeriksanya
 - [x] Laporan bab, laporan akhir, dan dashboard dosen memuat kode dan status A dan B
 - [ ] Kesetaraan kesulitan Bagian B dengan Tantangan perlu dilihat dari kelas (waktu pengerjaan dan banyaknya yang tersangkut)
+
+## Dashboard dosen: tantangan dan praktik dalam satu tabel
+
+- [x] Tab Progres: titik kecil praktik di tiap sel (hijau bila A dan B lulus), kolom Praktik lulus dan sedang di tabel Per bab, kartu ringkasan, dan penyaring "Tampilkan peserta yang belum ... di bab ..." (tantangan, praktik, atau salah satunya)
+- [x] Diuji: logika penyaring (6 uji) dan di browser (titik, kolom, filter, pesan bila migrasi 0008 belum ada)

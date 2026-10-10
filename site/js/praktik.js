@@ -162,3 +162,25 @@ export function csvPraktik(rekap, babs) {
   for (const x of rekap.baris) baris.push([x.peserta.nim, x.peserta.nama, x.peserta.kelas, ...babs.map((b) => KODE_SEL[x.sel[b].kode] + (x.sel[b].b !== null ? " (A: " + KODE_SEL[x.sel[b].a] + ", B: " + KODE_SEL[x.sel[b].b] + ")" : "")), x.lulus, x.kirim, x.terakhir].map(kutip).join(","));
   return baris.join("\r\n") + "\r\n";
 }
+
+// ---------- penyaring "belum mengerjakan" untuk dashboard instruktur ----------
+export const MODE_BELUM = { "": "Semua peserta", tantangan: "Tantangan belum selesai", praktik: "Praktik belum lulus", salah: "Tantangan atau praktik belum" };
+/**
+ * Apakah seorang peserta masih punya sesuatu yang belum dikerjakan?
+ * @param {Object<number,{kode:string}>} selLatihan  sel tantangan per bab (kode: selesai-langsung, selesai-bantuan, sedang, belum, unggah)
+ * @param {Object<number,{kode:string}>|null} selPraktik  sel praktik per bab (kode: lulus, sedang, belum), atau null bila tak ada praktik
+ * @param {{bab?:string|number, status?:string}} f  bab "" = semua bab; status = kunci MODE_BELUM
+ * @param {number[]} babKode bab yang punya tantangan kode/konsep  @param {number[]} babPraktik bab yang punya praktik
+ */
+export function masihBelum(selLatihan, selPraktik, f, babKode, babPraktik) {
+  const status = f.status || "";
+  if (!status) return true;
+  const bab = f.bab === "" || f.bab === undefined ? null : Number(f.bab);
+  const babL = (bab === null ? babKode : babKode.filter((b) => b === bab));
+  const babP = (bab === null ? babPraktik : babPraktik.filter((b) => b === bab));
+  const latihanBelum = babL.some((b) => selLatihan[b] && !String(selLatihan[b].kode).startsWith("selesai") && selLatihan[b].kode !== "unggah");
+  const praktikBelum = !!selPraktik && babP.some((b) => selPraktik[b] && selPraktik[b].kode !== "lulus");
+  if (status === "tantangan") return latihanBelum;
+  if (status === "praktik") return praktikBelum;
+  return latihanBelum || praktikBelum;
+}

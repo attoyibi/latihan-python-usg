@@ -591,3 +591,7 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 .la-kv{border-collapse:collapse;font-size:13px;margin:6px 0}
 .la-kv th{text-align:left;padding:2px 14px 2px 0;color:var(--muted);font-weight:500}
 .la-kv td{padding:2px 0}
+
+/* Titik praktik di sel tabel Progres dashboard */
+.sel-wrap{position:relative;display:inline-block;padding:0 6px}
+.sel-wrap .pm{top:-4px;right:-5px}

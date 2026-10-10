@@ -11,11 +11,13 @@ import * as RisetUI from "./riset-ui.js";
 import * as PraktikDash from "./praktik-dash-ui.js";
 import * as LaporanAkhirDash from "./laporan-akhir-ui.js";
 import { kolomBelumAda } from "./sinkron.js";
+import { muatIndeks } from "./praktik-data.js";
+import { rekapPraktik, masihBelum, MODE_BELUM } from "./praktik.js";
 import { SEL, SEL_TEKS, susunRekap, saringPeserta, pilihanSaringan, buatCsv, ambilSemua, AMBANG_TERSANGKUT } from "./rekap.js";
 
 const LAMBANG = { "selesai-langsung": "✓", "selesai-bantuan": "✓*", sedang: "◐", belum: "○", unggah: "–" };
 
-let keadaan = { tab: "progres", cid: "", data: null, saring: { prodi: "", angkatan: "", rombel: "", cari: "" }, urut: "nama", muat: false, galat: "" };
+let keadaan = { tab: "progres", cid: "", data: null, saring: { prodi: "", angkatan: "", rombel: "", cari: "" }, belum: { bab: "", status: "" }, urut: "nama", muat: false, galat: "" };
 
 function formatWaktu(iso) {
   if (!iso) return "belum ada";
@@ -24,7 +26,20 @@ function formatWaktu(iso) {
   return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 }
 
-async function muat(cid) {
+/** Data praktik satu mata kuliah untuk tab Progres: bab berpraktik, bab dengan Bagian B, dan status tahap semua peserta. */
+async function muatPraktik(client, kuliah) {
+  const indeks = await muatIndeks(kuliah.id, kuliah.praktik === true);
+  const hasil = { babs: [...indeks].sort((a, b) => a - b), denganB: indeks.denganB || new Set(), tahap: [], ada: true };
+  if (!hasil.babs.length) return hasil;
+  try {
+    hasil.tahap = await ambilSemua(() => client.from("praktikum_tahap").select("user_id,praktikum_id,tahap_id,status,jumlah_kirim,diperbarui_pada").eq("matakuliah_id", kuliah.id).order("user_id"));
+  } catch (e) {
+    hasil.ada = false; // migrasi 0008 belum dijalankan: tantangan tetap tampil, praktik dilewati
+  }
+  return hasil;
+}
+
+async function muat(cid, kuliah) {
   const client = Auth.getClient();
   keadaan.muat = true;
   keadaan.galat = "";
@@ -39,7 +54,8 @@ async function muat(cid) {
       ambilSemua(() => client.from("progres").select("*").eq("matakuliah_id", cid).order("user_id").order("bab")),
       ambilSemua(() => client.from("aktivitas").select("user_id,bab,detail").eq("matakuliah_id", cid).eq("jenis", "tempel_diblokir").order("id")),
     ]);
-    keadaan.data = { peserta, progres, tempel, diambil: new Date().toISOString() };
+    const praktik = kuliah ? await muatPraktik(client, kuliah) : { babs: [], denganB: new Set(), tahap: [], ada: true };
+    keadaan.data = { peserta, progres, tempel, praktik, diambil: new Date().toISOString() };
   } catch (e) {
     keadaan.galat = Auth.friendly(e);
     keadaan.data = null;
@@ -73,7 +89,7 @@ export async function renderInstruktur({ kuliahAktif }) {
 
   const gambar = () => tampilkan(main, kuliahAktif, kuliah);
   main.replaceChildren(h("section", { class: "card" }, h("h2", {}, "Dashboard instruktur"), h("p", { class: "muted" }, "Memuat data peserta")));
-  if (!keadaan.data) await muat(kuliah.id);
+  if (!keadaan.data) await muat(kuliah.id, kuliah);
   gambar();
 }
 
@@ -88,7 +104,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     RisetUI.reset();
     PraktikDash.reset();
     LaporanAkhirDash.reset();
-    await muat(keadaan.cid);
+    await muat(keadaan.cid, kuliah);
     tampilkan(main, kuliahAktif, kuliah);
   };
 
@@ -104,6 +120,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     PraktikDash.reset();
     LaporanAkhirDash.reset();
     keadaan.saring = { prodi: "", angkatan: "", rombel: "", cari: "" };
+    keadaan.belum = { bab: "", status: "" };
     renderInstruktur({ kuliahAktif });
   });
 
@@ -155,7 +172,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
     return;
   }
 
-  const { peserta, progres, tempel, diambil } = keadaan.data;
+  const { peserta, progres, tempel, praktik, diambil } = keadaan.data;
   const pil = pilihanSaringan(peserta);
   const buatMenu = (id, label, nilai, opsi, ubah) => {
     const s = h("select", { id, "aria-label": label }, h("option", { value: "" }, label + ": semua"), opsi.map((o) => h("option", { value: String(o), selected: String(o) === String(nilai) ? "" : false }, String(o))));
@@ -189,12 +206,17 @@ function tampilkan(main, kuliahAktif, kuliah) {
   const terpilih = saringPeserta(peserta, keadaan.saring);
   const rekap = susunRekap({ peserta: terpilih, progres, materi, tempel });
   const { ringkasan } = rekap;
+  // Praktik (Bagian A dan B) per peserta, dari tabel praktikum_tahap; kosong bila kuliah tanpa praktik atau migrasi 0008 belum ada.
+  const adaPraktik = !!praktik && praktik.babs.length > 0 && praktik.ada;
+  const rekapP = adaPraktik ? rekapPraktik({ peserta: terpilih, tahap: praktik.tahap, babs: praktik.babs, denganB: praktik.denganB }) : null;
+  const praktikDari = new Map(rekapP ? rekapP.baris.map((x) => [x.peserta.id, x]) : []);
+  const babPraktikSet = new Set(adaPraktik ? praktik.babs : []);
 
   const kartu = (angka, label) => h("div", { class: "d-stat" }, h("strong", {}, String(angka)), h("span", { class: "muted" }, label));
   const ringkas = h(
     "section",
     { class: "card" },
-    h("div", { class: "d-stats" }, kartu(ringkasan.jumlahPeserta, "peserta"), kartu(ringkasan.rataSelesai + " dari " + ringkasan.totalBabKode, "rata-rata bab kode selesai"), kartu(ringkasan.belumMulai, "belum mulai"), kartu(ringkasan.tersangkut, "tersangkut (kirim " + AMBANG_TERSANGKUT + " kali atau lebih, belum lulus)"), kartu(ringkasan.adaTempel, "pernah mencoba menempel")),
+    h("div", { class: "d-stats" }, kartu(ringkasan.jumlahPeserta, "peserta"), kartu(ringkasan.rataSelesai + " dari " + ringkasan.totalBabKode, "rata-rata bab kode selesai"), kartu(ringkasan.belumMulai, "belum mulai"), kartu(ringkasan.tersangkut, "tersangkut (kirim " + AMBANG_TERSANGKUT + " kali atau lebih, belum lulus)"), kartu(ringkasan.adaTempel, "pernah mencoba menempel"), ...(rekapP ? [kartu(rekapP.selesai, "lulus semua praktik (dari " + praktik.babs.length + " bab)")] : [])),
     h("p", { class: "muted" }, "Data diambil " + formatWaktu(diambil) + ". Muat ulang untuk melihat yang terbaru.")
   );
 
@@ -224,13 +246,13 @@ function tampilkan(main, kuliahAktif, kuliah) {
         "table",
         { class: "rekap" },
         h("caption", { class: "sr-only" }, "Ringkasan per bab"),
-        h("thead", {}, h("tr", {}, ["Bab", "Selesai", "Tanpa petunjuk", "Dengan petunjuk", "Sedang", "Belum", "Rata-rata kirim"].map((t) => h("th", { scope: "col" }, t)))),
+        h("thead", {}, h("tr", {}, ["Bab", "Selesai", "Tanpa petunjuk", "Dengan petunjuk", "Sedang", "Belum", "Rata-rata kirim"].concat(rekapP ? ["Praktik lulus", "Praktik sedang"] : []).map((t) => h("th", { scope: "col" }, t)))),
         h(
           "tbody",
           {},
           rekap.perBab.map((b) =>
             b.unggah
-              ? h("tr", {}, h("th", { scope: "row" }, b.bab + ". " + b.judul), h("td", { colspan: "6", class: "muted" }, "Tugas unggah, belum dilacak"))
+              ? h("tr", {}, h("th", { scope: "row" }, b.bab + ". " + b.judul), h("td", { colspan: String(6 + (rekapP ? 2 : 0)), class: "muted" }, "Tugas unggah, belum dilacak"))
               : h(
                   "tr",
                   {},
@@ -240,7 +262,8 @@ function tampilkan(main, kuliahAktif, kuliah) {
                   h("td", {}, String(b.bantuan)),
                   h("td", {}, String(b.sedang)),
                   h("td", {}, String(b.belum)),
-                  h("td", {}, b.rataKirim === null ? "-" : String(b.rataKirim))
+                  h("td", {}, b.rataKirim === null ? "-" : String(b.rataKirim)),
+                  ...(rekapP ? (() => { const pb = rekapP.perBab.find((x) => x.bab === b.bab); return [h("td", {}, pb ? String(pb.lulus) : "-"), h("td", {}, pb ? String(pb.sedang) : "-")]; })() : [])
                 )
           )
         )
@@ -254,7 +277,17 @@ function tampilkan(main, kuliahAktif, kuliah) {
     selesai: (a, b) => b.selesai - a.selesai || (a.peserta.nama || "").localeCompare(b.peserta.nama || "", "id"),
     sedikit: (a, b) => a.selesai - b.selesai || (a.peserta.nama || "").localeCompare(b.peserta.nama || "", "id"),
   };
-  const baris = rekap.baris.slice().sort(urutan[keadaan.urut] || urutan.nama);
+  const babKode = materi.filter((m) => m.jenis !== "unggah").map((m) => m.bab);
+  const barisSemua = rekap.baris.slice().sort(urutan[keadaan.urut] || urutan.nama);
+  const baris = barisSemua.filter((b) => masihBelum(b.sel, (praktikDari.get(b.peserta.id) || {}).sel || (adaPraktik ? {} : null), keadaan.belum, babKode, praktik ? praktik.babs : []));
+  const selBab = h("select", { id: "dBab", "aria-label": "Bab yang diperiksa" }, h("option", { value: "" }, "Semua bab"), materi.filter((m) => m.jenis !== "unggah").map((m) => h("option", { value: String(m.bab), selected: String(m.bab) === String(keadaan.belum.bab) ? "" : false }, "Bab " + m.bab)));
+  const selBelum = h("select", { id: "dBelum", "aria-label": "Tampilkan peserta yang" }, Object.entries(MODE_BELUM).filter(([v]) => adaPraktik || v === "" || v === "tantangan").map(([v, t]) => h("option", { value: v, selected: v === keadaan.belum.status ? "" : false }, t)));
+  const ubahBelum = () => {
+    keadaan.belum = { bab: selBab.value, status: selBelum.value };
+    tampilkan(main, kuliahAktif, kuliah);
+  };
+  selBab.addEventListener("change", ubahBelum);
+  selBelum.addEventListener("change", ubahBelum);
   const selUrut = h(
     "select",
     { id: "dUrut", "aria-label": "Urutkan" },
@@ -266,22 +299,28 @@ function tampilkan(main, kuliahAktif, kuliah) {
   });
   const csv = h("button", { type: "button", class: "btn btn-sm", onclick: () => unduh("rekap-" + kuliah.id + ".csv", buatCsv(rekap, materi)) }, "Unduh CSV");
 
-  const sel = (c, m) =>
-    h(
+  const NAMA_P = { lulus: "praktik lulus", sedang: "praktik sedang dikerjakan", belum: "praktik belum" };
+  const sel = (c, m, p) => {
+    const ps = p && babPraktikSet.has(m.bab) && p.sel[m.bab] ? p.sel[m.bab] : babPraktikSet.has(m.bab) ? { kode: "belum", a: "belum", b: null } : null;
+    const lengkap = ps ? "; " + NAMA_P[ps.kode] + (ps.b !== null ? " (A: " + ps.a + ", B: " + ps.b + ")" : "") : "";
+    return h(
       "td",
-      { class: "sel " + c.kode, title: "Bab " + m.bab + ": " + SEL_TEKS[c.kode] + (c.kirim ? ", kirim " + c.kirim + " kali" : "") },
-      h("span", { "aria-label": SEL_TEKS[c.kode] }, LAMBANG[c.kode]),
+      { class: "sel " + c.kode, title: "Bab " + m.bab + ": " + SEL_TEKS[c.kode] + (c.kirim ? ", kirim " + c.kirim + " kali" : "") + lengkap },
+      h("span", { class: "sel-wrap" }, h("span", { "aria-label": SEL_TEKS[c.kode] + lengkap }, LAMBANG[c.kode]), ps ? h("span", { class: "pm" + (ps.kode === "belum" ? "" : " " + ps.kode), "aria-hidden": "true" }) : null),
       c.kirim ? h("small", {}, String(c.kirim)) : null
     );
+  };
   const tabel = h(
     "section",
     { class: "card" },
     h("h3", {}, "Peserta dan bab"),
-    h("div", { class: "filters" }, selUrut, csv),
+    h("div", { class: "filters" }, selUrut, h("label", {}, "Tampilkan ", selBelum), h("label", {}, "di ", selBab), csv),
+    keadaan.belum.status ? h("p", { class: "muted" }, baris.length + " dari " + barisSemua.length + " peserta cocok.") : null,
+    praktik && praktik.babs.length && !praktik.ada ? h("p", { class: "kh-peringatan" }, "Data praktik belum bisa dibaca (migrasi 0008_praktikum.sql belum dijalankan). Tantangan tetap tampil.") : null,
     h(
       "p",
       { class: "muted d-legend" },
-      LAMBANG[SEL.SELESAI_LANGSUNG] + " selesai tanpa petunjuk; " + LAMBANG[SEL.SELESAI_BANTUAN] + " selesai memakai petunjuk; " + LAMBANG[SEL.SEDANG] + " sedang (angka = berapa kali kirim); " + LAMBANG[SEL.BELUM] + " belum; " + LAMBANG[SEL.UNGGAH] + " tugas unggah."
+      LAMBANG[SEL.SELESAI_LANGSUNG] + " selesai tanpa petunjuk; " + LAMBANG[SEL.SELESAI_BANTUAN] + " selesai memakai petunjuk; " + LAMBANG[SEL.SEDANG] + " sedang (angka = berapa kali kirim); " + LAMBANG[SEL.BELUM] + " belum; " + LAMBANG[SEL.UNGGAH] + " tugas unggah." + (adaPraktik ? " Titik kecil di sudut = praktik: kosong belum, setengah sedang atau salah satu bagian saja, hijau lulus (A dan B, bila ada)." : "")
     ),
     baris.length
       ? h(
@@ -300,7 +339,7 @@ function tampilkan(main, kuliahAktif, kuliah) {
                   "tr",
                   {},
                   h("th", { scope: "row", class: "nama" }, h("strong", {}, b.peserta.nama), h("small", {}, (b.peserta.nim || "") + " - " + (b.peserta.kelas || ""))),
-                  materi.map((m) => sel(b.sel[m.bab], m)),
+                  materi.map((m) => sel(b.sel[m.bab], m, praktikDari.get(b.peserta.id))),
                   h("td", {}, b.selesai + "/" + ringkasan.totalBabKode),
                   h("td", { class: b.tempel > 0 ? "tempel ada" : "tempel", title: b.tempel ? b.tempel + " percobaan tempel diblokir. Ini petunjuk untuk dibicarakan, bukan bukti kecurangan." : "" }, b.tempel ? String(b.tempel) : "-"),
                   h("td", { class: "muted" }, formatWaktu(b.terakhir))

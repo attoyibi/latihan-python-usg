@@ -16,6 +16,15 @@ Menjadikan dosen instruktur: jalankan `supabase/jadikan_instruktur.sql` (lihat [
 - **Peserta dan bab:** tabel tiap peserta di tiap bab. Lambang: ✓ selesai tanpa petunjuk, ✓* selesai memakai petunjuk, ◐ sedang (angka = berapa kali kirim), ○ belum, – tugas unggah (belum dilacak).
 - Saringan prodi, angkatan, kelas, pencarian nama atau NIM, dan urutan. **Unduh CSV** menghasilkan rekap yang bisa dibuka di Excel.
 
+## Tantangan dan praktik dalam satu tabel (tab Progres)
+
+Bila mata kuliah punya praktik (migrasi `0008_praktikum.sql`), tab Progres juga menampilkan praktik:
+- **Titik kecil di sudut tiap sel** tabel Peserta dan bab, sama seperti di sisi peserta: kosong (belum), setengah (salah satu bagian sudah dimulai atau lulus), hijau (lulus; di bab yang punya Bagian B, hijau hanya bila Bagian A dan B sama-sama lulus). Arahkan kursor ke sel untuk melihat rincian `A` dan `B`.
+- **Tabel Per bab** mendapat kolom Praktik lulus dan Praktik sedang, dan kartu ringkasan memuat berapa peserta yang lulus semua praktik.
+- **Penyaring "Tampilkan ... di ..."**: pilih *Tantangan belum selesai*, *Praktik belum lulus*, atau *Tantangan atau praktik belum*, lalu batasi ke satu bab atau semua bab. Tabel hanya menampilkan peserta yang masih tertinggal, jadi mudah mencari siapa yang perlu dihampiri. Penyaring ini bisa digabung dengan penyaring prodi, angkatan, kelas, dan pencarian.
+
+Bila migrasi 0008 belum dijalankan, tab Progres menampilkan tantangan seperti biasa dengan satu pesan bahwa data praktik belum bisa dibaca. Tab **Praktik** menampilkan rincian per bab dan kode peserta.
+
 ## Arti "paham"
 Bab dianggap dikuasai bila peserta lulus **tanpa membuka satu pun petunjuk** (jalur `langsung`). Bila ia lulus setelah membuka petunjuk, jalurnya `bantuan` (✓*). Ini tanda, bukan vonis: petunjuk memang disediakan untuk belajar. Yang perlu diperhatikan adalah pola: peserta yang hampir semua babnya ✓*, atau bab yang hampir semua pesertanya ✓*.
 
