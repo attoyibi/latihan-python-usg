@@ -1,5 +1,6 @@
 // Antarmuka penjalan Java untuk halaman. Bentuk run() sama dengan penjalan Python di runner.js.
 import { buatPemantau } from "./penjalan.js";
+import { susunPekerjaan, uraikanHasil } from "./praktikum-java.js";
 
 export const BATAS_JAVA_DETIK = 8;
 
@@ -37,4 +38,16 @@ export async function runJava(code, inputs) {
   }
   const masukan = inputs.length ? inputs.join("\n") + "\n" : "";
   return jv.jalankan({ type: "run", code, inputs: [masukan] }, BATAS_JAVA_DETIK * 1000, (m) => uraikan(m.hasil || "GALAT_JALAN\nTidak ada hasil dari penjalan."));
+}
+
+// Praktikum: menguji atau menjalankan proyek berisi beberapa berkas .java (lihat praktikum-java.js). Bentuk hasil sama dengan
+// runProyek Python: {timeout, error, proyek: {kasus:[...]} atau {keluaran, galat}}. batasMs berlaku untuk seluruh pekerjaan.
+export async function runProyekJava(berkas, perintah, batasMs = 45000) {
+  try {
+    await jv.tunggu();
+  } catch (e) {
+    return { timeout: false, error: e.message + " Tekan Coba lagi di atas editor.", proyek: null };
+  }
+  const { sumber, tafsir } = susunPekerjaan(berkas, perintah);
+  return jv.jalankan({ type: "proyek", sumber }, batasMs, (m) => ({ timeout: false, error: null, proyek: uraikanHasil(m.hasil || "GALAT_KOMPILASI\nTidak ada hasil dari penjalan.", tafsir) }));
 }

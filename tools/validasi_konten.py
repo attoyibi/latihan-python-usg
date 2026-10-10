@@ -125,6 +125,7 @@ def cek_materi(c):
 
 NAMA_BERKAS_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$")
 EKSTENSI_PRAKTIKUM = (".py", ".txt", ".json", ".csv", ".md")
+EKSTENSI_JAVA = (".java", ".txt", ".json", ".csv", ".md")
 
 
 def cek_praktikum(c, babs):
@@ -168,10 +169,12 @@ def cek_satu_praktikum(c, babs, e, pk, w):
     for k in ("judul", "deskripsi", "bahasa", "entri", "tahap"):
         if k not in pk:
             err(f"{w}: kolom '{k}' tidak ada")
-    if pk.get("bahasa") != "python" or c.get("bahasa") != "python":
-        err(f"{w}: saat ini praktikum hanya didukung untuk bahasa python (mata kuliah dan praktikum)")
-    if pk.get("jalur") not in (None, ["web"]):
-        err(f"{w}: 'jalur' pada fase ini hanya boleh ['web']")
+    if pk.get("bahasa") not in ("python", "java") or pk.get("bahasa") != c.get("bahasa"):
+        err(f"{w}: 'bahasa' praktikum harus python atau java dan sama dengan bahasa mata kuliah")
+    java = pk.get("bahasa") == "java"
+    for j in pk.get("jalur", ["web"]):
+        if j not in ("web", "laptop"):
+            err(f"{w}: 'jalur' hanya boleh 'web' atau 'laptop'")
     if not isinstance(pk.get("entri"), str) or not NAMA_BERKAS_RE.fullmatch(pk.get("entri", "")):
         err(f"{w}: 'entri' bukan nama berkas yang sah")
     tahap = pk.get("tahap")
@@ -190,6 +193,9 @@ def cek_satu_praktikum(c, babs, e, pk, w):
         if tid in ada_id:
             err(f"{x}: id tahap '{tid}' kembar")
         ada_id.add(tid)
+        tanpa_uji = not t.get("kasus")
+        if tanpa_uji and (t.get("opsional") is not True or t.get("jalur", "web") not in ("web", "laptop")):
+            err(f"{x}: tahap tanpa kasus uji harus opsional (\"opsional\": true) dengan jalur web atau laptop")
         for k in ("judul", "tujuan", "langkah", "diminta", "awal", "contoh", "kasus"):
             if k not in t:
                 err(f"{x}: kolom '{k}' tidak ada")
@@ -203,17 +209,21 @@ def cek_satu_praktikum(c, babs, e, pk, w):
                 err(f"{x}: '{jenis}' harus berupa kamus nama berkas -> isi")
                 continue
             for n, isi in kamus.items():
-                if not NAMA_BERKAS_RE.fullmatch(n) or not n.lower().endswith(EKSTENSI_PRAKTIKUM):
+                if not NAMA_BERKAS_RE.fullmatch(n) or not n.lower().endswith(EKSTENSI_JAVA if java else EKSTENSI_PRAKTIKUM):
                     err(f"{x}.{jenis}: nama berkas tidak sah: {n!r}")
+                if java and n.lower().endswith(".java") and not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*\.java", n):
+                    err(f"{x}.{jenis}: nama berkas Java harus sama dengan nama kelasnya: {n!r}")
                 if not isinstance(isi, str) or len(isi) > 100000:
                     err(f"{x}.{jenis}.{n}: isi harus teks (maksimal 100000 karakter)")
         for n in t.get("contoh", {}):
             nama_contoh[n] = nama_contoh.get(n, 0) + 1
+            if nama_contoh[n] > 1 and n not in t.get("ubah", []):
+                err(f"{x}: berkas contoh {n!r} sudah ada di tahap sebelumnya; cantumkan di 'ubah' bila tahap ini merevisinya")
         sedia = set(t.get("awal", {})) | set(t.get("contoh", {}))
-        for n in t.get("diminta", []):
+        for n in ([] if tanpa_uji else t.get("diminta", [])):
             if n not in sedia:
                 err(f"{x}: berkas diminta {n!r} tidak ada di 'awal' maupun 'contoh'")
-        if not t.get("kasus"):
+        if not t.get("kasus") and not t.get("opsional"):
             err(f"{x}: minimal satu kasus uji")
         for j, k in enumerate(t.get("kasus", [])):
             y = f"{x}.kasus[{j}]"
@@ -221,15 +231,13 @@ def cek_satu_praktikum(c, babs, e, pk, w):
                 err(f"{y}: 'nama' tidak ada")
             if ("kode" in k) == ("jalankan" in k):
                 err(f"{y}: isi tepat salah satu dari 'kode' atau 'jalankan'")
+            if java and "jalankan" in k and k["jalankan"] != "Main":
+                err(f"{y}: kasus jalankan pada Java selalu menjalankan kelas Main")
             if "jalankan" in k and not NAMA_BERKAS_RE.fullmatch(str(k["jalankan"])):
                 err(f"{y}: 'jalankan' bukan nama berkas yang sah")
         for pj in t.get("petunjuk", []):
             if pj.get("jenis") not in ("soal", "buku", "kode", "kata") or not pj.get("isi"):
                 err(f"{x}: petunjuk harus berisi jenis (soal, buku, kode, kata) dan isi")
-    # Berkas contoh milik satu tahap saja: dua tahap tidak boleh memberi contoh untuk nama berkas yang sama
-    for n, jumlah in nama_contoh.items():
-        if jumlah > 1:
-            err(f"{w}: berkas contoh {n!r} muncul di {jumlah} tahap (tiap berkas dimiliki satu tahap)")
     if pk.get("entri") not in nama_contoh:
         err(f"{w}: berkas entri {pk.get('entri')!r} tidak ada di contoh tahap mana pun")
 

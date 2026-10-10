@@ -9,83 +9,113 @@
  "entri": "kasir.py",
  "gambaran": [
   "UD Rasa Gresik menjual oleh-oleh dalam boks: keripik, petis, dan dodol. Pak Fauzan memberi potongan bila pelanggan membeli banyak, dan Bu Ida ingin kasir yang menghitung tagihan, mencetak struk, dan menyimpan belanjaan.",
-  "Praktikum ini membangun kasir itu sedikit demi sedikit. Tahap 1 sampai 9 masing-masing menambah satu berkas yang dipakai tahap berikutnya, dan tahap 10 menyatukan semuanya menjadi aplikasi yang bisa dijalankan.",
+  "Praktikum ini membangun kasir itu sedikit demi sedikit, mengikuti urutan bab. Tahap 1 sampai 4 berupa skrip sederhana yang membaca masukan dan mencetak hasil (variabel, if, perulangan, list). Di tahap 5 (bab 8) kamu merapikan perhitungannya menjadi fungsi, lalu tahap 6 sampai 10 menambah struk, kelas, penyimpanan, katalog, dan pencarian. Tahap 11 menyatukan semuanya menjadi aplikasi yang bisa dijalankan.",
   "Tidak ada tahap yang terkunci dan semua boleh dilewati. Bila kamu melewati satu tahap, tahap berikutnya otomatis memakai berkas contoh dari tahap itu supaya proyekmu tetap bisa jalan; kamu bisa kembali mengerjakannya kapan saja.",
   "Ruang kerjanya bebas: kamu boleh membuat berkas baru untuk mencoba apa saja, menjalankan berkas mana pun, dan membuat salah. Yang dinilai hanya berkas yang diminta di tiap tahap."
  ],
  "tahap": [
   {
    "id": "t01",
-   "judul": "Hitung subtotal dan format rupiah",
+   "judul": "Hitung subtotal pesanan",
    "bab": [
     2
    ],
-   "tujuan": "Membuat dua fungsi kecil yang dipakai di seluruh aplikasi kasir: menghitung subtotal dan menulis angka sebagai rupiah.",
+   "tujuan": "Membaca satu pesanan dari masukan, menyimpannya di variabel, dan menghitung subtotalnya. Ini langkah pertama kasir UD Rasa Gresik.",
    "langkah": [
-    "Buat berkas subtotal.py (sudah ada kerangkanya di editor).",
-    "Tulis subtotal(jumlah, harga_satuan) yang mengembalikan jumlah dikali harga satuan.",
-    "Tulis format_rupiah(angka) yang mengembalikan teks seperti \"Rp1.250.000\": awalan Rp, titik sebagai pemisah ribuan, tanpa desimal.",
-    "Coba di berkas coba.py (boleh kamu buat sendiri): print(format_rupiah(subtotal(3, 25000))). Lalu tekan Kirim jawaban."
+    "Buat berkas pesanan.py (kerangkanya sudah ada di editor).",
+    "Baca nama barang (teks), jumlah boks (bilangan bulat), dan harga satuan (bilangan bulat) dengan tiga input() terpisah. Simpan di variabel nama, jumlah, dan harga_satuan.",
+    "Hitung subtotal = jumlah dikali harga_satuan.",
+    "Cetak dua baris: pertama nama, spasi, x, lalu jumlah (contoh: keripik x100); kedua Subtotal: Rp diikuti angkanya (contoh: Subtotal: Rp1000000).",
+    "Tekan Jalankan dengan masukan tiga baris (keripik, 100, 10000) untuk mencobanya, lalu Kirim jawaban."
    ],
    "diminta": [
-    "subtotal.py"
+    "pesanan.py"
    ],
    "petunjuk": [
     {
      "jenis": "soal",
-     "isi": "Subtotal hanya perkalian. Untuk format_rupiah, f\"{angka:,.0f}\" memberi 1,250,000 dengan koma sebagai pemisah ribuan."
+     "isi": "input() selalu menghasilkan teks. Bungkus dengan int(...) untuk jumlah dan harga supaya bisa dikali."
     },
     {
      "jenis": "buku",
-     "isi": "Baca lagi bagian f-string dan format angka di bab 2, lalu ingat replace() milik teks untuk mengganti koma dengan titik."
+     "isi": "Bab 2: variabel, tipe data (teks dan angka), konversi int(), operator *, dan f-string untuk menyusun teks cetakan."
     },
     {
      "jenis": "soal",
-     "isi": "return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")"
+     "isi": "print(f\"{nama} x{jumlah}\") dan print(f\"Subtotal: Rp{subtotal}\")."
     }
    ],
    "awal": {
-    "subtotal.py": "# subtotal.py\n\ndef subtotal(jumlah, harga_satuan):\n    # kembalikan jumlah dikali harga satuan\n    pass\n\n\ndef format_rupiah(angka):\n    # kembalikan teks seperti \"Rp1.250.000\"\n    pass\n"
+    "pesanan.py": "# pesanan.py\n# baca nama, jumlah (int), dan harga_satuan (int), masing-masing dengan input()\n\n# hitung subtotal\n\n# cetak dua baris: nama xjumlah, lalu Subtotal: Rp...\n"
    },
    "contoh": {
-    "subtotal.py": "# subtotal.py\n\ndef subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n\n\ndef format_rupiah(angka):\n    return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")\n"
+    "pesanan.py": "# pesanan.py\nnama = input()\njumlah = int(input())\nharga_satuan = int(input())\n\nsubtotal = jumlah * harga_satuan\n\nprint(f\"{nama} x{jumlah}\")\nprint(f\"Subtotal: Rp{subtotal}\")\n"
    },
    "kasus": [
     {
-     "nama": "subtotal 3 boks harga 25.000",
-     "kode": "from subtotal import subtotal\nassert subtotal(3, 25000) == 75000"
+     "nama": "seratus boks keripik",
+     "jalankan": "pesanan.py",
+     "masukan": [
+      "keripik",
+      "100",
+      "10000"
+     ],
+     "memuat": [
+      "keripik x100",
+      "Subtotal: Rp1000000"
+     ]
     },
     {
-     "nama": "subtotal nol boks",
-     "kode": "from subtotal import subtotal\nassert subtotal(0, 25000) == 0"
+     "nama": "sepuluh boks petis",
+     "jalankan": "pesanan.py",
+     "masukan": [
+      "petis",
+      "10",
+      "5000"
+     ],
+     "memuat": [
+      "petis x10",
+      "Subtotal: Rp50000"
+     ]
     },
     {
-     "nama": "subtotal harga bukan bulat",
-     "kode": "from subtotal import subtotal\nassert subtotal(4, 12500) == 50000"
+     "nama": "nol boks",
+     "jalankan": "pesanan.py",
+     "masukan": [
+      "dodol",
+      "0",
+      "25000"
+     ],
+     "memuat": [
+      "dodol x0",
+      "Subtotal: Rp0"
+     ]
     },
     {
-     "nama": "format jutaan",
-     "kode": "from subtotal import format_rupiah\nassert format_rupiah(1250000) == \"Rp1.250.000\""
+     "nama": "tiga boks dodol",
+     "jalankan": "pesanan.py",
+     "masukan": [
+      "dodol",
+      "3",
+      "25000"
+     ],
+     "memuat": [
+      "dodol x3",
+      "Subtotal: Rp75000"
+     ]
     },
     {
-     "nama": "format ribuan",
-     "kode": "from subtotal import format_rupiah\nassert format_rupiah(75000) == \"Rp75.000\""
-    },
-    {
-     "nama": "format di bawah seribu",
-     "kode": "from subtotal import format_rupiah\nassert format_rupiah(500) == \"Rp500\""
-    },
-    {
-     "nama": "format nol",
-     "kode": "from subtotal import format_rupiah\nassert format_rupiah(0) == \"Rp0\""
-    },
-    {
-     "nama": "hasil format berupa teks",
-     "kode": "from subtotal import format_rupiah\nassert isinstance(format_rupiah(1000), str)"
-    },
-    {
-     "nama": "gabungan (tersembunyi)",
-     "kode": "from subtotal import subtotal, format_rupiah\nassert format_rupiah(subtotal(7, 12500)) == \"Rp87.500\"\nassert format_rupiah(1440000.0) == \"Rp1.440.000\"",
+     "nama": "nama dan angka lain (tersembunyi)",
+     "jalankan": "pesanan.py",
+     "masukan": [
+      "jenang",
+      "7",
+      "12500"
+     ],
+     "memuat": [
+      "jenang x7",
+      "Subtotal: Rp87500"
+     ],
      "tersembunyi": true
     }
    ]
@@ -96,72 +126,132 @@
    "bab": [
     4
    ],
-   "tujuan": "Menerapkan aturan potongan UD Rasa Gresik dan menghitung total bayar dengan memakai fungsi dari tahap 1.",
+   "tujuan": "Menerapkan aturan potongan UD Rasa Gresik dengan if, elif, else, lalu menghitung total yang harus dibayar.",
    "langkah": [
-    "Buat berkas harga.py. Baris pertamanya mengimpor subtotal dari subtotal.py milikmu.",
-    "Tulis potongan(jumlah_boks): 100 boks atau lebih mengembalikan 0.12, 50 sampai 99 boks mengembalikan 0.08, selain itu 0.0.",
-    "Tulis total_bayar(jumlah_boks, harga_satuan): subtotal dikurangi potongannya. Pakai subtotal() dan potongan(), jangan menulis ulang rumusnya.",
-    "Uji di coba.py, lalu Kirim jawaban."
+    "Buat berkas potongan.py (kerangkanya memuat bagian tahap 1 yang sudah jadi, jadi kamu tidak perlu mengetiknya lagi).",
+    "Tentukan variabel potongan_persen: 12 bila jumlah_boks 100 atau lebih, 8 bila 50 sampai 99, selain itu 0.",
+    "Hitung total_bayar = subtotal dikurangi potongannya (subtotal dikali potongan_persen dibagi 100).",
+    "Kerangka sudah mencetak dua baris untuk kamu: Potongan: 12% dan Total bayar: Rp880000. Jalankan dengan masukan 100 lalu 10000 untuk memeriksa, lalu Kirim jawaban."
    ],
    "diminta": [
-    "harga.py"
+    "potongan.py"
    ],
    "petunjuk": [
     {
      "jenis": "soal",
-     "isi": "Periksa dari batas yang paling besar dulu: if jumlah_boks >= 100, elif jumlah_boks >= 50, else."
+     "isi": "Periksa dari batas yang paling besar dulu: if jumlah_boks >= 100, lalu elif jumlah_boks >= 50, lalu else."
     },
     {
      "jenis": "buku",
-     "isi": "Bab 4 membahas if, elif, else dan urutan memeriksa kondisi."
+     "isi": "Bab 4: if, elif, else, dan mengapa urutan memeriksa kondisi penting."
+    },
+    {
+     "jenis": "soal",
+     "isi": "total_bayar = subtotal - subtotal * potongan_persen / 100. Hasilnya bisa berupa pecahan; f\"{total_bayar:.0f}\" di kerangka membulatkannya untuk dicetak."
     }
    ],
    "awal": {
-    "harga.py": "# harga.py\nfrom subtotal import subtotal\n\n\ndef potongan(jumlah_boks):\n    # 100 atau lebih -> 0.12, 50 sampai 99 -> 0.08, selain itu 0.0\n    pass\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    # subtotal dikurangi potongan\n    pass\n"
+    "potongan.py": "# potongan.py\njumlah_boks = int(input())\nharga_satuan = int(input())\nsubtotal = jumlah_boks * harga_satuan\n\n# tentukan potongan_persen: 12 bila jumlah_boks >= 100, 8 bila 50 sampai 99, selain itu 0\n\n# hitung total_bayar: subtotal dikurangi potongannya\n\nprint(f\"Potongan: {potongan_persen}%\")\nprint(f\"Total bayar: Rp{total_bayar:.0f}\")\n"
    },
    "contoh": {
-    "harga.py": "# harga.py\nfrom subtotal import subtotal\n\n\ndef potongan(jumlah_boks):\n    if jumlah_boks >= 100:\n        return 0.12\n    elif jumlah_boks >= 50:\n        return 0.08\n    else:\n        return 0.0\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    kotor = subtotal(jumlah_boks, harga_satuan)\n    return kotor - kotor * potongan(jumlah_boks)\n"
+    "potongan.py": "# potongan.py\njumlah_boks = int(input())\nharga_satuan = int(input())\nsubtotal = jumlah_boks * harga_satuan\n\nif jumlah_boks >= 100:\n    potongan_persen = 12\nelif jumlah_boks >= 50:\n    potongan_persen = 8\nelse:\n    potongan_persen = 0\n\ntotal_bayar = subtotal - subtotal * potongan_persen / 100\n\nprint(f\"Potongan: {potongan_persen}%\")\nprint(f\"Total bayar: Rp{total_bayar:.0f}\")\n"
    },
    "kasus": [
     {
-     "nama": "potongan 100 boks",
-     "kode": "from harga import potongan\nassert potongan(100) == 0.12"
+     "nama": "tepat 100 boks",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "100",
+      "10000"
+     ],
+     "memuat": [
+      "Potongan: 12%",
+      "Total bayar: Rp880000"
+     ]
     },
     {
-     "nama": "potongan di atas 100 boks",
-     "kode": "from harga import potongan\nassert potongan(250) == 0.12"
+     "nama": "di atas 100 boks",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "250",
+      "1000"
+     ],
+     "memuat": [
+      "Potongan: 12%",
+      "Total bayar: Rp220000"
+     ]
     },
     {
-     "nama": "potongan tepat 50 boks",
-     "kode": "from harga import potongan\nassert potongan(50) == 0.08"
+     "nama": "tepat 50 boks",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "50",
+      "10000"
+     ],
+     "memuat": [
+      "Potongan: 8%",
+      "Total bayar: Rp460000"
+     ]
     },
     {
-     "nama": "potongan 99 boks",
-     "kode": "from harga import potongan\nassert potongan(99) == 0.08"
+     "nama": "99 boks",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "99",
+      "1000"
+     ],
+     "memuat": [
+      "Potongan: 8%",
+      "Total bayar: Rp91080"
+     ]
     },
     {
-     "nama": "tanpa potongan 49 boks",
-     "kode": "from harga import potongan\nassert potongan(49) == 0.0"
+     "nama": "60 boks",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "60",
+      "10000"
+     ],
+     "memuat": [
+      "Potongan: 8%",
+      "Total bayar: Rp552000"
+     ]
     },
     {
-     "nama": "tanpa potongan nol boks",
-     "kode": "from harga import potongan\nassert potongan(0) == 0.0"
+     "nama": "49 boks tanpa potongan",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "49",
+      "1000"
+     ],
+     "memuat": [
+      "Potongan: 0%",
+      "Total bayar: Rp49000"
+     ]
     },
     {
-     "nama": "total 100 boks",
-     "kode": "from harga import total_bayar\nassert abs(total_bayar(100, 10000) - 880000) < 0.01"
+     "nama": "10 boks tanpa potongan",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "10",
+      "25000"
+     ],
+     "memuat": [
+      "Potongan: 0%",
+      "Total bayar: Rp250000"
+     ]
     },
     {
-     "nama": "total 60 boks",
-     "kode": "from harga import total_bayar\nassert abs(total_bayar(60, 10000) - 552000) < 0.01"
-    },
-    {
-     "nama": "total 10 boks",
-     "kode": "from harga import total_bayar\nassert abs(total_bayar(10, 25000) - 250000) < 0.01"
-    },
-    {
-     "nama": "harga.py memakai subtotal dari tahap 1 (tersembunyi)",
-     "kode": "import harga\nassert hasattr(harga, 'subtotal'), 'harga.py harus mengimpor subtotal dari subtotal.py'",
+     "nama": "harga lain (tersembunyi)",
+     "jalankan": "potongan.py",
+     "masukan": [
+      "100",
+      "12500"
+     ],
+     "memuat": [
+      "Potongan: 12%",
+      "Total bayar: Rp1100000"
+     ],
      "tersembunyi": true
     }
    ]
@@ -172,37 +262,41 @@
    "bab": [
     5
    ],
-   "tujuan": "Membaca beberapa pesanan sekaligus dan menghitung tagihan tiap pesanan serta jumlah seluruhnya.",
+   "tujuan": "Membaca beberapa pesanan sekaligus dengan perulangan, menghitung tagihan tiap pesanan, dan menjumlahkan semuanya.",
    "langkah": [
-    "Buat berkas menu.py dengan fungsi hitung_semua().",
-    "Baca n (banyak pesanan) dengan input(). Lalu ulangi n kali: baca jumlah boks dan harga satuan (dua input() terpisah).",
-    "Tiap pesanan cetak persis: Pesanan 1: Rp880.000 (nomor mulai dari 1, jumlahnya dari total_bayar dan format_rupiah).",
-    "Setelah semua pesanan cetak: Total semua: Rp930.000. Panggil hitung_semua() di bagian paling bawah berkas.",
-    "Jalankan menu.py dengan masukan 2, 100, 10000, 10, 5000 untuk memeriksa, lalu Kirim jawaban."
+    "Buat berkas banyak.py (kerangkanya sudah memuat perulangan dan variabel penjumlahnya).",
+    "Di dalam perulangan, hitung total_bayar tiap pesanan dengan aturan potongan yang sama seperti tahap 2 (ketik ulang bagian if-nya di dalam perulangan).",
+    "Cetak tiap pesanan persis: Pesanan 1: Rp880000 (nomor mulai dari 1), lalu tambahkan total_bayar ke jumlah_semua.",
+    "Setelah perulangan, cetak: Total semua: Rp930000 (angkanya jumlah_semua).",
+    "Jalankan dengan masukan 2, 100, 10000, 10, 5000 untuk memeriksa, lalu Kirim jawaban."
    ],
    "diminta": [
-    "menu.py"
+    "banyak.py"
    ],
    "petunjuk": [
     {
      "jenis": "soal",
-     "isi": "for i in range(1, n + 1): memberi nomor pesanan dari 1."
+     "isi": "Bagian potongan sama persis dengan tahap 2, hanya sekarang berada di dalam for. Nomor pesanan sudah disediakan oleh range(1, banyak + 1)."
     },
     {
      "jenis": "buku",
-     "isi": "Bab 5 menjelaskan for, range, dan akumulator (variabel yang dijumlahkan di tiap putaran)."
+     "isi": "Bab 5: for, range, dan akumulator (variabel yang bertambah di tiap putaran)."
+    },
+    {
+     "jenis": "soal",
+     "isi": "jumlah_semua += total_bayar di dalam perulangan, dan cetak totalnya di luar perulangan (sejajar dengan for)."
     }
    ],
    "awal": {
-    "menu.py": "# menu.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef hitung_semua():\n    # baca n, lalu ulangi n kali membaca jumlah boks dan harga satuan\n    pass\n\n\nhitung_semua()\n"
+    "banyak.py": "# banyak.py\nbanyak = int(input())\njumlah_semua = 0\n\nfor nomor in range(1, banyak + 1):\n    jumlah_boks = int(input())\n    harga_satuan = int(input())\n    # hitung subtotal dan total_bayar dengan potongan seperti tahap 2\n    # cetak: Pesanan 1: Rp880000\n    # tambahkan total_bayar ke jumlah_semua\n\n# cetak: Total semua: Rp...\n"
    },
    "contoh": {
-    "menu.py": "# menu.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef hitung_semua():\n    n = int(input())\n    jumlah_total = 0\n    for i in range(1, n + 1):\n        jumlah_boks = int(input())\n        harga_satuan = int(input())\n        tagihan = total_bayar(jumlah_boks, harga_satuan)\n        print(f\"Pesanan {i}: {format_rupiah(tagihan)}\")\n        jumlah_total += tagihan\n    print(f\"Total semua: {format_rupiah(jumlah_total)}\")\n\n\nhitung_semua()\n"
+    "banyak.py": "# banyak.py\nbanyak = int(input())\njumlah_semua = 0\n\nfor nomor in range(1, banyak + 1):\n    jumlah_boks = int(input())\n    harga_satuan = int(input())\n    subtotal = jumlah_boks * harga_satuan\n    if jumlah_boks >= 100:\n        potongan_persen = 12\n    elif jumlah_boks >= 50:\n        potongan_persen = 8\n    else:\n        potongan_persen = 0\n    total_bayar = subtotal - subtotal * potongan_persen / 100\n    print(f\"Pesanan {nomor}: Rp{total_bayar:.0f}\")\n    jumlah_semua += total_bayar\n\nprint(f\"Total semua: Rp{jumlah_semua:.0f}\")\n"
    },
    "kasus": [
     {
      "nama": "dua pesanan",
-     "jalankan": "menu.py",
+     "jalankan": "banyak.py",
      "masukan": [
       "2",
       "100",
@@ -211,27 +305,27 @@
       "5000"
      ],
      "memuat": [
-      "Pesanan 1: Rp880.000",
-      "Pesanan 2: Rp50.000",
-      "Total semua: Rp930.000"
+      "Pesanan 1: Rp880000",
+      "Pesanan 2: Rp50000",
+      "Total semua: Rp930000"
      ]
     },
     {
      "nama": "satu pesanan",
-     "jalankan": "menu.py",
+     "jalankan": "banyak.py",
      "masukan": [
       "1",
       "60",
       "10000"
      ],
      "memuat": [
-      "Pesanan 1: Rp552.000",
-      "Total semua: Rp552.000"
+      "Pesanan 1: Rp552000",
+      "Total semua: Rp552000"
      ]
     },
     {
      "nama": "tanpa pesanan",
-     "jalankan": "menu.py",
+     "jalankan": "banyak.py",
      "masukan": [
       "0"
      ],
@@ -241,7 +335,7 @@
     },
     {
      "nama": "tiga pesanan",
-     "jalankan": "menu.py",
+     "jalankan": "banyak.py",
      "masukan": [
       "3",
       "50",
@@ -252,15 +346,15 @@
       "1000"
      ],
      "memuat": [
-      "Pesanan 1: Rp920.000",
-      "Pesanan 2: Rp980.000",
-      "Pesanan 3: Rp88.000",
-      "Total semua: Rp1.988.000"
+      "Pesanan 1: Rp920000",
+      "Pesanan 2: Rp980000",
+      "Pesanan 3: Rp88000",
+      "Total semua: Rp1988000"
      ]
     },
     {
      "nama": "lima pesanan (tersembunyi)",
-     "jalankan": "menu.py",
+     "jalankan": "banyak.py",
      "masukan": [
       "5",
       "1",
@@ -275,8 +369,8 @@
       "1000"
      ],
      "memuat": [
-      "Pesanan 5: Rp5.000",
-      "Total semua: Rp15.000"
+      "Pesanan 5: Rp5000",
+      "Total semua: Rp15000"
      ],
      "tersembunyi": true
     }
@@ -288,12 +382,14 @@
    "bab": [
     6
    ],
-   "tujuan": "Menyimpan barang yang dibeli dalam sebuah list dan menghitung total keranjang memakai total_bayar dari tahap 2.",
+   "tujuan": "Menyimpan barang yang dibeli dalam sebuah list, menghapus satu barang, dan mencetak isi keranjang beserta totalnya.",
    "langkah": [
-    "Buat berkas keranjang.py dengan list bernama isi di tingkat modul (di luar fungsi).",
-    "Tulis kosongkan(), tambah(nama, jumlah, harga_satuan), dan hapus(nama). hapus() mengembalikan True bila barangnya ada lalu dihapus, selain itu False.",
-    "Tulis total() yang menjumlahkan total_bayar() tiap barang di isi, dan banyak_jenis() yang mengembalikan banyaknya barang berbeda di keranjang.",
-    "Coba tambah dua barang di coba.py dan cetak total(). Lalu Kirim jawaban."
+    "Buat berkas keranjang.py (kerangkanya berisi urutan pekerjaan sebagai komentar).",
+    "Baca banyak barang, lalu untuk tiap barang baca nama, jumlah (int), dan harga satuan (int), dan simpan sebagai list kecil [nama, jumlah, harga_satuan] ke dalam list keranjang dengan append().",
+    "Baca satu nama lagi (nama_hapus). Bila tidak kosong dan ada di keranjang, hapus barang itu dan cetak Dihapus: petis; bila tidak ada, cetak Tidak ada: dodol. Bila kosong, jangan cetak apa-apa.",
+    "Untuk tiap barang yang tersisa cetak nama, spasi, x, jumlah, spasi, Rp, lalu total bayarnya (potongan seperti tahap 2), misalnya keripik x100 Rp880000.",
+    "Terakhir cetak Jenis barang: 2 (banyak barang di keranjang) dan TOTAL Rp930000 (jumlah semua total bayar).",
+    "Coba dengan masukan 2, keripik, 100, 10000, petis, 10, 5000, lalu satu baris kosong. Setelah itu Kirim jawaban."
    ],
    "diminta": [
     "keranjang.py"
@@ -301,60 +397,241 @@
    "petunjuk": [
     {
      "jenis": "soal",
-     "isi": "Simpan tiap barang sebagai list kecil [nama, jumlah, harga_satuan] lalu isi.append(...)."
+     "isi": "keranjang.append([nama, jumlah, harga_satuan]) menyimpan satu barang. Untuk mencari yang dihapus, jalani indeks dengan for i in range(len(keranjang)) dan bandingkan keranjang[i][0]."
     },
     {
      "jenis": "buku",
-     "isi": "Bab 6: append, del, len, dan perulangan atas isi list."
+     "isi": "Bab 6: append, del, len, indeks, dan perulangan atas list (termasuk list di dalam list)."
+    },
+    {
+     "jenis": "soal",
+     "isi": "Setelah del keranjang[i], hentikan pencarian dengan break. Untuk mencetak, for barang in keranjang: lalu barang[0], barang[1], barang[2] adalah nama, jumlah, harga."
     }
    ],
    "awal": {
-    "keranjang.py": "# keranjang.py\nfrom harga import total_bayar\n\nisi = []\n\n\ndef kosongkan():\n    pass\n\n\ndef tambah(nama, jumlah, harga_satuan):\n    pass\n\n\ndef hapus(nama):\n    # True bila ada dan dihapus, False bila tidak ada\n    pass\n\n\ndef total():\n    pass\n\n\ndef banyak_jenis():\n    pass\n"
+    "keranjang.py": "# keranjang.py\nkeranjang = []\n\nbanyak = int(input())\n# ulangi banyak kali: baca nama, jumlah (int), harga_satuan (int); simpan [nama, jumlah, harga_satuan] dengan append\n\nnama_hapus = input()\n# bila nama_hapus tidak kosong: cari dan hapus, lalu cetak Dihapus: ... atau Tidak ada: ...\n\ntotal = 0\n# untuk tiap barang: hitung total bayar (potongan seperti tahap 2), cetak nama xjumlah Rp..., tambahkan ke total\n\n# cetak: Jenis barang: n\n# cetak: TOTAL Rp...\n"
    },
    "contoh": {
-    "keranjang.py": "# keranjang.py\nfrom harga import total_bayar\n\nisi = []\n\n\ndef kosongkan():\n    isi.clear()\n\n\ndef tambah(nama, jumlah, harga_satuan):\n    isi.append([nama, jumlah, harga_satuan])\n\n\ndef hapus(nama):\n    for i in range(len(isi)):\n        if isi[i][0] == nama:\n            del isi[i]\n            return True\n    return False\n\n\ndef total():\n    jumlah = 0\n    for nama, banyak, harga in isi:\n        jumlah += total_bayar(banyak, harga)\n    return jumlah\n\n\ndef banyak_jenis():\n    return len(isi)\n"
+    "keranjang.py": "# keranjang.py\nkeranjang = []\n\nbanyak = int(input())\nfor i in range(banyak):\n    nama = input()\n    jumlah = int(input())\n    harga_satuan = int(input())\n    keranjang.append([nama, jumlah, harga_satuan])\n\nnama_hapus = input()\nif nama_hapus != \"\":\n    ditemukan = False\n    for i in range(len(keranjang)):\n        if keranjang[i][0] == nama_hapus:\n            del keranjang[i]\n            ditemukan = True\n            break\n    if ditemukan:\n        print(f\"Dihapus: {nama_hapus}\")\n    else:\n        print(f\"Tidak ada: {nama_hapus}\")\n\ntotal = 0\nfor barang in keranjang:\n    nama = barang[0]\n    jumlah = barang[1]\n    subtotal = jumlah * barang[2]\n    if jumlah >= 100:\n        potongan_persen = 12\n    elif jumlah >= 50:\n        potongan_persen = 8\n    else:\n        potongan_persen = 0\n    total_bayar = subtotal - subtotal * potongan_persen / 100\n    print(f\"{nama} x{jumlah} Rp{total_bayar:.0f}\")\n    total += total_bayar\n\nprint(f\"Jenis barang: {len(keranjang)}\")\nprint(f\"TOTAL Rp{total:.0f}\")\n"
    },
    "kasus": [
     {
-     "nama": "keranjang kosong",
-     "kode": "import keranjang as k\nk.kosongkan()\nassert k.total() == 0\nassert k.banyak_jenis() == 0"
-    },
-    {
-     "nama": "tambah dua barang",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 100, 10000)\nk.tambah('petis', 10, 5000)\nassert k.banyak_jenis() == 2\nassert abs(k.total() - 930000) < 0.01"
+     "nama": "dua barang tanpa hapus",
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "2",
+      "keripik",
+      "100",
+      "10000",
+      "petis",
+      "10",
+      "5000",
+      ""
+     ],
+     "memuat": [
+      "keripik x100 Rp880000",
+      "petis x10 Rp50000",
+      "Jenis barang: 2",
+      "TOTAL Rp930000"
+     ]
     },
     {
      "nama": "hapus barang yang ada",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 100, 10000)\nk.tambah('petis', 10, 5000)\nassert k.hapus('petis') is True\nassert abs(k.total() - 880000) < 0.01"
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "2",
+      "keripik",
+      "100",
+      "10000",
+      "petis",
+      "10",
+      "5000",
+      "petis"
+     ],
+     "memuat": [
+      "Dihapus: petis",
+      "keripik x100 Rp880000",
+      "Jenis barang: 1",
+      "TOTAL Rp880000"
+     ]
     },
     {
      "nama": "hapus barang yang tidak ada",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('keripik', 1, 1000)\nassert k.hapus('dodol') is False\nassert k.banyak_jenis() == 1"
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "1",
+      "keripik",
+      "1",
+      "1000",
+      "dodol"
+     ],
+     "memuat": [
+      "Tidak ada: dodol",
+      "keripik x1 Rp1000",
+      "Jenis barang: 1",
+      "TOTAL Rp1000"
+     ]
     },
     {
-     "nama": "hapus dua kali",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('petis', 10, 5000)\nassert k.hapus('petis') is True\nassert k.hapus('petis') is False"
+     "nama": "keranjang kosong",
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "0",
+      ""
+     ],
+     "memuat": [
+      "Jenis barang: 0",
+      "TOTAL Rp0"
+     ]
     },
     {
-     "nama": "kosongkan setelah diisi",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('petis', 10, 5000)\nk.kosongkan()\nassert k.banyak_jenis() == 0\nassert k.total() == 0"
+     "nama": "hapus barang pertama dari tiga",
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "3",
+      "a",
+      "1",
+      "1000",
+      "b",
+      "2",
+      "1000",
+      "c",
+      "3",
+      "1000",
+      "a"
+     ],
+     "memuat": [
+      "Dihapus: a",
+      "Jenis barang: 2",
+      "TOTAL Rp5000"
+     ]
     },
     {
      "nama": "potongan dihitung per barang (tersembunyi)",
-     "kode": "import keranjang as k\nk.kosongkan()\nk.tambah('a', 60, 10000)\nk.tambah('b', 49, 10000)\nassert abs(k.total() - (552000 + 490000)) < 0.01",
+     "jalankan": "keranjang.py",
+     "masukan": [
+      "2",
+      "a",
+      "60",
+      "10000",
+      "b",
+      "49",
+      "10000",
+      ""
+     ],
+     "memuat": [
+      "a x60 Rp552000",
+      "b x49 Rp490000",
+      "TOTAL Rp1042000"
+     ],
      "tersembunyi": true
     }
    ]
   },
   {
    "id": "t05",
+   "judul": "Bungkus perhitungan jadi fungsi",
+   "bab": [
+    8
+   ],
+   "tujuan": "Perhitungan subtotal, potongan, dan total bayar tadi kamu ketik berulang di tiga berkas. Sekarang kamu membungkusnya jadi fungsi di satu berkas supaya bisa dipakai bagian lain aplikasi.",
+   "langkah": [
+    "Buat berkas harga.py (kerangka fungsinya sudah ada di editor). Tiap fungsi punya parameter dan mengembalikan nilai dengan return, bukan mencetak.",
+    "subtotal(jumlah, harga_satuan): kembalikan jumlah dikali harga satuan.",
+    "potongan(jumlah_boks): kembalikan 12, 8, atau 0 (persen) dengan aturan yang sama seperti tahap 2.",
+    "total_bayar(jumlah_boks, harga_satuan): subtotal dikurangi potongannya. Pakai subtotal() dan potongan() yang baru kamu tulis, jangan menulis ulang rumusnya.",
+    "format_rupiah(angka): kembalikan teks seperti Rp1.250.000 (awalan Rp, titik sebagai pemisah ribuan, tanpa desimal). Ini menggantikan cetakan angka polos di tahap sebelumnya.",
+    "Coba di berkas coba.py (boleh kamu buat sendiri): print(format_rupiah(total_bayar(100, 10000))) harus mencetak Rp880.000. Lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "harga.py"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "def nama_fungsi(parameter): lalu badan yang menjorok (indentasi) dan diakhiri return nilai. Isi fungsinya sama dengan potongan kode di tahap 1 dan 2; yang berbeda hanya angkanya datang dari parameter, bukan dari input()."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 8: def, parameter, return, dan memanggil fungsi dari fungsi lain. Untuk format_rupiah, ingat metode replace() milik teks dari bab 7."
+    },
+    {
+     "jenis": "soal",
+     "isi": "f\"{angka:,.0f}\" menghasilkan 1,250,000 dengan koma sebagai pemisah ribuan. Ganti koma dengan titik: return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")"
+    }
+   ],
+   "awal": {
+    "harga.py": "# harga.py\n\ndef subtotal(jumlah, harga_satuan):\n    # kembalikan jumlah dikali harga satuan\n    pass\n\n\ndef potongan(jumlah_boks):\n    # kembalikan 12 (100 boks atau lebih), 8 (50 sampai 99), atau 0 (persen)\n    pass\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    # subtotal dikurangi potongannya; pakai subtotal() dan potongan()\n    pass\n\n\ndef format_rupiah(angka):\n    # kembalikan teks seperti \"Rp1.250.000\"\n    pass\n"
+   },
+   "contoh": {
+    "harga.py": "# harga.py\n\ndef subtotal(jumlah, harga_satuan):\n    return jumlah * harga_satuan\n\n\ndef potongan(jumlah_boks):\n    if jumlah_boks >= 100:\n        return 12\n    elif jumlah_boks >= 50:\n        return 8\n    else:\n        return 0\n\n\ndef total_bayar(jumlah_boks, harga_satuan):\n    kotor = subtotal(jumlah_boks, harga_satuan)\n    return kotor - kotor * potongan(jumlah_boks) / 100\n\n\ndef format_rupiah(angka):\n    return \"Rp\" + f\"{angka:,.0f}\".replace(\",\", \".\")\n"
+   },
+   "kasus": [
+    {
+     "nama": "subtotal 3 boks harga 25.000",
+     "kode": "from harga import subtotal\nassert subtotal(3, 25000) == 75000"
+    },
+    {
+     "nama": "subtotal nol boks",
+     "kode": "from harga import subtotal\nassert subtotal(0, 25000) == 0"
+    },
+    {
+     "nama": "potongan 100 boks",
+     "kode": "from harga import potongan\nassert potongan(100) == 12\nassert potongan(250) == 12"
+    },
+    {
+     "nama": "potongan 50 sampai 99 boks",
+     "kode": "from harga import potongan\nassert potongan(50) == 8\nassert potongan(99) == 8"
+    },
+    {
+     "nama": "tanpa potongan di bawah 50 boks",
+     "kode": "from harga import potongan\nassert potongan(49) == 0\nassert potongan(0) == 0"
+    },
+    {
+     "nama": "total 100 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(100, 10000) - 880000) < 0.01"
+    },
+    {
+     "nama": "total 60 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(60, 10000) - 552000) < 0.01"
+    },
+    {
+     "nama": "total 10 boks",
+     "kode": "from harga import total_bayar\nassert abs(total_bayar(10, 25000) - 250000) < 0.01"
+    },
+    {
+     "nama": "format jutaan",
+     "kode": "from harga import format_rupiah\nassert format_rupiah(1250000) == \"Rp1.250.000\""
+    },
+    {
+     "nama": "format ribuan dan ratusan",
+     "kode": "from harga import format_rupiah\nassert format_rupiah(75000) == \"Rp75.000\"\nassert format_rupiah(500) == \"Rp500\""
+    },
+    {
+     "nama": "format nol dan hasil berupa teks",
+     "kode": "from harga import format_rupiah\nassert format_rupiah(0) == \"Rp0\"\nassert isinstance(format_rupiah(1000), str)"
+    },
+    {
+     "nama": "gabungan (tersembunyi)",
+     "kode": "from harga import total_bayar, format_rupiah\nassert format_rupiah(total_bayar(100, 12500)) == \"Rp1.100.000\"\nassert format_rupiah(1440000.0) == \"Rp1.440.000\"",
+     "tersembunyi": true
+    },
+    {
+     "nama": "total_bayar memakai subtotal dan potongan (tersembunyi)",
+     "kode": "import harga\nharga.subtotal = lambda j, h: 1000\nharga.potongan = lambda j: 10\nassert abs(harga.total_bayar(5, 5) - 900) < 0.01, 'total_bayar harus memanggil subtotal() dan potongan()'",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t06",
    "judul": "Struk belanja dengan fungsi",
    "bab": [
     8
    ],
    "tujuan": "Memecah pekerjaan menjadi fungsi-fungsi kecil yang masing-masing mengembalikan nilai, dan memakainya untuk menyusun struk.",
    "langkah": [
-    "Buat berkas struk.py. Impor total_bayar dari harga.py dan format_rupiah dari subtotal.py.",
+    "Buat berkas struk.py. Impor total_bayar dan format_rupiah dari harga.py.",
     "Tulis baris_struk(nama, jumlah, harga_satuan) yang mengembalikan teks seperti: keripik x100 Rp880.000 (nama, spasi, x, jumlah, spasi, total rupiah).",
     "Tulis buat_struk(isi) dengan isi berupa list [nama, jumlah, harga]. Hasilnya satu teks bersambung baris baru: baris pertama STRUK UD RASA GRESIK, satu baris per barang (dari baris_struk), baris terakhir TOTAL diikuti jumlah rupiah, misalnya TOTAL Rp930.000.",
     "Cetak buat_struk([[\"keripik\", 100, 10000]]) di coba.py untuk memeriksa, lalu Kirim jawaban."
@@ -373,10 +650,10 @@
     }
    ],
    "awal": {
-    "struk.py": "# struk.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    pass\n\n\ndef buat_struk(isi):\n    pass\n"
+    "struk.py": "# struk.py\nfrom harga import total_bayar, format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    pass\n\n\ndef buat_struk(isi):\n    pass\n"
    },
    "contoh": {
-    "struk.py": "# struk.py\nfrom harga import total_bayar\nfrom subtotal import format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    return f\"{nama} x{jumlah} {format_rupiah(total_bayar(jumlah, harga_satuan))}\"\n\n\ndef buat_struk(isi):\n    baris = [\"STRUK UD RASA GRESIK\"]\n    total = 0\n    for nama, jumlah, harga in isi:\n        baris.append(baris_struk(nama, jumlah, harga))\n        total += total_bayar(jumlah, harga)\n    baris.append(\"TOTAL \" + format_rupiah(total))\n    return \"\\n\".join(baris)\n"
+    "struk.py": "# struk.py\nfrom harga import total_bayar, format_rupiah\n\n\ndef baris_struk(nama, jumlah, harga_satuan):\n    return f\"{nama} x{jumlah} {format_rupiah(total_bayar(jumlah, harga_satuan))}\"\n\n\ndef buat_struk(isi):\n    baris = [\"STRUK UD RASA GRESIK\"]\n    total = 0\n    for nama, jumlah, harga in isi:\n        baris.append(baris_struk(nama, jumlah, harga))\n        total += total_bayar(jumlah, harga)\n    baris.append(\"TOTAL \" + format_rupiah(total))\n    return \"\\n\".join(baris)\n"
    },
    "kasus": [
     {
@@ -407,7 +684,7 @@
    ]
   },
   {
-   "id": "t06",
+   "id": "t07",
    "judul": "Kelas Barang dan Keranjang",
    "bab": [
     9
@@ -468,7 +745,7 @@
    ]
   },
   {
-   "id": "t07",
+   "id": "t08",
    "judul": "Simpan dan muat keranjang",
    "bab": [
     10
@@ -524,7 +801,7 @@
    ]
   },
   {
-   "id": "t08",
+   "id": "t09",
    "judul": "Daftar barang (CRUD sederhana)",
    "bab": [
     11
@@ -594,7 +871,7 @@
    ]
   },
   {
-   "id": "t09",
+   "id": "t10",
    "judul": "Cari dan urutkan barang",
    "bab": [
     12,
@@ -664,7 +941,7 @@
    ]
   },
   {
-   "id": "t10",
+   "id": "t11",
    "judul": "Produk akhir: aplikasi kasir",
    "bab": [
     14

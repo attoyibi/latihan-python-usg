@@ -654,10 +654,10 @@
     db.praktikum_tahap = db.praktikum_tahap || [];
     db.praktikum_laporan = db.praktikum_laporan || [];
     db.praktikum_berkas = db.praktikum_berkas || [];
-    const ids = ["t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10"];
+    const ids = ["t01", "t02", "t03", "t04", "t05", "t06", "t07", "t08", "t09", "t10", "t11"];
     for (let n = 1; n <= 12; n++) {
       const uid = "u-seed" + n;
-      const sampai = n <= 3 ? 10 : n <= 7 ? 4 + (n % 3) : 2;
+      const sampai = n <= 3 ? 11 : n <= 7 ? 4 + (n % 3) : 2;
       ids.slice(0, sampai).forEach((tid, i) => {
         const macet = n > 7 && i === sampai - 1;
         db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: "kasir", tahap_id: tid, status: macet ? "sedang" : n % 4 === 0 && i === 1 ? "dilewati" : "lulus", jalur: "web", jumlah_kirim: macet ? 6 + n : 1 + ((n + i) % 3), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: macet ? null : "2026-10-03T03:00:00Z", pakai_contoh: n % 5 === 0 && i === 2, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });

@@ -45,6 +45,11 @@ self.onmessage = async (e) => {
     } catch (err) {
       self.postMessage({ type: "fatal", error: String(err) });
     }
+  } else if (m.type === "proyek") {
+    // Praktikum: beberapa berkas sekaligus (JavaRun mode paket). m.sumber sudah berformat paket.
+    self.postMessage({ type: "started", id: m.id });
+    const hasil = await kerja(m.sumber, "");
+    self.postMessage({ type: "done", id: m.id, hasil });
   } else if (m.type === "run") {
     self.postMessage({ type: "started", id: m.id });
     const hasil = await kerja(m.code, m.inputs.join("\f"));

@@ -379,7 +379,7 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 
 - [x] Migrasi `0008_praktikum.sql` (hanya menambah empat tabel; RLS peserta mengelola miliknya, instruktur membaca; jam server; batas 40 berkas); uji PGlite pada data lama
 - [x] Penguji Python bersama browser dan CPython (`praktikum_harness.py`), diuji 117 kasus dengan Python sungguhan (`tools/uji_praktikum.py`)
-- [x] Praktikum Kasir UD Rasa Gresik (10 tahap) di Algoritma dan Pemrograman; konfigurasi JSON, tanpa aturan waktu di kode
+- [x] Praktikum Kasir UD Rasa Gresik (11 tahap; tahap 1 sampai 4 berupa skrip, fungsi baru di tahap 5 / bab 8) di Algoritma dan Pemrograman; konfigurasi JSON, tanpa aturan waktu di kode
 - [x] Halaman mata kuliah (bagian Praktikum, tanda Ada praktik), notifikasi di bab, daftar tahap, ruang kerja berkas, riwayat versi, laporan 3 kolom dan PDF, ekspor satu halaman HTML
 - [x] Tab Praktikum di dashboard dosen (matriks, per tahap, lihat berkas, CSV)
 - [x] Diuji di browser (Pyodide nyata, ekspor HTML dengan `input()`, ponsel 375 px, tanpa migrasi 0008, PBO tidak berubah)

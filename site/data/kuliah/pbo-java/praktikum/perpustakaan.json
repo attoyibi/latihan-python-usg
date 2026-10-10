@@ -1,0 +1,873 @@
+{
+ "id": "perpustakaan",
+ "judul": "Sistem Perpustakaan Kampus USG",
+ "deskripsi": "Satu proyek Java yang tumbuh dari bab ke bab: dari satu kelas Buku sampai aplikasi perpustakaan berbasis menu. Kamu menulis berkasnya sendiri; tiap tahap memakai berkas tahap sebelumnya.",
+ "bahasa": "java",
+ "jalur": [
+  "web",
+  "laptop"
+ ],
+ "entri": "Main.java",
+ "gambaran": [
+  "Tahap 1 sampai 10: dikerjakan di website dan diuji otomatis. Inilah inti proyek (kelas, enkapsulasi, pewarisan, polimorfisme, abstraksi, eksepsi, collection, berkas, pola Factory, aplikasi akhir).",
+  "Tahap 11 dan 12 (basis data dan antarmuka grafis): opsional, dikerjakan di laptop sendiri karena butuh JDK, basis data, dan layar.",
+  "Tahap 13 (rancangan mendalam): opsional, bisa di website, dinilai dosen dengan rubrik.",
+  "Tahap 11 sampai 13 setara sebagai cara menambah nilai: kamu memilih jalur yang sesuai perangkatmu."
+ ],
+ "jalurPenjelasan": [
+  {
+   "judul": "Di website",
+   "isi": "Tahap 1 sampai 10 dan 13. Tulis kode di ruang kerja, tekan Jalankan untuk mencoba, lalu Kirim jawaban untuk diuji. Tidak perlu memasang apa pun."
+  },
+  {
+   "judul": "Di laptop sendiri",
+   "isi": "Tahap 11 dan 12 (JDBC dan Swing). Pasang JDK dan VS Code, kerjakan di sana, lalu kembali ke sini untuk menandai selesai dan menulis laporan. Website tidak menjalankan kodenya."
+  },
+  {
+   "judul": "Tanpa laptop",
+   "isi": "Kerjakan tahap 1 sampai 10 di website (bisa lewat ponsel, walau menulis kode lebih nyaman di layar besar), lalu ambil tahap 13 sebagai pengganti jalur laptop."
+  }
+ ],
+ "penilaian": [
+  {
+   "judul": "Dasar (inti proyek)",
+   "butir": [
+    "Tahap 1 sampai 10 lulus dengan berkas buatan sendiri (berkas contoh tidak dihitung).",
+    "Laporan praktikum terisi dengan kalimat sendiri."
+   ]
+  },
+  {
+   "judul": "Nilai tambah, pilih salah satu atau keduanya",
+   "butir": [
+    "Jalur laptop: tahap 11 (basis data) dan 12 (antarmuka grafis) dengan demo singkat kepada dosen.",
+    "Jalur rancangan: tahap 13 (diagram kelas, fitur rancangan sendiri, prinsip SOLID) dinilai dengan rubrik."
+   ]
+  },
+  {
+   "judul": "Keduanya setara",
+   "butir": [
+    "Jalur laptop dan jalur rancangan bisa sampai nilai tertinggi. Memiliki laptop bukan syarat."
+   ]
+  }
+ ],
+ "tahap": [
+  {
+   "id": "t01",
+   "judul": "Kelas Buku",
+   "bab": [
+    2
+   ],
+   "tujuan": "Membuat kelas pertama: sebuah Buku dengan tiga atribut, constructor, dan method info().",
+   "langkah": [
+    "Buat berkas Buku.java dengan kelas Buku. Beri atribut judul dan penulis (String) serta stok (int).",
+    "Tulis constructor Buku(String judul, String penulis, int stok) yang mengisi ketiga atribut memakai this.",
+    "Tulis method info() yang mengembalikan teks seperti \"Laskar Pelangi oleh Andrea Hirata (stok: 3)\".",
+    "Buat berkas Main.java, buat dua objek Buku, cetak info() keduanya, lalu tekan Jalankan. Setelah itu Kirim jawaban."
+   ],
+   "diminta": [
+    "Buku.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Atribut dideklarasikan di dalam kelas tetapi di luar method. Di constructor, this.judul = judul memisahkan atribut dari parameter yang bernama sama."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 2: kelas, objek, atribut, method, dan constructor."
+    }
+   ],
+   "awal": {
+    "Buku.java": "// Buku.java\npublic class Buku {\n    // TODO: tiga atribut: judul dan penulis (String), stok (int)\n\n    // TODO: constructor Buku(String judul, String penulis, int stok)\n\n    // TODO: method info() yang mengembalikan teks seperti\n    //       \"Laskar Pelangi oleh Andrea Hirata (stok: 3)\"\n}\n"
+   },
+   "contoh": {
+    "Buku.java": "// Buku.java\npublic class Buku {\n    String judul;\n    String penulis;\n    int stok;\n\n    Buku(String judul, String penulis, int stok) {\n        this.judul = judul;\n        this.penulis = penulis;\n        this.stok = stok;\n    }\n\n    String info() {\n        return judul + \" oleh \" + penulis + \" (stok: \" + stok + \")\";\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "info satu buku",
+     "kode": "Buku b = new Buku(\"Laskar Pelangi\", \"Andrea Hirata\", 3);\nsama(\"Laskar Pelangi oleh Andrea Hirata (stok: 3)\", b.info());"
+    },
+    {
+     "nama": "constructor mengisi atribut",
+     "kode": "Buku b = new Buku(\"Bumi\", \"Tere Liye\", 7);\nsama(\"Bumi\", b.judul);\nsama(\"Tere Liye\", b.penulis);\nsama(7, b.stok);"
+    },
+    {
+     "nama": "dua objek terpisah",
+     "kode": "Buku a = new Buku(\"A\", \"P\", 5);\nBuku b = new Buku(\"B\", \"Q\", 9);\na.stok = 1;\nsama(9, b.stok);\nsama(\"B oleh Q (stok: 9)\", b.info());"
+    },
+    {
+     "nama": "info mengikuti stok (tersembunyi)",
+     "kode": "Buku b = new Buku(\"X\", \"Y\", 1);\nb.stok = 0;\nsama(\"X oleh Y (stok: 0)\", b.info());",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t02",
+   "judul": "Enkapsulasi: menjaga stok",
+   "bab": [
+    3
+   ],
+   "tujuan": "Menyembunyikan atribut Buku dan hanya mengubahnya lewat method yang menjaga aturan (stok tidak boleh negatif).",
+   "langkah": [
+    "Buka Buku.java dari tahap 1 (berkas contohnya sudah ada bila kamu melewati tahap itu). Ubah ketiga atribut menjadi private.",
+    "Tambahkan getJudul(), getPenulis(), dan getStok().",
+    "Tambahkan setStok(int stok) yang hanya mengubah stok bila nilainya 0 atau lebih. Constructor memakainya.",
+    "Tambahkan pinjam() (kurangi stok dan kembalikan true bila stok ada, selain itu false) dan kembalikan() (tambah stok).",
+    "Pastikan info() tetap sama. Coba di Main.java lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "Buku.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Kode di kelas lain tidak lagi boleh menulis b.stok = -5. Semua perubahan lewat method, dan method itulah yang menjaga aturan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 3: enkapsulasi dan access modifier (private, public, getter dan setter)."
+    }
+   ],
+   "awal": {},
+   "contoh": {
+    "Buku.java": "// Buku.java\npublic class Buku {\n    private String judul;\n    private String penulis;\n    private int stok;\n\n    public Buku(String judul, String penulis, int stok) {\n        this.judul = judul;\n        this.penulis = penulis;\n        setStok(stok);\n    }\n\n    public String getJudul() {\n        return judul;\n    }\n\n    public String getPenulis() {\n        return penulis;\n    }\n\n    public int getStok() {\n        return stok;\n    }\n\n    public void setStok(int stok) {\n        if (stok >= 0) {\n            this.stok = stok;\n        }\n    }\n\n    public boolean pinjam() {\n        if (stok > 0) {\n            stok--;\n            return true;\n        }\n        return false;\n    }\n\n    public void kembalikan() {\n        stok++;\n    }\n\n    public String info() {\n        return judul + \" oleh \" + penulis + \" (stok: \" + stok + \")\";\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "atribut private",
+     "kode": "cek(privat(Buku.class, \"judul\") && privat(Buku.class, \"penulis\") && privat(Buku.class, \"stok\"), \"Atribut judul, penulis, dan stok harus private\");"
+    },
+    {
+     "nama": "getter",
+     "kode": "Buku b = new Buku(\"Bumi\", \"Tere Liye\", 7);\nsama(\"Bumi\", b.getJudul());\nsama(\"Tere Liye\", b.getPenulis());\nsama(7, b.getStok());"
+    },
+    {
+     "nama": "pinjam mengurangi stok",
+     "kode": "Buku b = new Buku(\"A\", \"B\", 2);\ncek(b.pinjam(), \"pinjam() harus true bila stok ada\");\nsama(1, b.getStok());"
+    },
+    {
+     "nama": "pinjam saat stok habis",
+     "kode": "Buku b = new Buku(\"A\", \"B\", 1);\nb.pinjam();\ncek(!b.pinjam(), \"pinjam() harus false bila stok 0\");\nsama(0, b.getStok());"
+    },
+    {
+     "nama": "kembalikan menambah stok",
+     "kode": "Buku b = new Buku(\"A\", \"B\", 0);\nb.kembalikan();\nsama(1, b.getStok());"
+    },
+    {
+     "nama": "stok negatif ditolak (tersembunyi)",
+     "kode": "Buku b = new Buku(\"A\", \"B\", 5);\nb.setStok(-3);\nsama(5, b.getStok());\nBuku c = new Buku(\"C\", \"D\", -2);\nsama(0, c.getStok());",
+     "tersembunyi": true
+    },
+    {
+     "nama": "info tetap sama (tersembunyi)",
+     "kode": "sama(\"A oleh B (stok: 2)\", new Buku(\"A\", \"B\", 2).info());",
+     "tersembunyi": true
+    }
+   ],
+   "ubah": [
+    "Buku.java"
+   ]
+  },
+  {
+   "id": "t03",
+   "judul": "Pewarisan: jenis anggota",
+   "bab": [
+    5
+   ],
+   "tujuan": "Membuat kelas Anggota dan dua turunannya, Mahasiswa dan Dosen, yang mewarisi perilaku umum dan mengubah sebagian.",
+   "langkah": [
+    "Buat Anggota.java: atribut private nama dan id, constructor, getNama(), getId(), getBatasPinjam() (2), hitungDenda(int hariTerlambat) (hari * 1000), dan info() (\"M01 - Sari\").",
+    "Buat Mahasiswa.java sebagai turunan Anggota: constructor memanggil super(nama, id), batas pinjam 3, dan info() diawali \"Mahasiswa \" lalu info milik Anggota.",
+    "Buat Dosen.java dengan cara yang sama: batas pinjam 5 dan info() diawali \"Dosen \".",
+    "Coba di Main.java lalu Kirim jawaban."
+   ],
+   "diminta": [
+    "Anggota.java",
+    "Mahasiswa.java",
+    "Dosen.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Pakai @Override dan super.info() supaya Mahasiswa tidak menulis ulang apa yang sudah ada di Anggota."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 5: pewarisan (extends, super, override)."
+    }
+   ],
+   "awal": {
+    "Anggota.java": "// Anggota.java\npublic class Anggota {\n    // TODO: atribut private nama dan id (String)\n\n    // TODO: constructor Anggota(String nama, String id)\n\n    // TODO: getNama() dan getId()\n\n    // TODO: getBatasPinjam() mengembalikan 2\n\n    // TODO: hitungDenda(int hariTerlambat) mengembalikan hariTerlambat * 1000\n\n    // TODO: info() mengembalikan teks seperti \"M01 - Sari\"\n}\n",
+    "Mahasiswa.java": "// Mahasiswa.java\npublic class Mahasiswa {\n    // TODO: jadikan turunan Anggota (extends), buat constructor yang memanggil super(...),\n    //       lalu override getBatasPinjam() (3) dan info() (\"Mahasiswa \" lalu info milik Anggota)\n}\n",
+    "Dosen.java": "// Dosen.java\npublic class Dosen {\n    // TODO: sama seperti Mahasiswa, tetapi batas pinjam 5 dan info() diawali \"Dosen \"\n}\n"
+   },
+   "contoh": {
+    "Anggota.java": "// Anggota.java\npublic class Anggota {\n    private String nama;\n    private String id;\n\n    public Anggota(String nama, String id) {\n        this.nama = nama;\n        this.id = id;\n    }\n\n    public String getNama() {\n        return nama;\n    }\n\n    public String getId() {\n        return id;\n    }\n\n    public int getBatasPinjam() {\n        return 2;\n    }\n\n    public int hitungDenda(int hariTerlambat) {\n        return hariTerlambat * 1000;\n    }\n\n    public String info() {\n        return id + \" - \" + nama;\n    }\n}\n",
+    "Mahasiswa.java": "// Mahasiswa.java\npublic class Mahasiswa extends Anggota {\n    public Mahasiswa(String nama, String id) {\n        super(nama, id);\n    }\n\n    @Override\n    public int getBatasPinjam() {\n        return 3;\n    }\n\n    @Override\n    public String info() {\n        return \"Mahasiswa \" + super.info();\n    }\n}\n",
+    "Dosen.java": "// Dosen.java\npublic class Dosen extends Anggota {\n    public Dosen(String nama, String id) {\n        super(nama, id);\n    }\n\n    @Override\n    public int getBatasPinjam() {\n        return 5;\n    }\n\n    @Override\n    public String info() {\n        return \"Dosen \" + super.info();\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "Mahasiswa adalah Anggota",
+     "kode": "Anggota a = new Mahasiswa(\"Sari\", \"M01\");\nsama(\"Mahasiswa M01 - Sari\", a.info());\nsama(3, a.getBatasPinjam());"
+    },
+    {
+     "nama": "Dosen adalah Anggota",
+     "kode": "Anggota a = new Dosen(\"Budi\", \"D01\");\nsama(\"Dosen D01 - Budi\", a.info());\nsama(5, a.getBatasPinjam());"
+    },
+    {
+     "nama": "anggota biasa",
+     "kode": "Anggota a = new Anggota(\"Tamu\", \"T01\");\nsama(\"T01 - Tamu\", a.info());\nsama(2, a.getBatasPinjam());"
+    },
+    {
+     "nama": "pewarisan sungguhan",
+     "kode": "sama(Anggota.class, Mahasiswa.class.getSuperclass());\nsama(Anggota.class, Dosen.class.getSuperclass());"
+    },
+    {
+     "nama": "getter diwarisi (tersembunyi)",
+     "kode": "Mahasiswa m = new Mahasiswa(\"Sari\", \"M01\");\nsama(\"Sari\", m.getNama());\nsama(\"M01\", m.getId());",
+     "tersembunyi": true
+    },
+    {
+     "nama": "denda dasar (tersembunyi)",
+     "kode": "sama(3000, new Anggota(\"T\", \"1\").hitungDenda(3));",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t04",
+   "judul": "Polimorfisme: denda keterlambatan",
+   "bab": [
+    6
+   ],
+   "tujuan": "Membuat tiap jenis anggota menghitung denda dengan caranya sendiri, lalu menjumlahkan denda banyak anggota tanpa memeriksa jenisnya.",
+   "langkah": [
+    "Di Mahasiswa.java override hitungDenda(int hariTerlambat): Rp500 per hari, dan 0 bila hari kurang dari 1.",
+    "Di Dosen.java override hitungDenda: Rp250 per hari, dan 0 bila hari kurang dari 1.",
+    "Buat Denda.java dengan method static int total(Anggota[] daftar, int hariTerlambat) yang menjumlahkan hitungDenda tiap anggota.",
+    "Jangan memakai instanceof di Denda.total: biarkan polimorfisme memilih method yang tepat. Kirim jawaban."
+   ],
+   "diminta": [
+    "Mahasiswa.java",
+    "Dosen.java",
+    "Denda.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Variabel bertipe Anggota boleh menyimpan Mahasiswa atau Dosen; saat hitungDenda dipanggil, Java memakai versi milik objek yang sebenarnya."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 6: polimorfisme, overriding, dan pemanggilan method dinamis."
+    }
+   ],
+   "awal": {
+    "Denda.java": "// Denda.java\npublic class Denda {\n    // TODO: method static int total(Anggota[] daftar, int hariTerlambat)\n    //       yang menjumlahkan denda tiap anggota. Jangan memeriksa jenis anggotanya\n    //       dengan instanceof: biarkan polimorfisme yang memilih hitungDenda() yang tepat.\n}\n"
+   },
+   "contoh": {
+    "Mahasiswa.java": "// Mahasiswa.java\npublic class Mahasiswa extends Anggota {\n    public Mahasiswa(String nama, String id) {\n        super(nama, id);\n    }\n\n    @Override\n    public int getBatasPinjam() {\n        return 3;\n    }\n\n    @Override\n    public int hitungDenda(int hariTerlambat) {\n        if (hariTerlambat < 1) {\n            return 0;\n        }\n        return hariTerlambat * 500;\n    }\n\n    @Override\n    public String info() {\n        return \"Mahasiswa \" + super.info();\n    }\n}\n",
+    "Dosen.java": "// Dosen.java\npublic class Dosen extends Anggota {\n    public Dosen(String nama, String id) {\n        super(nama, id);\n    }\n\n    @Override\n    public int getBatasPinjam() {\n        return 5;\n    }\n\n    @Override\n    public int hitungDenda(int hariTerlambat) {\n        if (hariTerlambat < 1) {\n            return 0;\n        }\n        return hariTerlambat * 250;\n    }\n\n    @Override\n    public String info() {\n        return \"Dosen \" + super.info();\n    }\n}\n",
+    "Denda.java": "// Denda.java\npublic class Denda {\n    public static int total(Anggota[] daftar, int hariTerlambat) {\n        int jumlah = 0;\n        for (Anggota a : daftar) {\n            jumlah += a.hitungDenda(hariTerlambat);\n        }\n        return jumlah;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "denda mahasiswa",
+     "kode": "Anggota a = new Mahasiswa(\"Sari\", \"M01\");\nsama(1500, a.hitungDenda(3));"
+    },
+    {
+     "nama": "denda dosen",
+     "kode": "Anggota a = new Dosen(\"Budi\", \"D01\");\nsama(750, a.hitungDenda(3));"
+    },
+    {
+     "nama": "tidak terlambat tidak didenda",
+     "kode": "Anggota a = new Mahasiswa(\"Sari\", \"M01\");\nsama(0, a.hitungDenda(0));\nsama(0, a.hitungDenda(-2));\nsama(0, new Dosen(\"B\", \"D\").hitungDenda(0));"
+    },
+    {
+     "nama": "anggota biasa tetap Rp1000",
+     "kode": "sama(2000, new Anggota(\"Tamu\", \"T01\").hitungDenda(2));"
+    },
+    {
+     "nama": "total denda banyak anggota",
+     "kode": "Anggota[] daftar = { new Mahasiswa(\"S\", \"M1\"), new Dosen(\"B\", \"D1\"), new Anggota(\"T\", \"T1\") };\nsama(3500, Denda.total(daftar, 2));"
+    },
+    {
+     "nama": "daftar kosong (tersembunyi)",
+     "kode": "sama(0, Denda.total(new Anggota[0], 5));",
+     "tersembunyi": true
+    }
+   ],
+   "ubah": [
+    "Mahasiswa.java",
+    "Dosen.java"
+   ]
+  },
+  {
+   "id": "t05",
+   "judul": "Abstraksi: Item, interface, dan Majalah",
+   "bab": [
+    7
+   ],
+   "tujuan": "Menggeneralisasi Buku dan Majalah menjadi Item (kelas abstrak) yang memenuhi kontrak interface DapatDipinjam.",
+   "langkah": [
+    "Buat DapatDipinjam.java: interface dengan tersedia(), pinjam(), dan kembalikan().",
+    "Buat Item.java: abstract class yang mengimplementasikan DapatDipinjam. Pindahkan judul, stok, tersedia(), pinjam(), dan kembalikan() ke sini. Tambahkan method abstrak masaPinjamHari() dan jenis(), serta info() yang memakai jenis().",
+    "Ubah Buku.java menjadi turunan Item (14 hari, jenis \"Buku\", info() tetap menyebut penulis).",
+    "Buat Majalah.java turunan Item (atribut edisi, 3 hari, jenis \"Majalah\"). Kirim jawaban."
+   ],
+   "diminta": [
+    "DapatDipinjam.java",
+    "Item.java",
+    "Buku.java",
+    "Majalah.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Kelas abstrak tidak bisa di-new, tetapi boleh punya method berisi. Yang abstrak hanya hal yang berbeda tiap turunan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 7: abstraksi, abstract class, dan interface."
+    }
+   ],
+   "awal": {
+    "DapatDipinjam.java": "// DapatDipinjam.java\n// TODO: interface DapatDipinjam dengan tiga method tanpa isi:\n//       boolean tersedia();  boolean pinjam();  void kembalikan();\n",
+    "Item.java": "// Item.java\n// TODO: abstract class Item yang mengimplementasikan DapatDipinjam.\n//       Atribut private judul dan stok (stok negatif dijadikan 0), getJudul(), getStok(),\n//       tersedia(), pinjam(), kembalikan() seperti di Buku sebelumnya,\n//       method abstrak masaPinjamHari() (int) dan jenis() (String),\n//       dan info() yang mengembalikan jenis() + \": \" + judul + \" (stok: \" + stok + \")\".\n",
+    "Majalah.java": "// Majalah.java\n// TODO: class Majalah turunan Item dengan atribut edisi (int).\n//       Constructor Majalah(String judul, int edisi, int stok), getEdisi(),\n//       masaPinjamHari() = 3, dan jenis() = \"Majalah\".\n"
+   },
+   "contoh": {
+    "DapatDipinjam.java": "// DapatDipinjam.java\npublic interface DapatDipinjam {\n    boolean tersedia();\n\n    boolean pinjam();\n\n    void kembalikan();\n}\n",
+    "Item.java": "// Item.java\npublic abstract class Item implements DapatDipinjam {\n    private String judul;\n    private int stok;\n\n    public Item(String judul, int stok) {\n        this.judul = judul;\n        this.stok = Math.max(0, stok);\n    }\n\n    public String getJudul() {\n        return judul;\n    }\n\n    public int getStok() {\n        return stok;\n    }\n\n    @Override\n    public boolean tersedia() {\n        return stok > 0;\n    }\n\n    @Override\n    public boolean pinjam() {\n        if (stok > 0) {\n            stok--;\n            return true;\n        }\n        return false;\n    }\n\n    @Override\n    public void kembalikan() {\n        stok++;\n    }\n\n    public abstract int masaPinjamHari();\n\n    public abstract String jenis();\n\n    public String info() {\n        return jenis() + \": \" + judul + \" (stok: \" + stok + \")\";\n    }\n}\n",
+    "Buku.java": "// Buku.java\npublic class Buku extends Item {\n    private String penulis;\n\n    public Buku(String judul, String penulis, int stok) {\n        super(judul, stok);\n        this.penulis = penulis;\n    }\n\n    public String getPenulis() {\n        return penulis;\n    }\n\n    @Override\n    public int masaPinjamHari() {\n        return 14;\n    }\n\n    @Override\n    public String jenis() {\n        return \"Buku\";\n    }\n\n    @Override\n    public String info() {\n        return \"Buku: \" + getJudul() + \" oleh \" + penulis + \" (stok: \" + getStok() + \")\";\n    }\n}\n",
+    "Majalah.java": "// Majalah.java\npublic class Majalah extends Item {\n    private int edisi;\n\n    public Majalah(String judul, int edisi, int stok) {\n        super(judul, stok);\n        this.edisi = edisi;\n    }\n\n    public int getEdisi() {\n        return edisi;\n    }\n\n    @Override\n    public int masaPinjamHari() {\n        return 3;\n    }\n\n    @Override\n    public String jenis() {\n        return \"Majalah\";\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "Item abstrak dan DapatDipinjam interface",
+     "kode": "cek(abstrak(Item.class), \"Item harus abstract class\");\ncek(DapatDipinjam.class.isInterface(), \"DapatDipinjam harus interface\");\ncek(DapatDipinjam.class.isAssignableFrom(Item.class), \"Item harus mengimplementasikan DapatDipinjam\");"
+    },
+    {
+     "nama": "Buku adalah Item",
+     "kode": "Item i = new Buku(\"Bumi\", \"Tere Liye\", 2);\nsama(14, i.masaPinjamHari());\nsama(\"Buku\", i.jenis());\nsama(\"Buku: Bumi oleh Tere Liye (stok: 2)\", i.info());"
+    },
+    {
+     "nama": "Majalah adalah Item",
+     "kode": "Item i = new Majalah(\"Tempo\", 12, 1);\nsama(3, i.masaPinjamHari());\nsama(\"Majalah\", i.jenis());\nsama(\"Majalah: Tempo (stok: 1)\", i.info());"
+    },
+    {
+     "nama": "pinjam lewat interface",
+     "kode": "DapatDipinjam d = new Majalah(\"Tempo\", 12, 1);\ncek(d.tersedia(), \"harus tersedia saat stok 1\");\ncek(d.pinjam(), \"pinjam pertama harus berhasil\");\ncek(!d.tersedia(), \"tidak tersedia saat stok 0\");\ncek(!d.pinjam(), \"pinjam saat habis harus false\");\nd.kembalikan();\ncek(d.tersedia(), \"tersedia lagi setelah dikembalikan\");"
+    },
+    {
+     "nama": "satu daftar untuk dua jenis (tersembunyi)",
+     "kode": "List<Item> daftar = new ArrayList<>();\ndaftar.add(new Buku(\"A\", \"B\", 1));\ndaftar.add(new Majalah(\"C\", 1, 1));\nint total = 0;\nfor (Item i : daftar) {\n    total += i.masaPinjamHari();\n}\nsama(17, total);",
+     "tersembunyi": true
+    },
+    {
+     "nama": "stok awal negatif jadi 0 (tersembunyi)",
+     "kode": "sama(0, new Majalah(\"M\", 1, -4).getStok());\nsama(0, new Buku(\"B\", \"P\", -1).getStok());",
+     "tersembunyi": true
+    }
+   ],
+   "ubah": [
+    "Buku.java"
+   ]
+  },
+  {
+   "id": "t06",
+   "judul": "Eksepsi: pinjam yang aman",
+   "bab": [
+    8
+   ],
+   "tujuan": "Membuat eksepsi sendiri untuk kegagalan peminjaman dan memakainya pada kelas Peminjaman.",
+   "langkah": [
+    "Buat StokHabisException dan BatasPinjamException, keduanya turunan Exception (checked) dengan constructor yang menerima pesan.",
+    "Buat Peminjaman.java untuk satu Anggota. Simpan daftar Item yang sedang dipinjam.",
+    "pinjam(Item) melempar BatasPinjamException (\"<nama> sudah mencapai batas <batas> item\") bila batas anggota tercapai, lebih dulu daripada memeriksa stok. Bila item.pinjam() gagal, lempar StokHabisException (\"Stok habis: <judul>\").",
+    "kembalikan(Item) mengembalikan true dan menambah stok hanya bila item memang sedang dipinjam. Kirim jawaban."
+   ],
+   "diminta": [
+    "StokHabisException.java",
+    "BatasPinjamException.java",
+    "Peminjaman.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Method yang bisa melempar eksepsi checked wajib mendeklarasikan throws. Lempar eksepsi sebelum mengubah apa pun supaya keadaan tidak setengah berubah."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 8: penanganan eksepsi (try, catch, throw, throws, eksepsi buatan sendiri)."
+    }
+   ],
+   "awal": {
+    "StokHabisException.java": "// StokHabisException.java\n// TODO: class StokHabisException turunan Exception (bukan RuntimeException)\n//       dengan constructor yang menerima pesan (String) dan meneruskannya ke super.\n",
+    "BatasPinjamException.java": "// BatasPinjamException.java\n// TODO: seperti StokHabisException, tetapi bernama BatasPinjamException.\n",
+    "Peminjaman.java": "// Peminjaman.java\n// TODO: class Peminjaman untuk satu anggota.\n//   - constructor Peminjaman(Anggota anggota); simpan daftar Item yang sedang dipinjam\n//   - int getDipinjam(): banyaknya item yang sedang dipinjam\n//   - void pinjam(Item item) throws StokHabisException, BatasPinjamException\n//       1) bila jumlah dipinjam sudah mencapai anggota.getBatasPinjam(): lempar BatasPinjamException\n//          dengan pesan \"<nama> sudah mencapai batas <batas> item\"\n//       2) bila item.pinjam() gagal: lempar StokHabisException dengan pesan \"Stok habis: <judul>\"\n//       3) selain itu catat item ke daftar\n//   - boolean kembalikan(Item item): true dan item.kembalikan() bila item memang sedang dipinjam, selain itu false\n"
+   },
+   "contoh": {
+    "StokHabisException.java": "// StokHabisException.java\npublic class StokHabisException extends Exception {\n    public StokHabisException(String pesan) {\n        super(pesan);\n    }\n}\n",
+    "BatasPinjamException.java": "// BatasPinjamException.java\npublic class BatasPinjamException extends Exception {\n    public BatasPinjamException(String pesan) {\n        super(pesan);\n    }\n}\n",
+    "Peminjaman.java": "// Peminjaman.java\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Peminjaman {\n    private Anggota anggota;\n    private List<Item> dipinjam = new ArrayList<>();\n\n    public Peminjaman(Anggota anggota) {\n        this.anggota = anggota;\n    }\n\n    public int getDipinjam() {\n        return dipinjam.size();\n    }\n\n    public void pinjam(Item item) throws StokHabisException, BatasPinjamException {\n        if (dipinjam.size() >= anggota.getBatasPinjam()) {\n            throw new BatasPinjamException(anggota.getNama() + \" sudah mencapai batas \" + anggota.getBatasPinjam() + \" item\");\n        }\n        if (!item.pinjam()) {\n            throw new StokHabisException(\"Stok habis: \" + item.getJudul());\n        }\n        dipinjam.add(item);\n    }\n\n    public boolean kembalikan(Item item) {\n        if (dipinjam.remove(item)) {\n            item.kembalikan();\n            return true;\n        }\n        return false;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "pinjam berhasil",
+     "kode": "Peminjaman p = new Peminjaman(new Mahasiswa(\"Sari\", \"M01\"));\nBuku b = new Buku(\"A\", \"B\", 2);\np.pinjam(b);\nsama(1, p.getDipinjam());\nsama(1, b.getStok());"
+    },
+    {
+     "nama": "stok habis melempar StokHabisException",
+     "kode": "Peminjaman p = new Peminjaman(new Mahasiswa(\"Sari\", \"M01\"));\nBuku b = new Buku(\"A\", \"B\", 1);\np.pinjam(b);\ntry {\n    p.pinjam(b);\n    cek(false, \"harus melempar StokHabisException\");\n} catch (StokHabisException e) {\n    sama(\"Stok habis: A\", e.getMessage());\n}\nsama(1, p.getDipinjam());"
+    },
+    {
+     "nama": "batas pinjam",
+     "kode": "Peminjaman p = new Peminjaman(new Mahasiswa(\"Sari\", \"M01\"));\nBuku b = new Buku(\"A\", \"B\", 10);\np.pinjam(b);\np.pinjam(b);\np.pinjam(b);\ntry {\n    p.pinjam(b);\n    cek(false, \"harus melempar BatasPinjamException\");\n} catch (BatasPinjamException e) {\n    sama(\"Sari sudah mencapai batas 3 item\", e.getMessage());\n}\nsama(7, b.getStok());"
+    },
+    {
+     "nama": "eksepsi bertipe checked",
+     "kode": "cek(Exception.class.isAssignableFrom(StokHabisException.class) && !RuntimeException.class.isAssignableFrom(StokHabisException.class), \"StokHabisException harus turunan Exception, bukan RuntimeException\");\ncek(Exception.class.isAssignableFrom(BatasPinjamException.class) && !RuntimeException.class.isAssignableFrom(BatasPinjamException.class), \"BatasPinjamException harus turunan Exception, bukan RuntimeException\");"
+    },
+    {
+     "nama": "kembalikan",
+     "kode": "Peminjaman p = new Peminjaman(new Dosen(\"Budi\", \"D01\"));\nBuku b = new Buku(\"A\", \"B\", 1);\np.pinjam(b);\ncek(p.kembalikan(b), \"kembalikan() harus true untuk item yang dipinjam\");\nsama(1, b.getStok());\nsama(0, p.getDipinjam());"
+    },
+    {
+     "nama": "kembalikan yang tidak dipinjam (tersembunyi)",
+     "kode": "Peminjaman p = new Peminjaman(new Dosen(\"Budi\", \"D01\"));\nBuku b = new Buku(\"A\", \"B\", 1);\ncek(!p.kembalikan(b), \"kembalikan() harus false bila item tidak dipinjam\");\nsama(1, b.getStok());",
+     "tersembunyi": true
+    },
+    {
+     "nama": "batas diperiksa lebih dulu daripada stok (tersembunyi)",
+     "kode": "Peminjaman p = new Peminjaman(new Mahasiswa(\"Sari\", \"M01\"));\nBuku banyak = new Buku(\"A\", \"B\", 9);\np.pinjam(banyak);\np.pinjam(banyak);\np.pinjam(banyak);\nBuku habis = new Buku(\"C\", \"D\", 0);\ntry {\n    p.pinjam(habis);\n    cek(false, \"harus melempar BatasPinjamException\");\n} catch (BatasPinjamException e) {\n    sama(\"Sari sudah mencapai batas 3 item\", e.getMessage());\n}",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t07",
+   "judul": "Collection: Katalog",
+   "bab": [
+    9
+   ],
+   "tujuan": "Menyimpan banyak Item di List, mencari, mengurutkan, menyaring, dan menghitung dengan Map.",
+   "langkah": [
+    "Buat Katalog.java dengan List<Item> di dalamnya.",
+    "Tulis tambah(Item), jumlah(), semua() (salinan sesuai urutan masuk), dan cari(String judul) (huruf besar/kecil diabaikan; null bila tidak ada).",
+    "Tulis urutJudul() yang mengembalikan salinan terurut menurut judul tanpa mengubah daftar asli, dan tersedia() yang hanya memuat item bersetok.",
+    "Tulis hitungPerJenis() yang mengembalikan Map<String, Integer> (TreeMap) jumlah item per jenis(). Kirim jawaban."
+   ],
+   "diminta": [
+    "Katalog.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Collections.sort mengubah list yang diberikan, jadi urutkan salinannya. Map.merge(kunci, 1, Integer::sum) menambah hitungan tanpa if."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 9: Collection framework dan generics (List, Map, Comparator)."
+    }
+   ],
+   "awal": {
+    "Katalog.java": "// Katalog.java\nimport java.util.List;\nimport java.util.Map;\n\npublic class Katalog {\n    // TODO: simpan Item dalam sebuah List<Item>, lalu tulis:\n    //   void tambah(Item item)\n    //   int jumlah()\n    //   List<Item> semua()           salinan daftar sesuai urutan masuk\n    //   Item cari(String judul)      huruf besar/kecil diabaikan; null bila tidak ada\n    //   List<Item> urutJudul()       salinan yang diurutkan menurut judul (daftar asli tidak berubah)\n    //   List<Item> tersedia()        hanya item yang stoknya ada\n    //   Map<String, Integer> hitungPerJenis()   jumlah item per jenis(), urut menurut nama jenis (TreeMap)\n}\n"
+   },
+   "contoh": {
+    "Katalog.java": "// Katalog.java\nimport java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.TreeMap;\n\npublic class Katalog {\n    private List<Item> daftar = new ArrayList<>();\n\n    public void tambah(Item item) {\n        daftar.add(item);\n    }\n\n    public int jumlah() {\n        return daftar.size();\n    }\n\n    public List<Item> semua() {\n        return new ArrayList<>(daftar);\n    }\n\n    public Item cari(String judul) {\n        for (Item item : daftar) {\n            if (item.getJudul().equalsIgnoreCase(judul)) {\n                return item;\n            }\n        }\n        return null;\n    }\n\n    public List<Item> urutJudul() {\n        List<Item> salinan = new ArrayList<>(daftar);\n        Collections.sort(salinan, (a, b) -> a.getJudul().compareToIgnoreCase(b.getJudul()));\n        return salinan;\n    }\n\n    public List<Item> tersedia() {\n        List<Item> hasil = new ArrayList<>();\n        for (Item item : daftar) {\n            if (item.tersedia()) {\n                hasil.add(item);\n            }\n        }\n        return hasil;\n    }\n\n    public Map<String, Integer> hitungPerJenis() {\n        Map<String, Integer> hitung = new TreeMap<>();\n        for (Item item : daftar) {\n            hitung.merge(item.jenis(), 1, Integer::sum);\n        }\n        return hitung;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "tambah dan jumlah",
+     "kode": "Katalog k = new Katalog();\nsama(0, k.jumlah());\nk.tambah(new Buku(\"A\", \"P\", 1));\nk.tambah(new Majalah(\"B\", 1, 1));\nsama(2, k.jumlah());"
+    },
+    {
+     "nama": "cari abaikan huruf besar kecil",
+     "kode": "Katalog k = new Katalog();\nBuku b = new Buku(\"Laskar Pelangi\", \"A\", 1);\nk.tambah(b);\ncek(k.cari(\"laskar PELANGI\") == b, \"cari() harus menemukan item walau huruf besar/kecil berbeda\");\ncek(k.cari(\"tidak ada\") == null, \"cari() harus null bila tidak ada\");"
+    },
+    {
+     "nama": "urut judul tanpa mengubah daftar asli",
+     "kode": "Katalog k = new Katalog();\nk.tambah(new Buku(\"Cinta\", \"P\", 1));\nk.tambah(new Buku(\"alpha\", \"P\", 1));\nk.tambah(new Majalah(\"Bravo\", 1, 1));\nList<Item> urut = k.urutJudul();\nsama(\"alpha\", urut.get(0).getJudul());\nsama(\"Bravo\", urut.get(1).getJudul());\nsama(\"Cinta\", urut.get(2).getJudul());\nsama(\"Cinta\", k.semua().get(0).getJudul());"
+    },
+    {
+     "nama": "hanya yang tersedia",
+     "kode": "Katalog k = new Katalog();\nk.tambah(new Buku(\"Ada\", \"P\", 2));\nk.tambah(new Buku(\"Habis\", \"P\", 0));\nk.tambah(new Majalah(\"Juga\", 1, 1));\nsama(2, k.tersedia().size());\nsama(\"Ada\", k.tersedia().get(0).getJudul());"
+    },
+    {
+     "nama": "hitung per jenis",
+     "kode": "Katalog k = new Katalog();\nk.tambah(new Buku(\"A\", \"P\", 1));\nk.tambah(new Buku(\"B\", \"P\", 1));\nk.tambah(new Majalah(\"C\", 1, 1));\nsama(\"{Buku=2, Majalah=1}\", k.hitungPerJenis().toString());"
+    },
+    {
+     "nama": "katalog kosong (tersembunyi)",
+     "kode": "Katalog k = new Katalog();\nsama(0, k.urutJudul().size());\nsama(0, k.tersedia().size());\nsama(\"{}\", k.hitungPerJenis().toString());\ncek(k.cari(\"x\") == null, \"cari() pada katalog kosong harus null\");",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t08",
+   "judul": "Berkas: menyimpan katalog",
+   "bab": [
+    10
+   ],
+   "tujuan": "Menyimpan Katalog ke berkas teks dan memuatnya kembali, supaya data tidak hilang saat program ditutup.",
+   "langkah": [
+    "Buat Penyimpanan.java dengan static void simpan(Katalog, String namaBerkas) throws IOException.",
+    "Tulis satu baris per item, kolom dipisah titik koma: Buku;judul;penulis;stok dan Majalah;judul;edisi;stok. Pakai Files.write(Paths.get(...), baris).",
+    "Tulis static Katalog muat(String namaBerkas) throws IOException: bila berkas tidak ada, kembalikan Katalog kosong; selain itu baca dengan Files.readAllLines lalu buat kembali Buku atau Majalah.",
+    "Coba simpan lalu muat di Main.java. Kirim jawaban."
+   ],
+   "diminta": [
+    "Penyimpanan.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Gunakan split(\";\") untuk memecah baris dan Integer.parseInt untuk mengubah teks angka. Berkas yang kamu tulis tersimpan di folder kerja browser."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 10: operasi berkas (Files, Path) dan penyimpanan objek."
+    }
+   ],
+   "awal": {
+    "Penyimpanan.java": "// Penyimpanan.java\nimport java.io.IOException;\n\npublic class Penyimpanan {\n    // TODO: static void simpan(Katalog katalog, String namaBerkas) throws IOException\n    //       Tulis satu baris per item, kolom dipisah titik koma:\n    //         Buku;<judul>;<penulis>;<stok>\n    //         Majalah;<judul>;<edisi>;<stok>\n    //       (gunakan Files.write(Paths.get(namaBerkas), daftarBaris))\n\n    // TODO: static Katalog muat(String namaBerkas) throws IOException\n    //       Bila berkas tidak ada, kembalikan Katalog kosong. Selain itu baca semua baris\n    //       (Files.readAllLines), pecah dengan split(\";\"), dan buat Buku atau Majalah.\n}\n"
+   },
+   "contoh": {
+    "Penyimpanan.java": "// Penyimpanan.java\nimport java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Penyimpanan {\n    public static void simpan(Katalog katalog, String namaBerkas) throws IOException {\n        List<String> baris = new ArrayList<>();\n        for (Item item : katalog.semua()) {\n            if (item instanceof Buku) {\n                Buku b = (Buku) item;\n                baris.add(\"Buku;\" + b.getJudul() + \";\" + b.getPenulis() + \";\" + b.getStok());\n            } else if (item instanceof Majalah) {\n                Majalah m = (Majalah) item;\n                baris.add(\"Majalah;\" + m.getJudul() + \";\" + m.getEdisi() + \";\" + m.getStok());\n            }\n        }\n        Files.write(Paths.get(namaBerkas), baris);\n    }\n\n    public static Katalog muat(String namaBerkas) throws IOException {\n        Katalog katalog = new Katalog();\n        if (!Files.exists(Paths.get(namaBerkas))) {\n            return katalog;\n        }\n        for (String baris : Files.readAllLines(Paths.get(namaBerkas))) {\n            String[] bagian = baris.split(\";\");\n            if (bagian[0].equals(\"Buku\")) {\n                katalog.tambah(new Buku(bagian[1], bagian[2], Integer.parseInt(bagian[3])));\n            } else if (bagian[0].equals(\"Majalah\")) {\n                katalog.tambah(new Majalah(bagian[1], Integer.parseInt(bagian[2]), Integer.parseInt(bagian[3])));\n            }\n        }\n        return katalog;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "simpan menulis baris yang benar",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-katalog.txt\"));\nKatalog k = new Katalog();\nk.tambah(new Buku(\"Bumi\", \"Tere Liye\", 2));\nk.tambah(new Majalah(\"Tempo\", 12, 1));\nPenyimpanan.simpan(k, \"uji-katalog.txt\");\nList<String> baris = java.nio.file.Files.readAllLines(java.nio.file.Paths.get(\"uji-katalog.txt\"));\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-katalog.txt\"));\nsama(2, baris.size());\nsama(\"Buku;Bumi;Tere Liye;2\", baris.get(0));\nsama(\"Majalah;Tempo;12;1\", baris.get(1));"
+    },
+    {
+     "nama": "simpan lalu muat kembali",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-katalog.txt\"));\nKatalog k = new Katalog();\nk.tambah(new Buku(\"Bumi\", \"Tere Liye\", 2));\nk.tambah(new Majalah(\"Tempo\", 12, 1));\nPenyimpanan.simpan(k, \"uji-katalog.txt\");\nKatalog baru = Penyimpanan.muat(\"uji-katalog.txt\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-katalog.txt\"));\nsama(2, baru.jumlah());\nsama(\"Buku: Bumi oleh Tere Liye (stok: 2)\", baru.semua().get(0).info());\nsama(\"Majalah: Tempo (stok: 1)\", baru.semua().get(1).info());"
+    },
+    {
+     "nama": "berkas belum ada",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"tidak-ada-katalog.txt\"));\nKatalog k = Penyimpanan.muat(\"tidak-ada-katalog.txt\");\nsama(0, k.jumlah());"
+    },
+    {
+     "nama": "katalog kosong dapat disimpan (tersembunyi)",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-kosong.txt\"));\nPenyimpanan.simpan(new Katalog(), \"uji-kosong.txt\");\nsama(0, Penyimpanan.muat(\"uji-kosong.txt\").jumlah());\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-kosong.txt\"));",
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t09",
+   "judul": "Desain: pola Factory dan prinsip SOLID",
+   "bab": [
+    13,
+    14
+   ],
+   "tujuan": "Memindahkan keputusan \"jenis apa yang dibuat\" ke satu tempat (pola Factory) supaya menambah jenis baru tidak mengubah kelas lain.",
+   "langkah": [
+    "Buat ItemFactory.java dengan static Item buat(String jenis, String judul, String keterangan, int stok). Keterangan adalah penulis (buku) atau nomor edisi (majalah).",
+    "Jenis dikenali tanpa memperhatikan huruf besar/kecil: \"buku\" dan \"majalah\". Jenis lain melempar IllegalArgumentException (\"Jenis tidak dikenal: <jenis>\").",
+    "Ubah Penyimpanan.muat agar memakai ItemFactory, tidak lagi memilih Buku atau Majalah sendiri. Itu penerapan prinsip Open/Closed: jenis baru cukup menambah satu tempat.",
+    "Pastikan simpan lalu muat masih bekerja. Kirim jawaban, lalu pikirkan prinsip SOLID mana lagi yang terlihat di proyekmu (untuk tahap 13)."
+   ],
+   "diminta": [
+    "ItemFactory.java",
+    "Penyimpanan.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Factory adalah method yang menjadi satu-satunya tempat memanggil new untuk beberapa kelas yang berkerabat. Pemanggil cukup bergantung pada tipe Item."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 13: prinsip SOLID. Bab 14: pengantar design pattern (Factory)."
+    }
+   ],
+   "awal": {
+    "ItemFactory.java": "// ItemFactory.java\npublic class ItemFactory {\n    // TODO: static Item buat(String jenis, String judul, String keterangan, int stok)\n    //   - jenis \"buku\" (huruf besar/kecil diabaikan): kembalikan Buku, keterangan = penulis\n    //   - jenis \"majalah\": kembalikan Majalah, keterangan = nomor edisi (ubah dengan Integer.parseInt)\n    //   - selain itu lempar IllegalArgumentException dengan pesan \"Jenis tidak dikenal: <jenis>\"\n}\n"
+   },
+   "contoh": {
+    "ItemFactory.java": "// ItemFactory.java\npublic class ItemFactory {\n    // keterangan: penulis untuk buku, nomor edisi untuk majalah\n    public static Item buat(String jenis, String judul, String keterangan, int stok) {\n        if (jenis.equalsIgnoreCase(\"buku\")) {\n            return new Buku(judul, keterangan, stok);\n        }\n        if (jenis.equalsIgnoreCase(\"majalah\")) {\n            return new Majalah(judul, Integer.parseInt(keterangan), stok);\n        }\n        throw new IllegalArgumentException(\"Jenis tidak dikenal: \" + jenis);\n    }\n}\n",
+    "Penyimpanan.java": "// Penyimpanan.java\nimport java.io.IOException;\nimport java.nio.file.Files;\nimport java.nio.file.Paths;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class Penyimpanan {\n    public static void simpan(Katalog katalog, String namaBerkas) throws IOException {\n        List<String> baris = new ArrayList<>();\n        for (Item item : katalog.semua()) {\n            if (item instanceof Buku) {\n                Buku b = (Buku) item;\n                baris.add(\"Buku;\" + b.getJudul() + \";\" + b.getPenulis() + \";\" + b.getStok());\n            } else if (item instanceof Majalah) {\n                Majalah m = (Majalah) item;\n                baris.add(\"Majalah;\" + m.getJudul() + \";\" + m.getEdisi() + \";\" + m.getStok());\n            }\n        }\n        Files.write(Paths.get(namaBerkas), baris);\n    }\n\n    public static Katalog muat(String namaBerkas) throws IOException {\n        Katalog katalog = new Katalog();\n        if (!Files.exists(Paths.get(namaBerkas))) {\n            return katalog;\n        }\n        for (String baris : Files.readAllLines(Paths.get(namaBerkas))) {\n            String[] bagian = baris.split(\";\");\n            katalog.tambah(ItemFactory.buat(bagian[0], bagian[1], bagian[2], Integer.parseInt(bagian[3])));\n        }\n        return katalog;\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "membuat buku",
+     "kode": "Item i = ItemFactory.buat(\"buku\", \"Bumi\", \"Tere Liye\", 2);\ncek(i instanceof Buku, \"jenis buku harus menghasilkan Buku\");\nsama(\"Buku: Bumi oleh Tere Liye (stok: 2)\", i.info());"
+    },
+    {
+     "nama": "membuat majalah",
+     "kode": "Item i = ItemFactory.buat(\"majalah\", \"Tempo\", \"12\", 1);\ncek(i instanceof Majalah, \"jenis majalah harus menghasilkan Majalah\");\nsama(12, ((Majalah) i).getEdisi());"
+    },
+    {
+     "nama": "huruf besar kecil diabaikan",
+     "kode": "cek(ItemFactory.buat(\"BUKU\", \"A\", \"P\", 1) instanceof Buku, \"BUKU harus dikenali\");\ncek(ItemFactory.buat(\"Majalah\", \"A\", \"3\", 1) instanceof Majalah, \"Majalah harus dikenali\");"
+    },
+    {
+     "nama": "jenis tidak dikenal",
+     "kode": "try {\n    ItemFactory.buat(\"kaset\", \"X\", \"Y\", 1);\n    cek(false, \"harus melempar IllegalArgumentException\");\n} catch (IllegalArgumentException e) {\n    sama(\"Jenis tidak dikenal: kaset\", e.getMessage());\n}"
+    },
+    {
+     "nama": "simpan dan muat tetap bekerja (tersembunyi)",
+     "kode": "java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-factory.txt\"));\nKatalog k = new Katalog();\nk.tambah(ItemFactory.buat(\"buku\", \"Bumi\", \"Tere Liye\", 2));\nk.tambah(ItemFactory.buat(\"majalah\", \"Tempo\", \"12\", 1));\nPenyimpanan.simpan(k, \"uji-factory.txt\");\nKatalog baru = Penyimpanan.muat(\"uji-factory.txt\");\njava.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(\"uji-factory.txt\"));\nsama(2, baru.jumlah());\nsama(\"Majalah: Tempo (stok: 1)\", baru.semua().get(1).info());",
+     "tersembunyi": true
+    }
+   ],
+   "ubah": [
+    "Penyimpanan.java"
+   ]
+  },
+  {
+   "id": "t10",
+   "judul": "Produk akhir: aplikasi perpustakaan",
+   "bab": [
+    15
+   ],
+   "tujuan": "Menggabungkan semua kelas menjadi aplikasi konsol berbasis menu yang meminjamkan, mengembalikan, dan menampilkan koleksi.",
+   "langkah": [
+    "Buat Main.java. Isi Katalog lewat ItemFactory: buku Laskar Pelangi (Andrea Hirata, stok 2), buku Bumi (Tere Liye, stok 1), majalah Tempo (edisi 12, stok 1).",
+    "Buat satu Peminjaman untuk new Mahasiswa(\"Sari\", \"M01\").",
+    "Ulangi menu sampai pilihan 0. Cetak persis \"MENU: 1 pinjam, 2 kembali, 3 daftar, 0 keluar\" lalu baca pilihan.",
+    "Pilihan 1 dan 2 membaca satu baris judul. Gunakan pesan: \"Dipinjam: <judul>\", pesan eksepsi bila gagal, \"Dikembalikan: <judul>\", \"Tidak sedang dipinjam: <judul>\", dan \"Judul tidak ditemukan\". Pilihan 3 mencetak info() tiap item urut judul. Pilihan 0 mencetak \"Terima kasih\".",
+    "Jalankan dengan masukan di kotak masukan, lalu Kirim jawaban. Setelah lulus, kamu sudah punya produk akhir."
+   ],
+   "diminta": [
+    "Main.java"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Gunakan Scanner dengan nextLine() untuk semua masukan supaya baris tidak tertinggal. Tangkap kedua eksepsi dengan satu catch (A | B e)."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 15: integrasi konsep dalam proyek."
+    }
+   ],
+   "awal": {
+    "Main.java": "// Main.java\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        // TODO: aplikasi perpustakaan berbasis menu.\n        // 1) Isi Katalog lewat ItemFactory: buku \"Laskar Pelangi\" (Andrea Hirata, stok 2),\n        //    buku \"Bumi\" (Tere Liye, stok 1), majalah \"Tempo\" (edisi 12, stok 1).\n        // 2) Buat satu Peminjaman untuk new Mahasiswa(\"Sari\", \"M01\").\n        // 3) Ulangi sampai pilihan 0. Tiap putaran cetak persis:\n        //      MENU: 1 pinjam, 2 kembali, 3 daftar, 0 keluar\n        //    lalu baca satu baris (pilihan):\n        //      1  baca satu baris judul. Tidak ada: \"Judul tidak ditemukan\".\n        //         Berhasil: \"Dipinjam: <judul>\". Gagal: cetak pesan eksepsinya.\n        //      2  baca satu baris judul. Tidak ada: \"Judul tidak ditemukan\".\n        //         Berhasil: \"Dikembalikan: <judul>\", bila tidak sedang dipinjam: \"Tidak sedang dipinjam: <judul>\"\n        //      3  cetak info() tiap item, urut menurut judul\n        //      0  cetak \"Terima kasih\" lalu berhenti\n        //      lainnya: \"Pilihan tidak dikenal\"\n    }\n}\n"
+   },
+   "contoh": {
+    "Main.java": "// Main.java\nimport java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Katalog katalog = new Katalog();\n        katalog.tambah(ItemFactory.buat(\"buku\", \"Laskar Pelangi\", \"Andrea Hirata\", 2));\n        katalog.tambah(ItemFactory.buat(\"buku\", \"Bumi\", \"Tere Liye\", 1));\n        katalog.tambah(ItemFactory.buat(\"majalah\", \"Tempo\", \"12\", 1));\n        Peminjaman peminjaman = new Peminjaman(new Mahasiswa(\"Sari\", \"M01\"));\n        Scanner in = new Scanner(System.in);\n\n        while (true) {\n            System.out.println(\"MENU: 1 pinjam, 2 kembali, 3 daftar, 0 keluar\");\n            String pilihan = in.nextLine().trim();\n            if (pilihan.equals(\"0\")) {\n                System.out.println(\"Terima kasih\");\n                break;\n            } else if (pilihan.equals(\"1\")) {\n                Item item = katalog.cari(in.nextLine().trim());\n                if (item == null) {\n                    System.out.println(\"Judul tidak ditemukan\");\n                } else {\n                    try {\n                        peminjaman.pinjam(item);\n                        System.out.println(\"Dipinjam: \" + item.getJudul());\n                    } catch (StokHabisException | BatasPinjamException e) {\n                        System.out.println(e.getMessage());\n                    }\n                }\n            } else if (pilihan.equals(\"2\")) {\n                Item item = katalog.cari(in.nextLine().trim());\n                if (item == null) {\n                    System.out.println(\"Judul tidak ditemukan\");\n                } else if (peminjaman.kembalikan(item)) {\n                    System.out.println(\"Dikembalikan: \" + item.getJudul());\n                } else {\n                    System.out.println(\"Tidak sedang dipinjam: \" + item.getJudul());\n                }\n            } else if (pilihan.equals(\"3\")) {\n                for (Item item : katalog.urutJudul()) {\n                    System.out.println(item.info());\n                }\n            } else {\n                System.out.println(\"Pilihan tidak dikenal\");\n            }\n        }\n    }\n}\n"
+   },
+   "kasus": [
+    {
+     "nama": "menu keluar langsung",
+     "jalankan": "Main",
+     "masukan": [
+      "0"
+     ],
+     "memuat": [
+      "MENU: 1 pinjam, 2 kembali, 3 daftar, 0 keluar",
+      "Terima kasih"
+     ]
+    },
+    {
+     "nama": "pinjam lalu daftar",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "Bumi",
+      "3",
+      "0"
+     ],
+     "memuat": [
+      "Dipinjam: Bumi",
+      "Buku: Bumi oleh Tere Liye (stok: 0)",
+      "Buku: Laskar Pelangi oleh Andrea Hirata (stok: 2)",
+      "Majalah: Tempo (stok: 1)"
+     ]
+    },
+    {
+     "nama": "stok habis",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "Bumi",
+      "1",
+      "Bumi",
+      "0"
+     ],
+     "memuat": [
+      "Dipinjam: Bumi",
+      "Stok habis: Bumi"
+     ]
+    },
+    {
+     "nama": "batas pinjam mahasiswa",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "Laskar Pelangi",
+      "1",
+      "Laskar Pelangi",
+      "1",
+      "Tempo",
+      "1",
+      "Bumi",
+      "0"
+     ],
+     "memuat": [
+      "Sari sudah mencapai batas 3 item"
+     ]
+    },
+    {
+     "nama": "kembalikan",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "Bumi",
+      "2",
+      "Bumi",
+      "2",
+      "Bumi",
+      "0"
+     ],
+     "memuat": [
+      "Dipinjam: Bumi",
+      "Dikembalikan: Bumi",
+      "Tidak sedang dipinjam: Bumi"
+     ]
+    },
+    {
+     "nama": "judul tidak ada dan pilihan salah (tersembunyi)",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "Tidak ada",
+      "9",
+      "0"
+     ],
+     "memuat": [
+      "Judul tidak ditemukan",
+      "Pilihan tidak dikenal"
+     ],
+     "tersembunyi": true
+    },
+    {
+     "nama": "judul tidak peka huruf (tersembunyi)",
+     "jalankan": "Main",
+     "masukan": [
+      "1",
+      "bumi",
+      "0"
+     ],
+     "memuat": [
+      "Dipinjam: Bumi"
+     ],
+     "tersembunyi": true
+    }
+   ]
+  },
+  {
+   "id": "t11",
+   "judul": "Basis data dengan JDBC (jalur laptop, opsional)",
+   "bab": [
+    11
+   ],
+   "tujuan": "Menyimpan data buku di basis data SQLite lewat JDBC, tidak lagi di berkas teks. Dikerjakan di laptop sendiri; tidak diuji otomatis oleh website.",
+   "langkah": [
+    "Pasang JDK 11 atau lebih baru dan VS Code dengan ekstensi \"Extension Pack for Java\" (atau IDE lain yang kamu suka).",
+    "Buat proyek, salin kelas-kelas dari tahap 1 sampai 9, dan tambahkan pustaka sqlite-jdbc (berkas jar dari repositori Maven atau lewat Maven/Gradle).",
+    "Tulis kelas BukuDao (kerangka ada di bawah) yang membuat tabel buku, menambah data, dan membaca daftar judul dengan PreparedStatement.",
+    "Hubungkan ke Katalog: muat isi tabel ke Katalog saat program mulai dan simpan perubahan ke tabel.",
+    "Jalankan, lalu siapkan tangkapan layar atau demo singkat. Tekan Tandai sudah kukerjakan, dan jelaskan di laporan apa yang kamu bangun serta kendalanya."
+   ],
+   "diminta": [],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Selalu pakai PreparedStatement dengan tanda tanya (?) untuk nilai dari pengguna, jangan menyambung string SQL."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 11: koneksi basis data JDBC dan CRUD."
+    }
+   ],
+   "awal": {},
+   "contoh": {},
+   "kasus": [],
+   "jalur": "laptop",
+   "opsional": true,
+   "kerangka": {
+    "BukuDao.java": "// BukuDao.java  (kerangka, tidak ikut diuji website)\nimport java.sql.*;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class BukuDao {\n    private final String url = \"jdbc:sqlite:perpustakaan.db\";\n\n    public BukuDao() throws SQLException {\n        try (Connection c = DriverManager.getConnection(url); Statement s = c.createStatement()) {\n            s.execute(\"CREATE TABLE IF NOT EXISTS buku (id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, penulis TEXT, stok INTEGER)\");\n        }\n    }\n\n    public void tambah(String judul, String penulis, int stok) throws SQLException {\n        try (Connection c = DriverManager.getConnection(url);\n             PreparedStatement p = c.prepareStatement(\"INSERT INTO buku (judul, penulis, stok) VALUES (?, ?, ?)\")) {\n            p.setString(1, judul);\n            p.setString(2, penulis);\n            p.setInt(3, stok);\n            p.executeUpdate();\n        }\n    }\n\n    public List<String> daftarJudul() throws SQLException {\n        List<String> hasil = new ArrayList<>();\n        try (Connection c = DriverManager.getConnection(url);\n             Statement s = c.createStatement();\n             ResultSet r = s.executeQuery(\"SELECT judul FROM buku ORDER BY judul\")) {\n            while (r.next()) {\n                hasil.add(r.getString(\"judul\"));\n            }\n        }\n        return hasil;\n    }\n}\n"
+   }
+  },
+  {
+   "id": "t12",
+   "judul": "Antarmuka grafis dengan Swing (jalur laptop, opsional)",
+   "bab": [
+    12
+   ],
+   "tujuan": "Membuat jendela sederhana untuk melihat dan meminjam koleksi. Dikerjakan di laptop sendiri; tidak diuji otomatis oleh website.",
+   "langkah": [
+    "Di proyek yang sama (JDK sudah terpasang dari tahap 11), buat kelas JendelaPerpustakaan dari kerangka di bawah.",
+    "Jalankan dan pastikan jendela menampilkan daftar item urut judul dan tombol Pinjam mengurangi stok yang dipilih.",
+    "Tambahkan satu hal sendiri: tombol Kembali, kolom pencarian, atau pesan kesalahan lewat JOptionPane.",
+    "Siapkan tangkapan layar atau demo singkat, tekan Tandai sudah kukerjakan, dan jelaskan di laporan bagaimana event handling bekerja di kodemu."
+   ],
+   "diminta": [],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Semua yang mengubah tampilan dijalankan lewat SwingUtilities.invokeLater. Lambda (e -> ...) memendekkan ActionListener."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 12: antarmuka grafis dan event handling."
+    }
+   ],
+   "awal": {},
+   "contoh": {},
+   "kasus": [],
+   "jalur": "laptop",
+   "opsional": true,
+   "kerangka": {
+    "JendelaPerpustakaan.java": "// JendelaPerpustakaan.java  (kerangka, tidak ikut diuji website)\nimport javax.swing.*;\nimport java.awt.BorderLayout;\n\npublic class JendelaPerpustakaan {\n    public static void main(String[] args) {\n        SwingUtilities.invokeLater(() -> {\n            Katalog katalog = new Katalog();\n            katalog.tambah(ItemFactory.buat(\"buku\", \"Bumi\", \"Tere Liye\", 1));\n            katalog.tambah(ItemFactory.buat(\"majalah\", \"Tempo\", \"12\", 1));\n\n            DefaultListModel<String> model = new DefaultListModel<>();\n            JList<String> daftar = new JList<>(model);\n            Runnable muatUlang = () -> {\n                model.clear();\n                for (Item item : katalog.urutJudul()) {\n                    model.addElement(item.info());\n                }\n            };\n            muatUlang.run();\n\n            JButton pinjam = new JButton(\"Pinjam\");\n            pinjam.addActionListener(e -> {\n                int i = daftar.getSelectedIndex();\n                if (i >= 0) {\n                    katalog.urutJudul().get(i).pinjam();\n                    muatUlang.run();\n                }\n            });\n\n            JFrame jendela = new JFrame(\"Perpustakaan USG\");\n            jendela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);\n            jendela.add(new JScrollPane(daftar), BorderLayout.CENTER);\n            jendela.add(pinjam, BorderLayout.SOUTH);\n            jendela.setSize(420, 320);\n            jendela.setVisible(true);\n        });\n    }\n}\n"
+   }
+  },
+  {
+   "id": "t13",
+   "judul": "Rancangan mendalam (dinilai dosen, bisa di website, opsional)",
+   "bab": [
+    4,
+    13,
+    14,
+    15
+   ],
+   "tujuan": "Menunjukkan pemahaman desain tanpa perlu laptop: diagram kelas, satu fitur rancangan sendiri, dan penerapan prinsip SOLID. Dinilai dosen dengan rubrik, bukan oleh pengujian otomatis.",
+   "langkah": [
+    "Buka Rancangan.md di ruang kerja dan gambar diagram kelas proyekmu dengan teks (UML sederhana).",
+    "Rancang satu fitur baru yang masuk akal (mis. perpanjangan pinjaman, reservasi, atau daftar tunggu). Tuliskan kodenya di berkas .java baru di ruang kerja ini, dan pastikan program tetap bisa dikompilasi dan dijalankan.",
+    "Tunjuk minimal dua prinsip SOLID yang kamu terapkan, di kelas atau method yang mana, dan mengapa.",
+    "Tulis satu keputusan desain beserta alternatif yang kamu timbang. Tekan Tandai sudah kukerjakan bila sudah siap dinilai."
+   ],
+   "diminta": [
+    "Rancangan.md"
+   ],
+   "petunjuk": [
+    {
+     "jenis": "soal",
+     "isi": "Dosen menilai kejelasan alasan, bukan banyaknya kode. Satu fitur kecil yang dirancang rapi lebih baik daripada fitur besar yang berantakan."
+    },
+    {
+     "jenis": "buku",
+     "isi": "Bab 4: diagram kelas UML. Bab 13: SOLID. Bab 14: design pattern. Bab 15: integrasi."
+    }
+   ],
+   "awal": {
+    "Rancangan.md": "# Rancangan Sistem Perpustakaan USG\n\n## Diagram kelas\n(Gambarkan dengan teks. Contoh:)\n\n    Item <<abstract>>\n      - judul : String\n      - stok  : int\n      + pinjam() : boolean\n      + masaPinjamHari() : int  {abstract}\n         ^\n         |\n      Buku    Majalah\n\nTulis diagrammu di bawah ini: semua kelas, atribut penting, dan hubungannya (pewarisan, implementasi, keterkaitan).\n\n\n\n## Fitur tambahan yang saya rancang sendiri\n(Satu fitur baru yang masuk akal untuk perpustakaan, mis. perpanjangan pinjaman, reservasi, atau daftar tunggu.\nJelaskan fiturnya, kelas yang ditambah atau diubah, dan tulis kodenya di berkas .java lain di ruang kerja.)\n\n\n\n## Prinsip desain yang saya terapkan\n(Pilih minimal dua dari SOLID, tunjuk kelas atau method yang menerapkannya, dan jelaskan alasannya.\nBoleh juga menjelaskan satu tempat yang masih melanggarnya dan bagaimana memperbaikinya.)\n\n\n\n## Pertimbangan dan alternatif\n(Satu keputusan desain yang kamu ambil, pilihan lain yang kamu timbang, dan mengapa kamu memilih yang ini.)\n\n"
+   },
+   "contoh": {},
+   "kasus": [],
+   "jalur": "web",
+   "opsional": true,
+   "dinilaiDosen": true
+  }
+ ]
+}

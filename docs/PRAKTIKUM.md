@@ -1,6 +1,6 @@
 # Praktikum: proyek berantai
 
-Praktikum adalah satu proyek yang tumbuh dari bab ke bab dan berakhir pada produk yang bisa dijalankan. Di Algoritma dan Pemrograman, proyeknya **Kasir UD Rasa Gresik** (10 tahap, Python). Ini tambahan di luar latihan bab; latihan bab tidak berubah.
+Praktikum adalah satu proyek yang tumbuh dari bab ke bab dan berakhir pada produk yang bisa dijalankan. Di Algoritma dan Pemrograman, proyeknya **Kasir UD Rasa Gresik** (11 tahap, Python). Urutannya mengikuti bab: tahap 1 sampai 4 berupa skrip dengan `input()` dan `print()` (variabel, if, perulangan, list), dan fungsi baru dipakai di tahap 5 (bab 8). Ini tambahan di luar latihan bab; latihan bab tidak berubah.
 
 ## Yang dilihat peserta
 

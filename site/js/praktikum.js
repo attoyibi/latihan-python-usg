@@ -6,6 +6,11 @@ import { kelengkapan } from "./laporan.js";
 export const MAKS_BERKAS = 30; // batas di tampilan; database membatasi 40
 export const MAKS_UKURAN = 100000;
 export const EKSTENSI = [".py", ".txt", ".json", ".csv", ".md"];
+export const EKSTENSI_JAVA = [".java", ".txt", ".json", ".csv", ".md"];
+export const NAMA_JAVA = /^[A-Za-z_][A-Za-z0-9_]{0,58}\.java$/;
+export const NAMA_RESERVASI_JAVA = ["Uji", "GagalUji", "JavaRun"];
+/** Akhiran berkas kode yang dijalankan untuk satu bahasa. */
+export const berkasKode = (bahasa) => (bahasa === "java" ? /\.java$/i : /\.py$/i);
 export const POLA_NAMA = /^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}$/;
 export const PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
 
@@ -40,16 +45,26 @@ export function tahapBerikut(praktikum, peta) {
   return praktikum.tahap.findIndex((t) => !["lulus", "dilewati"].includes(statusTahap(peta, t.id)));
 }
 
+/** Tahap yang tidak punya kasus uji otomatis: dikerjakan di laptop atau dinilai dosen dengan rubrik. */
+export const tanpaUji = (tahap) => !(tahap.kasus && tahap.kasus.length);
+export const jalurTahap = (tahap) => tahap.jalur || "web";
+export const NAMA_JALUR_TAHAP = { web: "Di website", laptop: "Di laptop sendiri" };
+
 // ---------- berkas ----------
 /** @returns {string} pesan galat, atau "" bila nama sah */
-export function validasiNamaBerkas(nama, ada = [], { jumlah = ada.length } = {}) {
+export function validasiNamaBerkas(nama, ada = [], { jumlah = ada.length, bahasa = "python" } = {}) {
   const n = String(nama || "");
   if (!n) return "Tulis nama berkas.";
   if (n.length > 60) return "Nama berkas terlalu panjang (maksimal 60 karakter).";
   if (/[\\/]/.test(n)) return "Nama berkas tidak boleh memuat garis miring (semua berkas ada di satu folder).";
   if (/\s/.test(n)) return "Nama berkas tidak boleh memuat spasi. Pakai garis bawah, mis. daftar_barang.py.";
   if (!POLA_NAMA.test(n)) return "Nama berkas hanya boleh huruf, angka, titik, strip, dan garis bawah, dan tidak boleh diawali titik.";
-  if (!EKSTENSI.some((e) => n.toLowerCase().endsWith(e))) return "Akhiran berkas harus salah satu dari: " + EKSTENSI.join(", ") + ".";
+  const ekstensi = bahasa === "java" ? EKSTENSI_JAVA : EKSTENSI;
+  if (!ekstensi.some((e) => n.toLowerCase().endsWith(e))) return "Akhiran berkas harus salah satu dari: " + ekstensi.join(", ") + ".";
+  if (bahasa === "java" && n.toLowerCase().endsWith(".java")) {
+    if (!NAMA_JAVA.test(n)) return "Nama berkas Java harus sama dengan nama kelasnya: huruf, angka, dan garis bawah saja, mis. Buku.java.";
+    if (NAMA_RESERVASI_JAVA.includes(n.slice(0, -5))) return "Nama " + n + " dipakai penguji. Pilih nama kelas lain.";
+  }
   if (ada.includes(n)) return "Sudah ada berkas bernama " + n + ".";
   if (jumlah >= MAKS_BERKAS) return "Sudah mencapai batas " + MAKS_BERKAS + " berkas. Hapus yang tidak dipakai dulu.";
   return "";
@@ -71,9 +86,10 @@ export function lengkapiDariContoh(praktikum, idx, berkas) {
   for (let j = 0; j < idx; j++) {
     for (const [nama, isi] of Object.entries(praktikum.tahap[j].contoh || {})) {
       dariSebelum.add(nama);
-      if (!hasil[nama]) {
+      // Tahap yang merevisi berkas tahap sebelumnya memberi contoh baru: contoh yang belum diubah peserta diperbarui ke versi terbaru.
+      if (!hasil[nama] || (hasil[nama].asal === "contoh" && hasil[nama].isi !== isi)) {
         hasil[nama] = { isi, asal: "contoh" };
-        ditambah.push(nama);
+        if (!ditambah.includes(nama)) ditambah.push(nama);
       }
     }
   }
@@ -239,7 +255,7 @@ export function susunLaporanPraktikum(d) {
   }
   blok.push({ t: "bagian", teks: "Status tahap" });
   const peta = petaStatus(d.statusTahap);
-  blok.push({ t: "kode", teks: d.praktikum.tahap.map((t, i) => { const r = peta.get(t.id); return "Tahap " + (i + 1) + " " + t.judul + ": " + STATUS[statusTahap(peta, t.id)] + (r && r.jumlah_kirim ? " (" + r.jumlah_kirim + " kali kirim)" : "") + (r && r.pakai_contoh ? " [memakai berkas contoh]" : ""); }).join("\n") });
+  blok.push({ t: "kode", teks: d.praktikum.tahap.map((t, i) => { const r = peta.get(t.id); return "Tahap " + (i + 1) + " " + t.judul + ": " + STATUS[statusTahap(peta, t.id)] + (r && r.jumlah_kirim ? " (" + r.jumlah_kirim + " kali kirim)" : "") + (r && r.pakai_contoh ? " [memakai berkas contoh]" : "") + (r && r.jalur === "laptop" && r.status === "lulus" ? " [dikerjakan di laptop, ditandai sendiri]" : ""); }).join("\n") });
   blok.push({ t: "kaki", teks: "Kode verifikasi: " + d.kodeVerifikasi });
   return blok;
 }
@@ -250,8 +266,8 @@ export const barisBerkas = (mk, pid, nama, b) => ({ matakuliah_id: mk, praktikum
 export const barisTahap = (mk, pid, tid, r) => ({ matakuliah_id: mk, praktikum_id: pid, tahap_id: tid, status: r.status, jalur: r.jalur || "web", jumlah_kirim: r.jumlah_kirim || 0, pertama_dibuka: r.pertama_dibuka || null, lulus_pada: r.lulus_pada || null, pakai_contoh: !!r.pakai_contoh, centang: r.centang || {} });
 
 // ---------- rekap untuk dashboard instruktur ----------
-export const KODE_SEL = { lulus: "lulus", "lulus-contoh": "lulus (contoh)", dilewati: "dilewati", sedang: "sedang", belum: "belum" };
-const kodeSel = (r) => (!r ? "belum" : r.status === "lulus" ? (r.pakai_contoh ? "lulus-contoh" : "lulus") : r.status);
+export const KODE_SEL = { lulus: "lulus", "lulus-contoh": "lulus (contoh)", "lulus-laptop": "selesai di laptop (laporan sendiri)", dilewati: "dilewati", sedang: "sedang", belum: "belum" };
+const kodeSel = (r) => (!r ? "belum" : r.status === "lulus" ? (r.jalur === "laptop" ? "lulus-laptop" : r.pakai_contoh ? "lulus-contoh" : "lulus") : r.status);
 
 /**
  * Peserta x tahap dari baris praktikum_tahap dan praktikum_laporan (satu praktikum).
@@ -321,3 +337,48 @@ export function csvPraktikum(rekap, praktikum) {
   for (const b of rekap.baris) baris.push([b.peserta.nim, b.peserta.nama, b.peserta.kelas, ...praktikum.tahap.map((t) => KODE_SEL[b.sel[t.id].kode]), b.lulus, b.dilewati, b.kirim, b.laporan.baik + "/" + b.laporan.total, b.laporan.tempel, b.terakhir].map(kutip).join(","));
   return baris.join("\r\n") + "\r\n";
 }
+
+// ---------- ekspor proyek Java ----------
+/**
+ * Halaman HTML berisi seluruh kode proyek Java beserta cara menjalankannya di komputer yang punya JDK. Berbeda dari ekspor
+ * Python, halaman ini tidak menjalankan programnya: Java butuh JDK (browser tidak bisa menjalankannya tanpa pustaka besar).
+ */
+export function bangunHtmlEksporJava(d) {
+  const daftar = Object.keys(d.berkas).sort();
+  const utama = d.entri ? namaKelasJava(d.entri) : "Main";
+  return `<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${lolos(d.judul)}</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#f6f8f8;color:#0b1b1c;line-height:1.55}
+main{max-width:820px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+p.k{color:#4a5b5c;margin:0 0 14px}
+pre{background:#0b3d3f;color:#d9f3f1;padding:12px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word;font-size:13px;overflow-x:auto}
+details{margin:10px 0;background:#fff;border:1px solid #dbe6e5;border-radius:12px;padding:10px 14px}
+summary{cursor:pointer;font-weight:600}
+.s{color:#4a5b5c;font-size:13px}
+@media (prefers-color-scheme:dark){body{background:#081616;color:#eaf4f3}p.k,.s{color:#9db3b2}details{background:#0c1e1e;border-color:#254242}}
+</style>
+</head>
+<body>
+<main>
+<h1>${lolos(d.judul)}</h1>
+<p class="k">${lolos(d.deskripsi || "Proyek Java yang dibuat di praktikum.")}${d.oleh ? " Dibuat oleh " + lolos(d.oleh) + "." : ""}</p>
+<h2>Cara menjalankan</h2>
+<ol>
+<li>Pasang JDK 11 atau lebih baru (mis. Eclipse Temurin).</li>
+<li>Simpan tiap kode di bawah sebagai berkas dengan nama yang sama, dalam satu folder.</li>
+<li>Di terminal pada folder itu: <code>javac *.java</code> lalu <code>java ${lolos(utama)}</code>.</li>
+</ol>
+<p class="s">Halaman ini hanya menampilkan kode (${daftar.length} berkas). Java tidak bisa dijalankan langsung dari halaman web biasa.</p>
+${daftar.map((n) => `<details open><summary>${lolos(n)}</summary><pre><code>${lolos(d.berkas[n])}</code></pre></details>`).join("\n")}
+</main>
+</body>
+</html>
+`;
+}
+const namaKelasJava = (n) => String(n).replace(/\.java$/i, "");

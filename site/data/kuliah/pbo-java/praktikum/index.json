@@ -1,0 +1,9 @@
+[
+ {
+  "id": "perpustakaan",
+  "judul": "Sistem Perpustakaan Kampus USG",
+  "deskripsi": "Satu proyek Java yang tumbuh dari bab ke bab: dari satu kelas Buku sampai aplikasi perpustakaan berbasis menu. Kamu menulis berkasnya sendiri; tiap tahap memakai berkas tahap sebelumnya.",
+  "berkas": "perpustakaan.json",
+  "jumlahTahap": 13
+ }
+]

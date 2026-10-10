@@ -125,6 +125,8 @@ def main():
     for f in daftar:
         p = json.load(open(f, encoding="utf8"))
         nama = os.path.basename(os.path.dirname(os.path.dirname(f))) + "/" + os.path.basename(f)
+        if p.get("bahasa") == "java":
+            continue  # praktikum Java diuji tools/uji_praktikum_java.mjs
         print("\n== " + nama + " ==")
         periksa_struktur(p, nama)
         for i in range(len(p["tahap"])):

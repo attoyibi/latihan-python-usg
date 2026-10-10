@@ -10,9 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -37,6 +39,10 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
  * Berkas masukan boleh memuat beberapa kasus, dipisah karakter form feed (\f); sumber hanya
  * dikompilasi sekali. Keluaran: per kasus satu baris status (OK atau GALAT_JALAN) lalu keluarannya,
  * dipisah \f juga. Bila kompilasi gagal, keluaran hanya GALAT_KOMPILASI dan daftar galatnya.
+ *
+ * Mode paket (praktikum, beberapa berkas): sumber diawali U+0002, berisi satu atau lebih paket dipisah U+0004. Tiap paket:
+ * kelas-utama U+0003 masukan U+0003 nama1 U+0005 isi1 U+0005 nama2 U+0005 isi2 ... Tiap paket dikompilasi sendiri (semua
+ * berkasnya sekaligus) lalu kelas utamanya dijalankan; hasil per paket (status, keluaran) dipisah \f.
  */
 public class JavaRun {
     static final String MAIN = "Main";
@@ -96,11 +102,16 @@ public class JavaRun {
     }
 
     static String proses(String source, String semua) throws Exception {
+        if (source.startsWith("\u0002")) {
+            return prosesPaket(source.substring(1));
+        }
         String[] kasus = semua.split("\f", -1);
         StringBuilder hasil = new StringBuilder();
 
         Map<String, byte[]> classes = new HashMap<>();
-        List<String> galat = compile(source, classes);
+        Map<String, String> satu = new LinkedHashMap<>();
+        satu.put(MAIN + ".java", source);
+        List<String> galat = compile(satu, classes);
         if (!galat.isEmpty()) {
             hasil.append("GALAT_KOMPILASI\n");
             for (String g : galat) {
@@ -112,12 +123,49 @@ public class JavaRun {
             if (k > 0) {
                 hasil.append('\f');
             }
-            hasil.append(jalankan(classes, kasus[k].getBytes(StandardCharsets.UTF_8)));
+            hasil.append(jalankan(classes, kasus[k].getBytes(StandardCharsets.UTF_8), MAIN));
         }
         return hasil.toString();
     }
 
-    static String jalankan(Map<String, byte[]> classes, byte[] input) {
+    static String prosesPaket(String mentah) {
+        String[] paket = mentah.split("\u0004", -1);
+        StringBuilder hasil = new StringBuilder();
+        for (int i = 0; i < paket.length; i++) {
+            if (i > 0) {
+                hasil.append('\f');
+            }
+            try {
+                hasil.append(satuPaket(paket[i]));
+            } catch (Throwable e) {
+                hasil.append("GALAT_KOMPILASI\nPenjalan gagal: ").append(e);
+            }
+        }
+        return hasil.toString();
+    }
+
+    static String satuPaket(String p) {
+        String[] bagian = p.split("\u0003", 3);
+        String utama = bagian[0];
+        String masukan = bagian[1];
+        String[] f = bagian[2].split("\u0005", -1);
+        Map<String, String> berkas = new LinkedHashMap<>();
+        for (int i = 0; i + 1 < f.length; i += 2) {
+            berkas.put(f[i], f[i + 1]);
+        }
+        Map<String, byte[]> classes = new HashMap<>();
+        List<String> galat = compile(berkas, classes);
+        if (!galat.isEmpty()) {
+            StringBuilder b = new StringBuilder("GALAT_KOMPILASI\n");
+            for (String g : galat) {
+                b.append(g).append('\n');
+            }
+            return b.toString();
+        }
+        return jalankan(classes, masukan.getBytes(StandardCharsets.UTF_8), utama);
+    }
+
+    static String jalankan(Map<String, byte[]> classes, byte[] input, String utama) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(buf, true, StandardCharsets.UTF_8);
         PrintStream oldOut = System.out;
@@ -138,7 +186,7 @@ public class JavaRun {
                     return defineClass(name, b, 0, b.length);
                 }
             };
-            Method m = loader.loadClass(MAIN).getDeclaredMethod("main", String[].class);
+            Method m = loader.loadClass(utama).getDeclaredMethod("main", String[].class);
             m.invoke(null, (Object) new String[0]);
         } catch (InvocationTargetException e) {
             status = "GALAT_JALAN";
@@ -168,16 +216,22 @@ public class JavaRun {
         }
     }
 
-    static List<String> compile(String source, Map<String, byte[]> classes) {
+    static List<String> compile(Map<String, String> berkas, Map<String, byte[]> classes) {
         List<String> galat = new ArrayList<>();
-        char[] contents = source.toCharArray();
-        ICompilationUnit unit = new ICompilationUnit() {
-            public char[] getContents() { return contents; }
-            public char[] getMainTypeName() { return MAIN.toCharArray(); }
-            public char[][] getPackageName() { return null; }
-            public char[] getFileName() { return (MAIN + ".java").toCharArray(); }
-            public boolean ignoreOptionalProblems() { return false; }
-        };
+        Map<String, ICompilationUnit> unitPerNama = new LinkedHashMap<>();
+        for (Map.Entry<String, String> e : berkas.entrySet()) {
+            String namaBerkas = e.getKey();
+            String tipe = namaBerkas.endsWith(".java") ? namaBerkas.substring(0, namaBerkas.length() - 5) : namaBerkas;
+            char[] contents = e.getValue().toCharArray();
+            unitPerNama.put(tipe, new ICompilationUnit() {
+                public char[] getContents() { return contents; }
+                public char[] getMainTypeName() { return tipe.toCharArray(); }
+                public char[][] getPackageName() { return null; }
+                public char[] getFileName() { return namaBerkas.toCharArray(); }
+                public boolean ignoreOptionalProblems() { return false; }
+            });
+        }
+        Set<String> namaTipe = unitPerNama.keySet();
 
         INameEnvironment env = new INameEnvironment() {
             public NameEnvironmentAnswer findType(char[][] compoundTypeName) {
@@ -190,7 +244,8 @@ public class JavaRun {
             }
 
             NameEnvironmentAnswer cari(String name) {
-                if (name.equals(MAIN)) {
+                ICompilationUnit unit = unitPerNama.get(name);
+                if (unit != null) {
                     return new NameEnvironmentAnswer(unit, null);
                 }
                 byte[] b = bacaKelas(name);
@@ -206,7 +261,7 @@ public class JavaRun {
 
             public boolean isPackage(char[][] parentPackageName, char[] packageName) {
                 String nama = (parentPackageName == null ? "" : CharOperation.toString(parentPackageName).replace('.', '/') + "/") + new String(packageName);
-                if (nama.equals(MAIN)) {
+                if (namaTipe.contains(nama)) {
                     return false;
                 }
                 return bacaKelas(nama) == TIDAK_ADA;
@@ -226,7 +281,7 @@ public class JavaRun {
             public void acceptResult(CompilationResult r) {
                 if (r.hasErrors()) {
                     for (CategorizedProblem p : r.getErrors()) {
-                        galat.add(MAIN + ".java:" + p.getSourceLineNumber() + ": " + p.getMessage());
+                        galat.add(new String(r.getCompilationUnit().getFileName()) + ":" + p.getSourceLineNumber() + ": " + p.getMessage());
                     }
                 } else {
                     for (ClassFile cf : r.getClassFiles()) {
@@ -237,7 +292,7 @@ public class JavaRun {
         };
 
         Compiler compiler = new Compiler(env, DefaultErrorHandlingPolicies.proceedWithAllProblems(), new CompilerOptions(opsi), req, new DefaultProblemFactory(Locale.ENGLISH));
-        compiler.compile(new ICompilationUnit[] {unit});
+        compiler.compile(unitPerNama.values().toArray(new ICompilationUnit[0]));
         return galat;
     }
 }
