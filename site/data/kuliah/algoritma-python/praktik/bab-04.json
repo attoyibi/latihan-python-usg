@@ -86,5 +86,93 @@
    ],
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Validasi dan status nilai",
+  "tujuan": "Memperluas program yang sudah jalan: menolak masukan tidak sah dan menambah keluaran dari hasil percabangan.",
+  "berkas": "nilai.py",
+  "masukanContoh": "90",
+  "langkah": [
+   "nilai.py sudah berjalan: ia membaca satu nilai dan mencetak huruf mutunya. Kamu tidak mengganti isinya, tetapi memperluasnya. Tidak ada ____ di sini; semua kamu tulis sendiri.",
+   "Nilai hanya sah antara 0 dan 100. Di luar itu cetak persis Nilai tidak valid dan jangan cetak baris Huruf atau Status.",
+   "Untuk nilai yang sah, setelah baris Huruf cetak Status: LULUS bila hurufnya A, B, atau C, selain itu Status: TIDAK LULUS.",
+   "Bila nilainya tepat 100, cetak juga satu baris Sempurna! di paling akhir.",
+   "Coba dengan masukan 90, 54, 100, dan 105 (masing-masing dijalankan sendiri), lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Periksa dulu apakah nilai di luar 0 sampai 100; hanya bila sah lanjut ke percabangan huruf. if nilai < 0 or nilai > 100: ... else: ..."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 4: if, elif, else, percabangan di dalam percabangan, dan operator logika or dan and."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Setelah menentukan huruf (di dalam else), cetak Huruf, lalu if huruf != \"D\": cetak LULUS, else TIDAK LULUS, lalu if nilai == 100: cetak Sempurna!"
+   }
+  ],
+  "awal": "# nilai.py\nnilai = int(input())\n\nif nilai >= 85:\n    huruf = \"A\"\nelif nilai >= 70:\n    huruf = \"B\"\nelif nilai >= 55:\n    huruf = \"C\"\nelse:\n    huruf = \"D\"\n\nprint(f\"Huruf: {huruf}\")\n",
+  "kasus": [
+   {
+    "nama": "nilai 90",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: A' in k, 'keluaran harus memuat ' + 'Huruf: A' + ', keluarannya: ' + repr(k)\nassert 'Status: LULUS' in k, 'keluaran harus memuat ' + 'Status: LULUS' + ', keluarannya: ' + repr(k)\nassert 'Sempurna' not in k, 'keluaran tidak boleh memuat ' + 'Sempurna' + ', keluarannya: ' + repr(k)\nassert 'tidak valid' not in k, 'keluaran tidak boleh memuat ' + 'tidak valid' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "90"
+    ]
+   },
+   {
+    "nama": "nilai 55 batas C",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: C' in k, 'keluaran harus memuat ' + 'Huruf: C' + ', keluarannya: ' + repr(k)\nassert 'Status: LULUS' in k, 'keluaran harus memuat ' + 'Status: LULUS' + ', keluarannya: ' + repr(k)\nassert 'TIDAK LULUS' not in k, 'keluaran tidak boleh memuat ' + 'TIDAK LULUS' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "55"
+    ]
+   },
+   {
+    "nama": "nilai 54 tidak lulus",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: D' in k, 'keluaran harus memuat ' + 'Huruf: D' + ', keluarannya: ' + repr(k)\nassert 'Status: TIDAK LULUS' in k, 'keluaran harus memuat ' + 'Status: TIDAK LULUS' + ', keluarannya: ' + repr(k)\nassert 'Status: LULUS' not in k, 'keluaran tidak boleh memuat ' + 'Status: LULUS' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "54"
+    ]
+   },
+   {
+    "nama": "nilai 100 sempurna",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: A' in k, 'keluaran harus memuat ' + 'Huruf: A' + ', keluarannya: ' + repr(k)\nassert 'Status: LULUS' in k, 'keluaran harus memuat ' + 'Status: LULUS' + ', keluarannya: ' + repr(k)\nassert 'Sempurna!' in k, 'keluaran harus memuat ' + 'Sempurna!' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "100"
+    ]
+   },
+   {
+    "nama": "nilai negatif tidak valid",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Nilai tidak valid' in k, 'keluaran harus memuat ' + 'Nilai tidak valid' + ', keluarannya: ' + repr(k)\nassert 'Huruf:' not in k, 'keluaran tidak boleh memuat ' + 'Huruf:' + ', keluarannya: ' + repr(k)\nassert 'Status:' not in k, 'keluaran tidak boleh memuat ' + 'Status:' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "-5"
+    ]
+   },
+   {
+    "nama": "nilai di atas 100 tidak valid",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Nilai tidak valid' in k, 'keluaran harus memuat ' + 'Nilai tidak valid' + ', keluarannya: ' + repr(k)\nassert 'Huruf:' not in k, 'keluaran tidak boleh memuat ' + 'Huruf:' + ', keluarannya: ' + repr(k)\nassert 'Status:' not in k, 'keluaran tidak boleh memuat ' + 'Status:' + ', keluarannya: ' + repr(k)\nassert 'Sempurna' not in k, 'keluaran tidak boleh memuat ' + 'Sempurna' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "101"
+    ]
+   },
+   {
+    "nama": "nilai 0 masih sah (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: D' in k, 'keluaran harus memuat ' + 'Huruf: D' + ', keluarannya: ' + repr(k)\nassert 'Status: TIDAK LULUS' in k, 'keluaran harus memuat ' + 'Status: TIDAK LULUS' + ', keluarannya: ' + repr(k)\nassert 'tidak valid' not in k, 'keluaran tidak boleh memuat ' + 'tidak valid' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "0"
+    ],
+    "tersembunyi": true
+   },
+   {
+    "nama": "batas 70 dan 85 (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('nilai.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Huruf: B' in k, 'keluaran harus memuat ' + 'Huruf: B' + ', keluarannya: ' + repr(k)\nassert 'Status: LULUS' in k, 'keluaran harus memuat ' + 'Status: LULUS' + ', keluarannya: ' + repr(k)\nassert 'Huruf: A' not in k, 'keluaran tidak boleh memuat ' + 'Huruf: A' + ', keluarannya: ' + repr(k)\nassert 'Huruf: C' not in k, 'keluaran tidak boleh memuat ' + 'Huruf: C' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "70"
+    ],
+    "tersembunyi": true
+   }
+  ]
+ }
 }

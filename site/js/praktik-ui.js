@@ -1,8 +1,9 @@
-// Kartu Praktik di halaman bab: mengecil secara default, satu berkas, kerangka dengan bagian ____ yang harus dilengkapi.
-// Logika murni ada di praktik.js, penyimpanan dan sinkron di praktik-data.js.
+// Kartu Praktik di halaman bab: mengecil secara default. Berisi Bagian A (terbimbing: lengkapi bagian ____) dan, di bab yang punya,
+// Bagian B (kembangkan: memperluas program dasar tanpa ____). Logika murni ada di praktik.js, penyimpanan dan sinkron di praktik-data.js.
 //
-// ctx = { store, kuliah: {id, nama}, instruktur(): boolean, perbaruiTanda(): void }
-// Praktik wajib untuk melengkapi bab, tetapi tidak mengunci apa pun: boleh dibuka kapan saja dan dikerjakan tanpa urutan.
+// ctx = { store, kuliah: {id, nama, bahasa}, instruktur(): boolean, perbaruiTanda(): void }
+// Praktik wajib untuk melengkapi bab, tetapi tidak mengunci apa pun: kedua bagian boleh dibuka kapan saja dan tanpa urutan.
+// Titik di lingkaran status bab hijau hanya bila Bagian A dan B (bila ada) sama-sama lulus.
 import { h } from "./dom.js";
 import * as Anticopas from "./anticopas.js";
 import * as Sinkron from "./sinkron.js";
@@ -18,6 +19,8 @@ export const statusLokal = D.statusLokal;
 const sekarang = () => new Date().toISOString();
 /** Penanda kecil di sudut lingkaran status bab: kosong, setengah, atau penuh. */
 export const titikPraktik = (status) => h("span", { class: "pm" + (status === "belum" ? "" : " " + status), "aria-hidden": "true" });
+// Contoh jawaban instruktur di tabel kunci_jawaban: Bagian A bernomor 50 + bab, Bagian B bernomor 70 + bab.
+export const nomorKunci = (bab, bagian) => (bagian === "B" ? 70 : 50) + bab;
 
 function tombolKonfirmasi(label, tanya, aksi) {
   const kotak = h("span", { class: "pk-konfirmasi" });
@@ -70,21 +73,24 @@ function pasangEditor(holder, isi, saatUbah, jaga, java) {
   return { nilai: () => cm.getValue(), setNilai: (v) => cm.setValue(v), segarkan: () => cm.refresh() };
 }
 
-/** Kartu Praktik untuk satu bab. @param {object} def isi praktik/bab-NN.json */
-export function kartuPraktik(ctx, def) {
+/**
+ * Satu bagian praktik (editor, Jalankan, Periksa, petunjuk).
+ * @param {"A"|"B"} bagian  @param {object} d definisi bagian itu (Bagian A: definisi praktik; Bagian B: def.bagianB)
+ * @param {() => void} saatStatus dipanggil bila status bagian ini berubah
+ */
+function bangunBagian(ctx, def, bagian, d, saatStatus) {
   const mk = ctx.kuliah.id;
   const bab = def.bab;
   const instruktur = ctx.instruktur();
-  let s = D.bacaLokal(ctx.store, mk, bab);
-  const kunciBuka = "pk-buka:" + mk + ":" + bab;
-  const kunciHint = "pk-hint:" + mk + ":" + bab;
-  let buka = !!ctx.store.get(kunciBuka, false);
-  let ed = null;
-  let kotor = false; // peserta sudah mengetik di sesi ini: penyusulan dari server tidak boleh menimpa
-  const simpan = () => D.simpanLokal(ctx.store, mk, bab, s);
   const java = ctx.kuliah.bahasa === "java";
   const jalankanProyek = java ? runProyekJava : runProyek;
-  const bisaJalan = java || def.kasus.some((k) => k.jalankan);
+  const bisaJalan = java || d.kasus.some((k) => k.jalankan);
+  const sfx = bab + bagian;
+  const kunciHint = (bagian === "B" ? "pk-hintB:" : "pk-hint:") + mk + ":" + bab;
+  let s = D.bacaLokal(ctx.store, mk, bab, bagian);
+  let ed = null;
+  let kotor = false; // peserta sudah mengetik di sesi ini: penyusulan dari server tidak boleh menimpa
+  const simpan = () => D.simpanLokal(ctx.store, mk, bab, s, bagian);
 
   const statusChip = h("span", { class: "pk-status" });
   const segarStatus = () => {
@@ -94,18 +100,15 @@ export function kartuPraktik(ctx, def) {
   };
   segarStatus();
 
-  const ubah = h("span", { class: "praktik-ubah" }, buka ? "Tutup" : "Buka");
-  const kepala = h("button", { type: "button", class: "praktik-kepala", "aria-expanded": String(buka), "aria-controls": "praktik-isi-" + bab }, h("span", { class: "eyebrow" }, "Praktik"), h("strong", {}, def.judul), statusChip, ubah);
-
-  // ----- isi -----
-  const langkah = h("ol", { class: "pk-langkah" }, def.langkah.map((t) => h("li", {}, t)));
+  const langkah = h("ol", { class: "pk-langkah" }, d.langkah.map((t) => h("li", {}, t)));
+  const petunjuk = d.petunjuk || [];
   const hintBox = h("div", {});
   let hintTampil = Number(ctx.store.get(kunciHint, 0)) || 0;
   const hintBtn = h("button", { type: "button", class: "btn btn-sm" });
   const gambarHint = () => {
-    hintBox.replaceChildren(...def.petunjuk.slice(0, hintTampil).map((p, i) => h("div", { class: "hint" }, h("strong", {}, (p.jenis === "buku" ? "Baca di buku" : "Petunjuk " + (i + 1)) + ": "), p.isi)));
-    hintBtn.textContent = hintTampil >= def.petunjuk.length ? "Semua petunjuk sudah dibuka" : "Butuh petunjuk? (" + hintTampil + " dari " + def.petunjuk.length + ")";
-    hintBtn.disabled = hintTampil >= def.petunjuk.length;
+    hintBox.replaceChildren(...petunjuk.slice(0, hintTampil).map((p, i) => h("div", { class: "hint" }, h("strong", {}, (p.jenis === "buku" ? "Baca di buku" : "Petunjuk " + (i + 1)) + ": "), p.isi)));
+    hintBtn.textContent = hintTampil >= petunjuk.length ? "Semua petunjuk sudah dibuka" : "Butuh petunjuk? (" + hintTampil + " dari " + petunjuk.length + ")";
+    hintBtn.disabled = hintTampil >= petunjuk.length;
   };
   hintBtn.addEventListener("click", () => {
     hintTampil++;
@@ -115,12 +118,13 @@ export function kartuPraktik(ctx, def) {
   gambarHint();
 
   const holder = h("div", { class: "pk-editor" });
-  const stdin = h("textarea", { class: "input pk-masukan", rows: "2", "aria-label": "Masukan untuk program", spellcheck: "false", placeholder: java ? "Masukan untuk Scanner, satu baris per pertanyaan (boleh kosong)" : "Masukan untuk input(), satu baris per pertanyaan" });
-  stdin.value = def.masukanContoh || "";
+  const stdin = h("textarea", { class: "input pk-masukan", id: "pk-masukan-" + sfx, rows: "2", "aria-label": "Masukan untuk program", spellcheck: "false", placeholder: java ? "Masukan untuk Scanner, satu baris per pertanyaan (boleh kosong)" : "Masukan untuk input(), satu baris per pertanyaan" });
+  stdin.value = d.masukanContoh || "";
   const keluaran = h("pre", { class: "pk-keluaran", "aria-live": "polite", tabindex: "0" }, "Keluaran program akan tampil di sini.");
   const hasilBox = h("div", { class: "pk-hasil", "aria-live": "polite" });
   const jalanBtn = h("button", { type: "button", class: "btn" }, "Jalankan");
-  const periksaBtn = h("button", { type: "button", class: "btn btn-primary" }, "Periksa praktik");
+  const periksaBtn = h("button", { type: "button", class: "btn btn-primary" }, bagian === "B" ? "Periksa Bagian B" : "Periksa praktik");
+  const labelPeriksa = periksaBtn.textContent;
   const pesan = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   let sibuk = false;
   const atur = (b) => {
@@ -135,24 +139,24 @@ export function kartuPraktik(ctx, def) {
     s.isi = isi;
     s.t = sekarang();
     const sebelum = s.status;
-    if (s.status === "belum" && isi !== def.awal) {
+    if (s.status === "belum" && isi !== d.awal) {
       s.status = "sedang";
       s.pertama_dibuka = s.pertama_dibuka || s.t;
     }
     simpan();
     if (s.status !== sebelum) {
       segarStatus();
-      ctx.perbaruiTanda();
+      saatStatus();
     }
     clearTimeout(timerTulis);
-    timerTulis = setTimeout(() => D.sinkronkan(mk, bab, def, s), 400);
+    timerTulis = setTimeout(() => D.sinkronkan(mk, bab, bagian, d, s), 400);
   };
-  const jaga = { kecualikan: () => instruktur, saatTempel: () => Sinkron.aktivitas(mk, bab, "tempel_diblokir", { lokasi: "praktik" }) };
+  const jaga = { kecualikan: () => instruktur, saatTempel: () => Sinkron.aktivitas(mk, bab, "tempel_diblokir", { lokasi: bagian === "B" ? "praktik-b" : "praktik" }) };
   const siapkanEditor = () => {
     if (ed) return;
-    ed = pasangEditor(holder, s.isi !== null ? s.isi : def.awal, saatUbah, jaga, java);
+    ed = pasangEditor(holder, s.isi !== null ? s.isi : d.awal, saatUbah, jaga, java);
   };
-  const isiSaatIni = () => (ed ? ed.nilai() : s.isi !== null ? s.isi : def.awal);
+  const isiSaatIni = () => (ed ? ed.nilai() : s.isi !== null ? s.isi : d.awal);
 
   jalanBtn.addEventListener("click", async () => {
     if (sibuk) return;
@@ -160,12 +164,12 @@ export function kartuPraktik(ctx, def) {
     jalanBtn.textContent = "Menjalankan";
     keluaran.textContent = "";
     try {
-      const r = await jalankanProyek({ [def.berkas]: isiSaatIni() }, { aksi: "jalankan", entri: def.berkas, masukan: stdin.value ? stdin.value.split("\n") : [] });
+      const r = await jalankanProyek({ [d.berkas]: isiSaatIni() }, { aksi: "jalankan", entri: d.berkas, masukan: stdin.value ? stdin.value.split("\n") : [] });
       let teks;
       if (r.timeout) teks = "Program berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan.";
       else if (r.error) teks = r.error;
       else if (!r.proyek) teks = "Tidak ada hasil.";
-      else teks = (r.proyek.keluaran || "") + (r.proyek.galat ? (r.proyek.keluaran ? "\n" : "") + r.proyek.galat : "") || (bisaJalan ? "(program selesai tanpa keluaran)" : "(selesai; praktik ini diuji lewat Periksa praktik, bukan lewat keluaran)");
+      else teks = (r.proyek.keluaran || "") + (r.proyek.galat ? (r.proyek.keluaran ? "\n" : "") + r.proyek.galat : "") || (bisaJalan ? "(program selesai tanpa keluaran)" : "(selesai; praktik ini diuji lewat tombol Periksa, bukan lewat keluaran)");
       keluaran.textContent = teks;
       keluaran.classList.toggle("pk-galat", !!(r.error || r.timeout || (r.proyek && r.proyek.galat)));
     } finally {
@@ -181,7 +185,7 @@ export function kartuPraktik(ctx, def) {
     hasilBox.replaceChildren();
     try {
       const isi = isiSaatIni();
-      const r = await jalankanProyek({ [def.berkas]: isi }, { aksi: "kasus", kasus: def.kasus });
+      const r = await jalankanProyek({ [d.berkas]: isi }, { aksi: "kasus", kasus: d.kasus });
       if (r.timeout || r.error || !r.proyek) {
         hasilBox.replaceChildren(h("p", { class: "form-msg" }, r.timeout ? "Pemeriksaan berjalan terlalu lama dan dihentikan. Periksa perulangan tanpa akhir atau input() yang menunggu masukan." : r.error || "Pemeriksaan tidak menghasilkan apa-apa. Coba lagi."));
         return;
@@ -198,31 +202,31 @@ export function kartuPraktik(ctx, def) {
       } else if (s.status === "belum") s.status = "sedang";
       s.riwayat = [{ t, lulus: ring.lulus, benar: ring.benar, total: ring.total }, ...(s.riwayat || [])].slice(0, 20);
       simpan();
-      D.sinkronkan(mk, bab, def, s, { hasil: P.hasilUntukRiwayat(ring), lulus: ring.lulus });
+      D.sinkronkan(mk, bab, bagian, d, s, { hasil: P.hasilUntukRiwayat(ring), lulus: ring.lulus });
       segarStatus();
-      ctx.perbaruiTanda();
+      saatStatus();
       hasilBox.replaceChildren(
         h("p", { class: "pk-ringkas" + (ring.lulus ? " ok" : "") }, ring.lulus ? "Lulus: " + ring.benar + " dari " + ring.total + " pemeriksaan benar." : "Belum lulus: " + ring.benar + " dari " + ring.total + " pemeriksaan benar. Perbaiki lalu periksa lagi; tidak ada batas percobaan."),
         h("ul", { class: "pk-kasus" }, ring.tampil.map((c) => h("li", { class: c.lulus ? "ok" : "gagal" }, h("span", { "aria-hidden": "true" }, c.lulus ? "✓ " : "✗ "), h("strong", {}, c.nama), c.lulus || !c.pesan ? null : h("pre", { class: "pk-pesan" }, c.pesan))))
       );
     } finally {
-      periksaBtn.textContent = "Periksa praktik";
+      periksaBtn.textContent = labelPeriksa;
       atur(false);
     }
   });
 
   const kembaliBtn = tombolKonfirmasi("Kembalikan kerangka", "Kodemu diganti dengan kerangka awal. Perubahanmu hilang. Lanjutkan?", () => {
     siapkanEditor();
-    ed.setNilai(def.awal);
-    saatUbah(def.awal);
+    ed.setNilai(d.awal);
+    saatUbah(d.awal);
     pesan.textContent = "Kerangka awal dikembalikan.";
   });
-  // Khusus instruktur: contoh jawaban diambil dari tabel kunci_jawaban (nomor 50 + bab); tidak ada di situs.
+  // Khusus instruktur: contoh jawaban diambil dari tabel kunci_jawaban; tidak ada di situs.
   const kunciBtn = instruktur ? h("button", { type: "button", class: "btn", title: "Khusus instruktur: isi contoh jawaban lalu periksa" }, "Isi kunci (instruktur)") : null;
   if (kunciBtn)
     kunciBtn.addEventListener("click", async () => {
       kunciBtn.disabled = true;
-      const k = await ambilKunci(mk, 50 + bab);
+      const k = await ambilKunci(mk, nomorKunci(bab, bagian));
       kunciBtn.disabled = false;
       if (k.galat) {
         pesan.textContent = k.galat;
@@ -234,16 +238,16 @@ export function kartuPraktik(ctx, def) {
       periksaBtn.click();
     });
 
-  const isi = h(
+  const el = h(
     "div",
-    { class: "praktik-isi", id: "praktik-isi-" + bab, hidden: !buka },
-    h("p", {}, def.tujuan),
-    h("p", { class: "muted" }, "Praktik dikerjakan di kelas atau sesudahnya. Salin dan tempel dimatikan; jumlah percobaan tempel dicatat (isinya tidak). Pekerjaanmu tersimpan otomatis."),
+    { class: "praktik-bagian", "data-bagian": bagian },
+    bagian === "B" || def.bagianB ? h("div", { class: "praktik-bagian-kepala" }, h("h4", {}, bagian === "B" ? "Bagian B: " + d.judul : "Bagian A: terbimbing"), statusChip) : null,
+    h("p", {}, d.tujuan),
     h("h4", {}, "Langkah"),
     langkah,
-    h("p", { class: "muted" }, "Berkas: " + def.berkas),
+    h("p", { class: "muted" }, "Berkas: " + d.berkas),
     holder,
-    bisaJalan ? h("label", { for: "pk-masukan-" + bab, class: "muted" }, java ? "Masukan untuk tombol Jalankan (satu baris untuk setiap pembacaan Scanner)" : "Masukan untuk tombol Jalankan (satu baris untuk setiap input)") : null,
+    bisaJalan ? h("label", { for: "pk-masukan-" + sfx, class: "muted" }, java ? "Masukan untuk tombol Jalankan (satu baris untuk setiap pembacaan Scanner)" : "Masukan untuk tombol Jalankan (satu baris untuk setiap input)") : null,
     bisaJalan ? stdin : null,
     h("div", { class: "actions" }, jalanBtn, periksaBtn, kembaliBtn, kunciBtn),
     keluaran,
@@ -252,8 +256,59 @@ export function kartuPraktik(ctx, def) {
     h("div", { class: "actions" }, hintBtn),
     hintBox
   );
-  stdin.id = "pk-masukan-" + bab;
+  // Tanpa Bagian B, chip status ada di kepala kartu (bukan di bagian ini).
+  return {
+    el,
+    status: () => P.statusDari(s),
+    chip: statusChip,
+    buka: () => {
+      siapkanEditor();
+      ed.segarkan();
+    },
+    jaga,
+    /** Dipanggil setelah data server digabung ke lokal; tidak menimpa bila peserta sudah mengetik. */
+    muatUlang: () => {
+      if (kotor) return;
+      s = D.bacaLokal(ctx.store, mk, bab, bagian);
+      segarStatus();
+      if (ed && s.isi !== null && ed.nilai() !== s.isi) ed.setNilai(s.isi);
+    },
+  };
+}
 
+/** Kartu Praktik untuk satu bab. @param {object} def isi praktik/bab-NN.json (boleh memuat bagianB) */
+export function kartuPraktik(ctx, def) {
+  const mk = ctx.kuliah.id;
+  const bab = def.bab;
+  const instruktur = ctx.instruktur();
+  const kunciBuka = "pk-buka:" + mk + ":" + bab;
+  let buka = !!ctx.store.get(kunciBuka, false);
+
+  const statusChip = h("span", { class: "pk-status" });
+  let blokA = null;
+  let blokB = null;
+  const segarGabungan = () => {
+    const st = P.statusGabungan(!!def.bagianB, blokA.status(), blokB ? blokB.status() : "belum");
+    statusChip.textContent = P.STATUS[st];
+    statusChip.className = "pk-status pk-st-" + st;
+  };
+  const saatStatus = () => {
+    segarGabungan();
+    ctx.perbaruiTanda();
+  };
+  blokA = bangunBagian(ctx, def, "A", def, saatStatus);
+  blokB = def.bagianB ? bangunBagian(ctx, def, "B", def.bagianB, saatStatus) : null;
+  segarGabungan();
+
+  const ubah = h("span", { class: "praktik-ubah" }, buka ? "Tutup" : "Buka");
+  const kepala = h("button", { type: "button", class: "praktik-kepala", "aria-expanded": String(buka), "aria-controls": "praktik-isi-" + bab }, h("span", { class: "eyebrow" }, "Praktik"), h("strong", {}, def.judul), statusChip, ubah);
+  const isi = h(
+    "div",
+    { class: "praktik-isi", id: "praktik-isi-" + bab, hidden: !buka },
+    h("p", { class: "muted" }, "Praktik dikerjakan di kelas atau sesudahnya." + (blokB ? " Bagian A dan Bagian B sama-sama diperiksa; titik hijau di bab ini muncul setelah keduanya lulus, dan urutannya bebas." : "") + " Salin dan tempel dimatikan; jumlah percobaan tempel dicatat (isinya tidak). Pekerjaanmu tersimpan otomatis."),
+    blokA.el,
+    blokB ? blokB.el : null
+  );
   const kartu = h("section", { class: "card praktik-kartu", "aria-label": "Praktik" }, kepala, isi);
   const pasang = () => {
     kepala.setAttribute("aria-expanded", String(buka));
@@ -261,8 +316,8 @@ export function kartuPraktik(ctx, def) {
     isi.hidden = !buka;
     kartu.classList.toggle("buka", buka);
     if (buka) {
-      siapkanEditor();
-      ed.segarkan();
+      blokA.buka();
+      if (blokB) blokB.buka();
     }
   };
   kepala.addEventListener("click", () => {
@@ -271,14 +326,14 @@ export function kartuPraktik(ctx, def) {
     pasang();
   });
   pasang();
-  Anticopas.blokirSalinTempel(kartu, { lokasi: "praktik", kecualikan: () => instruktur, saatTempel: jaga.saatTempel });
+  Anticopas.blokirSalinTempel(kartu, { lokasi: "praktik", kecualikan: () => instruktur, saatTempel: blokA.jaga.saatTempel });
 
   // pekerjaan di server (mis. dikerjakan di perangkat lain)
-  D.susulPraktik(ctx.store, mk, bab).then((berubah) => {
-    if (!berubah || kotor) return;
-    s = D.bacaLokal(ctx.store, mk, bab);
-    segarStatus();
-    if (ed && s.isi !== null && ed.nilai() !== s.isi) ed.setNilai(s.isi);
+  D.susulPraktik(ctx.store, mk, bab, def).then((berubah) => {
+    if (!berubah) return;
+    blokA.muatUlang();
+    if (blokB) blokB.muatUlang();
+    segarGabungan();
     ctx.perbaruiTanda();
   });
   return kartu;

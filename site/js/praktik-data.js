@@ -6,7 +6,7 @@
 //   * Bila tabel belum ada (migrasi 0008 belum dijalankan), kirim dihentikan diam-diam dan pekerjaan tetap aman di browser.
 //   * Mata kuliah tanpa tanda "praktik": true di matakuliah.json tidak mengambil apa pun (tanpa permintaan jaringan).
 import * as Auth from "./auth.js";
-import { TAHAP, idPraktik, gabungKeadaan, keadaanKosong, statusDari, periksaDef, barisBerkas, barisTahap } from "./praktik.js";
+import { TAHAP, TAHAP_B, tahapBagian, idPraktik, gabungKeadaan, keadaanKosong, statusDari, statusGabungan, periksaDef, barisBerkas, barisTahap } from "./praktik.js";
 
 const JEDA_MS = 2500;
 const ULANG_MS = 30000;
@@ -20,15 +20,23 @@ async function ambilJson(path) {
   if (!r.ok) throw new Error(path + " " + r.status);
   return r.json();
 }
-/** Nomor bab yang punya praktik (Set). Kosong bila mata kuliah tidak bertanda praktik atau indeksnya tidak ada. */
+/**
+ * Nomor bab yang punya praktik (Set). Kosong bila mata kuliah tidak bertanda praktik atau indeksnya tidak ada.
+ * Properti tambahan denganB (Set) berisi bab yang punya Bagian B (kembangkan), dari kolom "bagianB" di index.json.
+ */
 export function muatIndeks(mk, ada = true) {
-  if (!ada) return Promise.resolve(new Set());
+  if (!ada) return Promise.resolve(Object.assign(new Set(), { denganB: new Set() }));
   if (!cacheIdx.has(mk)) {
     cacheIdx.set(
       mk,
       ambilJson("data/kuliah/" + mk + "/praktik/index.json").then(
-        (j) => new Set((Array.isArray(j.bab) ? j.bab : []).filter((n) => Number.isInteger(n))),
-        () => new Set()
+        (j) => {
+          const ok = (a) => (Array.isArray(a) ? a : []).filter((n) => Number.isInteger(n));
+          const s = new Set(ok(j.bab));
+          s.denganB = new Set(ok(j.bagianB).filter((n) => s.has(n)));
+          return s;
+        },
+        () => Object.assign(new Set(), { denganB: new Set() })
       )
     );
   }
@@ -50,13 +58,15 @@ export function muatPraktik(mk, bab) {
 }
 
 // ---------- keadaan lokal ----------
-export const kunciLokal = (mk, bab) => "pk2:" + mk + ":" + bab;
-export function bacaLokal(store, mk, bab) {
-  const x = store.get(kunciLokal(mk, bab), null);
+// Bagian A disimpan di "pk2:<mata kuliah>:<bab>", Bagian B di "pk2b:<mata kuliah>:<bab>".
+export const kunciLokal = (mk, bab, bagian = "A") => (bagian === "B" ? "pk2b:" : "pk2:") + mk + ":" + bab;
+export function bacaLokal(store, mk, bab, bagian = "A") {
+  const x = store.get(kunciLokal(mk, bab, bagian), null);
   return Object.assign(keadaanKosong(), x && typeof x === "object" && !Array.isArray(x) ? x : {});
 }
-export const simpanLokal = (store, mk, bab, s) => store.set(kunciLokal(mk, bab), s);
-export const statusLokal = (store, mk, bab) => statusDari(bacaLokal(store, mk, bab));
+export const simpanLokal = (store, mk, bab, s, bagian = "A") => store.set(kunciLokal(mk, bab, bagian), s);
+/** Status satu bab (gabungan A dan B bila bab itu punya Bagian B). */
+export const statusLokal = (store, mk, bab, adaB = false) => statusGabungan(adaB, statusDari(bacaLokal(store, mk, bab)), adaB ? statusDari(bacaLokal(store, mk, bab, "B")) : "belum");
 
 // ---------- antrean ke server ----------
 let uid = null;
@@ -88,15 +98,19 @@ const jadwalkan = (ms) => {
   timer = setTimeout(kirimSekarang, ms);
 };
 
-/** Menyusulkan pekerjaan satu bab ke server: berkas (isi), status, dan bila diminta satu versi (hasil Periksa). */
-export function sinkronkan(mk, bab, def, s, versi = null) {
+/**
+ * Menyusulkan pekerjaan satu bagian praktik ke server: berkas (isi), status, dan bila diminta satu versi (hasil Periksa).
+ * @param {"A"|"B"} bagian  @param {{berkas:string}} defBagian definisi bagian itu (Bagian A: definisi praktiknya sendiri)
+ */
+export function sinkronkan(mk, bab, bagian, defBagian, s, versi = null) {
   if (!aktif() || !tabelAda) return;
   pakaiAkun();
   const pid = idPraktik(bab);
-  if (typeof s.isi === "string") antre.berkas[mk + "|" + pid] = barisBerkas(mk, pid, def.berkas, { isi: s.isi, asal: "milik" });
-  antre.tahap[mk + "|" + pid] = barisTahap(mk, pid, TAHAP, s);
+  const tid = tahapBagian(bagian);
+  if (typeof s.isi === "string") antre.berkas[[mk, pid, defBagian.berkas].join("|")] = barisBerkas(mk, pid, defBagian.berkas, { isi: s.isi, asal: "milik" });
+  antre.tahap[[mk, pid, tid].join("|")] = barisTahap(mk, pid, tid, s);
   if (versi) {
-    antre.versi.push({ matakuliah_id: mk, praktikum_id: pid, tahap_id: TAHAP, berkas: { [def.berkas]: s.isi }, hasil: versi.hasil, lulus: !!versi.lulus, dibuat_pada: new Date().toISOString() });
+    antre.versi.push({ matakuliah_id: mk, praktikum_id: pid, tahap_id: tid, berkas: { [defBagian.berkas]: s.isi }, hasil: versi.hasil, lulus: !!versi.lulus, dibuat_pada: new Date().toISOString() });
     if (antre.versi.length > 40) antre.versi.splice(0, antre.versi.length - 40);
   }
   simpanAntrean();
@@ -170,8 +184,11 @@ export async function kirimSekarang() {
 
 // ---------- membaca dari server ----------
 const sudahDisusul = new Set();
-/** Menggabungkan pekerjaan satu bab di server ke lokal (sekali per bab per muat halaman). true bila ada yang berubah. */
-export async function susulPraktik(store, mk, bab) {
+/**
+ * Menggabungkan pekerjaan satu bab di server ke lokal (sekali per bab per muat halaman). true bila ada yang berubah.
+ * @param {object} def definisi praktik (nama berkas Bagian A dan, bila ada, Bagian B)
+ */
+export async function susulPraktik(store, mk, bab, def) {
   if (!aktif() || !tabelAda) return false;
   const id = [Auth.getUserId(), mk, bab].join("|");
   if (sudahDisusul.has(id)) return false;
@@ -189,11 +206,17 @@ export async function susulPraktik(store, mk, bab) {
         return false;
       }
     }
-    const lokal = bacaLokal(store, mk, bab);
-    const gab = gabungKeadaan(lokal, (b.data || [])[0] || null, (t.data || []).find((r) => r.tahap_id === TAHAP) || null);
-    if (JSON.stringify(gab) === JSON.stringify(lokal)) return false;
-    simpanLokal(store, mk, bab, gab);
-    return true;
+    let berubah = false;
+    const bagian = [["A", def && def.berkas], ...(def && def.bagianB ? [["B", def.bagianB.berkas]] : [])];
+    for (const [nama, berkas] of bagian) {
+      const lokal = bacaLokal(store, mk, bab, nama);
+      const gab = gabungKeadaan(lokal, (b.data || []).find((r) => r.nama === berkas) || null, (t.data || []).find((r) => r.tahap_id === tahapBagian(nama)) || null);
+      if (JSON.stringify(gab) !== JSON.stringify(lokal)) {
+        simpanLokal(store, mk, bab, gab, nama);
+        berubah = true;
+      }
+    }
+    return berubah;
   } catch (e) {
     sudahDisusul.delete(id);
     return false;
@@ -216,12 +239,13 @@ export async function susulStatusKuliah(store, mk) {
     let berubah = false;
     for (const r of data || []) {
       const m = /^bab-(\d{2})$/.exec(r.praktikum_id || "");
-      if (!m || r.tahap_id !== TAHAP) continue;
+      if (!m || (r.tahap_id !== TAHAP && r.tahap_id !== TAHAP_B)) continue;
       const bab = Number(m[1]);
-      const lokal = bacaLokal(store, mk, bab);
+      const bagian = r.tahap_id === TAHAP_B ? "B" : "A";
+      const lokal = bacaLokal(store, mk, bab, bagian);
       const gab = gabungKeadaan(lokal, null, r);
       if (JSON.stringify(gab) !== JSON.stringify(lokal)) {
-        simpanLokal(store, mk, bab, gab);
+        simpanLokal(store, mk, bab, gab, bagian);
         berubah = true;
       }
     }

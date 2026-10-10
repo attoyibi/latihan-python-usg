@@ -419,3 +419,10 @@ Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. La
 - [x] Tab Laporan akhir di dashboard dosen: ringkasan per peserta, buka laporan lengkap di layar, unduh PDF dan CSV
 - [x] Diuji: 27 uji paket dan blok PDF, termasuk tabel yang belum ada; di browser (ekspor PDF, tab dosen)
 - [ ] Belum diuji di Supabase sungguhan (kueri `percobaan` dan `praktikum_*` besar), dan di ponsel sungguhan
+
+## Praktik: Bagian A dan B
+
+- [x] Kartu praktik dua bagian: A terbimbing, B kembangkan (program dasar yang sudah jalan, tanpa `____`); titik hijau hanya bila A dan B lulus (tanpa migrasi: `p01` dan `p02`)
+- [x] Bagian B untuk Algoritma bab 4, 5, dan 6; jawabannya di `kunci/` dan `kunci_jawaban` nomor 70 + bab; validator dan uji Python memeriksanya
+- [x] Laporan bab, laporan akhir, dan dashboard dosen memuat kode dan status A dan B
+- [ ] Bagian B untuk bab lain dan untuk PBO; kesetaraan kesulitan dengan Tantangan perlu dilihat dari kelas

@@ -4,6 +4,7 @@
 // Kode TIDAK diketik atau ditempel peserta di laporan: ia ditarik otomatis dari kiriman terakhir (tabel percobaan atau browser),
 // dan dari berkas praktik. Hanya form akhir yang ditulis peserta, sehingga aturan salin-tempel tetap utuh.
 import { KOLOM, kelengkapan } from "./laporan.js";
+import { statusGabungan } from "./praktik.js";
 
 export const PID_AKHIR = "akhir";
 export const MAKS_BARIS_KODE = 80;
@@ -53,7 +54,12 @@ export function kalimatStatus(b) {
     if (l.kirim) t += ", " + l.kirim + " kali kirim";
     bagian.push(t);
   } else bagian.push("Bab ini dikumpulkan sebagai tugas unggahan.");
-  if (b.praktik) bagian.push("Praktik: " + (STATUS_PRAKTIK[b.praktik.status] || STATUS_PRAKTIK.belum) + (b.praktik.kirim ? ", diperiksa " + b.praktik.kirim + " kali" : ""));
+  if (b.praktik) {
+    let p = "Praktik: " + (STATUS_PRAKTIK[b.praktik.status] || STATUS_PRAKTIK.belum);
+    if (b.praktik.bagianB) p += " (Bagian A: " + (STATUS_PRAKTIK[b.praktik.statusA] || STATUS_PRAKTIK.belum) + ", Bagian B: " + (STATUS_PRAKTIK[b.praktik.bagianB.status] || STATUS_PRAKTIK.belum) + ")";
+    if (b.praktik.kirim) p += ", diperiksa " + b.praktik.kirim + " kali";
+    bagian.push(p);
+  }
   return bagian.join(". ") + ".";
 }
 
@@ -112,11 +118,14 @@ export function susunBlokAkhir(paket) {
       }
     }
     if (b.praktik) {
-      const kode = b.praktik.isi ? potongKode(b.praktik.isi) : null;
-      blok.push({ t: "paragraf", teks: kode ? "Kode praktik (" + b.praktik.berkas + "):" : "Kode praktik: (belum dikerjakan)", kosong: !kode });
-      if (kode) {
-        blok.push({ t: "kode", teks: kode.teks });
-        if (kode.dipotong) blok.push({ t: "catatan", teks: "(" + kode.dipotong + " baris lagi tidak ditampilkan)" });
+      const bagian = [[b.praktik.bagianB ? "Kode praktik Bagian A" : "Kode praktik", b.praktik.berkas, b.praktik.isi]].concat(b.praktik.bagianB ? [["Kode praktik Bagian B", b.praktik.bagianB.berkas, b.praktik.bagianB.isi]] : []);
+      for (const [label, berkas, isi] of bagian) {
+        const kode = isi ? potongKode(isi) : null;
+        blok.push({ t: "paragraf", teks: kode ? label + " (" + berkas + "):" : label + ": (belum dikerjakan)", kosong: !kode });
+        if (kode) {
+          blok.push({ t: "kode", teks: kode.teks });
+          if (kode.dipotong) blok.push({ t: "catatan", teks: "(" + kode.dipotong + " baris lagi tidak ditampilkan)" });
+        }
       }
     }
   }
@@ -140,16 +149,24 @@ export function susunPaket(d) {
   const kiriman = pilihKiriman(d.percobaan);
   const progres = new Map((d.progres || []).map((p) => [p.bab, p]));
   const laporan = new Map((d.laporan || []).map((l) => [l.bab, l]));
-  const berkas = new Map();
+  const berkas = new Map(); // "bab:nama berkas" -> baris
   for (const f of d.berkasPraktik || []) {
     const m = /^bab-(\d{2})$/.exec(f.praktikum_id || "");
-    if (m) berkas.set(Number(m[1]), f);
+    if (m) berkas.set(Number(m[1]) + ":" + f.nama, f);
   }
-  const tahap = new Map();
+  const tahap = new Map(); // "bab:p01|p02" -> baris
   for (const t of d.tahapPraktik || []) {
     const m = /^bab-(\d{2})$/.exec(t.praktikum_id || "");
-    if (m && t.tahap_id === "p01") tahap.set(Number(m[1]), t);
+    if (m && (t.tahap_id === "p01" || t.tahap_id === "p02")) tahap.set(Number(m[1]) + ":" + t.tahap_id, t);
   }
+  const urut = { belum: 0, sedang: 1, lulus: 2 };
+  const bagianPraktik = (bab, tid, nama, lp) => {
+    const t = tahap.get(bab + ":" + tid);
+    const f = nama ? berkas.get(bab + ":" + nama) : null;
+    const sl = lp ? lp.status : "belum";
+    const ss = t ? t.status : "belum";
+    return { status: urut[sl] >= urut[ss] ? sl : ss, kirim: Math.max(lp ? lp.jumlah_kirim || 0 : 0, t ? t.jumlah_kirim || 0 : 0), isi: lp && lp.isi ? lp.isi : f ? f.isi : "" };
+  };
   const bab = d.materi.map((m) => {
     const lok = (d.lokal && d.lokal.latihan(m.bab)) || null;
     const pr = progres.get(m.bab);
@@ -171,13 +188,10 @@ export function susunPaket(d) {
     let praktik = null;
     if (d.babPraktik && d.babPraktik.has(m.bab)) {
       const def = (d.defPraktik && d.defPraktik.get(m.bab)) || {};
-      const lp = d.lokal && d.lokal.praktik(m.bab);
-      const f = berkas.get(m.bab);
-      const t = tahap.get(m.bab);
-      const urut = { belum: 0, sedang: 1, lulus: 2 };
-      const sl = lp ? lp.status : "belum";
-      const ss = t ? t.status : "belum";
-      praktik = { judul: def.judul || "", berkas: def.berkas || (f && f.nama) || "", status: urut[sl] >= urut[ss] ? sl : ss, kirim: Math.max(lp ? lp.jumlah_kirim || 0 : 0, t ? t.jumlah_kirim || 0 : 0), isi: lp && lp.isi ? lp.isi : f ? f.isi : "" };
+      const adaB = !!(d.babPraktik.denganB && d.babPraktik.denganB.has(m.bab));
+      const a = bagianPraktik(m.bab, "p01", def.berkas, d.lokal && d.lokal.praktik(m.bab, "A"));
+      const bB = adaB ? bagianPraktik(m.bab, "p02", def.bagianB && def.bagianB.berkas, d.lokal && d.lokal.praktik(m.bab, "B")) : null;
+      praktik = { judul: def.judul || "", berkas: def.berkas || "", status: statusGabungan(adaB, a.status, bB ? bB.status : "belum"), statusA: a.status, kirim: a.kirim + (bB ? bB.kirim : 0), isi: a.isi, bagianB: bB ? { berkas: (def.bagianB && def.bagianB.berkas) || "", status: bB.status, kirim: bB.kirim, isi: bB.isi } : null };
     }
     return { bab: m.bab, judul: m.judul, jenis: m.jenis, latihan, refleksi: { jawaban }, praktik };
   });

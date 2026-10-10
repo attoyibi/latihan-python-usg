@@ -68,5 +68,100 @@
    ],
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Statistik angka sampai nol",
+  "tujuan": "Memperluas perulangan while yang sudah jalan: melewati data tidak sah dan menghitung beberapa statistik sekaligus.",
+  "berkas": "rata.py",
+  "masukanContoh": "5\n10\n0",
+  "langkah": [
+   "rata.py sudah membaca angka sampai peserta mengetik 0, lalu mencetak jumlahnya. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Angka negatif tidak dihitung: cetak Dilewati: -3 (dengan angkanya) lalu lanjut membaca angka berikutnya.",
+   "Hitung juga banyak angka yang sah dan angka terbesarnya.",
+   "Setelah 0, bila ada minimal satu angka sah cetak empat baris: Total: ..., Banyak: ..., Rata-rata: ... (dua angka di belakang koma), dan Terbesar: .... Bila tidak ada angka sah, cetak hanya Belum ada data.",
+   "Coba dengan masukan 5, 10, 0 dan 4, -3, 6, 0, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Simpan banyak dan terbesar sebagai variabel yang diperbarui di dalam perulangan. Untuk negatif pakai if angka < 0: print(...) lalu continue."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 5: while, break, continue, dan akumulator."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Mulai dengan banyak = 0 dan terbesar = None. Setelah perulangan, if banyak == 0: cetak Belum ada data, else cetak empat baris dengan f\"{total / banyak:.2f}\"."
+   }
+  ],
+  "awal": "# rata.py\ntotal = 0\n\nwhile True:\n    angka = int(input())\n    if angka == 0:\n        break\n    total += angka\n\nprint(f\"Total: {total}\")\n",
+  "kasus": [
+   {
+    "nama": "dua angka",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Total: 15' in k, 'keluaran harus memuat ' + 'Total: 15' + ', keluarannya: ' + repr(k)\nassert 'Banyak: 2' in k, 'keluaran harus memuat ' + 'Banyak: 2' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 7.50' in k, 'keluaran harus memuat ' + 'Rata-rata: 7.50' + ', keluarannya: ' + repr(k)\nassert 'Terbesar: 10' in k, 'keluaran harus memuat ' + 'Terbesar: 10' + ', keluarannya: ' + repr(k)\nassert 'Dilewati' not in k, 'keluaran tidak boleh memuat ' + 'Dilewati' + ', keluarannya: ' + repr(k)\nassert 'Belum ada data' not in k, 'keluaran tidak boleh memuat ' + 'Belum ada data' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "5",
+     "10",
+     "0"
+    ]
+   },
+   {
+    "nama": "ada angka negatif dilewati",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Dilewati: -3' in k, 'keluaran harus memuat ' + 'Dilewati: -3' + ', keluarannya: ' + repr(k)\nassert 'Total: 10' in k, 'keluaran harus memuat ' + 'Total: 10' + ', keluarannya: ' + repr(k)\nassert 'Banyak: 2' in k, 'keluaran harus memuat ' + 'Banyak: 2' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 5.00' in k, 'keluaran harus memuat ' + 'Rata-rata: 5.00' + ', keluarannya: ' + repr(k)\nassert 'Terbesar: 6' in k, 'keluaran harus memuat ' + 'Terbesar: 6' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "4",
+     "-3",
+     "6",
+     "0"
+    ]
+   },
+   {
+    "nama": "langsung nol",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Belum ada data' in k, 'keluaran harus memuat ' + 'Belum ada data' + ', keluarannya: ' + repr(k)\nassert 'Total:' not in k, 'keluaran tidak boleh memuat ' + 'Total:' + ', keluarannya: ' + repr(k)\nassert 'Banyak:' not in k, 'keluaran tidak boleh memuat ' + 'Banyak:' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata:' not in k, 'keluaran tidak boleh memuat ' + 'Rata-rata:' + ', keluarannya: ' + repr(k)\nassert 'Terbesar:' not in k, 'keluaran tidak boleh memuat ' + 'Terbesar:' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "0"
+    ]
+   },
+   {
+    "nama": "hanya angka negatif",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Dilewati: -1' in k, 'keluaran harus memuat ' + 'Dilewati: -1' + ', keluarannya: ' + repr(k)\nassert 'Dilewati: -2' in k, 'keluaran harus memuat ' + 'Dilewati: -2' + ', keluarannya: ' + repr(k)\nassert 'Belum ada data' in k, 'keluaran harus memuat ' + 'Belum ada data' + ', keluarannya: ' + repr(k)\nassert 'Total:' not in k, 'keluaran tidak boleh memuat ' + 'Total:' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata:' not in k, 'keluaran tidak boleh memuat ' + 'Rata-rata:' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "-1",
+     "-2",
+     "0"
+    ]
+   },
+   {
+    "nama": "satu angka",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Total: 7' in k, 'keluaran harus memuat ' + 'Total: 7' + ', keluarannya: ' + repr(k)\nassert 'Banyak: 1' in k, 'keluaran harus memuat ' + 'Banyak: 1' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 7.00' in k, 'keluaran harus memuat ' + 'Rata-rata: 7.00' + ', keluarannya: ' + repr(k)\nassert 'Terbesar: 7' in k, 'keluaran harus memuat ' + 'Terbesar: 7' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "7",
+     "0"
+    ]
+   },
+   {
+    "nama": "pembulatan dua desimal (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Rata-rata: 1.67' in k, 'keluaran harus memuat ' + 'Rata-rata: 1.67' + ', keluarannya: ' + repr(k)\nassert 'Terbesar: 2' in k, 'keluaran harus memuat ' + 'Terbesar: 2' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "1",
+     "2",
+     "2",
+     "0"
+    ],
+    "tersembunyi": true
+   },
+   {
+    "nama": "terbesar bukan angka terakhir (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rata.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Terbesar: 9' in k, 'keluaran harus memuat ' + 'Terbesar: 9' + ', keluarannya: ' + repr(k)\nassert 'Banyak: 3' in k, 'keluaran harus memuat ' + 'Banyak: 3' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "9",
+     "3",
+     "8",
+     "0"
+    ],
+    "tersembunyi": true
+   }
+  ]
+ }
 }

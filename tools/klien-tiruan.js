@@ -381,9 +381,12 @@
           return rt.ok ? { data: [{ isi: await rt.text(), bahasa: "berkas" }], error: null } : { data: [], error: null };
         }
         const nomor = Number(q.f.bab);
-        const bab = String(nomor > 50 ? nomor - 50 : nomor).padStart(2, "0"); // kunci praktik bab N disimpan sebagai bab 50 + N
+        // kunci praktik: Bagian A bab N = 50 + N (praktik-NN), Bagian B = 70 + N (praktik-NNb)
+        const awalan = nomor > 70 ? "praktik-" : nomor > 50 ? "praktik-" : "bab-";
+        const dasar = nomor > 70 ? nomor - 70 : nomor > 50 ? nomor - 50 : nomor;
+        const bab = String(dasar).padStart(2, "0") + (nomor > 70 ? "b" : "");
         for (const ext of ["py", "java"]) {
-          const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/" + (nomor > 50 ? "praktik-" : "bab-") + bab + "." + ext);
+          const r = await fetch("/__kunci/" + q.f.matakuliah_id + "/" + awalan + bab + "." + ext);
           if (r.ok) return { data: [{ isi: await r.text(), bahasa: ext === "py" ? "python" : "java" }], error: null };
         }
         return { data: [], error: null };
@@ -655,10 +658,10 @@
   };
 
   // Data contoh praktik per bab untuk dashboard instruktur (tab Praktik): sebagian peserta contoh sudah mengerjakan beberapa bab.
-  if (!db.seedPk2) {
-    db.seedPk2 = true;
-    db.praktikum_tahap = (db.praktikum_tahap || []).filter((r) => !/^[a-z]+$/.test(r.praktikum_id));
-    db.praktikum_berkas = (db.praktikum_berkas || []).filter((r) => /^bab-\d\d$/.test(r.praktikum_id));
+  if (!db.seedPk3) {
+    db.seedPk3 = true;
+    db.praktikum_tahap = (db.praktikum_tahap || []).filter((r) => !/^u-seed/.test(r.user_id) && !/^[a-z]+$/.test(r.praktikum_id));
+    db.praktikum_berkas = (db.praktikum_berkas || []).filter((r) => !/^u-seed/.test(r.user_id) && /^bab-\d\d$/.test(r.praktikum_id));
     const babs = [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
     for (let n = 1; n <= 12; n++) {
       const uid = "u-seed" + n;
@@ -667,6 +670,7 @@
         const macet = n > 7 && i === sampai - 1;
         const pid = "bab-" + String(bab).padStart(2, "0");
         db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: pid, tahap_id: "p01", status: macet ? "sedang" : "lulus", jalur: "web", jumlah_kirim: macet ? 6 + n : 1 + ((n + i) % 3), pertama_dibuka: "2026-10-02T03:00:00Z", lulus_pada: macet ? null : "2026-10-03T03:00:00Z", pakai_contoh: false, centang: {}, diperbarui_pada: "2026-10-0" + (3 + (n % 5)) + "T04:00:00Z" });
+        if ([4, 5, 6].includes(bab) && n % 2 === 0) db.praktikum_tahap.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: pid, tahap_id: "p02", status: n % 4 === 0 ? "lulus" : "sedang", jalur: "web", jumlah_kirim: 3, pertama_dibuka: "2026-10-04T03:00:00Z", lulus_pada: n % 4 === 0 ? "2026-10-05T03:00:00Z" : null, pakai_contoh: false, centang: {}, diperbarui_pada: "2026-10-06T04:00:00Z" });
         db.praktikum_berkas.push({ user_id: uid, matakuliah_id: "algoritma-python", praktikum_id: pid, nama: "halo.py", isi: "# kode praktik bab " + bab + " milik peserta contoh\nprint('halo')\n", asal: "milik", diperbarui_pada: "2026-10-03T04:00:00Z" });
       });
     }

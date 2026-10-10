@@ -150,6 +150,10 @@ def cek_praktik(c, materi):
             err(f'{pre}/index.json: harus berbentuk {{"bab": [nomor, ...]}} berisi minimal satu nomor bab')
             daftar = []
     ada = sorted(int(f.name[4:6]) for f in folder.glob("bab-[0-9][0-9].json"))
+    dengan_b = indeks.get("bagianB", []) if isinstance(indeks, dict) else []
+    if not isinstance(dengan_b, list) or not all(isinstance(b, int) for b in dengan_b):
+        err(f"{pre}/index.json: 'bagianB' harus daftar nomor bab")
+        dengan_b = []
     if daftar and sorted(daftar) != ada:
         err(f"{pre}/index.json: daftar bab {sorted(daftar)} tidak sama dengan berkas bab-NN.json yang ada {ada}")
     for b in ada:
@@ -157,6 +161,35 @@ def cek_praktik(c, materi):
         pk = load(folder / f"bab-{b:02d}.json")
         if pk is not None:
             cek_satu_praktik(b, pk, babs_kode, w, c.get("bahasa"))
+            if ("bagianB" in pk) != (b in dengan_b):
+                err(f"{w}: kolom bagianB dan daftar 'bagianB' di index.json tidak cocok untuk bab {b}")
+
+
+def cek_bagian_b(pk, w, bahasa):
+    """Bagian B (kembangkan): berkas sendiri, program dasar yang sudah jalan (tanpa ____), kasus uji, dan tanpa contoh jawaban."""
+    b = pk.get("bagianB")
+    w = w + ".bagianB"
+    if not isinstance(b, dict):
+        err(f"{w}: harus berupa objek")
+        return
+    for k in ("judul", "tujuan", "langkah", "berkas", "awal", "petunjuk", "kasus"):
+        if not b.get(k):
+            err(f"{w}: kolom '{k}' tidak ada atau kosong")
+    if "contoh" in b:
+        err(f"{w}: contoh jawaban tidak boleh ada di situs (publik)")
+    pola = NAMA_JAVA_RE if bahasa == "java" else NAMA_BERKAS_RE
+    if not isinstance(b.get("berkas"), str) or not pola.fullmatch(b.get("berkas", "")):
+        err(f"{w}: 'berkas' tidak sah")
+    if b.get("berkas") == pk.get("berkas"):
+        err(f"{w}: 'berkas' harus berbeda dari Bagian A")
+    if "____" in str(b.get("awal", "")):
+        err(f"{w}: 'awal' Bagian B adalah program dasar yang sudah jalan dan tidak boleh memuat ____")
+    nama_kasus = [k.get("nama") for k in b.get("kasus", [])]
+    if len(nama_kasus) < 3 or len(set(nama_kasus)) != len(nama_kasus) or not all(nama_kasus):
+        err(f"{w}: minimal tiga kasus dengan nama unik")
+    for j, k in enumerate(b.get("kasus", [])):
+        if ("kode" in k) == ("jalankan" in k):
+            err(f"{w}.kasus[{j}]: isi tepat salah satu dari 'kode' atau 'jalankan'")
 
 
 def cek_satu_praktik(bab, pk, babs_kode, w, bahasa="python"):
@@ -178,6 +211,8 @@ def cek_satu_praktik(bab, pk, babs_kode, w, bahasa="python"):
         err(f"{w}: 'masukanContoh' harus teks")
     if not isinstance(pk.get("langkah"), list) or not all(isinstance(l, str) and l.strip() for l in pk.get("langkah", [])):
         err(f"{w}: 'langkah' harus daftar teks tidak kosong")
+    if "bagianB" in pk:
+        cek_bagian_b(pk, w, bahasa)
     pj = pk.get("petunjuk") or []
     if len(pj) < 2 or any(p.get("jenis") not in ("soal", "buku", "video") or not p.get("isi") for p in pj):
         err(f"{w}: 'petunjuk' harus minimal dua butir berisi jenis (soal, buku, video) dan isi")

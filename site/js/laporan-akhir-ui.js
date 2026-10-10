@@ -176,7 +176,9 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
     kartu(h("p", { class: "verdict fail" }, "Gagal memuat: " + (e.message || e)));
     return;
   }
-  const babPraktik = [...(await muatIndeks(kuliah.id, kuliah.praktik === true))];
+  const indeksPraktik = await muatIndeks(kuliah.id, kuliah.praktik === true);
+  const babPraktik = [...indeksPraktik];
+  const denganB = indeksPraktik.denganB || new Set();
   const babLatihan = kuliah.materi.filter((m) => m.jenis !== "unggah").map((m) => m.bab);
   const per = (arr, f) => {
     const m = new Map();
@@ -200,7 +202,9 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
   const tersaring = (ui.kelas ? peserta.filter((p) => p.kelas === ui.kelas) : peserta).slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama), "id"));
   const baris = tersaring.map((p) => {
     const lat = (progresU.get(p.id) || []).filter((r) => r.status === "selesai" && babLatihan.includes(r.bab)).length;
-    const pr = (tahapU.get(p.id) || []).filter((r) => r.status === "lulus" && r.tahap_id === "p01" && babPraktik.includes(Number((/^bab-(\d{2})$/.exec(r.praktikum_id) || [])[1]))).length;
+    const barisT = tahapU.get(p.id) || [];
+    const lulusT = (bab, tid) => barisT.some((r) => r.status === "lulus" && r.praktikum_id === "bab-" + String(bab).padStart(2, "0") && r.tahap_id === tid);
+    const pr = babPraktik.filter((bab) => lulusT(bab, "p01") && (!denganB.has(bab) || lulusT(bab, "p02"))).length;
     const ref = (laporanU.get(p.id) || []).filter((r) => kelengkapan(r.jawaban || {}, KOLOM).baik >= 3).length;
     const ak = (akhirU.get(p.id) || [])[0];
     const kl = kelengkapanAkhir(ak && ak.jawaban);

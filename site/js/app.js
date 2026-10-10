@@ -82,7 +82,7 @@ const STATUS_TEXT = { belum: "Belum dikerjakan", sedang: "Sedang dikerjakan", se
 function mark(n) {
   const st = statusOf(n);
   const ada = !!COURSE && PRAKTIK.has(n);
-  const ps = ada ? PraktikUI.statusLokal(store, COURSE.id, n) : null;
+  const ps = ada ? PraktikUI.statusLokal(store, COURSE.id, n, !!(PRAKTIK.denganB && PRAKTIK.denganB.has(n))) : null;
   const label = "Latihan: " + STATUS_TEXT[st].toLowerCase() + (ada ? ". Praktik: " + PraktikUI.NAMA_STATUS[ps].toLowerCase() : "");
   return h("span", { class: "st " + (st === "belum" ? "" : st), role: "img", "aria-label": label, title: label }, ada ? PraktikUI.titikPraktik(ps) : null);
 }
@@ -710,16 +710,20 @@ function lampiranLaporan(m, ch) {
   return { tipe: "kode", judul: "kode di editor (belum pernah dikirim)", isi: draf || (ch ? ch.starter : ""), hasil: "Belum pernah dikirim untuk dinilai." };
 }
 
-// Lampiran PDF untuk praktik bab ini: kode terakhir milik peserta beserta status dan jumlah pemeriksaan.
+// Lampiran PDF untuk praktik bab ini: kode terakhir milik peserta (Bagian A dan, bila ada, Bagian B) beserta status dan jumlah pemeriksaan.
 function lampiranPraktik(def) {
   if (!def) return null;
-  const s = PraktikData.bacaLokal(store, COURSE.id, def.bab);
-  const status = PraktikUI.NAMA_STATUS[PraktikData.statusLokal(store, COURSE.id, def.bab)];
-  return {
-    judul: "praktik: " + def.judul + " (" + def.berkas + ")",
-    isi: s.isi !== null ? s.isi : "",
-    hasil: "Status praktik: " + status.toLowerCase() + (s.jumlah_kirim ? ", diperiksa " + s.jumlah_kirim + " kali." : ".") + (s.isi === null ? " Praktik ini belum dikerjakan." : ""),
-  };
+  const komentar = COURSE && COURSE.bahasa === "java" ? "//" : "#";
+  const bagian = [["A", def]].concat(def.bagianB ? [["B", def.bagianB]] : []);
+  const isi = [];
+  const hasil = [];
+  for (const [nama, d] of bagian) {
+    const s = PraktikData.bacaLokal(store, COURSE.id, def.bab, nama);
+    const st = PraktikUI.NAMA_STATUS[s.status === "lulus" || s.status === "sedang" ? s.status : "belum"].toLowerCase();
+    hasil.push((def.bagianB ? "Bagian " + nama + ": " : "Praktik: ") + st + (s.jumlah_kirim ? ", diperiksa " + s.jumlah_kirim + " kali" : "") + (s.isi === null ? " (belum dikerjakan)" : ""));
+    if (s.isi !== null) isi.push((def.bagianB ? komentar + " ===== Bagian " + nama + ": " + d.berkas + " =====\n" : "") + s.isi);
+  }
+  return { judul: "praktik: " + def.judul + " (" + def.berkas + (def.bagianB ? ", " + def.bagianB.berkas : "") + ")", isi: isi.join("\n\n"), hasil: hasil.join(". ") + "." };
 }
 
 async function renderBab(n) {

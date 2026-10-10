@@ -16,6 +16,7 @@ Praktik wajib untuk melengkapi bab, tetapi **tidak terkunci**: urutan bebas, tid
 - **Lingkaran status bab tidak berubah** (hijau = latihan lulus, seperti sebelumnya). Di sudut kanan atasnya ada **titik kecil** untuk praktik: kosong (belum), setengah kuning (sedang dikerjakan), hijau (lulus). Dipakai di sidebar, kartu bab, dan kepala halaman bab. Bab tanpa praktik tidak menampilkan titik.
 - **Kartu Praktik mengecil secara default**: satu baris tipis (judul, status, *Buka*). Dibuka dengan sekali klik, dan pilihan itu diingat per bab.
 - Isi kartu: tujuan, langkah, petunjuk bertahap, editor satu berkas, **Jalankan**, **Periksa praktik**, **Kembalikan kerangka**. Pekerjaan tersimpan otomatis dan tidak ada batas percobaan.
+- **Dua bagian di bab yang punya Bagian B.** *Bagian A (terbimbing)*: lengkapi `____`. *Bagian B (kembangkan)*: program dasar yang sudah jalan, tanpa `____`; peserta memperluasnya (kasus tepi, data kosong, fitur kecil) dengan skenario yang berbeda dari Tantangan dan tingkat kesulitan setara Tantangan. Keduanya berdiri sendiri dan bebas urutan. Titik di lingkaran status **hijau hanya bila A dan B sama-sama lulus**; bila salah satu sudah dimulai atau lulus, titiknya setengah kuning. Bab tanpa Bagian B (belum ditulis) cukup Bagian A. Saat ini Bagian B ada di Algoritma bab 4, 5, dan 6.
 - Salin dan tempel dimatikan; jumlah percobaan tempel dicatat (isinya tidak), seperti di Latihan.
 
 ## Laporan akhir (satu PDF)
@@ -32,14 +33,14 @@ Kode tidak diketik atau ditempel peserta: ia ditarik otomatis dari data yang sud
 
 ## Memasang
 
-Memakai migrasi `0008_praktikum.sql` yang sudah ada (tabel `praktikum_berkas`, `praktikum_tahap`, `praktikum_versi`). Praktik bab 6 disimpan sebagai `praktikum_id = bab-06`, `tahap_id = p01`. Tidak ada migrasi baru. Situs aman dipasang sebelum atau sesudah migrasi: bila tabel belum ada, pekerjaan tetap tersimpan di browser dan tab Praktik dosen menampilkan petunjuk menjalankan 0008. Mata kuliah tanpa tanda `"praktik": true` tidak memuat apa pun dari fitur ini dan tidak membuat permintaan jaringan tambahan.
+Memakai migrasi `0008_praktikum.sql` yang sudah ada (tabel `praktikum_berkas`, `praktikum_tahap`, `praktikum_versi`). Praktik bab 6 disimpan sebagai `praktikum_id = bab-06`; Bagian A memakai `tahap_id = p01` dan Bagian B `p02` (berkas masing-masing satu baris di `praktikum_berkas`). Tidak ada migrasi baru. Situs aman dipasang sebelum atau sesudah migrasi: bila tabel belum ada, pekerjaan tetap tersimpan di browser dan tab Praktik dosen menampilkan petunjuk menjalankan 0008. Mata kuliah tanpa tanda `"praktik": true` tidak memuat apa pun dari fitur ini dan tidak membuat permintaan jaringan tambahan.
 
-Contoh jawaban praktik **tidak ada di situs**. Ia disimpan di tabel `kunci_jawaban` (migrasi `0009`) sebagai nomor bab 50 + bab (praktik bab 6 = baris 56), hanya bisa dibaca instruktur.
+Contoh jawaban praktik **tidak ada di situs**. Ia disimpan di tabel `kunci_jawaban` (migrasi `0009`): Bagian A sebagai nomor bab 50 + bab (praktik bab 6 = baris 56) dan Bagian B sebagai 70 + bab (baris 76), hanya bisa dibaca instruktur.
 
 ## Menulis praktik sendiri
 
 1. Beri tanda `"praktik": true` pada mata kuliahnya di `site/data/matakuliah.json` (Python atau Java).
-2. Buat `site/data/kuliah/<mata kuliah>/praktik/index.json`: `{"bab": [1, 2, 4, ...]}`.
+2. Buat `site/data/kuliah/<mata kuliah>/praktik/index.json`: `{"bab": [1, 2, 4, ...], "bagianB": [4, 5]}` (`bagianB` hanya berisi bab yang punya Bagian B).
 3. Buat satu berkas per bab, `praktik/bab-NN.json`:
 
 ```json
@@ -57,6 +58,8 @@ Contoh jawaban praktik **tidak ada di situs**. Ia disimpan di tabel `kunci_jawab
 ```
 
 Praktik **Java** memakai satu berkas `Main.java` yang berisi kelas-kelas bantu dan `public class Main` (untuk Jalankan); kasus `kode` adalah badan method `main` kelas penguji `Uji` (tersedia `cek(syarat, pesan)`, `sama(diharapkan, nyata)`, `privat(Kelas.class, "atribut")`, `abstrak(Kelas.class)`) dan kasus `jalankan` selalu `"jalankan": "Main"`. Hanya sintaks Java 8 yang didukung penjalan di browser.
+
+Bagian B ditulis sebagai kolom `bagianB` di berkas bab yang sama, dengan kolom `judul`, `tujuan`, `langkah`, `berkas` (berbeda dari Bagian A), `masukanContoh`, `petunjuk`, `awal` (program dasar yang sudah jalan, **tanpa `____`**), dan `kasus`; jawabannya di `kunci/<mata kuliah>/praktik-NNb.py`. Kasus yang menguji keluaran program lengkap dengan "tidak boleh memuat" ditulis sebagai kasus `kode` yang menjalankan berkas dengan `runpy` (lihat `bab-04.json`).
 
 Aturan: satu berkas per praktik (`.py` atau `Main.java`); `awal` memuat tanda `____`; minimal dua petunjuk dan tiga kasus; kasus `jalankan` menjalankan berkas dengan `masukan` lalu memeriksa bahwa keluaran memuat semua teks di `memuat`; kasus `kode` dijalankan dengan `assert` setelah berkas peserta dimuat. Kasus `tersembunyi` hanya menyembunyikan rincian di layar peserta. **Jangan** menaruh kolom `contoh` (jawaban) di JSON: validator menolaknya.
 

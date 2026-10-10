@@ -27,7 +27,7 @@ export function pengakses(store, mk) {
       return { selesai: !!store.get(kunciDi(mk, "done", bab), false), mulai: !!store.get(kunciDi(mk, "started", bab), false) || tries > 0, kirim: tries, kode: k && !k.konsep && typeof k.kode === "string" ? k.kode : "", lulus: k ? !!k.lulus : null, kasus_lulus: k ? k.kasus_lulus : null, kasus_total: k ? k.kasus_total : null };
     },
     laporan: (bab) => store.get(kunciDi(mk, "laporan", bab), null),
-    praktik: (bab) => bacaPraktikLokal(store, mk, bab),
+    praktik: (bab, bagian = "A") => bacaPraktikLokal(store, mk, bab, bagian),
   };
 }
 
@@ -77,7 +77,7 @@ export async function kumpulkan({ kuliah, profil, uid, store = null }) {
   const defPraktik = new Map();
   for (const b of babPraktik) {
     const def = await muatPraktik(mk, b);
-    if (def) defPraktik.set(b, { judul: def.judul, berkas: def.berkas });
+    if (def) defPraktik.set(b, { judul: def.judul, berkas: def.berkas, bagianB: def.bagianB ? { berkas: def.bagianB.berkas } : null });
   }
   const barisAkhir = (akhirRows || []).find((r) => r.praktikum_id === PID_AKHIR) || null;
   let akhir;

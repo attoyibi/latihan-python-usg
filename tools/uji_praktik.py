@@ -58,7 +58,7 @@ def kasus(berkas, daftar):
     return jalankan(berkas, {"aksi": "kasus", "kasus": daftar})["kasus"]
 
 
-def periksa(p, nama, babs_materi, contoh):
+def periksa(p, nama, babs_materi, contoh, blanko=True):
     pre = nama + ": "
     b = p["berkas"]
     cek(pre + "punya bab, judul, tujuan, langkah, dan kasus", all(p.get(k) for k in ("bab", "judul", "tujuan", "langkah", "kasus")))
@@ -70,7 +70,10 @@ def periksa(p, nama, babs_materi, contoh):
     cek(pre + "kasus jalankan menunjuk berkas praktik ini", all(k.get("jalankan", b) == b for k in p["kasus"]))
     cek(pre + "ada kasus yang tidak tersembunyi", any(not k.get("tersembunyi") for k in p["kasus"]))
     cek(pre + "petunjuk sah dan bertahap (minimal dua)", len(p["petunjuk"]) >= 2 and all(h.get("jenis") in ("soal", "buku", "video") and h.get("isi") for h in p["petunjuk"]))
-    cek(pre + "kerangka memuat tanda ____", "____" in p["awal"])
+    if blanko:
+        cek(pre + "kerangka memuat tanda ____", "____" in p["awal"])
+    else:
+        cek(pre + "program dasar Bagian B berjalan tanpa tanda ____ (peserta menulis sendiri)", "____" not in p["awal"])
     cek(pre + "situs tidak memuat contoh jawaban (publik)", "contoh" not in p)
     cek(pre + "ukuran wajar", len(p["awal"]) <= 8000)
     if contoh is None:
@@ -108,6 +111,12 @@ def main():
         berkas_contoh = os.path.join(RAKAR, "kunci", kuliah, "praktik-%02d.py" % p["bab"])
         contoh = open(berkas_contoh, encoding="utf8").read() if os.path.exists(berkas_contoh) else None
         periksa(p, nama, babs_kode, contoh)
+        if "bagianB" in p:
+            bB = dict(p["bagianB"], bab=p["bab"])
+            cek(nama + ": Bagian B memakai berkas berbeda dari Bagian A dan tidak memuat contoh jawaban", bB["berkas"] != p["berkas"] and "contoh" not in p["bagianB"])
+            berkas_b = os.path.join(RAKAR, "kunci", kuliah, "praktik-%02db.py" % p["bab"])
+            contoh_b = open(berkas_b, encoding="utf8").read() if os.path.exists(berkas_b) else None
+            periksa(bB, nama + " (Bagian B)", babs_kode, contoh_b, blanko=False)
         per_kuliah.setdefault(kuliah, []).append(p["bab"])
     for idx in glob.glob(os.path.join(RAKAR, "site", "data", "kuliah", "*", "praktik", "index.json")):
         kuliah = os.path.basename(os.path.dirname(os.path.dirname(idx)))
@@ -115,6 +124,8 @@ def main():
             continue  # bukan Python (Java diuji tools/uji_praktik_java.mjs)
         data = json.load(open(idx, encoding="utf8"))
         cek(kuliah + "/praktik/index.json cocok dengan berkas bab-NN.json yang ada", sorted(data.get("bab", [])) == sorted(per_kuliah.get(kuliah, [])), (data, per_kuliah.get(kuliah)))
+        ada_b = sorted(b for b in per_kuliah.get(kuliah, []) if "bagianB" in json.load(open(os.path.join(RAKAR, "site", "data", "kuliah", kuliah, "praktik", "bab-%02d.json" % b), encoding="utf8")))
+        cek(kuliah + "/praktik/index.json: daftar bagianB cocok dengan berkas yang punya bagianB", sorted(data.get("bagianB", [])) == ada_b, (data.get("bagianB"), ada_b))
     print(("\n%d dari %d uji GAGAL." % (gagal, total)) if gagal else "\nSemua %d uji lulus." % total)
     sys.exit(1 if gagal else 0)
 

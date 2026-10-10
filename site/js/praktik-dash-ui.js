@@ -5,7 +5,7 @@ import { h } from "./dom.js";
 import * as Auth from "./auth.js";
 import { ambilSemua } from "./rekap.js";
 import { muatIndeks, muatPraktik, tabelBelumAda } from "./praktik-data.js";
-import { rekapPraktik, csvPraktik, idPraktik, KODE_SEL, TAHAP } from "./praktik.js";
+import { rekapPraktik, csvPraktik, idPraktik, KODE_SEL } from "./praktik.js";
 
 let cache = null; // { cid, tahap }
 const ui = { kelas: "", lihat: null };
@@ -25,7 +25,7 @@ const waktu = (iso) => {
 
 async function muat(cid) {
   if (cache && cache.cid === cid) return cache;
-  const tahap = await ambilSemua(() => Auth.getClient().from("praktikum_tahap").select("*").eq("matakuliah_id", cid).eq("tahap_id", TAHAP).order("user_id"));
+  const tahap = await ambilSemua(() => Auth.getClient().from("praktikum_tahap").select("*").eq("matakuliah_id", cid).order("user_id"));
   cache = { cid, tahap };
   return cache;
 }
@@ -44,6 +44,7 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
   }
   const babsSet = await muatIndeks(kuliah.id, kuliah.praktik === true);
   const babs = [...babsSet].sort((a, b) => a - b);
+  const denganB = babsSet.denganB || new Set();
   if (!babs.length) {
     kartu(h("p", { class: "muted" }, "Mata kuliah ini belum punya praktik. Praktik berupa berkas JSON per bab di site/data/kuliah/" + kuliah.id + "/praktik/ (lihat docs/PRAKTIK.md); begitu ada, tab ini terisi sendiri."));
     return;
@@ -64,13 +65,13 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
     ulang();
   });
   const tersaring = ui.kelas ? peserta.filter((p) => p.kelas === ui.kelas) : peserta;
-  const rekap = rekapPraktik({ peserta: tersaring.slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama), "id")), tahap: data.tahap, babs });
+  const rekap = rekapPraktik({ peserta: tersaring.slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama), "id")), tahap: data.tahap, babs, denganB });
 
   const ringkas = h(
     "section",
     { class: "card" },
     h("h3", {}, "Praktik per bab"),
-    h("p", { class: "muted" }, "Praktik wajib untuk melengkapi bab, dikerjakan di kelas atau sesudahnya, dan tidak terkunci. Kolom ◐ berarti sudah mulai tetapi belum lulus."),
+    h("p", { class: "muted" }, "Praktik wajib untuk melengkapi bab, dikerjakan di kelas atau sesudahnya, dan tidak terkunci. ◐ berarti sudah mulai tetapi belum lulus. Bab yang punya Bagian B (kembangkan) baru ✓ bila Bagian A dan B sama-sama lulus."),
     h("div", { class: "filters" }, h("label", {}, "Kelas ", kelasSel), h("button", { type: "button", class: "btn btn-sm", onclick: () => unduh("praktik-" + kuliah.id + ".csv", csvPraktik(rekap, babs)) }, "Unduh CSV")),
     h("div", { class: "d-stats" }, stat(rekap.baris.length, "peserta"), stat(rekap.mulai, "sudah mulai"), stat(rekap.baris.length - rekap.mulai, "belum mulai"), stat(rekap.selesai, "lulus semua praktik"))
   );
@@ -83,8 +84,8 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
     h("h3", {}, "Per bab"),
     h("p", { class: "muted" }, "Bab dengan banyak peserta 'sedang' dan rata-rata kirim tinggi biasanya yang perlu dibahas di kelas."),
     h("div", { class: "tablewrap" }, h("table", { class: "rekap" },
-      h("thead", {}, h("tr", {}, ["Bab", "Lulus", "Sedang", "Rata-rata kirim"].map((t) => h("th", { scope: "col" }, t)))),
-      h("tbody", {}, rekap.perBab.map((t) => h("tr", {}, h("td", {}, t.bab + ". " + (judulBab.get(t.bab) || "")), h("td", {}, String(t.lulus)), h("td", { style: t.sedang === maksMacet && t.sedang > 0 ? "font-weight:700" : "" }, String(t.sedang)), h("td", {}, t.kirimRata ? String(t.kirimRata) : "-")))))
+      h("thead", {}, h("tr", {}, ["Bab", "Lulus", "Sedang", "Bagian A lulus", "Bagian B lulus", "Rata-rata kirim"].map((t) => h("th", { scope: "col" }, t)))),
+      h("tbody", {}, rekap.perBab.map((t) => h("tr", {}, h("td", {}, t.bab + ". " + (judulBab.get(t.bab) || "")), h("td", {}, String(t.lulus)), h("td", { style: t.sedang === maksMacet && t.sedang > 0 ? "font-weight:700" : "" }, String(t.sedang)), h("td", {}, String(t.aLulus)), h("td", {}, t.adaB ? String(t.bLulus) : "-"), h("td", {}, t.kirimRata ? String(t.kirimRata) : "-")))))
     )
   );
 
@@ -117,7 +118,8 @@ export async function render({ main, kepala, kuliah, unduh, peserta }) {
         babs.map((b) => {
           const sel = x.sel[b];
           const isi = sel.kode === "belum" ? LAMBANG.belum : h("button", { type: "button", class: "btn btn-sm", "aria-label": "Lihat kode praktik bab " + b + " milik " + x.peserta.nama, onclick: () => lihat(x, b) }, LAMBANG[sel.kode]);
-          return h("td", { class: "sel " + (sel.kode === "lulus" ? "selesai-langsung" : sel.kode), title: "Bab " + b + ": " + KODE_SEL[sel.kode] + (sel.kirim ? ", " + sel.kirim + " kirim" : "") }, isi, sel.kirim ? h("small", {}, String(sel.kirim)) : null);
+          const ab = sel.b !== null ? "A" + LAMBANG[sel.a] + " B" + LAMBANG[sel.b] : null;
+          return h("td", { class: "sel " + (sel.kode === "lulus" ? "selesai-langsung" : sel.kode), title: "Bab " + b + ": " + KODE_SEL[sel.kode] + (ab ? " (" + ab + ")" : "") + (sel.kirim ? ", " + sel.kirim + " kirim" : "") }, isi, ab ? h("small", {}, ab) : sel.kirim ? h("small", {}, String(sel.kirim)) : null);
         }),
         h("td", {}, x.lulus + "/" + babs.length),
         h("td", {}, String(x.kirim)),
