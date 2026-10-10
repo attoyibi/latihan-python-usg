@@ -423,6 +423,6 @@ Catatan: bagian ini dibangun di atas ruang praktikum lama yang sudah dihapus. La
 ## Praktik: Bagian A dan B
 
 - [x] Kartu praktik dua bagian: A terbimbing, B kembangkan (program dasar yang sudah jalan, tanpa `____`); titik hijau hanya bila A dan B lulus (tanpa migrasi: `p01` dan `p02`)
-- [x] Bagian B untuk Algoritma bab 4, 5, dan 6; jawabannya di `kunci/` dan `kunci_jawaban` nomor 70 + bab; validator dan uji Python memeriksanya
+- [x] Bagian B untuk semua bab berpraktik: Algoritma 13 bab (Python) dan PBO 11 bab (Java, `MainB.java`); jawabannya di `kunci/` dan `kunci_jawaban` nomor 70 + bab; validator, uji Python, dan uji JVM memeriksanya
 - [x] Laporan bab, laporan akhir, dan dashboard dosen memuat kode dan status A dan B
-- [ ] Bagian B untuk bab lain dan untuk PBO; kesetaraan kesulitan dengan Tantangan perlu dilihat dari kelas
+- [ ] Kesetaraan kesulitan Bagian B dengan Tantangan perlu dilihat dari kelas (waktu pengerjaan dan banyaknya yang tersangkut)

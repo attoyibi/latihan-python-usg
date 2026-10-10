@@ -75,5 +75,92 @@
    ],
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Rekap nilai dari teks",
+  "tujuan": "Memperluas program yang mengolah teks dan list bersarang: merapikan nama, melewati baris rusak, mengurutkan, dan menghitung ringkasan.",
+  "berkas": "rekap.py",
+  "masukanContoh": "3\nandi:80\n  BUDI : 90\ncitra:70",
+  "langkah": [
+   "rekap.py membaca n baris berformat nama:nilai ke dalam list bersarang dan mencetak tiap baris. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Rapikan nama menjadi format judul tanpa spasi berlebih (mis.  BUDI  menjadi Budi).",
+   "Baris yang tidak memuat tanda : tidak boleh membuat program berhenti: cetak Baris tidak valid: <teks baris> dan lewati.",
+   "Cetak data dari nilai tertinggi ke terendah (nilai sama: urutan masuk dipertahankan). Setelahnya cetak Tertinggi: Nama (nilai) dan Rata-rata: ... (dua angka di belakang koma), dihitung dari baris yang sah saja.",
+   "Bila tidak ada baris yang sah, cetak hanya Tidak ada data. Coba dengan masukan di kolom contoh, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "baris.split(\":\") memecah teks; if \":\" not in baris untuk memeriksa. Untuk mengurutkan list bersarang menurun: sorted(data, key=lambda d: d[1], reverse=True) (sorted stabil), atau ambil nilai terbesar berulang kali dengan perulangan."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 7: list bersarang, split, strip, title, dan menjalani list di dalam list."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Kumpulkan hanya baris yang sah ke data. Rata-rata = jumlah nilai dibagi len(data), dicetak dengan f\"{rata:.2f}\"."
+   }
+  ],
+  "awal": "# rekap.py\nn = int(input())\ndata = []\nfor i in range(n):\n    nama, nilai = input().split(\":\")\n    data.append([nama.strip(), int(nilai)])\n\nfor nama, nilai in data:\n    print(f\"{nama}: {nilai}\")\n",
+  "kasus": [
+   {
+    "nama": "tiga baris rapi dan terurut",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Budi: 90' in k, 'keluaran harus memuat ' + 'Budi: 90' + ', keluarannya: ' + repr(k)\nassert 'Andi: 80' in k, 'keluaran harus memuat ' + 'Andi: 80' + ', keluarannya: ' + repr(k)\nassert 'Citra: 70' in k, 'keluaran harus memuat ' + 'Citra: 70' + ', keluarannya: ' + repr(k)\nassert 'Tertinggi: Budi (90)' in k, 'keluaran harus memuat ' + 'Tertinggi: Budi (90)' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 80.00' in k, 'keluaran harus memuat ' + 'Rata-rata: 80.00' + ', keluarannya: ' + repr(k)\nassert 'tidak valid' not in k, 'keluaran tidak boleh memuat ' + 'tidak valid' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "3",
+     "andi:80",
+     "  BUDI : 90",
+     "citra:70"
+    ]
+   },
+   {
+    "nama": "urutan menurun",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert k.index('Budi: 90') < k.index('Andi: 80') < k.index('Citra: 70'), 'data harus terurut dari nilai tertinggi: ' + repr(k)",
+    "masukan": [
+     "3",
+     "andi:80",
+     "  BUDI : 90",
+     "citra:70"
+    ]
+   },
+   {
+    "nama": "baris rusak dilewati",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Baris tidak valid: xyz' in k, 'keluaran harus memuat ' + 'Baris tidak valid: xyz' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 70.00' in k, 'keluaran harus memuat ' + 'Rata-rata: 70.00' + ', keluarannya: ' + repr(k)\nassert 'Tertinggi: Andi (80)' in k, 'keluaran harus memuat ' + 'Tertinggi: Andi (80)' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "3",
+     "andi:80",
+     "xyz",
+     "budi:60"
+    ]
+   },
+   {
+    "nama": "semua baris rusak",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Baris tidak valid: abc' in k, 'keluaran harus memuat ' + 'Baris tidak valid: abc' + ', keluarannya: ' + repr(k)\nassert 'Baris tidak valid: def' in k, 'keluaran harus memuat ' + 'Baris tidak valid: def' + ', keluarannya: ' + repr(k)\nassert 'Tidak ada data' in k, 'keluaran harus memuat ' + 'Tidak ada data' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata' not in k, 'keluaran tidak boleh memuat ' + 'Rata-rata' + ', keluarannya: ' + repr(k)\nassert 'Tertinggi' not in k, 'keluaran tidak boleh memuat ' + 'Tertinggi' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "2",
+     "abc",
+     "def"
+    ]
+   },
+   {
+    "nama": "tanpa baris",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Tidak ada data' in k, 'keluaran harus memuat ' + 'Tidak ada data' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata' not in k, 'keluaran tidak boleh memuat ' + 'Rata-rata' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "0"
+    ]
+   },
+   {
+    "nama": "nilai sama: urutan masuk dipertahankan (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('rekap.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Tertinggi: Z (70)' in k, 'keluaran harus memuat ' + 'Tertinggi: Z (70)' + ', keluarannya: ' + repr(k)\nassert 'Rata-rata: 56.67' in k, 'keluaran harus memuat ' + 'Rata-rata: 56.67' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "3",
+     "x:50",
+     "y:50",
+     "z:70"
+    ],
+    "tersembunyi": true
+   }
+  ]
+ }
 }

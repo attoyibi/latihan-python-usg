@@ -52,5 +52,66 @@
     "Angka: -1"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Eksepsi: penarikan bank",
+  "tujuan": "Menulis eksepsi buatan sendiri yang membawa data, melempar eksepsi berbeda untuk kasus berbeda, dan memakai blok finally.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya UmurTidakValidException dan Validator sebagai contoh pola. Kamu menambah yang baru; tidak ada ____ di sini.",
+   "Tambahkan eksepsi SaldoKurangException (turunan Exception) dengan constructor SaldoKurangException(int kurang), pesan Saldo kurang Rp<kurang>, dan method int getKurang().",
+   "Tambahkan kelas Bank dengan static int tarik(int saldo, int jumlah) throws SaldoKurangException: kembalikan saldo baru. Bila jumlah 0 atau negatif, lempar IllegalArgumentException dengan pesan Jumlah harus positif. Bila jumlah melebihi saldo, lempar SaldoKurangException dengan kurang = jumlah - saldo.",
+   "Tambahkan atribut static int percobaan di Bank yang naik satu setiap tarik dipanggil, apa pun hasilnya (taruh di blok finally).",
+   "Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Eksepsi buatan sendiri dengan data: simpan kurang di atribut, panggil super(\"Saldo kurang Rp\" + kurang). Blok finally selalu dijalankan, bahkan setelah throw atau return."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 8: throw, throws, checked dan unchecked exception, serta finally."
+   },
+   {
+    "jenis": "soal",
+    "isi": "try { ... periksa dan return ... } finally { percobaan++; }"
+   }
+  ],
+  "awal": "// MainB.java\nclass UmurTidakValidException extends Exception {\n    UmurTidakValidException(String pesan) {\n        super(pesan);\n    }\n}\n\nclass Validator {\n    static int cekUmur(int umur) throws UmurTidakValidException {\n        if (umur < 0 || umur > 150) {\n            throw new UmurTidakValidException(\"Umur tidak valid: \" + umur);\n        }\n        return umur;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        try {\n            System.out.println(\"Umur sah: \" + Validator.cekUmur(20));\n            Validator.cekUmur(200);\n        } catch (UmurTidakValidException e) {\n            System.out.println(e.getMessage());\n        }\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "penarikan berhasil",
+    "kode": "sama(700, Bank.tarik(1000, 300));\nsama(0, Bank.tarik(500, 500));"
+   },
+   {
+    "nama": "saldo kurang membawa selisih",
+    "kode": "try {\n    Bank.tarik(100, 250);\n    cek(false, \"harus melempar SaldoKurangException\");\n} catch (SaldoKurangException e) {\n    sama(150, e.getKurang());\n    sama(\"Saldo kurang Rp150\", e.getMessage());\n}"
+   },
+   {
+    "nama": "jumlah tidak positif melempar eksepsi lain",
+    "kode": "try {\n    Bank.tarik(100, 0);\n    cek(false, \"jumlah 0 harus melempar IllegalArgumentException\");\n} catch (IllegalArgumentException e) {\n    sama(\"Jumlah harus positif\", e.getMessage());\n}\ntry {\n    Bank.tarik(100, -5);\n    cek(false, \"jumlah negatif harus melempar IllegalArgumentException\");\n} catch (IllegalArgumentException e) {\n}"
+   },
+   {
+    "nama": "percobaan dihitung walau gagal",
+    "kode": "int awal = Bank.percobaan;\nBank.tarik(1000, 100);\ntry { Bank.tarik(10, 100); } catch (SaldoKurangException e) { }\ntry { Bank.tarik(10, -1); } catch (IllegalArgumentException e) { }\nsama(awal + 3, Bank.percobaan);"
+   },
+   {
+    "nama": "program menangkap eksepsi",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Sisa: 700",
+     "Saldo kurang Rp150 (kurang 150)",
+     "Percobaan: 2"
+    ]
+   },
+   {
+    "nama": "eksepsi lama tetap bekerja (tersembunyi)",
+    "kode": "sama(20, Validator.cekUmur(20));\ntry {\n    Validator.cekUmur(151);\n    cek(false, \"harus melempar\");\n} catch (UmurTidakValidException e) {\n}",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

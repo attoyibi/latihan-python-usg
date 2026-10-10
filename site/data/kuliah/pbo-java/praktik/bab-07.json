@@ -51,5 +51,70 @@
     "Total: 12500"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Abstraksi: nama cara bayar dan kartu",
+  "tujuan": "Menambah method abstrak ke kelas abstrak, mengimplementasikannya di semua turunan, dan menulis turunan baru dengan aturan sendiri.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya kelas abstrak Pembayaran, Tunai, dan Transfer. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan method abstrak String nama() di Pembayaran, lalu implementasikan di Tunai (Tunai) dan Transfer (Transfer).",
+   "Tambahkan di Pembayaran method biasa String struk(int tagihan) yang menghasilkan nama(), tanda titik dua dan spasi, lalu total(tagihan), mis. Tunai: 10000.",
+   "Tambahkan kelas Kartu yang mewarisi Pembayaran: namanya Kartu dan biayanya 2 persen dari tagihan (pembagian bulat), tetapi paling sedikit 1000.",
+   "Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Menambah method abstrak membuat semua turunan wajib mengimplementasikannya; kompilator akan memberi tahu yang terlewat. Biaya kartu: Math.max(1000, tagihan * 2 / 100)."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 7: abstract class, method abstrak, dan method biasa yang memakai method abstrak."
+   },
+   {
+    "jenis": "soal",
+    "isi": "String struk(int tagihan) { return nama() + \": \" + total(tagihan); }"
+   }
+  ],
+  "awal": "// MainB.java\nabstract class Pembayaran {\n    abstract int biaya(int tagihan);\n\n    int total(int tagihan) {\n        return tagihan + biaya(tagihan);\n    }\n}\n\nclass Tunai extends Pembayaran {\n    @Override\n    int biaya(int tagihan) {\n        return 0;\n    }\n}\n\nclass Transfer extends Pembayaran {\n    @Override\n    int biaya(int tagihan) {\n        return 2500;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Pembayaran[] cara = { new Tunai(), new Transfer() };\n        for (Pembayaran p : cara) {\n            System.out.println(\"Total: \" + p.total(10000));\n        }\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "Pembayaran tetap abstrak",
+    "kode": "cek(abstrak(Pembayaran.class), \"Pembayaran harus abstract\");"
+   },
+   {
+    "nama": "nama tiap cara bayar",
+    "kode": "sama(\"Tunai\", new Tunai().nama());\nsama(\"Transfer\", new Transfer().nama());\nsama(\"Kartu\", new Kartu().nama());"
+   },
+   {
+    "nama": "struk",
+    "kode": "sama(\"Tunai: 10000\", new Tunai().struk(10000));\nsama(\"Transfer: 12500\", new Transfer().struk(10000));"
+   },
+   {
+    "nama": "biaya kartu dengan batas minimum",
+    "kode": "sama(1000, new Kartu().biaya(10000));\nsama(2000, new Kartu().biaya(100000));\nsama(1000, new Kartu().biaya(0));"
+   },
+   {
+    "nama": "dipakai lewat tipe abstrak",
+    "kode": "Pembayaran p = new Kartu();\nsama(\"Kartu: 11000\", p.struk(10000));"
+   },
+   {
+    "nama": "program mencetak tiga struk",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Tunai: 10000",
+     "Transfer: 12500",
+     "Kartu: 11000"
+    ]
+   },
+   {
+    "nama": "batas persis di 50000 (tersembunyi)",
+    "kode": "sama(1000, new Kartu().biaya(50000));\nsama(1020, new Kartu().biaya(51000));",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -54,5 +54,65 @@
    "kode": "from cari import cari_biner\nd = [1, 3, 5, 7, 9, 11]\nfor i, v in enumerate(d):\n    assert cari_biner(d, v) == i",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Pencarian lanjutan",
+  "tujuan": "Memperluas pencarian: menemukan semua kemunculan, kemunculan paling kiri dengan pencarian biner, dan nilai terdekat.",
+  "berkas": "pencarian.py",
+  "masukanContoh": "",
+  "langkah": [
+   "pencarian.py sudah punya cari_linear. Kamu menambah tiga fungsi; tidak ada ____ di sini.",
+   "cari_semua(daftar, target): list semua indeks tempat target muncul (list kosong bila tidak ada).",
+   "cari_kiri(terurut, target): indeks KEMUNCULAN PERTAMA target pada list terurut yang boleh memuat nilai kembar, atau -1. Pakai pencarian biner.",
+   "terdekat(terurut, target): nilai pada list terurut yang paling dekat dengan target (bila sama jauh, ambil yang lebih kecil), atau None bila list kosong.",
+   "Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Untuk cari_kiri: saat daftar[tengah] == target, jangan berhenti; simpan tengah sebagai kandidat lalu terus ke kiri (kanan = tengah - 1)."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 12: linear search, binary search, dan variasinya pada nilai kembar."
+   },
+   {
+    "jenis": "soal",
+    "isi": "terdekat: dengan pencarian biner, pada akhir kiri dan kanan berdampingan; bandingkan jarak kedua tetangga itu ke target."
+   }
+  ],
+  "awal": "# pencarian.py\n\ndef cari_linear(daftar, target):\n    for i in range(len(daftar)):\n        if daftar[i] == target:\n            return i\n    return -1\n",
+  "kasus": [
+   {
+    "nama": "semua kemunculan",
+    "kode": "from pencarian import cari_semua\nassert cari_semua([3, 1, 3, 2, 3], 3) == [0, 2, 4]\nassert cari_semua([1, 2], 9) == []\nassert cari_semua([], 1) == []"
+   },
+   {
+    "nama": "kemunculan pertama pada nilai kembar",
+    "kode": "from pencarian import cari_kiri\nassert cari_kiri([1, 2, 2, 2, 3], 2) == 1\nassert cari_kiri([5, 5, 5, 5], 5) == 0"
+   },
+   {
+    "nama": "cari kiri bila ada satu atau tidak ada",
+    "kode": "from pencarian import cari_kiri\nassert cari_kiri([1, 3, 5, 7], 5) == 2\nassert cari_kiri([1, 3, 5, 7], 4) == -1\nassert cari_kiri([], 1) == -1"
+   },
+   {
+    "nama": "nilai terdekat",
+    "kode": "from pencarian import terdekat\nassert terdekat([1, 5, 9, 14], 8) == 9\nassert terdekat([1, 5, 9, 14], 6) == 5\nassert terdekat([1, 5, 9, 14], 100) == 14\nassert terdekat([1, 5, 9, 14], -3) == 1"
+   },
+   {
+    "nama": "terdekat bila sama jauh ambil yang lebih kecil",
+    "kode": "from pencarian import terdekat\nassert terdekat([2, 6], 4) == 2\nassert terdekat([7], 3) == 7"
+   },
+   {
+    "nama": "terdekat pada list kosong dan nilai tepat (tersembunyi)",
+    "kode": "from pencarian import terdekat\nassert terdekat([], 3) is None\nassert terdekat([1, 5, 9], 5) == 5",
+    "tersembunyi": true
+   },
+   {
+    "nama": "cari kiri pada list besar (tersembunyi)",
+    "kode": "from pencarian import cari_kiri\nd = [i // 3 for i in range(3000)]\nassert cari_kiri(d, 500) == 1500\nassert cari_kiri(d, 999) == 2997",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -51,5 +51,64 @@
    "kode": "sama(0, new Produk(\"X\", 999).totalBayar(0));",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Produk dengan diskon dan penghitung",
+  "tujuan": "Memperluas kelas dengan constructor tambahan, atribut static sebagai penghitung, method yang mengembalikan objek baru, dan toString.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya kelas Produk (nama, harga, totalBayar). Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan constructor Produk(String nama) yang menetapkan harga 0 (panggil constructor yang sudah ada dengan this(...)).",
+   "Tambahkan atribut static int jumlah yang naik satu setiap objek Produk dibuat, apa pun constructor yang dipakai.",
+   "Tambahkan Produk diskon(int persen) yang mengembalikan objek Produk BARU dengan nama sama dan harga dipotong persen (harga * (100 - persen) / 100, bilangan bulat). Objek aslinya tidak boleh berubah.",
+   "Tambahkan toString() yang menghasilkan Nama (Rp harga), mis. Keripik (Rp10000). Tekan Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "this(nama, 0); memanggil constructor lain di kelas yang sama. Atribut static dimiliki kelas, bukan objek: static int jumlah = 0; lalu jumlah++ di constructor yang utama saja (constructor yang memanggil this(...) sudah ikut terhitung)."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 2: constructor, this, overloading constructor, dan atribut static."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Produk diskon(int persen) { return new Produk(nama, harga * (100 - persen) / 100); }"
+   }
+  ],
+  "awal": "// MainB.java\nclass Produk {\n    String nama;\n    int harga;\n\n    Produk(String nama, int harga) {\n        this.nama = nama;\n        this.harga = harga;\n    }\n\n    int totalBayar(int jumlah) {\n        return harga * jumlah;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Produk p = new Produk(\"Keripik\", 10000);\n        System.out.println(p.nama + \" x5 = \" + p.totalBayar(5));\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "constructor dengan nama saja",
+    "kode": "Produk p = new Produk(\"Dodol\");\nsama(\"Dodol\", p.nama);\nsama(0, p.harga);"
+   },
+   {
+    "nama": "penghitung objek",
+    "kode": "int awal = Produk.jumlah;\nnew Produk(\"A\", 100);\nnew Produk(\"B\");\nsama(awal + 2, Produk.jumlah);"
+   },
+   {
+    "nama": "diskon mengembalikan objek baru",
+    "kode": "Produk asli = new Produk(\"Keripik\", 10000);\nProduk murah = asli.diskon(10);\nsama(9000, murah.harga);\nsama(\"Keripik\", murah.nama);\nsama(10000, asli.harga);\ncek(murah != asli, \"diskon harus mengembalikan objek baru\");"
+   },
+   {
+    "nama": "teks objek",
+    "kode": "sama(\"Keripik (Rp10000)\", new Produk(\"Keripik\", 10000).toString());\nsama(\"Dodol (Rp0)\", \"\" + new Produk(\"Dodol\"));"
+   },
+   {
+    "nama": "program mencetak produk berdiskon",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Keripik (Rp9000)"
+    ]
+   },
+   {
+    "nama": "diskon penuh dan nol (tersembunyi)",
+    "kode": "sama(0, new Produk(\"X\", 500).diskon(100).harga);\nsama(500, new Produk(\"X\", 500).diskon(0).harga);",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

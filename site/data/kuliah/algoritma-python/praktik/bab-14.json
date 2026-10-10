@@ -51,5 +51,65 @@
    "kode": "from rekursi import faktorial, jumlah_sampai\nassert faktorial(10) == 3628800\nassert jumlah_sampai(100) == 5050",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Rekursi: Fibonacci, pangkat, dan balik teks",
+  "tujuan": "Memperluas modul rekursi: beberapa fungsi rekursif dengan kasus dasar masing-masing, termasuk penanganan masukan yang tidak sah.",
+  "berkas": "rekursi_lanjut.py",
+  "masukanContoh": "",
+  "langkah": [
+   "rekursi_lanjut.py sudah punya faktorial rekursif. Kamu menambah tiga fungsi rekursif; tidak ada ____ di sini.",
+   "fibonacci(n): fibonacci(0) = 0, fibonacci(1) = 1, dan seterusnya jumlah dua suku sebelumnya. Untuk n negatif, lempar ValueError.",
+   "pangkat(a, n): a pangkat n untuk n bulat 0 atau lebih (pangkat(a, 0) = 1), secara rekursif. Untuk n negatif, lempar ValueError.",
+   "balik(teks): teks dibalik urutannya secara rekursif (tanpa irisan [::-1]). balik(\"\") adalah \"\".",
+   "Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Pikirkan kasus dasar tiap fungsi dulu: fibonacci(0) dan fibonacci(1); pangkat(a, 0); balik(\"\"). Lalu langkah rekursif yang mengecilkan masukan. Untuk galat: raise ValueError(\"pesan\")."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 14: kasus dasar, langkah rekursif, dan menjaga masukan tidak sah."
+   },
+   {
+    "jenis": "soal",
+    "isi": "balik(teks) = balik(teks[1:]) + teks[0] untuk teks tidak kosong. pangkat(a, n) = a * pangkat(a, n - 1)."
+   }
+  ],
+  "awal": "# rekursi_lanjut.py\n\ndef faktorial(n):\n    if n <= 1:\n        return 1\n    return n * faktorial(n - 1)\n",
+  "kasus": [
+   {
+    "nama": "fibonacci",
+    "kode": "from rekursi_lanjut import fibonacci\nassert [fibonacci(i) for i in range(8)] == [0, 1, 1, 2, 3, 5, 8, 13]\nassert fibonacci(20) == 6765"
+   },
+   {
+    "nama": "fibonacci negatif",
+    "kode": "from rekursi_lanjut import fibonacci\ntry:\n    fibonacci(-1)\n    assert False, 'harus melempar ValueError'\nexcept ValueError:\n    pass"
+   },
+   {
+    "nama": "pangkat",
+    "kode": "from rekursi_lanjut import pangkat\nassert pangkat(2, 10) == 1024\nassert pangkat(5, 0) == 1\nassert pangkat(0, 3) == 0\nassert pangkat(-2, 3) == -8"
+   },
+   {
+    "nama": "pangkat negatif",
+    "kode": "from rekursi_lanjut import pangkat\ntry:\n    pangkat(2, -1)\n    assert False, 'harus melempar ValueError'\nexcept ValueError:\n    pass"
+   },
+   {
+    "nama": "balik teks",
+    "kode": "from rekursi_lanjut import balik\nassert balik('abc') == 'cba'\nassert balik('') == ''\nassert balik('a') == 'a'\nassert balik('Gresik') == 'kiserG'"
+   },
+   {
+    "nama": "faktorial tetap bekerja (tersembunyi)",
+    "kode": "from rekursi_lanjut import faktorial\nassert faktorial(5) == 120",
+    "tersembunyi": true
+   },
+   {
+    "nama": "balik tanpa irisan terbalik (tersembunyi)",
+    "kode": "import inspect, rekursi_lanjut\nassert '[::-1]' not in inspect.getsource(rekursi_lanjut.balik), 'balik tidak boleh memakai [::-1]'\nassert rekursi_lanjut.balik('xyz') == 'zyx'",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

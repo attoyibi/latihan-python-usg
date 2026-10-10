@@ -65,6 +65,7 @@ for (const k of readdirSync(dir)) {
   const indeks = JSON.parse(readFileSync(join(pd, "index.json"), "utf8"));
   const berkasBab = readdirSync(pd).filter((f) => /^bab-\d\d\.json$/.test(f));
   cek(k + "/praktik/index.json cocok dengan berkas bab-NN.json", JSON.stringify([...indeks.bab].sort((a, b) => a - b)) === JSON.stringify(berkasBab.map((f) => Number(f.slice(4, 6))).sort((a, b) => a - b)));
+  cek(k + "/praktik/index.json: daftar bagianB cocok dengan berkas yang punya bagianB", JSON.stringify([...(indeks.bagianB || [])].sort((a, b) => a - b)) === JSON.stringify(berkasBab.filter((f) => "bagianB" in JSON.parse(readFileSync(join(pd, f), "utf8"))).map((f) => Number(f.slice(4, 6))).sort((a, b) => a - b)));
   for (const f of berkasBab) {
     ada++;
     const p = JSON.parse(readFileSync(join(pd, f), "utf8"));
@@ -93,6 +94,27 @@ for (const k of readdirSync(dir)) {
     cek(pre + "kerangka awal paling banyak separuh kasus lulus", hAwal.filter((h) => h.lulus).length <= Math.floor(hAwal.length / 2), hAwal.filter((h) => h.lulus).map((h) => h.nama));
     const hKosong = kasus({}, p.kasus);
     cek(pre + "tanpa berkas, kasus tidak lulus semua", hKosong.some((h) => !h.lulus));
+    if (p.bagianB) {
+      const bb = p.bagianB;
+      const preB = nama + " (Bagian B): ";
+      cek(preB + "berkas MainB.java, berbeda dari Bagian A, program dasar tanpa ____, tanpa contoh jawaban", bb.berkas === "MainB.java" && bb.berkas !== p.berkas && !bb.awal.includes("____") && !("contoh" in bb));
+      const nmB = bb.kasus.map((x) => x.nama);
+      cek(preB + "nama kasus unik, minimal tiga, ada yang tidak tersembunyi, dan jalankan selalu MainB", new Set(nmB).size === nmB.length && nmB.length >= 3 && bb.kasus.some((x) => !x.tersembunyi) && bb.kasus.every((x) => ("kode" in x) !== ("jalankan" in x) && (!x.jalankan || x.jalankan === "MainB")), nmB);
+      cek(preB + "petunjuk sah dan minimal dua, langkah tidak kosong", bb.petunjuk.length >= 2 && bb.petunjuk.every((h) => ["soal", "buku", "video"].includes(h.jenis) && h.isi) && bb.langkah.length > 0);
+      const kunciB = join(root, "kunci", k, "praktik-" + String(p.bab).padStart(2, "0") + "b.java");
+      if (existsSync(kunciB)) {
+        const contohB = readFileSync(kunciB, "utf8");
+        cek(preB + "contoh tidak memuat tanda ____", !contohB.includes("____"));
+        const hasilB = kasus({ "MainB.java": contohB }, bb.kasus);
+        cek(preB + "contoh jawaban meluluskan semua " + bb.kasus.length + " kasus", hasilB.every((h) => h.lulus), hasilB.filter((h) => !h.lulus).map((h) => h.nama + " -> " + h.pesan));
+        const rB = jalankan({ "MainB.java": contohB }, "MainB.java");
+        cek(preB + "contoh berjalan tanpa galat dan mencetak sesuatu", rB.galat === null && rB.keluaran.trim() !== "", rB);
+      } else console.log("LEWAT " + preB + "contoh jawaban (kunci/ tidak ada di komputer ini)");
+      const hAwalB = kasus({ "MainB.java": bb.awal }, bb.kasus);
+      cek(preB + "program dasar tidak meluluskan semua kasus", hAwalB.some((h) => !h.lulus));
+      cek(preB + "program dasar paling banyak separuh kasus lulus", hAwalB.filter((h) => h.lulus).length <= Math.floor(hAwalB.length / 2), hAwalB.filter((h) => h.lulus).map((h) => h.nama));
+      cek(preB + "tanpa berkas, kasus tidak lulus semua", kasus({}, bb.kasus).some((h) => !h.lulus));
+    }
   }
 }
 cek("ada minimal satu praktik Java untuk diuji", ada >= 1);

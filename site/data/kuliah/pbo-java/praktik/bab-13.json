@@ -47,5 +47,63 @@
     "SMS: Halo"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "SOLID: penyiar ke banyak pengirim",
+  "tujuan": "Menulis kelas yang terbuka untuk penambahan tetapi tertutup untuk perubahan (open-closed) dengan bergantung hanya pada interface.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya interface Pengirim, EmailPengirim, SmsPengirim, dan Notifikasi. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan PushPengirim yang mengimplementasikan Pengirim: kirim(pesan) menghasilkan Push: <pesan>.",
+   "Tambahkan kelas Penyiar tanpa argumen constructor, dengan void tambah(Pengirim p), int jumlahPengirim(), dan List<String> siarkan(String pesan) yang memanggil kirim pada SEMUA pengirim berurutan sesuai penambahan dan mengembalikan hasilnya sebagai list.",
+   "Penyiar tidak boleh tahu jenis pengirim aslinya (tanpa instanceof atau nama kelas konkret). Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Simpan pengirim di List<Pengirim>. siarkan menjalani list itu dan menambahkan hasil kirim(pesan) ke list hasil. Pengirim baru ditambahkan dari luar tanpa menyentuh Penyiar."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 13: open-closed principle, dependency inversion, dan program ke interface."
+   },
+   {
+    "jenis": "soal",
+    "isi": "for (Pengirim p : daftar) { hasil.add(p.kirim(pesan)); }"
+   }
+  ],
+  "awal": "// MainB.java\nimport java.util.*;\n\ninterface Pengirim {\n    String kirim(String pesan);\n}\n\nclass EmailPengirim implements Pengirim {\n    public String kirim(String pesan) {\n        return \"Email: \" + pesan;\n    }\n}\n\nclass SmsPengirim implements Pengirim {\n    public String kirim(String pesan) {\n        return \"SMS: \" + pesan;\n    }\n}\n\nclass Notifikasi {\n    private Pengirim pengirim;\n\n    Notifikasi(Pengirim pengirim) {\n        this.pengirim = pengirim;\n    }\n\n    String beri(String pesan) {\n        return pengirim.kirim(pesan);\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        System.out.println(new Notifikasi(new EmailPengirim()).beri(\"Halo\"));\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "pengirim push",
+    "kode": "sama(\"Push: Hai\", new PushPengirim().kirim(\"Hai\"));"
+   },
+   {
+    "nama": "siarkan ke semua pengirim berurutan",
+    "kode": "Penyiar p = new Penyiar();\np.tambah(new EmailPengirim());\np.tambah(new SmsPengirim());\np.tambah(new PushPengirim());\nsama(3, p.jumlahPengirim());\nsama(Arrays.asList(\"Email: Halo\", \"SMS: Halo\", \"Push: Halo\"), p.siarkan(\"Halo\"));"
+   },
+   {
+    "nama": "tanpa pengirim",
+    "kode": "sama(0, new Penyiar().siarkan(\"x\").size());\nsama(0, new Penyiar().jumlahPengirim());"
+   },
+   {
+    "nama": "pengirim baru tanpa mengubah Penyiar",
+    "kode": "Penyiar p = new Penyiar();\np.tambah(new Pengirim() {\n    public String kirim(String pesan) {\n        return \"Chat: \" + pesan;\n    }\n});\np.tambah(m -> \"Lambda: \" + m);\nsama(Arrays.asList(\"Chat: Hai\", \"Lambda: Hai\"), p.siarkan(\"Hai\"));",
+    "tersembunyi": true
+   },
+   {
+    "nama": "notifikasi lama tetap bekerja",
+    "kode": "sama(\"Email: Halo\", new Notifikasi(new EmailPengirim()).beri(\"Halo\"));"
+   },
+   {
+    "nama": "program mencetak tiga hasil",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "[Email: Halo, SMS: Halo, Push: Halo]"
+    ]
+   }
+  ]
+ }
 }

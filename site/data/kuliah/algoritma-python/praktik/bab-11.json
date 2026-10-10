@@ -47,5 +47,60 @@
    "kode": "from daftar import tambah, hapus_kecil\nd = []\nfor nama, boks in [('a', 1), ('b', 2), ('c', 3), ('d', 50)]:\n    tambah(d, nama, boks)\nassert [p['nama'] for p in hapus_kecil(d, 10)] == ['d']",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Inventaris toko",
+  "tujuan": "Memperluas pengelolaan data dengan kamus: mengubah, menghapus, menyaring, dan menolak perubahan yang tidak sah.",
+  "berkas": "inventaris.py",
+  "masukanContoh": "",
+  "langkah": [
+   "inventaris.py menyimpan stok barang di kamus stok dan sudah punya tambah(nama, jumlah). Kamu menambah operasinya; tidak ada ____ di sini.",
+   "ubah_stok(nama, selisih): tambah atau kurangi stok (selisih boleh negatif). Kembalikan False dan jangan ubah apa pun bila barangnya tidak ada atau hasilnya akan negatif; selain itu True.",
+   "hapus(nama): hapus barang; True bila ada, False bila tidak ada.",
+   "kurang_dari(batas): list nama barang yang stoknya kurang dari batas, terurut abjad.",
+   "ringkas(): satu teks berisi nama=stok untuk semua barang, terurut abjad dan dipisah koma-spasi, mis. keripik=5, petis=2. Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Periksa dulu: if nama not in stok: return False, lalu hitung stok baru dan tolak bila negatif sebelum mengubah apa pun."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 11: operasi tambah, ubah, hapus, dan baca pada kamus."
+   },
+   {
+    "jenis": "soal",
+    "isi": "sorted(stok) memberi nama terurut. ringkas: \", \".join(f\"{n}={stok[n]}\" for n in sorted(stok))."
+   }
+  ],
+  "awal": "# inventaris.py\nstok = {}\n\n\ndef tambah(nama, jumlah):\n    stok[nama] = stok.get(nama, 0) + jumlah\n",
+  "kasus": [
+   {
+    "nama": "ubah stok",
+    "kode": "import inventaris as i\ni.tambah('keripik', 5)\nassert i.ubah_stok('keripik', 3) is True\nassert i.stok['keripik'] == 8\nassert i.ubah_stok('keripik', -8) is True\nassert i.stok['keripik'] == 0"
+   },
+   {
+    "nama": "ubah stok ditolak",
+    "kode": "import inventaris as i\ni.tambah('petis', 2)\nassert i.ubah_stok('petis', -3) is False\nassert i.stok['petis'] == 2\nassert i.ubah_stok('dodol', 1) is False\nassert 'dodol' not in i.stok"
+   },
+   {
+    "nama": "hapus",
+    "kode": "import inventaris as i\ni.tambah('a', 1)\nassert i.hapus('a') is True\nassert i.hapus('a') is False\nassert i.stok == {}"
+   },
+   {
+    "nama": "kurang dari batas terurut abjad",
+    "kode": "import inventaris as i\ni.tambah('petis', 2)\ni.tambah('keripik', 5)\ni.tambah('dodol', 1)\nassert i.kurang_dari(3) == ['dodol', 'petis']\nassert i.kurang_dari(1) == []"
+   },
+   {
+    "nama": "ringkasan",
+    "kode": "import inventaris as i\ni.tambah('petis', 2)\ni.tambah('keripik', 5)\nassert i.ringkas() == 'keripik=5, petis=2'\nassert (i.hapus('petis'), i.hapus('keripik')) == (True, True)\nassert i.ringkas() == ''"
+   },
+   {
+    "nama": "batas tepat tidak ikut (tersembunyi)",
+    "kode": "import inventaris as i\ni.tambah('a', 3)\ni.tambah('b', 2)\nassert i.kurang_dari(3) == ['b']",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

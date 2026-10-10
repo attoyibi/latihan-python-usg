@@ -47,5 +47,60 @@
    "kode": "from karyawan import Karyawan\nassert str(Karyawan('Ani', 8)) == 'Ani: 8 jam'",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Akun bank dan referensi objek",
+  "tujuan": "Memperluas kelas: atribut kelas sebagai penghitung, method yang menolak data tidak sah, salinan objek, dan tampilan teks.",
+  "berkas": "akun.py",
+  "masukanContoh": "",
+  "langkah": [
+   "akun.py sudah punya kelas Akun dengan constructor dan setor. Kamu menambah kemampuannya; tidak ada ____ di sini.",
+   "Atribut kelas jumlah menghitung berapa objek Akun yang pernah dibuat (naik satu tiap constructor dipanggil).",
+   "tarik(nominal): kembalikan True dan kurangi saldo bila nominal lebih dari 0 dan tidak melebihi saldo; selain itu kembalikan False tanpa mengubah saldo.",
+   "salin(): kembalikan objek Akun BARU dengan nama dan saldo yang sama. Perubahan pada salinan tidak boleh mengubah aslinya.",
+   "__str__: tampilkan Nama: saldo, mis. Sari: 500. Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Atribut kelas ditulis di tingkat kelas (jumlah = 0) dan diubah lewat nama kelas: Akun.jumlah += 1 di dalam __init__. salin() cukup memanggil Akun(...) dengan data yang sama."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 9: atribut objek dan atribut kelas, referensi dan salinan objek, dan __str__."
+   },
+   {
+    "jenis": "soal",
+    "isi": "def tarik(self, nominal): if nominal <= 0 or nominal > self.saldo: return False, lalu kurangi saldo dan return True."
+   }
+  ],
+  "awal": "# akun.py\n\nclass Akun:\n    def __init__(self, nama, saldo=0):\n        self.nama = nama\n        self.saldo = saldo\n\n    def setor(self, nominal):\n        self.saldo += nominal\n",
+  "kasus": [
+   {
+    "nama": "penghitung objek",
+    "kode": "from akun import Akun\nawal = Akun.jumlah\nAkun('A')\nAkun('B', 100)\nassert Akun.jumlah == awal + 2"
+   },
+   {
+    "nama": "tarik berhasil",
+    "kode": "from akun import Akun\na = Akun('Sari', 500)\nassert a.tarik(200) is True\nassert a.saldo == 300"
+   },
+   {
+    "nama": "tarik ditolak tanpa mengubah saldo",
+    "kode": "from akun import Akun\na = Akun('Sari', 100)\nassert a.tarik(500) is False\nassert a.tarik(0) is False\nassert a.tarik(-5) is False\nassert a.saldo == 100"
+   },
+   {
+    "nama": "salin berdiri sendiri",
+    "kode": "from akun import Akun\na = Akun('Sari', 100)\nb = a.salin()\nassert b is not a\nassert b.nama == 'Sari' and b.saldo == 100\nb.setor(50)\nassert a.saldo == 100 and b.saldo == 150"
+   },
+   {
+    "nama": "salin ikut dihitung (tersembunyi)",
+    "kode": "from akun import Akun\na = Akun('Sari')\nawal = Akun.jumlah\na.salin()\nassert Akun.jumlah == awal + 1",
+    "tersembunyi": true
+   },
+   {
+    "nama": "teks objek",
+    "kode": "from akun import Akun\nassert str(Akun('Sari', 500)) == 'Sari: 500'"
+   }
+  ]
+ }
 }

@@ -50,5 +50,73 @@
     "[satu, dua]"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Catatan: hitung, cari, dan ganti",
+  "tujuan": "Memperluas kelas berkas: menangani berkas yang belum ada, menyaring baris, dan mengubah isi berkas dengan membaca lalu menulis ulang.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya Catatan.simpan dan Catatan.baca. Kamu memperluasnya; tidak ada ____ di sini.",
+   "baca harus mengembalikan list KOSONG bila berkasnya belum ada (bukan melempar eksepsi).",
+   "Tambahkan static int hitung(String nama): banyak baris (0 bila berkas belum ada), dan static List<String> cari(String nama, String kata): baris yang memuat kata, tanpa membedakan huruf besar dan kecil.",
+   "Tambahkan static int ganti(String nama, String lama, String baru): ubah setiap baris yang sama persis dengan lama menjadi baru, simpan kembali berkasnya, dan kembalikan berapa baris yang diganti (0 bila berkas belum ada atau tidak ada yang cocok; berkas tidak ditulis ulang bila tidak ada yang diganti).",
+   "Catatan: penjalan di browser belum mendukung mode tambah (append) pada FileWriter, jadi mengubah isi berkas dilakukan dengan membaca semua baris, mengubahnya di memori, lalu menulis ulang. Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Berkas yang tidak ada melempar FileNotFoundException pada new FileReader; tangkap dan kembalikan list kosong. hitung dan cari bisa memakai baca. ganti: baca semua baris, ubah yang cocok pada list, lalu simpan(nama, list)."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 10: BufferedReader, PrintWriter, try-with-resources, dan menangani berkas yang tidak ada."
+   },
+   {
+    "jenis": "soal",
+    "isi": "baris.toLowerCase().contains(kata.toLowerCase()) dan baris.equals(lama) lalu daftar.set(i, baru)."
+   }
+  ],
+  "awal": "// MainB.java\nimport java.io.*;\nimport java.util.*;\n\nclass Catatan {\n    static void simpan(String nama, List<String> baris) throws IOException {\n        try (PrintWriter w = new PrintWriter(new FileWriter(nama))) {\n            for (String b : baris) {\n                w.println(b);\n            }\n        }\n    }\n\n    static List<String> baca(String nama) throws IOException {\n        List<String> hasil = new ArrayList<>();\n        try (BufferedReader r = new BufferedReader(new FileReader(nama))) {\n            String b;\n            while ((b = r.readLine()) != null) {\n                hasil.add(b);\n            }\n        }\n        return hasil;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) throws IOException {\n        Catatan.simpan(\"harian.txt\", Arrays.asList(\"beli keripik\", \"telepon Bu Ida\", \"beli petis\"));\n        System.out.println(Catatan.baca(\"harian.txt\"));\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "baca berkas yang belum ada",
+    "kode": "sama(0, Catatan.baca(\"tidak_ada_sama_sekali.txt\").size());"
+   },
+   {
+    "nama": "hitung baris",
+    "kode": "Catatan.simpan(\"c3.txt\", Arrays.asList(\"a\", \"b\", \"c\"));\nsama(3, Catatan.hitung(\"c3.txt\"));\nsama(0, Catatan.hitung(\"belum_ada_3.txt\"));"
+   },
+   {
+    "nama": "cari tanpa membedakan huruf",
+    "kode": "Catatan.simpan(\"c4.txt\", Arrays.asList(\"Beli keripik\", \"Telepon Bu Ida\", \"beli petis\"));\nsama(Arrays.asList(\"Beli keripik\", \"beli petis\"), Catatan.cari(\"c4.txt\", \"BELI\"));\nsama(0, Catatan.cari(\"c4.txt\", \"dodol\").size());"
+   },
+   {
+    "nama": "ganti baris yang cocok",
+    "kode": "Catatan.simpan(\"c6.txt\", Arrays.asList(\"a\", \"b\", \"a\", \"c\"));\nsama(2, Catatan.ganti(\"c6.txt\", \"a\", \"z\"));\nsama(Arrays.asList(\"z\", \"b\", \"z\", \"c\"), Catatan.baca(\"c6.txt\"));"
+   },
+   {
+    "nama": "ganti tanpa yang cocok atau tanpa berkas",
+    "kode": "Catatan.simpan(\"c7.txt\", Arrays.asList(\"a\", \"b\"));\nsama(0, Catatan.ganti(\"c7.txt\", \"x\", \"y\"));\nsama(Arrays.asList(\"a\", \"b\"), Catatan.baca(\"c7.txt\"));\nsama(0, Catatan.ganti(\"belum_ada_7.txt\", \"a\", \"b\"));"
+   },
+   {
+    "nama": "program mencetak hitung, jumlah ganti, dan hasil cari",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "3 baris, diganti 1, cari beli: [beli keripik, Beli petis dan dodol]"
+    ]
+   },
+   {
+    "nama": "cari di berkas yang belum ada (tersembunyi)",
+    "kode": "sama(0, Catatan.cari(\"belum_ada_5.txt\", \"a\").size());",
+    "tersembunyi": true
+   },
+   {
+    "nama": "ganti harus persis sama, bukan mengandung (tersembunyi)",
+    "kode": "Catatan.simpan(\"c8.txt\", Arrays.asList(\"abc\", \"ab\"));\nsama(1, Catatan.ganti(\"c8.txt\", \"ab\", \"x\"));\nsama(Arrays.asList(\"abc\", \"x\"), Catatan.baca(\"c8.txt\"));",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

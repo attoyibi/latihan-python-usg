@@ -52,5 +52,63 @@
     "Luas: 12.56"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Bentuk baru dan pemilih terbesar",
+  "tujuan": "Menambah kelas turunan baru ke hierarki polimorfik dan menulis method yang bekerja pada array bertipe induk.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya Bentuk, Persegi, dan Lingkaran. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan Segitiga (constructor alas dan tinggi, double) yang menimpa luas() dengan 0.5 kali alas kali tinggi.",
+   "Tambahkan kelas Geometri dengan method static double totalLuas(Bentuk[] daftar) (jumlah semua luas) dan static Bentuk terbesar(Bentuk[] daftar) (bentuk dengan luas terbesar; bila sama, yang pertama; null bila array kosong).",
+   "Kedua method harus bekerja untuk semua jenis bentuk lewat tipe Bentuk, tanpa memeriksa jenis aslinya. Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Panggil luas() pada tiap elemen; Java memilih versi yang sesuai jenis objek sebenarnya. Untuk terbesar simpan kandidat dan bandingkan luasnya selama menjalani array."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 6: overriding, polimorfisme, array bertipe induk, dan tidak perlu instanceof."
+   },
+   {
+    "jenis": "soal",
+    "isi": "if (daftar.length == 0) return null; lalu Bentuk terbaik = daftar[0]; dan perbarui bila ada luas yang lebih besar."
+   }
+  ],
+  "awal": "// MainB.java\nclass Bentuk {\n    double luas() {\n        return 0;\n    }\n}\n\nclass Persegi extends Bentuk {\n    double sisi;\n\n    Persegi(double sisi) {\n        this.sisi = sisi;\n    }\n\n    @Override\n    double luas() {\n        return sisi * sisi;\n    }\n}\n\nclass Lingkaran extends Bentuk {\n    double r;\n\n    Lingkaran(double r) {\n        this.r = r;\n    }\n\n    @Override\n    double luas() {\n        return 3.14 * r * r;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Bentuk[] daftar = { new Persegi(3), new Lingkaran(2) };\n        for (Bentuk b : daftar) {\n            System.out.println(\"Luas: \" + b.luas());\n        }\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "luas segitiga",
+    "kode": "cek(Math.abs(new Segitiga(4, 5).luas() - 10.0) < 0.0001, \"luas segitiga alas 4 tinggi 5 harus 10.0\");"
+   },
+   {
+    "nama": "total luas",
+    "kode": "Bentuk[] d = { new Persegi(2), new Segitiga(4, 5), new Persegi(1) };\ncek(Math.abs(Geometri.totalLuas(d) - 15.0) < 0.0001, \"total harus 15.0\");\ncek(Geometri.totalLuas(new Bentuk[0]) == 0.0, \"array kosong totalnya 0\");"
+   },
+   {
+    "nama": "bentuk terbesar",
+    "kode": "Bentuk a = new Persegi(2);\nBentuk b = new Lingkaran(2);\nBentuk c = new Segitiga(1, 1);\ncek(Geometri.terbesar(new Bentuk[] { a, b, c }) == b, \"lingkaran r 2 (12.56) harus terbesar\");"
+   },
+   {
+    "nama": "terbesar bila sama: yang pertama, dan array kosong",
+    "kode": "Bentuk a = new Persegi(2);\nBentuk b = new Persegi(2);\ncek(Geometri.terbesar(new Bentuk[] { a, b }) == a, \"bila sama harus yang pertama\");\ncek(Geometri.terbesar(new Bentuk[0]) == null, \"array kosong harus null\");"
+   },
+   {
+    "nama": "program mencetak total",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Total: 31.56"
+    ]
+   },
+   {
+    "nama": "bentuk lama tetap bekerja (tersembunyi)",
+    "kode": "cek(Math.abs(new Persegi(3).luas() - 9.0) < 0.0001, \"persegi\");\ncek(Math.abs(new Lingkaran(2).luas() - 12.56) < 0.0001, \"lingkaran\");",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

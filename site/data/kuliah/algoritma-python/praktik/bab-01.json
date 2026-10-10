@@ -75,5 +75,68 @@
    ],
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Struk listrik",
+  "tujuan": "Memperluas program yang sudah jalan dengan konstanta, perhitungan, dan keluaran berformat dua angka desimal.",
+  "berkas": "struk_listrik.py",
+  "masukanContoh": "Sari\n100",
+  "langkah": [
+   "struk_listrik.py sudah membaca nama dan pemakaian listrik (kWh), lalu mencetak nama dan biaya. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Baris pertama keluaran harus === STRUK LISTRIK ===.",
+   "Setelah baris Biaya tambahkan Admin: Rp2500 (simpan 2500 sebagai konstanta ADMIN), lalu Pajak: Rp... yang besarnya 10 persen dari biaya, dicetak dengan dua angka di belakang koma.",
+   "Tambahkan Total: Rp... (biaya ditambah admin ditambah pajak), juga dengan dua angka di belakang koma.",
+   "Baris terakhir: Terima kasih, <nama>! Coba dengan masukan Sari lalu 100, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Dua angka di belakang koma: f\"{nilai:.2f}\". Pajak = biaya * 0.1. Baris pertama dicetak sebelum baris lain apa pun."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 1: print, f-string, konstanta (nama huruf besar), dan urutan eksekusi baris demi baris."
+   },
+   {
+    "jenis": "soal",
+    "isi": "ADMIN = 2500, pajak = biaya * 0.1, total = biaya + ADMIN + pajak, lalu cetak masing-masing dengan f-string."
+   }
+  ],
+  "awal": "# struk_listrik.py\nnama = input()\npemakaian = int(input())\n\nTARIF = 1500\nbiaya = pemakaian * TARIF\n\nprint(f\"Pelanggan: {nama}\")\nprint(f\"Biaya: Rp{biaya}\")\n",
+  "kasus": [
+   {
+    "nama": "seratus kWh",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('struk_listrik.py', run_name='__main__')\nk = buf.getvalue()\nassert k.splitlines() and k.splitlines()[0] == '=== STRUK LISTRIK ===', 'baris pertama harus ' + '=== STRUK LISTRIK ===' + ', keluarannya: ' + repr(k)\nassert k.splitlines() and k.splitlines()[-1] == 'Terima kasih, Sari!', 'baris terakhir harus ' + 'Terima kasih, Sari!' + ', keluarannya: ' + repr(k)\nassert 'Pelanggan: Sari' in k, 'keluaran harus memuat ' + 'Pelanggan: Sari' + ', keluarannya: ' + repr(k)\nassert 'Biaya: Rp150000' in k, 'keluaran harus memuat ' + 'Biaya: Rp150000' + ', keluarannya: ' + repr(k)\nassert 'Admin: Rp2500' in k, 'keluaran harus memuat ' + 'Admin: Rp2500' + ', keluarannya: ' + repr(k)\nassert 'Pajak: Rp15000.00' in k, 'keluaran harus memuat ' + 'Pajak: Rp15000.00' + ', keluarannya: ' + repr(k)\nassert 'Total: Rp167500.00' in k, 'keluaran harus memuat ' + 'Total: Rp167500.00' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "Sari",
+     "100"
+    ]
+   },
+   {
+    "nama": "tanpa pemakaian",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('struk_listrik.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Biaya: Rp0' in k, 'keluaran harus memuat ' + 'Biaya: Rp0' + ', keluarannya: ' + repr(k)\nassert 'Pajak: Rp0.00' in k, 'keluaran harus memuat ' + 'Pajak: Rp0.00' + ', keluarannya: ' + repr(k)\nassert 'Total: Rp2500.00' in k, 'keluaran harus memuat ' + 'Total: Rp2500.00' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "Budi",
+     "0"
+    ]
+   },
+   {
+    "nama": "tiga puluh tiga kWh",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('struk_listrik.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Biaya: Rp49500' in k, 'keluaran harus memuat ' + 'Biaya: Rp49500' + ', keluarannya: ' + repr(k)\nassert 'Pajak: Rp4950.00' in k, 'keluaran harus memuat ' + 'Pajak: Rp4950.00' + ', keluarannya: ' + repr(k)\nassert 'Total: Rp56950.00' in k, 'keluaran harus memuat ' + 'Total: Rp56950.00' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "Ani",
+     "33"
+    ]
+   },
+   {
+    "nama": "nama dua kata (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('struk_listrik.py', run_name='__main__')\nk = buf.getvalue()\nassert k.splitlines() and k.splitlines()[-1] == 'Terima kasih, Dewi Lestari!', 'baris terakhir harus ' + 'Terima kasih, Dewi Lestari!' + ', keluarannya: ' + repr(k)\nassert 'Biaya: Rp10500' in k, 'keluaran harus memuat ' + 'Biaya: Rp10500' + ', keluarannya: ' + repr(k)\nassert 'Pajak: Rp1050.00' in k, 'keluaran harus memuat ' + 'Pajak: Rp1050.00' + ', keluarannya: ' + repr(k)\nassert 'Total: Rp14050.00' in k, 'keluaran harus memuat ' + 'Total: Rp14050.00' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "Dewi Lestari",
+     "7"
+    ],
+    "tersembunyi": true
+   }
+  ]
+ }
 }

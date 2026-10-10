@@ -50,5 +50,68 @@
     "Motor: 2 roda"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Pewarisan bertingkat",
+  "tujuan": "Memperluas hierarki kelas: kelas turunan baru, turunan dari turunan, dan method yang memakai method induk.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya Kendaraan (induk) dan Motor. Kamu menambah kelas; tidak ada ____ di sini.",
+   "Tambahkan Mobil yang mewarisi Kendaraan: constructor Mobil(int pintu) memanggil super(4), dan info() menghasilkan Mobil: 4 roda, N pintu.",
+   "Tambahkan Truk yang mewarisi Mobil: constructor Truk(int muatan) memakai 2 pintu (panggil constructor Mobil), dan info() menghasilkan info milik Mobil ditambah , muatan M kg, mis. Mobil: 4 roda, 2 pintu, muatan 500 kg.",
+   "Tambahkan kelas Garasi dengan method static String ringkas(Kendaraan[] daftar) yang menggabungkan info() semua kendaraan, dipisah titik koma dan spasi (; ).",
+   "Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Constructor kelas turunan harus memanggil constructor induk dengan super(...). Truk memanggil super(2) ke Mobil. Untuk memakai teks induk dalam info(): super.info() + \", muatan \" + ..."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 5: extends, super, overriding, dan pewarisan lebih dari satu tingkat."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Garasi.ringkas: bangun teks dengan perulangan, beri \"; \" di antara elemen (bukan di akhir)."
+   }
+  ],
+  "awal": "// MainB.java\nclass Kendaraan {\n    protected int roda;\n\n    Kendaraan(int roda) {\n        this.roda = roda;\n    }\n\n    String info() {\n        return roda + \" roda\";\n    }\n}\n\nclass Motor extends Kendaraan {\n    Motor() {\n        super(2);\n    }\n\n    @Override\n    String info() {\n        return \"Motor: \" + super.info();\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Kendaraan k = new Motor();\n        System.out.println(k.info());\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "mobil",
+    "kode": "sama(\"Mobil: 4 roda, 4 pintu\", new Mobil(4).info());\nsama(4, new Mobil(2).roda);"
+   },
+   {
+    "nama": "truk mewarisi mobil",
+    "kode": "Truk t = new Truk(500);\ncek(t instanceof Mobil, \"Truk harus turunan Mobil\");\nsama(\"Mobil: 4 roda, 2 pintu, muatan 500 kg\", t.info());"
+   },
+   {
+    "nama": "motor tetap bekerja",
+    "kode": "sama(\"Motor: 2 roda\", new Motor().info());"
+   },
+   {
+    "nama": "ringkasan garasi",
+    "kode": "Kendaraan[] k = { new Motor(), new Mobil(4) };\nsama(\"Motor: 2 roda; Mobil: 4 roda, 4 pintu\", Garasi.ringkas(k));"
+   },
+   {
+    "nama": "garasi kosong dan satu kendaraan",
+    "kode": "sama(\"\", Garasi.ringkas(new Kendaraan[0]));\nsama(\"Motor: 2 roda\", Garasi.ringkas(new Kendaraan[] { new Motor() }));"
+   },
+   {
+    "nama": "program mencetak ringkasan",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Motor: 2 roda; Mobil: 4 roda, 4 pintu; Mobil: 4 roda, 2 pintu, muatan 500 kg"
+    ]
+   },
+   {
+    "nama": "polimorfisme lewat tipe induk (tersembunyi)",
+    "kode": "Kendaraan k = new Truk(100);\nsama(\"Mobil: 4 roda, 2 pintu, muatan 100 kg\", k.info());",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -47,5 +47,69 @@
     "true"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Singleton dengan pengamat",
+  "tujuan": "Menggabungkan dua pola: Singleton sebagai penyimpan pengaturan bersama dan Observer yang diberi tahu saat pengaturan berubah.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya Konfigurasi sebagai singleton dengan satu atribut nama. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan interface Pengamat dengan method void diperbarui(String kunci, String nilai).",
+   "Di Konfigurasi tambahkan penyimpanan pengaturan (Map<String, String>), void set(String kunci, String nilai), dan String get(String kunci) yang mengembalikan null bila kunci belum ada.",
+   "Tambahkan void tambahPengamat(Pengamat p). Setiap kali set mengubah pengaturan (kunci baru atau nilai berbeda), semua pengamat diberi tahu lewat diperbarui. Bila nilainya sama dengan yang sudah ada, tidak ada pemberitahuan.",
+   "Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Bandingkan dengan nilai lama: String lama = data.get(kunci); if (nilai.equals(lama)) return; lalu simpan dan beri tahu semua pengamat. Singleton tetap satu objek: pengamat disimpan di dalamnya."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 14: Singleton, Observer, dan interface sebagai penghubung."
+   },
+   {
+    "jenis": "soal",
+    "isi": "for (Pengamat p : pengamat) { p.diperbarui(kunci, nilai); }"
+   }
+  ],
+  "awal": "// MainB.java\nclass Konfigurasi {\n    private static Konfigurasi instance;\n    private String nama = \"default\";\n\n    private Konfigurasi() {\n    }\n\n    static Konfigurasi get() {\n        if (instance == null) {\n            instance = new Konfigurasi();\n        }\n        return instance;\n    }\n\n    String getNama() {\n        return nama;\n    }\n\n    void setNama(String nama) {\n        this.nama = nama;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Konfigurasi.get().setNama(\"Gresik\");\n        System.out.println(Konfigurasi.get().getNama());\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "simpan dan ambil pengaturan",
+    "kode": "Konfigurasi k = Konfigurasi.get();\nk.set(\"warna_a1\", \"hijau\");\nsama(\"hijau\", k.get(\"warna_a1\"));\nsama(null, k.get(\"kunci_tidak_ada_a1\"));"
+   },
+   {
+    "nama": "pengamat diberi tahu saat berubah",
+    "kode": "final List<String> kejadian = new ArrayList<String>();\nKonfigurasi.get().tambahPengamat(new Pengamat() {\n    public void diperbarui(String kunci, String nilai) {\n        kejadian.add(kunci + \"=\" + nilai);\n    }\n});\nKonfigurasi.get().set(\"tema_b1\", \"gelap\");\nKonfigurasi.get().set(\"tema_b1\", \"terang\");\nsama(Arrays.asList(\"tema_b1=gelap\", \"tema_b1=terang\"), kejadian);"
+   },
+   {
+    "nama": "nilai sama tidak memberi tahu",
+    "kode": "final int[] hitung = { 0 };\nKonfigurasi.get().tambahPengamat(new Pengamat() {\n    public void diperbarui(String kunci, String nilai) {\n        hitung[0]++;\n    }\n});\nKonfigurasi.get().set(\"bahasa_c1\", \"id\");\nKonfigurasi.get().set(\"bahasa_c1\", \"id\");\nKonfigurasi.get().set(\"bahasa_c1\", \"id\");\nsama(1, hitung[0]);"
+   },
+   {
+    "nama": "semua pengamat diberi tahu",
+    "kode": "final int[] a = { 0 };\nfinal int[] b = { 0 };\nKonfigurasi.get().tambahPengamat(new Pengamat() {\n    public void diperbarui(String kunci, String nilai) { a[0]++; }\n});\nKonfigurasi.get().tambahPengamat(new Pengamat() {\n    public void diperbarui(String kunci, String nilai) { b[0]++; }\n});\nKonfigurasi.get().set(\"ukuran_d1\", \"besar\");\nsama(1, a[0]);\nsama(1, b[0]);"
+   },
+   {
+    "nama": "tetap singleton",
+    "kode": "cek(Konfigurasi.get() == Konfigurasi.get(), \"harus objek yang sama\");\ncek(java.lang.reflect.Modifier.isPrivate(Konfigurasi.class.getDeclaredConstructor().getModifiers()), \"constructor harus private\");"
+   },
+   {
+    "nama": "program mencetak dua perubahan saja",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Berubah: kota=Gresik",
+     "Berubah: kota=Surabaya"
+    ]
+   },
+   {
+    "nama": "pengaturan nama lama tetap bekerja (tersembunyi)",
+    "kode": "Konfigurasi.get().setNama(\"Gresik\");\nsama(\"Gresik\", Konfigurasi.get().getNama());",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

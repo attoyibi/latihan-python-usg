@@ -51,5 +51,65 @@
    "kode": "from fungsi import format_rupiah\nassert format_rupiah(1440000.0) == 'Rp1.440.000'",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Fungsi belanja",
+  "tujuan": "Memperluas modul fungsi: parameter berawalan, fungsi yang memakai fungsi lain, dan fungsi yang memilih dari list.",
+  "berkas": "belanja.py",
+  "masukanContoh": "",
+  "langkah": [
+   "belanja.py baru punya subtotal(jumlah, harga). Kamu menambah fungsi lain; tidak ada ____ di sini.",
+   "diskon(nilai, persen=0): kembalikan nilai setelah dipotong persen (mis. diskon(1000, 10) menghasilkan 900). Tanpa argumen persen, nilainya tetap.",
+   "total(daftar, diskon_persen=0): daftar berisi pasangan (jumlah, harga). Jumlahkan subtotal tiap pasangan (pakai subtotal() yang sudah ada), lalu terapkan diskon() pada jumlahnya.",
+   "terbesar(daftar): kembalikan pasangan dengan subtotal terbesar (bila sama, yang pertama), atau None bila daftar kosong.",
+   "Fungsi tidak mencetak apa-apa; semuanya mengembalikan nilai. Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "def diskon(nilai, persen=0): return nilai - nilai * persen / 100. Di total, jalani daftar dan panggil subtotal(jumlah, harga) pada tiap pasangan."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 8: parameter, nilai bawaan parameter, return, dan memanggil fungsi dari fungsi lain."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Untuk terbesar: simpan pasangan terbaik dan subtotalnya selama menjalani daftar; if len(daftar) == 0: return None."
+   }
+  ],
+  "awal": "# belanja.py\n\ndef subtotal(jumlah, harga):\n    return jumlah * harga\n",
+  "kasus": [
+   {
+    "nama": "diskon tanpa persen",
+    "kode": "from belanja import diskon\nassert diskon(1000) == 1000"
+   },
+   {
+    "nama": "diskon sepuluh persen",
+    "kode": "from belanja import diskon\nassert abs(diskon(1000, 10) - 900) < 0.001\nassert abs(diskon(250, 20) - 200) < 0.001"
+   },
+   {
+    "nama": "total beberapa pasangan",
+    "kode": "from belanja import total\nassert total([(2, 1000), (1, 500)]) == 2500\nassert total([]) == 0"
+   },
+   {
+    "nama": "total dengan diskon",
+    "kode": "from belanja import total\nassert abs(total([(2, 1000), (1, 500)], diskon_persen=10) - 2250) < 0.001"
+   },
+   {
+    "nama": "terbesar",
+    "kode": "from belanja import terbesar\nassert terbesar([(2, 1000), (1, 500), (3, 100)]) == (2, 1000)\nassert terbesar([]) is None"
+   },
+   {
+    "nama": "terbesar bila sama: yang pertama (tersembunyi)",
+    "kode": "from belanja import terbesar\nassert terbesar([(1, 300), (3, 100), (2, 150)]) == (1, 300)",
+    "tersembunyi": true
+   },
+   {
+    "nama": "total memakai subtotal (tersembunyi)",
+    "kode": "import belanja\nbelanja.subtotal = lambda j, h: 7\nassert belanja.total([(1, 1), (5, 5)]) == 14, 'total harus memanggil subtotal()'",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

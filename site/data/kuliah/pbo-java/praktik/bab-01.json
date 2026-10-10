@@ -43,5 +43,63 @@
    "kode": "Hewan h = new Hewan();\nsama(\"null berkata null\", h.bunyi());",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Hewan yang lebih pandai",
+  "tujuan": "Memperluas kelas yang sudah jalan dengan overloading method dan method pembanding antarobjek.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya kelas Hewan dengan bunyi() dan program yang memakainya. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan method bunyi(int kali) (nama sama, parameter beda): hasilnya nama, kata berkata, lalu suara diulang sebanyak kali, dipisah spasi. Contoh: Kucing berkata meong meong meong untuk kali = 3. Bila kali kurang dari 1, hasilnya nama diikuti kata diam, mis. Kucing diam.",
+   "Tambahkan boolean sama(Hewan lain): true bila nama sama (tanpa membedakan huruf besar dan kecil) dan suaranya sama persis.",
+   "Ubah main supaya mencetak h.bunyi(3). Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Dua method boleh sama nama asal daftar parameternya berbeda (overloading). Untuk mengulang suara pakai perulangan for dan StringBuilder atau penggabungan teks. equalsIgnoreCase membandingkan teks tanpa membedakan huruf."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 1: objek, atribut, method, dan memanggil method dengan argumen berbeda."
+   },
+   {
+    "jenis": "soal",
+    "isi": "if (kali < 1) return nama + \" diam\"; lalu bangun teks dengan perulangan sebanyak kali."
+   }
+  ],
+  "awal": "// MainB.java\nclass Hewan {\n    String nama;\n    String suara;\n\n    String bunyi() {\n        return nama + \" berkata \" + suara;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Hewan h = new Hewan();\n        h.nama = \"Kucing\";\n        h.suara = \"meong\";\n        System.out.println(h.bunyi());\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "bunyi berulang",
+    "kode": "Hewan h = new Hewan();\nh.nama = \"Kucing\";\nh.suara = \"meong\";\nsama(\"Kucing berkata meong meong meong\", h.bunyi(3));\nsama(\"Kucing berkata meong\", h.bunyi(1));"
+   },
+   {
+    "nama": "kali kurang dari satu",
+    "kode": "Hewan h = new Hewan();\nh.nama = \"Kucing\";\nh.suara = \"meong\";\nsama(\"Kucing diam\", h.bunyi(0));\nsama(\"Kucing diam\", h.bunyi(-2));"
+   },
+   {
+    "nama": "bunyi tanpa argumen tetap bekerja",
+    "kode": "Hewan h = new Hewan();\nh.nama = \"Ayam\";\nh.suara = \"kukuruyuk\";\nsama(\"Ayam berkata kukuruyuk\", h.bunyi());"
+   },
+   {
+    "nama": "membandingkan dua hewan",
+    "kode": "Hewan a = new Hewan();\na.nama = \"Kucing\";\na.suara = \"meong\";\nHewan b = new Hewan();\nb.nama = \"kucing\";\nb.suara = \"meong\";\nHewan c = new Hewan();\nc.nama = \"Kucing\";\nc.suara = \"miau\";\ncek(a.sama(b), \"nama beda huruf besar harus dianggap sama\");\ncek(!a.sama(c), \"suara berbeda harus dianggap tidak sama\");"
+   },
+   {
+    "nama": "program mencetak bunyi berulang",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Kucing berkata meong meong meong"
+    ]
+   },
+   {
+    "nama": "suara beda huruf besar tidak sama (tersembunyi)",
+    "kode": "Hewan a = new Hewan();\na.nama = \"Sapi\";\na.suara = \"Moo\";\nHewan b = new Hewan();\nb.nama = \"Sapi\";\nb.suara = \"moo\";\ncek(!a.sama(b), \"suara dibandingkan persis\");",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

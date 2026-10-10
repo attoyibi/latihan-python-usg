@@ -51,5 +51,68 @@
     "2"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Collection: hapus, urut, dan kata teratas",
+  "tujuan": "Memperluas kelas yang memakai ArrayList dan HashMap: menghapus, mengurutkan salinan, dan mencari elemen paling sering.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya DaftarNama dan Frekuensi. Kamu memperluasnya; tidak ada ____ di sini.",
+   "DaftarNama.hapus(String nama): hapus nama itu (kemunculan pertama) dan kembalikan true; false bila tidak ada.",
+   "DaftarNama.urut(): kembalikan List<String> BARU berisi semua nama terurut abjad. Daftar aslinya tidak boleh berubah.",
+   "Frekuensi.teratas(List<String> kata): kata yang paling sering muncul; bila seri, yang lebih dulu menurut abjad; null bila list kosong.",
+   "Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Collections.sort mengurutkan list yang diberikan, jadi salin dulu: new ArrayList<>(daftar). Untuk teratas, pakai hitung(kata) yang sudah ada lalu telusuri entri map sambil menyimpan yang terbaik."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 9: ArrayList, remove, Collections.sort, HashMap, dan menelusuri entri map."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Untuk seri: if (n > terbaik || (n == terbaik && k.compareTo(kata) < 0)) perbarui."
+   }
+  ],
+  "awal": "// MainB.java\nimport java.util.*;\n\nclass DaftarNama {\n    private List<String> daftar = new ArrayList<>();\n\n    void tambah(String nama) {\n        daftar.add(nama);\n    }\n\n    int banyak() {\n        return daftar.size();\n    }\n\n    boolean ada(String nama) {\n        return daftar.contains(nama);\n    }\n}\n\nclass Frekuensi {\n    static Map<String, Integer> hitung(List<String> kata) {\n        Map<String, Integer> hasil = new HashMap<>();\n        for (String k : kata) {\n            hasil.put(k, hasil.getOrDefault(k, 0) + 1);\n        }\n        return hasil;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        DaftarNama d = new DaftarNama();\n        d.tambah(\"Sari\");\n        d.tambah(\"Budi\");\n        System.out.println(\"Banyak: \" + d.banyak());\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "hapus nama",
+    "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\nd.tambah(\"Budi\");\ncek(d.hapus(\"Sari\"), \"Sari ada dan harus terhapus\");\ncek(!d.hapus(\"Sari\"), \"Sari sudah tidak ada\");\nsama(1, d.banyak());\ncek(!d.ada(\"Sari\"), \"Sari tidak boleh ada lagi\");"
+   },
+   {
+    "nama": "urut tanpa mengubah aslinya",
+    "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"Sari\");\nd.tambah(\"Budi\");\nd.tambah(\"Andi\");\nsama(Arrays.asList(\"Andi\", \"Budi\", \"Sari\"), d.urut());\nsama(3, d.banyak());\nList<String> u = d.urut();\nu.add(\"Baru\");\nsama(3, d.banyak());"
+   },
+   {
+    "nama": "kata teratas",
+    "kode": "sama(\"a\", Frekuensi.teratas(Arrays.asList(\"a\", \"b\", \"a\", \"c\")));\nsama(\"b\", Frekuensi.teratas(Arrays.asList(\"b\")));"
+   },
+   {
+    "nama": "seri: yang lebih dulu menurut abjad",
+    "kode": "sama(\"a\", Frekuensi.teratas(Arrays.asList(\"b\", \"a\", \"b\", \"a\", \"c\")));\nsama(\"apel\", Frekuensi.teratas(Arrays.asList(\"jeruk\", \"apel\", \"jeruk\", \"apel\")));"
+   },
+   {
+    "nama": "list kosong",
+    "kode": "sama(null, Frekuensi.teratas(new ArrayList<String>()));"
+   },
+   {
+    "nama": "program mencetak nama terurut",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Urut: [Andi, Budi, Sari]"
+    ]
+   },
+   {
+    "nama": "hapus hanya kemunculan pertama (tersembunyi)",
+    "kode": "DaftarNama d = new DaftarNama();\nd.tambah(\"A\");\nd.tambah(\"A\");\ncek(d.hapus(\"A\"), \"hapus pertama\");\nsama(1, d.banyak());",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -124,6 +124,7 @@ def cek_materi(c):
 
 
 NAMA_BERKAS_RE = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.-]{0,59}\.py$")
+NAMA_JAVA_B_RE = re.compile(r"^MainB\.java$")  # Bagian B Java: berkas MainB.java dengan kelas utama MainB
 NAMA_JAVA_RE = re.compile(r"^Main\.java$")  # praktik Java: satu berkas Main.java (kelas bantu boleh di dalamnya, kelas publiknya Main)
 
 
@@ -177,9 +178,9 @@ def cek_bagian_b(pk, w, bahasa):
             err(f"{w}: kolom '{k}' tidak ada atau kosong")
     if "contoh" in b:
         err(f"{w}: contoh jawaban tidak boleh ada di situs (publik)")
-    pola = NAMA_JAVA_RE if bahasa == "java" else NAMA_BERKAS_RE
+    pola = NAMA_JAVA_B_RE if bahasa == "java" else NAMA_BERKAS_RE
     if not isinstance(b.get("berkas"), str) or not pola.fullmatch(b.get("berkas", "")):
-        err(f"{w}: 'berkas' tidak sah")
+        err(f"{w}: 'berkas' tidak sah" + (" (Bagian B Java: MainB.java)" if bahasa == "java" else ""))
     if b.get("berkas") == pk.get("berkas"):
         err(f"{w}: 'berkas' harus berbeda dari Bagian A")
     if "____" in str(b.get("awal", "")):
@@ -190,6 +191,8 @@ def cek_bagian_b(pk, w, bahasa):
     for j, k in enumerate(b.get("kasus", [])):
         if ("kode" in k) == ("jalankan" in k):
             err(f"{w}.kasus[{j}]: isi tepat salah satu dari 'kode' atau 'jalankan'")
+        if bahasa == "java" and "jalankan" in k and k["jalankan"] != "MainB":
+            err(f"{w}.kasus[{j}]: 'jalankan' Bagian B Java harus MainB")
 
 
 def cek_satu_praktik(bab, pk, babs_kode, w, bahasa="python"):

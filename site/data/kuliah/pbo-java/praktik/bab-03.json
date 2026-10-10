@@ -54,5 +54,67 @@
     "Saldo: 1500"
    ]
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Rekening: transfer dan riwayat",
+  "tujuan": "Memperluas kelas yang terenkapsulasi: method yang melibatkan dua objek dan penghitung yang hanya naik bila operasi berhasil.",
+  "berkas": "MainB.java",
+  "masukanContoh": "",
+  "langkah": [
+   "MainB.java sudah punya kelas Rekening dengan saldo private, setor, dan tarik. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Tambahkan int getJumlahTransaksi(): banyaknya operasi setor dan tarik yang BERHASIL pada rekening itu (yang ditolak tidak dihitung).",
+   "Tambahkan boolean transfer(Rekening tujuan, int jumlah): tarik dari rekening ini lalu setor ke tujuan. Bila penarikan gagal, kembalikan false dan jangan ubah apa pun.",
+   "Saldo harus tetap private dan hanya berubah lewat method. Tekan Jalankan, lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Naikkan penghitung hanya di dalam cabang yang benar-benar mengubah saldo. transfer cukup memanggil tarik pada this dan setor pada tujuan, sehingga penghitung kedua rekening naik sendiri."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 3: private, getter, validasi, dan objek yang bekerja sama lewat method."
+   },
+   {
+    "jenis": "soal",
+    "isi": "if (tarik(jumlah)) { tujuan.setor(jumlah); return true; } return false;"
+   }
+  ],
+  "awal": "// MainB.java\nclass Rekening {\n    private int saldo;\n\n    Rekening(int saldoAwal) {\n        this.saldo = saldoAwal;\n    }\n\n    int getSaldo() {\n        return saldo;\n    }\n\n    void setor(int jumlah) {\n        if (jumlah > 0) {\n            saldo += jumlah;\n        }\n    }\n\n    boolean tarik(int jumlah) {\n        if (jumlah > 0 && jumlah <= saldo) {\n            saldo -= jumlah;\n            return true;\n        }\n        return false;\n    }\n}\n\npublic class MainB {\n    public static void main(String[] args) {\n        Rekening a = new Rekening(1000);\n        a.setor(500);\n        System.out.println(\"Saldo: \" + a.getSaldo());\n    }\n}\n",
+  "kasus": [
+   {
+    "nama": "transfer berhasil",
+    "kode": "Rekening a = new Rekening(1000);\nRekening b = new Rekening(50);\ncek(a.transfer(b, 400), \"transfer 400 dari 1000 harus berhasil\");\nsama(600, a.getSaldo());\nsama(450, b.getSaldo());"
+   },
+   {
+    "nama": "transfer gagal tidak mengubah apa pun",
+    "kode": "Rekening a = new Rekening(100);\nRekening b = new Rekening(0);\ncek(!a.transfer(b, 500), \"transfer melebihi saldo harus gagal\");\nsama(100, a.getSaldo());\nsama(0, b.getSaldo());\nsama(0, a.getJumlahTransaksi());\nsama(0, b.getJumlahTransaksi());"
+   },
+   {
+    "nama": "penghitung hanya operasi berhasil",
+    "kode": "Rekening r = new Rekening(100);\nr.setor(50);\nr.setor(-5);\nr.tarik(500);\nr.tarik(20);\nr.tarik(0);\nsama(2, r.getJumlahTransaksi());"
+   },
+   {
+    "nama": "transfer dihitung di kedua rekening",
+    "kode": "Rekening a = new Rekening(100);\nRekening b = new Rekening(0);\na.transfer(b, 30);\nsama(1, a.getJumlahTransaksi());\nsama(1, b.getJumlahTransaksi());"
+   },
+   {
+    "nama": "saldo tetap private",
+    "kode": "cek(privat(Rekening.class, \"saldo\"), \"atribut saldo harus private\");"
+   },
+   {
+    "nama": "program mencetak kedua saldo",
+    "jalankan": "MainB",
+    "masukan": [],
+    "memuat": [
+     "Saldo: 600 dan 400"
+    ]
+   },
+   {
+    "nama": "transfer jumlah nol atau negatif ditolak (tersembunyi)",
+    "kode": "Rekening a = new Rekening(100);\nRekening b = new Rekening(0);\ncek(!a.transfer(b, 0), \"transfer 0 harus ditolak\");\ncek(!a.transfer(b, -10), \"transfer negatif harus ditolak\");\nsama(0, b.getSaldo());",
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -83,5 +83,79 @@
    ],
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Konversi suhu",
+  "tujuan": "Memperluas program konversi: menerima bilangan pecahan, memakai beberapa rumus, dan menolak masukan yang tidak masuk akal.",
+  "berkas": "suhu.py",
+  "masukanContoh": "100",
+  "langkah": [
+   "suhu.py membaca suhu Celsius bulat dan mencetak Fahrenheit. Kamu memperluasnya; tidak ada ____ di sini.",
+   "Masukan boleh pecahan (mis. 36.6): ubah cara membacanya.",
+   "Cetak tiga baris: Fahrenheit: ... dan Reamur: ... (satu angka di belakang koma), serta Kelvin: ... (dua angka di belakang koma). Kelvin = Celsius + 273.15, Reamur = Celsius * 4 / 5.",
+   "Suhu di bawah -273.15 tidak mungkin ada: cetak persis Suhu tidak mungkin dan jangan cetak tiga baris tadi.",
+   "Coba dengan masukan 100, 36.6, dan -300 (masing-masing dijalankan sendiri), lalu Periksa Bagian B."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "float(input()) menerima pecahan. Pembatas: if c < -273.15: ... else: .... Satu angka di belakang koma: f\"{nilai:.1f}\"."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 2: tipe int dan float, konversi tipe, operator aritmetika, dan operator perbandingan."
+   },
+   {
+    "jenis": "soal",
+    "isi": "Taruh semua perhitungan dan cetakan di bawah else dari pemeriksaan suhu."
+   }
+  ],
+  "awal": "# suhu.py\nc = int(input())\nf = c * 9 / 5 + 32\nprint(f\"Fahrenheit: {f}\")\n",
+  "kasus": [
+   {
+    "nama": "titik didih air",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Fahrenheit: 212.0' in k, 'keluaran harus memuat ' + 'Fahrenheit: 212.0' + ', keluarannya: ' + repr(k)\nassert 'Kelvin: 373.15' in k, 'keluaran harus memuat ' + 'Kelvin: 373.15' + ', keluarannya: ' + repr(k)\nassert 'Reamur: 80.0' in k, 'keluaran harus memuat ' + 'Reamur: 80.0' + ', keluarannya: ' + repr(k)\nassert 'tidak mungkin' not in k, 'keluaran tidak boleh memuat ' + 'tidak mungkin' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "100"
+    ]
+   },
+   {
+    "nama": "titik beku air",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Fahrenheit: 32.0' in k, 'keluaran harus memuat ' + 'Fahrenheit: 32.0' + ', keluarannya: ' + repr(k)\nassert 'Kelvin: 273.15' in k, 'keluaran harus memuat ' + 'Kelvin: 273.15' + ', keluarannya: ' + repr(k)\nassert 'Reamur: 0.0' in k, 'keluaran harus memuat ' + 'Reamur: 0.0' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "0"
+    ]
+   },
+   {
+    "nama": "suhu badan berpecahan",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Fahrenheit: 97.9' in k, 'keluaran harus memuat ' + 'Fahrenheit: 97.9' + ', keluarannya: ' + repr(k)\nassert 'Kelvin: 309.75' in k, 'keluaran harus memuat ' + 'Kelvin: 309.75' + ', keluarannya: ' + repr(k)\nassert 'Reamur: 29.3' in k, 'keluaran harus memuat ' + 'Reamur: 29.3' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "36.6"
+    ]
+   },
+   {
+    "nama": "di bawah nol mutlak",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Suhu tidak mungkin' in k, 'keluaran harus memuat ' + 'Suhu tidak mungkin' + ', keluarannya: ' + repr(k)\nassert 'Fahrenheit' not in k, 'keluaran tidak boleh memuat ' + 'Fahrenheit' + ', keluarannya: ' + repr(k)\nassert 'Kelvin' not in k, 'keluaran tidak boleh memuat ' + 'Kelvin' + ', keluarannya: ' + repr(k)\nassert 'Reamur' not in k, 'keluaran tidak boleh memuat ' + 'Reamur' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "-300"
+    ]
+   },
+   {
+    "nama": "tepat nol mutlak masih sah (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Kelvin: 0.00' in k, 'keluaran harus memuat ' + 'Kelvin: 0.00' + ', keluarannya: ' + repr(k)\nassert 'tidak mungkin' not in k, 'keluaran tidak boleh memuat ' + 'tidak mungkin' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "-273.15"
+    ],
+    "tersembunyi": true
+   },
+   {
+    "nama": "negatif sah (tersembunyi)",
+    "kode": "import io, contextlib, runpy\nbuf = io.StringIO()\nwith contextlib.redirect_stdout(buf):\n    runpy.run_path('suhu.py', run_name='__main__')\nk = buf.getvalue()\nassert 'Fahrenheit: -40.0' in k, 'keluaran harus memuat ' + 'Fahrenheit: -40.0' + ', keluarannya: ' + repr(k)\nassert 'Kelvin: 233.15' in k, 'keluaran harus memuat ' + 'Kelvin: 233.15' + ', keluarannya: ' + repr(k)\nassert 'Reamur: -32.0' in k, 'keluaran harus memuat ' + 'Reamur: -32.0' + ', keluarannya: ' + repr(k)",
+    "masukan": [
+     "-40"
+    ],
+    "tersembunyi": true
+   }
+  ]
+ }
 }

@@ -42,5 +42,60 @@
    "kode": "from berkas import simpan_nama, baca_nama\nsimpan_nama([], 'tes4.txt')\nassert baca_nama('tes4.txt') == []",
    "tersembunyi": true
   }
- ]
+ ],
+ "bagianB": {
+  "judul": "Catatan harian: tambah, hitung, cari",
+  "tujuan": "Memperluas fungsi berkas: menambah tanpa menghapus, menghitung baris, mencari kata, dan menangani berkas yang belum ada.",
+  "berkas": "catatan.py",
+  "masukanContoh": "",
+  "langkah": [
+   "catatan.py sudah punya simpan (menulis dari awal) dan baca. Kamu menambah kemampuannya; tidak ada ____ di sini.",
+   "baca harus mengembalikan list kosong bila berkasnya belum ada (bukan berhenti dengan galat).",
+   "tambah(nama_berkas, baris): tambahkan satu baris di akhir berkas TANPA menghapus isi lama (berkas boleh belum ada).",
+   "hitung(nama_berkas): banyak baris di berkas (0 bila berkas belum ada).",
+   "cari(nama_berkas, kata): list baris yang memuat kata itu, tanpa membedakan huruf besar dan kecil (list kosong bila berkas belum ada). Tekan Periksa Bagian B untuk mengujinya."
+  ],
+  "petunjuk": [
+   {
+    "jenis": "soal",
+    "isi": "Mode \"a\" menambah di akhir berkas dan membuatnya bila belum ada. Berkas yang belum ada menghasilkan FileNotFoundError; tangkap dengan try dan except."
+   },
+   {
+    "jenis": "buku",
+    "isi": "Buku Bab 10: mode r, w, a, with, strip, dan menangani berkas yang tidak ada."
+   },
+   {
+    "jenis": "soal",
+    "isi": "hitung dan cari bisa memakai baca(nama_berkas). Untuk tanpa membedakan huruf: kata.lower() in baris.lower()."
+   }
+  ],
+  "awal": "# catatan.py\n\ndef simpan(nama_berkas, daftar):\n    with open(nama_berkas, \"w\") as f:\n        for baris in daftar:\n            f.write(baris + \"\\n\")\n\n\ndef baca(nama_berkas):\n    with open(nama_berkas) as f:\n        return [b.strip() for b in f]\n",
+  "kasus": [
+   {
+    "nama": "baca berkas yang belum ada",
+    "kode": "from catatan import baca\nassert baca('tidak_ada_sama_sekali.txt') == []"
+   },
+   {
+    "nama": "tambah tidak menghapus isi lama",
+    "kode": "from catatan import simpan, tambah, baca\nsimpan('c1.txt', ['satu', 'dua'])\ntambah('c1.txt', 'tiga')\nassert baca('c1.txt') == ['satu', 'dua', 'tiga']"
+   },
+   {
+    "nama": "tambah ke berkas baru",
+    "kode": "from catatan import tambah, baca\ntambah('c2.txt', 'pertama')\ntambah('c2.txt', 'kedua')\nassert baca('c2.txt') == ['pertama', 'kedua']"
+   },
+   {
+    "nama": "hitung baris",
+    "kode": "from catatan import simpan, hitung\nsimpan('c3.txt', ['a', 'b', 'c'])\nassert hitung('c3.txt') == 3\nassert hitung('belum_ada_3.txt') == 0"
+   },
+   {
+    "nama": "cari kata tanpa membedakan huruf",
+    "kode": "from catatan import simpan, cari\nsimpan('c4.txt', ['Beli keripik', 'Telepon Bu Ida', 'beli petis'])\nassert cari('c4.txt', 'BELI') == ['Beli keripik', 'beli petis']\nassert cari('c4.txt', 'dodol') == []"
+   },
+   {
+    "nama": "cari di berkas yang belum ada (tersembunyi)",
+    "kode": "from catatan import cari\nassert cari('belum_ada_5.txt', 'a') == []",
+    "tersembunyi": true
+   }
+  ]
+ }
 }
