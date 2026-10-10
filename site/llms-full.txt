@@ -1,0 +1,223 @@
+# Latihan Pemrograman USG
+
+> Situs latihan koding gratis tanpa instal: tulis dan jalankan kode Python dan Java langsung di browser. Dibuat oleh Muchson (https://muchson.web.id/) untuk mahasiswa Universitas Qomaruddin (USG) Gresik dan pemula umum. Bahasa: Indonesia.
+
+Aplikasi latihan memerlukan akun; halaman di bawah ini adalah ringkasan publik tiap mata kuliah dan bab.
+
+## Algoritma dan Pemrograman (Python)
+
+Fondasi berpikir komputasional dengan Python. Tulis kode langsung di browser dan lihat hasilnya saat itu juga.
+
+- [Ringkasan mata kuliah](https://latihan-usg.vercel.app/belajar/algoritma-python/)
+- [Bab 1: Fondasi algoritma dan Python](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-01/)
+  - Ringkasan: Algoritma adalah urutan langkah yang bisa diikuti mesin. Python dipakai karena mudah dibaca dan banyak dipakai di dunia kerja.
+  - Rujukan buku: Bab I, bagian C: Lima syarat sebuah algoritma, hlm. 6
+  - Tantangan: Menghitung bahan Jubung dari jumlah pesanan
+  - Praktik: Program pertamamu: menyapa. Membaca masukan dengan input() dan mencetak beberapa baris dengan print().
+  - Video: Belajar Python 01: Apa itu Python (https://www.youtube.com/watch?v=iA8lLwmtKQM)
+- [Bab 2: Variabel, tipe data, operator](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-02/)
+  - Ringkasan: Variabel adalah kotak bernama yang menyimpan nilai. Angka bulat, pecahan, teks, dan benar-salah punya aturan hitung masing-masing.
+  - Rujukan buku: Bab II, bagian B: Variabel, kotak yang diberi nama, hlm. 44
+  - Tantangan: Mengemas pudak ke dalam kotak
+  - Praktik: Enam operasi pada dua bilangan. Memakai operator aritmetika dan f-string untuk menampilkan hasil enam operasi dari dua bilangan.
+  - Video: Belajar Python 04: Mengenal Variabel (https://www.youtube.com/watch?v=gxmTFXfrMzk)
+  - Video: Belajar Python 05: Tipe Data (https://www.youtube.com/watch?v=b3X0CH98Y9g)
+- [Bab 3: Flowchart, pseudocode, penelusuran](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-03/)
+  - Ringkasan: Gambar dulu alurnya sebelum mengetik kode. Flowchart memakai simbol baku, pseudocode memakai kalimat terstruktur, penelusuran menjalankan rancangan dengan tangan.
+  - Rujukan buku: Bab III, bagian C: Flowchart, simbol baku dan artinya, hlm. 76
+  - Tantangan: Flowchart, pseudocode, dan penelusuran
+  - Video: Mengenal Pseudocode (https://www.youtube.com/watch?v=Qf4Npdwar_s)
+  - Video: Flowchart Looping dan Contoh Sehari-hari (https://www.youtube.com/watch?v=ld6F5qCg84o)
+- [Bab 4: Percabangan](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-04/)
+  - Ringkasan: Program memilih jalan dengan if, elif, dan else. Indentasi menentukan baris mana yang ikut dalam blok.
+  - Rujukan buku: Bab IV, bagian D: if tunggal, if-else, if-elif-else, hlm. 102
+  - Tantangan: Potongan harga bertingkat UD Rasa Gresik
+  - Praktik: Kategori usia dengan if, elif, else. Menyusun percabangan bertingkat dan memilih batas yang benar, termasuk kasus batas.
+  - Video: Belajar Python 21: IF dan ELSE Statement (https://www.youtube.com/watch?v=rF8rh40z_X0)
+  - Video: Belajar Python 22: ELIF Statement (https://www.youtube.com/watch?v=ICowoqcLp4E)
+- [Bab 5: Perulangan](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-05/)
+  - Ringkasan: for dipakai saat jumlah ulangan pasti, while saat bergantung pada syarat. Waspadai perulangan yang tidak pernah berhenti.
+  - Rujukan buku: Bab V, bagian C: for dan range(), hlm. 122
+  - Tantangan: Menjumlahkan boks dan berhenti saat dibatalkan
+  - Praktik: Tabel perkalian dengan for. Memakai for dan range() untuk mencetak baris berulang dengan nomor yang berubah.
+  - Video: Belajar Python 24: For Loop (https://www.youtube.com/watch?v=Z4qfMhx4XzQ)
+  - Video: Belajar Python 25: While Loop (https://www.youtube.com/watch?v=ZupffvoCChQ)
+- [Bab 6: List satu dimensi](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-06/)
+  - Ringkasan: List menyimpan banyak nilai sekaligus. Akses lewat indeks, ambil sepotong dengan slicing.
+  - Rujukan buku: Bab VI, bagian C: Mengakses elemen dengan indeks, hlm. 147
+  - Tantangan: Rekap nilai pesanan hari ini
+  - Praktik: Statistik sederhana dari sebuah list. Mengisi list dengan append dan memakai fungsi bawaan sum, max, dan min.
+  - Video: Belajar Python 29: List (https://www.youtube.com/watch?v=tERK7b5Woqs)
+  - Video: Belajar Python 30: Manipulasi List (https://www.youtube.com/watch?v=Xqvui6Bmrj0)
+- [Bab 7: Nested list dan string](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-07/)
+  - Ringkasan: Tabel di Python adalah list di dalam list. String bisa dipecah, disatukan, dan dirapikan.
+  - Rujukan buku: Bab VII, bagian C: String sebagai data yang bisa diolah, hlm. 170
+  - Tantangan: Mengolah baris pesanan teks
+  - Praktik: Memecah dan merapikan teks. Memakai method string split(), strip(), dan title() untuk mengolah teks masukan.
+  - Video: Belajar Python 33: Nested List (https://www.youtube.com/watch?v=u3xOkmxzeBE)
+  - Video: Belajar Python 16: Manipulasi String (https://www.youtube.com/watch?v=MPvC9uWATLI)
+- [Bab 8: Fungsi dan pemrograman modular](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-08/)
+  - Ringkasan: Fungsi memecah program jadi bagian kecil yang bisa dipakai ulang. def, parameter, dan return adalah kuncinya.
+  - Rujukan buku: Bab VIII, bagian C: Anatomi fungsi, hlm. 189
+  - Tantangan: Fungsi biaya kirim dan total tagihan
+  - Praktik: Dua fungsi yang berguna. Menulis fungsi dengan parameter dan return, termasuk menangani kasus list kosong.
+  - Video: Belajar Python 44: Pengenalan Fungsi (https://www.youtube.com/watch?v=ywE2eqG3-kc)
+  - Video: Belajar Python 46: Fungsi dengan return (https://www.youtube.com/watch?v=ADcQu-8R0Ok)
+- [Bab 9: Kelas, objek, referensi](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-09/)
+  - Ringkasan: Kelas menyatukan data dan fungsi yang berhubungan. Objek adalah hasil cetakan kelas; menyalin variabel belum tentu menyalin objeknya.
+  - Rujukan buku: Bab IX, bagian C: Anatomi kelas, hlm. 215
+  - Tantangan: Menyalin pesanan tanpa mengubah aslinya
+  - Praktik: Kelas Karyawan. Menulis kelas dengan constructor, atribut, dan method yang memakai self.
+  - Video: Belajar Python OOP 01: Pendahuluan (https://www.youtube.com/watch?v=1PjHsUnOkes)
+  - Video: Belajar Python OOP 02: Constructor __init__() (https://www.youtube.com/watch?v=w9emRmkbeps)
+- [Bab 10: Berkas dan File I/O](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-10/)
+  - Ringkasan: Data di variabel hilang saat program ditutup. Berkas menyimpannya; mode w menimpa, mode a menambah.
+  - Rujukan buku: Bab X, bagian E: Mode w menimpa, mode a menambah, hlm. 245
+  - Tantangan: Menyimpan dan membaca pesanan dari berkas
+  - Praktik: Menulis dan membaca berkas teks. Memakai with open(), mode berkas yang tepat, dan membuang karakter baris baru saat membaca.
+  - Video: Belajar Python 64: Read external file (https://www.youtube.com/watch?v=9xiuFrL0wSw)
+  - Video: Belajar Python 65: Write external file (https://www.youtube.com/watch?v=3FfNwPIAtNw)
+- [Bab 11: CRUD sederhana](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-11/)
+  - Ringkasan: Create, Read, Update, Delete adalah empat operasi yang ada di hampir semua aplikasi data.
+  - Rujukan buku: Bab XI, bagian G: Menyatukan jadi aplikasi konsol, hlm. 273
+  - Tantangan: Mengelola daftar pesanan (CRUD)
+  - Praktik: Daftar pesanan: tampil dan hapus. Mengolah daftar kamus: menampilkan isi dan membuang elemen tanpa ada yang terlewat.
+  - Video: Belajar Python PROJECT 67: Persiapan (https://www.youtube.com/watch?v=PmdQwH_NU3U)
+  - Video: Belajar Python PROJECT 69: Create (https://www.youtube.com/watch?v=TnZCxPbT1I8)
+- [Bab 12: Linear dan binary search](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-12/)
+  - Ringkasan: Linear search memeriksa satu per satu. Binary search membelah dua, tetapi datanya harus terurut.
+  - Rujukan buku: Bab XII, bagian C: Binary search, syarat data harus terurut, hlm. 290
+  - Tantangan: Binary search nomor pesanan
+  - Praktik: Linear dan binary search. Melengkapi pencarian linear (dengan hitungan langkah) dan pencarian biner pada list terurut.
+  - Video: Sequential Search dan Binary Search (https://www.youtube.com/watch?v=8K983gxITCI)
+  - Video: Konsep Logika Binary Search (https://www.youtube.com/watch?v=Xp68BLKf23w)
+- [Bab 13: Sorting dan pengantar Big-O](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-13/)
+  - Ringkasan: Bubble sort menukar tetangga; selection sort memilih yang terkecil. Big-O mengukur bagaimana jumlah langkah tumbuh.
+  - Rujukan buku: Bab XIII, bagian B: Bubble sort, algoritma paling intuitif, hlm. 311
+  - Tantangan: Bubble sort pesanan dari yang terbesar
+  - Praktik: Bubble sort dan hitung penukaran. Melengkapi bubble sort dan menghitung berapa kali penukaran sungguhan terjadi.
+  - Video: Konsep Logika Bubble Sort (https://www.youtube.com/watch?v=fHQQZ28WFuQ)
+  - Video: Bubble Sort dengan Python (https://www.youtube.com/watch?v=GntGHFfHSzk)
+- [Bab 14: Rekursi dan proyek akhir](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-14/)
+  - Ringkasan: Fungsi yang memanggil dirinya sendiri harus punya base case. Bab ini juga menutup proyek kelompok.
+  - Rujukan buku: Bab XIV, bagian C: Base case dan recursive case, hlm. 332
+  - Tantangan: Total pesanan dengan rekursi
+  - Praktik: Rekursi: faktorial dan jumlah. Menulis fungsi rekursif dengan kasus dasar yang benar dan langkah rekursif yang mendekati kasus dasar.
+  - Video: Fungsi Rekursif Pada Python (https://www.youtube.com/watch?v=n6s7IpVrECk)
+  - Video: Tutorial Fungsi Rekursif Python (https://www.youtube.com/watch?v=VtvxvCkKlok)
+
+## Pemrograman Berorientasi Objek (Java)
+
+Konsep kelas, objek, pewarisan, dan polimorfisme dengan Java.
+
+- [Ringkasan mata kuliah](https://latihan-usg.vercel.app/belajar/pbo-java/)
+- [Bab 1: Paradigma pemrograman berorientasi objek](https://latihan-usg.vercel.app/belajar/pbo-java/bab-01/)
+  - Ringkasan: Program bisa disusun sebagai kumpulan objek yang memegang data dan perilakunya sendiri. Bab ini membandingkan gaya prosedural dengan gaya objek, dan mengenalkan empat pilar OOP serta ekosistem Java.
+  - Rujukan buku: Bab I, bagian C: Gagasan dasar paradigma berorientasi objek, hlm. 5
+  - Tantangan: Katalog majalah perpustakaan
+  - Praktik: Objek pertamamu: Hewan. Membuat objek dari sebuah kelas, mengisi atributnya, dan memanggil method.
+  - Video: Belajar Java [OOP] 01: Pendahuluan (https://www.youtube.com/watch?v=bxOPd_b0rg4)
+  - Video: Belajar Java [OOP] 02a: Setup Visual Studio Code di Windows (https://www.youtube.com/watch?v=1vY5eNw5OdE)
+- [Bab 2: Kelas, objek, atribut, method, constructor](https://latihan-usg.vercel.app/belajar/pbo-java/bab-02/)
+  - Ringkasan: Kelas adalah cetak biru, objek adalah wujud nyatanya. Atribut menyimpan data, method melakukan pekerjaan, constructor menyiapkan objek saat dibuat.
+  - Rujukan buku: Bab II, bagian B: Kelas sebagai cetak biru dan objek sebagai instans, hlm. 19
+  - Tantangan: Anggota perpustakaan dengan dua constructor
+  - Praktik: Kelas Produk dengan constructor. Menulis constructor yang mengisi atribut dan method yang memakai atribut itu.
+  - Video: Belajar Java [OOP] 03: Pengenalan Class dan Object (https://www.youtube.com/watch?v=aQRemTq6Two)
+  - Video: Belajar Java [OOP] 04: Constructor (https://www.youtube.com/watch?v=45SxJ9GhEO0)
+  - Video: Belajar Java [OOP] 05: Methods (https://www.youtube.com/watch?v=_0rSpG23zps)
+- [Bab 3: Enkapsulasi dan access modifier](https://latihan-usg.vercel.app/belajar/pbo-java/bab-03/)
+  - Ringkasan: Data dilindungi dengan private, lalu diakses lewat getter dan setter. Setter yang baik memeriksa nilai sebelum menyimpannya.
+  - Rujukan buku: Bab III, bagian D: Getter, setter, dan validasi data di dalam setter, hlm. 36
+  - Tantangan: Menjaga NIM anggota dengan setter
+  - Praktik: Enkapsulasi: Rekening yang aman. Menyembunyikan atribut dengan private dan menjaga aturan data lewat method.
+  - Video: Belajar Java [OOP] 09: Public dan Private Keywords (https://www.youtube.com/watch?v=aRb7SO6iiqE)
+  - Video: Belajar Java [OOP] 10: Getter dan Setter (Encapsulasi) (https://www.youtube.com/watch?v=zwDMHJzTUzs)
+- [Bab 4: Pemodelan dengan diagram kelas UML](https://latihan-usg.vercel.app/belajar/pbo-java/bab-04/)
+  - Ringkasan: Sebelum menulis kode, rancang kelas dan hubungannya di atas kertas dengan diagram kelas UML.
+  - Rujukan buku: Bab IV, bagian C: Relasi antarkelas, asosiasi, agregasi, komposisi, hlm. 47
+  - Tantangan: Pemodelan dengan diagram kelas UML
+  - Video: Apa itu UML? Beserta Pengertian dan Contohnya (https://www.youtube.com/watch?v=zoZuzFmEUP4)
+  - Video: Belajar Class Diagram (https://www.youtube.com/watch?v=shpryDoscDU)
+- [Bab 5: Pewarisan (inheritance)](https://latihan-usg.vercel.app/belajar/pbo-java/bab-05/)
+  - Ringkasan: Subclass mewarisi atribut dan method superclass lewat extends, memakai super untuk memanggil bagian induk, dan mengubah perilaku dengan override.
+  - Rujukan buku: Bab V, bagian C: Kata kunci super pada constructor dan method, hlm. 63
+  - Tantangan: Skripsi sebagai turunan item perpustakaan
+  - Praktik: Pewarisan: Kendaraan dan Motor. Membuat kelas turunan yang memanggil constructor induk dan memakai method induk.
+  - Video: Learn Java [OOP] 18: Introduction to Inheritance (https://www.youtube.com/watch?v=CXqOqqe7zjo)
+  - Video: Learn Java [OOP] 20: Super (inheritance) (https://www.youtube.com/watch?v=MMCcP5Lnohs)
+  - Video: Learn Java [OOP] 19: Overriding Methods (inheritance) (https://www.youtube.com/watch?v=7okH5nc2LEc)
+  - Video: Belajar Java [OOP] 21: Subclass Constructor (inheritance) (https://www.youtube.com/watch?v=XHDA2qaTMw4)
+- [Bab 6: Polimorfisme](https://latihan-usg.vercel.app/belajar/pbo-java/bab-06/)
+  - Ringkasan: Satu pemanggilan method bisa berperilaku berbeda tergantung jenis objek sebenarnya. Inilah polimorfisme dinamis lewat override dan dynamic binding.
+  - Rujukan buku: Bab VI, bagian C: Overriding (polimorfisme dinamis), hlm. 76
+  - Tantangan: Denda keterlambatan per jenis koleksi
+  - Praktik: Polimorfisme: luas bentuk. Membuat method yang ditimpa di kelas turunan dan memanggilnya lewat tipe induk.
+  - Video: Learn Java [OOP] 17: Overloading Constructors and Methods (https://www.youtube.com/watch?v=TTt6v_be0Vk)
+  - Video: Belajar Java [OOP] 23: Polymorphism (https://www.youtube.com/watch?v=hvrS5b0k4Jk)
+  - Video: Belajar Java [OOP] 25: Object Casting (https://www.youtube.com/watch?v=MoIORVH4LwI)
+- [Bab 7: Abstraksi: abstract class dan interface](https://latihan-usg.vercel.app/belajar/pbo-java/bab-07/)
+  - Ringkasan: Interface adalah kontrak perilaku, abstract class adalah kerangka setengah jadi. Keduanya memaksa kelas turunan melengkapi bagian yang wajib.
+  - Rujukan buku: Bab VII, bagian C: Interface, kontrak perilaku, hlm. 90
+  - Tantangan: Majalah yang bisa dipinjam dan dicetak labelnya
+  - Praktik: Abstraksi: cara pembayaran. Melengkapi kelas abstrak dengan method abstrak yang diimplementasikan kelas turunan.
+  - Video: Belajar Java [OOP] 26: Abstract Class (https://www.youtube.com/watch?v=7N3lxM05cw0)
+  - Video: Belajar Java [OOP] 34: Interface (https://www.youtube.com/watch?v=ztQPFMFEItI)
+  - Video: Belajar Java [OOP] 35: Interface VS Abstract (https://www.youtube.com/watch?v=hkNgCn8Yl08)
+- [Bab 8: Penanganan eksepsi](https://latihan-usg.vercel.app/belajar/pbo-java/bab-08/)
+  - Ringkasan: Kesalahan saat program berjalan ditangkap dengan try-catch-finally, dilempar dengan throw, dan bisa dibuat khusus lewat custom exception.
+  - Rujukan buku: Bab VIII, bagian C: try-catch-finally dan try-with-resources, hlm. 103
+  - Tantangan: Batas pinjam dengan custom exception
+  - Praktik: Eksepsi: validasi umur. Melempar eksepsi buatan sendiri dan menangkap eksepsi bawaan dengan try dan catch.
+  - Video: Belajar Java [Dasar] 52: Mengenal Exception - Try, Catch, dan Finally (https://www.youtube.com/watch?v=u0EnKP6SdNM)
+  - Video: Belajar Java [Dasar] 53: Exception pada method (rantai exception) (https://www.youtube.com/watch?v=MACrl1oNLhc)
+- [Bab 9: Collection framework dan generics](https://latihan-usg.vercel.app/belajar/pbo-java/bab-09/)
+  - Ringkasan: List, Set, dan Map menyimpan banyak objek dengan cara berbeda. Generics menjaga tipe isinya, Comparator mengatur urutannya.
+  - Rujukan buku: Bab IX, bagian E: Iterasi, Comparable/Comparator, dan pengurutan objek
+  - Tantangan: Katalog buku berurutan dengan Map
+  - Praktik: Collection: daftar dan penghitung kata. Memakai ArrayList dan HashMap dengan generics.
+  - Video: Learn Java [OOP] 30: Generic Array List (https://www.youtube.com/watch?v=GTjuHxcBeJg)
+  - Video: Belajar Java [OOP] 31: Operasi Array List (https://www.youtube.com/watch?v=nUmr7xTamBg)
+  - Video: Belajar Java Collections: Map (HashMap, TreeMap, LinkedHashMap) (https://www.youtube.com/watch?v=-DVT3SvyXcA)
+- [Bab 10: Operasi berkas dan object persistence](https://latihan-usg.vercel.app/belajar/pbo-java/bab-10/)
+  - Ringkasan: Data disimpan ke berkas teks atau CSV dan dibaca kembali dengan Path dan Files, lengkap dengan penanganan eksepsi berkas.
+  - Rujukan buku: Bab X, bagian E: NIO.2 (Path, Files) dan penanganan eksepsi berkas, hlm. 132
+  - Tantangan: Menyimpan katalog ke berkas CSV
+  - Praktik: Menulis dan membaca berkas teks. Memakai PrintWriter dan BufferedReader dengan try-with-resources untuk menulis dan membaca baris.
+  - Video: Belajar Java [Dasar] 54: Pengenalan I/O Stream, input file (https://www.youtube.com/watch?v=YKnhpdWxp54)
+  - Video: Input/Output File Java (Membaca & Menulis) (https://www.youtube.com/watch?v=hgF21imQ_Is)
+- [Bab 11: Koneksi basis data JDBC dan CRUD](https://latihan-usg.vercel.app/belajar/pbo-java/bab-11/)
+  - Ringkasan: Program Java berbicara dengan basis data lewat JDBC. PreparedStatement dan pola DAO menjaga kode data tetap rapi.
+  - Rujukan buku: Bab XI, bagian C: Statement, PreparedStatement, dan ResultSet, hlm. 141
+  - Tantangan: Koneksi basis data JDBC dan CRUD
+  - Video: Tutorial Java Database (Bahasa Indonesia) (https://www.youtube.com/watch?v=_25BmjGfjQQ)
+  - Video: Java CRUD MySQL MVC Bagian 1 (Koneksi MySQL) (https://www.youtube.com/watch?v=nnQTqEgJUVM)
+- [Bab 12: Antarmuka grafis dan event handling](https://latihan-usg.vercel.app/belajar/pbo-java/bab-12/)
+  - Ringkasan: Aplikasi berjendela dibangun dari komponen Swing yang ditata layout manager dan dihidupkan oleh event listener.
+  - Rujukan buku: Bab XII, bagian D: Event handling, listener, event object, dan lambda, hlm. 156
+  - Tantangan: Antarmuka grafis dan event handling
+  - Video: Java Swing Tutorial (Bahasa Indonesia) (https://www.youtube.com/watch?v=iwW-5e5Rmrs)
+  - Video: Tutorial membuat tampilan GUI dengan Java Swing (https://www.youtube.com/watch?v=JMDNuZyD9nw)
+- [Bab 13: Prinsip desain SOLID](https://latihan-usg.vercel.app/belajar/pbo-java/bab-13/)
+  - Ringkasan: Lima prinsip untuk kode yang mudah diubah. Open-Closed, misalnya, menambah perilaku baru dengan menambah kelas, bukan mengubah kelas lama.
+  - Rujukan buku: Bab XIII, bagian B: Single Responsibility dan Open-Closed, hlm. 168
+  - Tantangan: Menambah jenis denda tanpa mengubah kelas lama
+  - Praktik: SOLID: bergantung pada abstraksi. Membuat kelas yang memakai interface, bukan kelas konkret (prinsip dependency inversion).
+  - Video: SOLID Principles: Konsep dan Penjelasannya (https://www.youtube.com/watch?v=hKjk2CWd1kY)
+  - Video: Apakah SOLID Wajib Digunakan? (https://www.youtube.com/watch?v=4YIUo7ZMMlk)
+- [Bab 14: Pengantar design pattern](https://latihan-usg.vercel.app/belajar/pbo-java/bab-14/)
+  - Ringkasan: Pola desain adalah resep yang sudah teruji. Singleton menjamin satu instance, Factory Method memusatkan pembuatan objek, MVC memisahkan data, tampilan, dan pengendali.
+  - Rujukan buku: Bab XIV, bagian C: Singleton, kasus koneksi basis data, hlm. 182
+  - Tantangan: Factory dan Singleton untuk item perpustakaan
+  - Praktik: Design pattern: Singleton. Menulis kelas yang hanya boleh punya satu objek: constructor private dan satu instance bersama.
+  - Video: Belajar Design Patterns 2: Singleton (https://www.youtube.com/watch?v=mkE3Nd4nwIM)
+  - Video: Belajar Design Patterns 4: Factory Method (https://www.youtube.com/watch?v=4hdLY7WkAXY)
+  - Video: Java CRUD MySQL MVC Bagian 1 (Koneksi MySQL) (https://www.youtube.com/watch?v=nnQTqEgJUVM)
+- [Bab 15: Integrasi konsep dalam proyek](https://latihan-usg.vercel.app/belajar/pbo-java/bab-15/)
+  - Ringkasan: Semua konsep Bab I sampai XIV dirakit menjadi satu aplikasi SIP-USG utuh lengkap dengan dokumentasi dan demonstrasi.
+  - Rujukan buku: Bab XV, bagian B: Peta integrasi seluruh konsep Bab I sampai XIV, hlm. 198
+  - Tantangan: Integrasi konsep dalam proyek
+
+## Pembuat
+
+- [Muchson](https://muchson.web.id/)

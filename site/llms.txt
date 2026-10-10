@@ -1,0 +1,50 @@
+# Latihan Pemrograman USG
+
+> Situs latihan koding gratis tanpa instal: tulis dan jalankan kode Python dan Java langsung di browser. Dibuat oleh Muchson (https://muchson.web.id/) untuk mahasiswa Universitas Qomaruddin (USG) Gresik dan pemula umum. Bahasa: Indonesia.
+
+Aplikasi latihan memerlukan akun; halaman di bawah ini adalah ringkasan publik tiap mata kuliah dan bab.
+
+## Algoritma dan Pemrograman (Python)
+
+Fondasi berpikir komputasional dengan Python. Tulis kode langsung di browser dan lihat hasilnya saat itu juga.
+
+- [Ringkasan mata kuliah](https://latihan-usg.vercel.app/belajar/algoritma-python/)
+- [Bab 1: Fondasi algoritma dan Python](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-01/): Algoritma adalah urutan langkah yang bisa diikuti mesin. Python dipakai karena mudah dibaca dan banyak dipakai di dunia kerja.
+- [Bab 2: Variabel, tipe data, operator](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-02/): Variabel adalah kotak bernama yang menyimpan nilai. Angka bulat, pecahan, teks, dan benar-salah punya aturan hitung masing-masing.
+- [Bab 3: Flowchart, pseudocode, penelusuran](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-03/): Gambar dulu alurnya sebelum mengetik kode. Flowchart memakai simbol baku, pseudocode memakai kalimat terstruktur, penelusuran menjalankan rancangan dengan tangan.
+- [Bab 4: Percabangan](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-04/): Program memilih jalan dengan if, elif, dan else. Indentasi menentukan baris mana yang ikut dalam blok.
+- [Bab 5: Perulangan](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-05/): for dipakai saat jumlah ulangan pasti, while saat bergantung pada syarat. Waspadai perulangan yang tidak pernah berhenti.
+- [Bab 6: List satu dimensi](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-06/): List menyimpan banyak nilai sekaligus. Akses lewat indeks, ambil sepotong dengan slicing.
+- [Bab 7: Nested list dan string](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-07/): Tabel di Python adalah list di dalam list. String bisa dipecah, disatukan, dan dirapikan.
+- [Bab 8: Fungsi dan pemrograman modular](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-08/): Fungsi memecah program jadi bagian kecil yang bisa dipakai ulang. def, parameter, dan return adalah kuncinya.
+- [Bab 9: Kelas, objek, referensi](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-09/): Kelas menyatukan data dan fungsi yang berhubungan. Objek adalah hasil cetakan kelas; menyalin variabel belum tentu menyalin objeknya.
+- [Bab 10: Berkas dan File I/O](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-10/): Data di variabel hilang saat program ditutup. Berkas menyimpannya; mode w menimpa, mode a menambah.
+- [Bab 11: CRUD sederhana](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-11/): Create, Read, Update, Delete adalah empat operasi yang ada di hampir semua aplikasi data.
+- [Bab 12: Linear dan binary search](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-12/): Linear search memeriksa satu per satu. Binary search membelah dua, tetapi datanya harus terurut.
+- [Bab 13: Sorting dan pengantar Big-O](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-13/): Bubble sort menukar tetangga; selection sort memilih yang terkecil. Big-O mengukur bagaimana jumlah langkah tumbuh.
+- [Bab 14: Rekursi dan proyek akhir](https://latihan-usg.vercel.app/belajar/algoritma-python/bab-14/): Fungsi yang memanggil dirinya sendiri harus punya base case. Bab ini juga menutup proyek kelompok.
+
+## Pemrograman Berorientasi Objek (Java)
+
+Konsep kelas, objek, pewarisan, dan polimorfisme dengan Java.
+
+- [Ringkasan mata kuliah](https://latihan-usg.vercel.app/belajar/pbo-java/)
+- [Bab 1: Paradigma pemrograman berorientasi objek](https://latihan-usg.vercel.app/belajar/pbo-java/bab-01/): Program bisa disusun sebagai kumpulan objek yang memegang data dan perilakunya sendiri. Bab ini membandingkan gaya prosedural dengan gaya objek, dan mengenalkan empat pilar OOP serta ekosistem Java.
+- [Bab 2: Kelas, objek, atribut, method, constructor](https://latihan-usg.vercel.app/belajar/pbo-java/bab-02/): Kelas adalah cetak biru, objek adalah wujud nyatanya. Atribut menyimpan data, method melakukan pekerjaan, constructor menyiapkan objek saat dibuat.
+- [Bab 3: Enkapsulasi dan access modifier](https://latihan-usg.vercel.app/belajar/pbo-java/bab-03/): Data dilindungi dengan private, lalu diakses lewat getter dan setter. Setter yang baik memeriksa nilai sebelum menyimpannya.
+- [Bab 4: Pemodelan dengan diagram kelas UML](https://latihan-usg.vercel.app/belajar/pbo-java/bab-04/): Sebelum menulis kode, rancang kelas dan hubungannya di atas kertas dengan diagram kelas UML.
+- [Bab 5: Pewarisan (inheritance)](https://latihan-usg.vercel.app/belajar/pbo-java/bab-05/): Subclass mewarisi atribut dan method superclass lewat extends, memakai super untuk memanggil bagian induk, dan mengubah perilaku dengan override.
+- [Bab 6: Polimorfisme](https://latihan-usg.vercel.app/belajar/pbo-java/bab-06/): Satu pemanggilan method bisa berperilaku berbeda tergantung jenis objek sebenarnya. Inilah polimorfisme dinamis lewat override dan dynamic binding.
+- [Bab 7: Abstraksi: abstract class dan interface](https://latihan-usg.vercel.app/belajar/pbo-java/bab-07/): Interface adalah kontrak perilaku, abstract class adalah kerangka setengah jadi. Keduanya memaksa kelas turunan melengkapi bagian yang wajib.
+- [Bab 8: Penanganan eksepsi](https://latihan-usg.vercel.app/belajar/pbo-java/bab-08/): Kesalahan saat program berjalan ditangkap dengan try-catch-finally, dilempar dengan throw, dan bisa dibuat khusus lewat custom exception.
+- [Bab 9: Collection framework dan generics](https://latihan-usg.vercel.app/belajar/pbo-java/bab-09/): List, Set, dan Map menyimpan banyak objek dengan cara berbeda. Generics menjaga tipe isinya, Comparator mengatur urutannya.
+- [Bab 10: Operasi berkas dan object persistence](https://latihan-usg.vercel.app/belajar/pbo-java/bab-10/): Data disimpan ke berkas teks atau CSV dan dibaca kembali dengan Path dan Files, lengkap dengan penanganan eksepsi berkas.
+- [Bab 11: Koneksi basis data JDBC dan CRUD](https://latihan-usg.vercel.app/belajar/pbo-java/bab-11/): Program Java berbicara dengan basis data lewat JDBC. PreparedStatement dan pola DAO menjaga kode data tetap rapi.
+- [Bab 12: Antarmuka grafis dan event handling](https://latihan-usg.vercel.app/belajar/pbo-java/bab-12/): Aplikasi berjendela dibangun dari komponen Swing yang ditata layout manager dan dihidupkan oleh event listener.
+- [Bab 13: Prinsip desain SOLID](https://latihan-usg.vercel.app/belajar/pbo-java/bab-13/): Lima prinsip untuk kode yang mudah diubah. Open-Closed, misalnya, menambah perilaku baru dengan menambah kelas, bukan mengubah kelas lama.
+- [Bab 14: Pengantar design pattern](https://latihan-usg.vercel.app/belajar/pbo-java/bab-14/): Pola desain adalah resep yang sudah teruji. Singleton menjamin satu instance, Factory Method memusatkan pembuatan objek, MVC memisahkan data, tampilan, dan pengendali.
+- [Bab 15: Integrasi konsep dalam proyek](https://latihan-usg.vercel.app/belajar/pbo-java/bab-15/): Semua konsep Bab I sampai XIV dirakit menjadi satu aplikasi SIP-USG utuh lengkap dengan dokumentasi dan demonstrasi.
+
+## Pembuat
+
+- [Muchson](https://muchson.web.id/)

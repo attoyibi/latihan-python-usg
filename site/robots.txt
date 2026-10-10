@@ -1,0 +1,25 @@
+# Halaman publik boleh dirayapi mesin pencari dan AI. Bagian berlogin tidak berisi apa pun untuk dirayapi.
+User-agent: *
+Allow: /
+
+# Perayap AI yang diizinkan secara eksplisit
+User-agent: GPTBot
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://latihan-usg.vercel.app/sitemap.xml

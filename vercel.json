@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "node tools/buat_config.mjs",
+  "buildCommand": "node tools/buat_config.mjs && node tools/buat_halaman_publik.mjs",
   "outputDirectory": "site",
   "headers": [
     {

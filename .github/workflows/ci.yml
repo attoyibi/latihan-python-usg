@@ -18,6 +18,8 @@ jobs:
           node-version: "22"
       - name: Periksa isi (materi dan challenge)
         run: python tools/validasi_konten.py
+      - name: Periksa halaman publik (SEO dan AI) sesuai data
+        run: node tools/buat_halaman_publik.mjs --periksa
       - name: Uji pembuat konfigurasi (menolak kunci service_role)
         run: node tools/uji_buat_config.mjs
       - name: Uji skrip pendaftaran peserta (server Supabase tiruan)

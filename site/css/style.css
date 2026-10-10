@@ -595,3 +595,7 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 /* Titik praktik di sel tabel Progres dashboard */
 .sel-wrap{position:relative;display:inline-block;padding:0 6px}
 .sel-wrap .pm{top:-4px;right:-5px}
+
+/* Kredit pembuat (footer semua halaman) */
+footer.pembuat{border-top:1px solid var(--line);padding:14px 16px 22px;text-align:center;font-size:13px;color:var(--muted)}
+footer.pembuat a{color:var(--brand-strong);font-weight:600}
