@@ -276,10 +276,12 @@ Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/pandu
 - [x] Layar Mulai, Tahap 1, Tahap 2, Hasil di rute `#k/<mk>/ujian/<id>` dengan login, penjalan Python, dan blokir tempel situs; kartu Ujian di halaman mata kuliah; promo tidak muncul selama ujian
 - [x] Diuji di `tools/server_uji.py` (akun budi): Tahap 1 terkunci, 9 butir Tahap 2 dari kode, nilai, uji ulang, muat ulang di tengah Tahap 2 (waktu tetap berjalan), tampilan HP 375 px
 - [x] Simulasi ujian (Bab 1-4, lebih mudah, nilai tidak dihitung, bisa diulang) supaya peserta mencoba setiap tahap; soal di `tools/ujian/simulasi_def.py`
-- [ ] **Belum aman untuk dipakai sungguhan:** keadaan ujian masih di browser (localStorage), jam dari perangkat, tes tersembunyi dan poin kunci teori masih ada di berkas publik `tasks.json`/`theory.json`. Jangan gabung ke `main` sebelum langkah server selesai
-- [ ] Migrasi `0010_ujian.sql` + fungsi RPC (jam server, kunci di tabel tertutup), diuji di proyek Supabase uji terpisah
-- [ ] Sambungkan klien ke fungsi; pindahkan kunci ke `kunci/` + tabel `ujian_kunci`
-- [ ] Tab "Ujian" di dashboard dosen (nilai, timpa, tinjauan, CSV, jadwal per kelas, akomodasi)
+- [x] Migrasi `0010_ujian.sql`: jadwal per kelas, akomodasi, sesi dengan jam server, kunci yang turun setelah Tahap 1 dikunci; diuji di PGlite (Tahap N di `tools/uji_sql`)
+- [x] Klien tersambung ke fungsi server; tes tersembunyi, poin kunci, butir konsep dipindah ke `kunci/` + tabel `ujian_kunci` (`tools/ujian/buat_kunci_ujian.py`)
+- [x] Tab "Ujian" di dashboard dosen: jadwal, tutup sekarang, akomodasi per NIM, rekap nilai, CSV, izinkan mengulang
+- [ ] **Jalankan 0010 dan `kunci/ujian_kunci.sql` di Supabase sungguhan** (sesi dengan folder kerja website-latihan, MCP), lalu uji dengan akun nyata di pratinjau
+- [ ] Soal UTS sungguhan yang belum pernah terbit (soal contoh sudah ada di riwayat repo publik)
+- [ ] Sisa celah: kunci butir Tahap 2 ada di browser selama Tahap 2; ringkasan nilai dikirim browser (lihat `docs/UJIAN.md`)
 - [ ] Pilot kecil di perangkat nyata; soal UAS Bab 8-14
 
 ## Tahap 8: Uji coba dan rilis

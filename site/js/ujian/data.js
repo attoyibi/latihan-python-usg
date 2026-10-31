@@ -1,12 +1,16 @@
-// Data ujian: definisi dari berkas JSON situs (data/kuliah/<mk>/ujian/) dan keadaan peserta (store.js, per akun).
+// Data ujian: definisi PUBLIK dari berkas JSON situs (data/kuliah/<mk>/ujian/), keadaan peserta, dan sesi di Supabase.
 // Mata kuliah tanpa tanda "ujian": true di matakuliah.json tidak mengambil apa pun.
-// Diadaptasi dari prototype double-check-exam (js/data.js); bagian dosen dan kohort contoh tidak dibawa.
+//
+// Server (migrasi 0010) memegang: jadwal per kelas, waktu mulai dan batas Tahap 1 (jam server), akomodasi waktu, dan kunci
+// (tes tersembunyi, poin kunci teori, butir konsep, varian) yang baru turun setelah Tahap 1 dikunci. Pekerjaan peserta
+// disimpan di browser (cadangan) dan dikirim ke kolom keadaan, jadi bisa dilanjutkan di perangkat lain dan dibaca dosen.
+// Diadaptasi dari prototype double-check-exam (js/data.js).
 import * as store from './store.js';
+import * as server from './server.js';
 import { buildItems, ITEM_TYPES } from './logic/items.js';
 import { summarize } from './logic/summary.js';
 import { computeS1 } from './logic/s1.js';
-import { computeGrade } from './logic/grade.js';
-import { accommodationFactor, stage1Deadline } from './logic/session.js';
+import { computeGrade, studentGrade, EVIDENCE_LABEL } from './logic/grade.js';
 
 async function ambilJson(path) {
   const r = await fetch(path, { cache: 'no-cache' });
@@ -16,7 +20,7 @@ async function ambilJson(path) {
 
 // ---- definisi ----
 const cacheIdx = new Map();
-// Daftar ujian satu mata kuliah: [{ id, judul, babDari, babSampai }]. Kosong bila tidak ada atau tidak bertanda.
+// Daftar ujian satu mata kuliah: [{ id, judul, babDari, babSampai, latihan }]. Kosong bila tidak ada atau tidak bertanda.
 export function muatIndeks(mk, ada = true) {
   if (!ada) return Promise.resolve([]);
   if (!cacheIdx.has(mk)) {
@@ -29,22 +33,55 @@ export function muatIndeks(mk, ada = true) {
 }
 
 let base = null; // { exam, tasks, theory, templates }
-let ctx = { mk: null, ujianId: null, peserta: null, meta: {} };
+let ctx = { mk: null, ujianId: null, peserta: null, meta: {}, status: null, kunci: false };
 
-// Memuat definisi satu ujian dan memilih penyimpanan untuk akun ini. peserta = { id, nama, nim, kelas }.
-// meta = baris index.json ujian ini (judul, jenis, latihan: true untuk simulasi yang boleh diulang).
+// Kunci dari server digabung ke definisi soal (tes tersembunyi, varian, ketentuan berubah, poin kunci, butir konsep).
+function gabungKunci(k) {
+  if (!k) return;
+  for (const t of base.tasks.tasks) Object.assign(t, (k.tasks || {})[t.id] || {});
+  for (const q of base.theory.questions) Object.assign(q, (k.theory || {})[q.id] || {});
+  ctx.kunci = true;
+}
+
+// Sesi server -> keadaan lokal (waktu dikonversi ke jam perangkat memakai selisih jam server).
+function terapkanSesi(sesi) {
+  store.update((s) => {
+    const d = (s.demo ||= {});
+    d.exam = { startedAt: server.keLokal(sesi.mulai_pada), endsAt: server.keLokal(sesi.batas_tahap1), speed: 1, factor: Number(sesi.faktor) || 1 };
+  }, { diam: true });
+}
+
+// Memuat definisi satu ujian, status dari server, dan memilih penyimpanan untuk akun ini.
+// peserta = { id, nama, nim, kelas }. meta = baris index.json (judul, jenis, latihan).
 export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
   const dir = `data/kuliah/${mk}/ujian/${ujianId}/`;
   const [exam, tasks, theory, templates] = await Promise.all(['exam', 'tasks', 'theory', 'templates'].map((f) => ambilJson(`${dir}${f}.json`)));
   base = { exam, tasks, theory, templates };
-  ctx = { mk, ujianId, peserta, meta };
+  ctx = { mk, ujianId, peserta, meta, status: null, kunci: false };
   store.pakai(peserta.id, mk, ujianId);
+  store.onSimpan(jadwalkanSimpan);
+
+  const st = await server.status(mk, ujianId);
+  ctx.status = st;
+  if (!st.sesi) {
+    // Tidak ada sesi di server (belum mulai, diulang, atau dihapus dosen): sisa keadaan lama di browser dibuang.
+    if (store.get().demo) store.reset();
+    return;
+  }
+  // Pekerjaan terbaru menang: dari server (perangkat lain) atau dari browser ini (belum sempat terkirim).
+  const lokal = store.get();
+  const dariServer = st.sesi.keadaan || {};
+  if ((dariServer._t || 0) > (lokal._t || 0)) store.ganti(dariServer);
+  terapkanSesi(st.sesi);
+  if (st.sesi.terkunci_pada) gabungKunci(await server.ambilKunci(mk, ujianId));
 }
 
 export const peserta = () => ctx.peserta;
-// Simulasi: nilai tidak dihitung dan boleh diulang dari awal.
+// Simulasi: nilai tidak dihitung dan boleh diulang dari awal (server memeriksa lewat jadwal boleh_ulang).
 export const isLatihan = () => ctx.meta.latihan === true;
 export const templates = () => base.templates;
+export const jadwal = () => (ctx.status ? { info: ctx.status.jadwal, buka: !!ctx.status.buka } : { info: null, buka: false });
+export const kunciTersedia = () => ctx.kunci;
 
 export function getExam() {
   const exam = structuredClone(base.exam);
@@ -59,17 +96,32 @@ export function getExam() {
 export const demo = () => store.get().demo || {};
 export const examSession = () => demo().exam || null;
 
-// Akomodasi waktu: daftar NIM di config.accommodations (diisi dosen).
-export function startExam() {
-  const cfg = getExam().config;
-  store.update((s) => {
-    (s.demo ||= {}).exam = { startedAt: Date.now(), speed: 1, factor: accommodationFactor(cfg, ctx.peserta.nim) };
-  });
+// Mulai: server memeriksa jadwal kelas, mencatat waktu mulai, dan menghitung batas Tahap 1 (termasuk akomodasi).
+export async function startExam() {
+  const st = await server.mulai(ctx.mk, ctx.ujianId, getExam().config.tahap1Minutes);
+  ctx.status = st;
+  terapkanSesi(st.sesi);
+  await simpanSekarang();
 }
 
-export function stage1EndsAt() {
-  const ses = examSession();
-  return stage1Deadline(ses.startedAt, getExam().config, ses.factor, ses.speed);
+export const stage1EndsAt = () => examSession().endsAt;
+
+// Mengunci Tahap 1 di server (snapshot + hash), lalu menerima kunci untuk menilai dan menyusun Tahap 2.
+export async function kunciTahap1(snapshot, hash) {
+  gabungKunci(await server.kunciTahap1(ctx.mk, ctx.ujianId, snapshot, hash));
+}
+
+// Simulasi: hapus sesi di server lalu mulai lagi dari layar awal.
+export async function ulangi() {
+  await server.ulang(ctx.mk, ctx.ujianId);
+  store.reset();
+  ctx.kunci = false;
+  const st = await server.status(ctx.mk, ctx.ujianId);
+  ctx.status = st;
+  // Definisi publik dimuat ulang supaya kunci dari percobaan sebelumnya tidak menempel.
+  const dir = `data/kuliah/${ctx.mk}/ujian/${ctx.ujianId}/`;
+  base.tasks = await ambilJson(`${dir}tasks.json`);
+  base.theory = await ambilJson(`${dir}theory.json`);
 }
 
 // 'belum' | 'stage1' | 'stage2' | 'selesai'
@@ -120,8 +172,59 @@ export function demoStudent() {
   return student;
 }
 
-// Timpaan dosen (nilai teori dan nilai akhir) baru ada setelah tersambung ke server; untuk sekarang kosong.
+// Timpaan dosen (nilai teori dan nilai akhir) belum ada; dosen membaca nilai otomatis di dashboard.
 export const theoryOverrides = () => ({});
 export const finalOverrides = () => ({});
 export const s1For = (student) => computeS1(student, getExam(), theoryOverrides());
-export const gradeFor = (student) => computeGrade(summarize(student, getExam(), theoryOverrides()), getExam().config);
+
+// Ringkasan yang dikirim ke server (kolom hasil) untuk rekap dosen. Skala 0-100.
+function ringkasan() {
+  const tahap = examStage();
+  const sub = demo().stage1?.submitted;
+  const out = { tahap };
+  if (sub) out.terlambat = !!sub.auto;
+  if (tahap !== 'selesai' || !ctx.kunci) return out;
+  const exam = getExam();
+  const student = demoStudent();
+  const r = summarize(student, exam, theoryOverrides());
+  const g = computeGrade(r, exam.config);
+  return {
+    ...out,
+    nilai: studentGrade(g, undefined).value, s1: Math.round(r.s1 * 100), s2: Math.round(r.s2 * 100),
+    benar: Object.values(r.correct).reduce((a, b) => a + b, 0), butir: r.n, percobaan: attempts().length,
+    keterangan: EVIDENCE_LABEL[g.evidence], flag: !!r.flag, latihan: isLatihan(),
+  };
+}
+
+// ---- kirim ke server (antrean sederhana: satu kiriman berjalan, sisanya digabung) ----
+let timer = null;
+let berjalan = null;
+let statusKirim = 'diam';
+const pendengarKirim = new Set();
+export const onStatusKirim = (cb) => { pendengarKirim.add(cb); cb(statusKirim); return () => pendengarKirim.delete(cb); };
+const setStatus = (s) => { statusKirim = s; pendengarKirim.forEach((cb) => cb(s)); };
+
+function jadwalkanSimpan() {
+  if (!examSession()) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => simpanSekarang().catch(() => {}), 1500);
+}
+
+export async function simpanSekarang() {
+  clearTimeout(timer);
+  if (!examSession()) return;
+  if (berjalan) { await berjalan.catch(() => {}); }
+  setStatus('menyimpan');
+  berjalan = server.simpan(ctx.mk, ctx.ujianId, store.get(), ringkasan());
+  try {
+    await berjalan;
+    setStatus('tersimpan');
+  } catch (e) {
+    setStatus('gagal');
+    clearTimeout(timer);
+    timer = setTimeout(() => simpanSekarang().catch(() => {}), 10000);
+    throw e;
+  } finally {
+    berjalan = null;
+  }
+}

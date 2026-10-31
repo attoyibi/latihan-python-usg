@@ -1,8 +1,9 @@
 """Membangun tasks.json satu ujian dengan MENJALANKAN kunci (tes tidak pernah diketik tangan).
 
 Pakai (dari akar repo):  python tools/ujian/buat_ujian.py simulasi
-Membaca tools/ujian/<id>_def.py (TASKS, CHANGES), menulis site/data/kuliah/algoritma-python/ujian/<id>/tasks.json
-dan contoh jawaban ke kunci/ujian/<id>/solutions.json (tidak ikut terbit). Diadaptasi dari prototype double-check-exam.
+Membaca tools/ujian/<id>_def.py (TASKS, CHANGES), menulis versi lengkap ke kunci/ujian/<id>/tasks.json dan contoh
+jawaban ke kunci/ujian/<id>/solutions.json (tidak ikut terbit). Sesudahnya jalankan buat_kunci_ujian.py.
+Diadaptasi dari prototype double-check-exam.
 """
 import importlib
 import json
@@ -49,13 +50,14 @@ def main(ujian_id, mk="algoritma-python"):
             "changes": changes,
         })
         solutions[t["id"]] = t["ref"]
-    out = AKAR / "site" / "data" / "kuliah" / mk / "ujian" / ujian_id
+    # Versi LENGKAP (dengan tes tersembunyi dan varian) hanya di kunci/ (diabaikan git). Berkas publik situs dan SQL
+    # tabel ujian_kunci dibuat dari sini oleh buat_kunci_ujian.py.
     kunci = AKAR / "kunci" / "ujian" / ujian_id
-    out.mkdir(parents=True, exist_ok=True)
     kunci.mkdir(parents=True, exist_ok=True)
-    (out / "tasks.json").write_text(json.dumps({"tasks": tasks}, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
+    (kunci / "tasks.json").write_text(json.dumps({"tasks": tasks}, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
     (kunci / "solutions.json").write_text(json.dumps({"code": solutions}, ensure_ascii=False, indent=2) + "\n", encoding="utf8")
-    print(f"ditulis: {out / 'tasks.json'} dan {kunci / 'solutions.json'}")
+    print(f"ditulis: {kunci / 'tasks.json'} dan {kunci / 'solutions.json'}")
+    print("lanjutkan: python tools/ujian/buat_kunci_ujian.py")
 
 
 if __name__ == "__main__":

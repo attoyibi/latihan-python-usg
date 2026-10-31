@@ -127,3 +127,18 @@ body.noscroll{overflow:hidden}
 .uj-kartu .badge.ok{background:var(--ok-bg);color:var(--ok)}
 .uj-lencana{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .uj-kartu .badge.info{background:var(--brand-soft);color:var(--brand-strong)}
+/* tab Ujian dosen: formulir jadwal dan akomodasi */
+.uj-dosen .uj-form{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin:10px 0 4px;padding:12px;border:1px dashed var(--line);border-radius:var(--r-btn);background:var(--soft)}
+.uj-dosen .uj-form .field{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0}
+.uj-dosen .uj-form .field>span{font-weight:600;font-size:13px}
+.uj-dosen .uj-form input,.uj-dosen .uj-form select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-btn);background:var(--card);color:var(--ink);max-width:100%}
+.uj-dosen .uj-form .uj-cek{flex-direction:row;align-items:center}
+.uj-dosen table{width:100%;border-collapse:collapse;font-size:14px}.uj-dosen th,.uj-dosen td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.uj-dosen th{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+.uj-dosen .tablewrap{overflow-x:auto}
+.uj-dosen .uj-aksi{white-space:nowrap}
+.uj-dosen .uj-ak{margin:6px 0;padding-left:1.2em}
+.uj-dosen .task-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.uj-dosen .badge.ok{background:var(--ok-bg);color:var(--ok)}.uj-dosen .badge.warn{background:var(--warn-bg);color:var(--warn)}
+.uj-dosen .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+@media (max-width:640px){.uj-dosen .uj-form .field{flex:1 1 100%}}

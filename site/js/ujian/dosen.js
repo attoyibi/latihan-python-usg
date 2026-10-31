@@ -1,0 +1,184 @@
+// Tab "Ujian" di dashboard instruktur: jadwal per kelas, akomodasi waktu, dan rekap nilai (migrasi 0010_ujian.sql).
+// Semua perubahan langsung ke Supabase lewat aturan RLS (hanya instruktur yang boleh menulis jadwal dan akomodasi).
+import * as server from './server.js';
+import { muatIndeks } from './data.js';
+import { toCsv } from './logic/csv.js';
+import { html, show, $, $$, ask, download } from './ui.js';
+
+const STATUS = { belum: 'Belum mulai', stage1: 'Tahap 1', stage2: 'Tahap 2', selesai: 'Selesai' };
+const fmtWaktu = (iso) => (iso ? new Date(iso).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: new Date(iso).getFullYear() === new Date().getFullYear() ? undefined : 'numeric', hour: '2-digit', minute: '2-digit' }) : '–');
+// <input type="datetime-local"> memakai waktu lokal tanpa zona: ubah dua arah dengan jam perangkat dosen.
+const keInput = (iso) => { const d = new Date(iso); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); };
+const dariInput = (v) => new Date(v).toISOString();
+const statusJadwal = (j) => { const t = Date.now(); return t < Date.parse(j.buka) ? ['warn', 'Terjadwal'] : t < Date.parse(j.tutup) ? ['ok', 'Buka'] : ['', 'Sudah tutup']; };
+
+async function ambilJson(path) {
+  const r = await fetch(path, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(`${path} ${r.status}`);
+  return r.json();
+}
+
+export async function renderTabDosen({ main, kepala, kuliah }) {
+  const isi = document.createElement('div');
+  isi.className = 'uj-dosen';
+  main.replaceChildren(kepala, isi);
+  show(isi, html`<section class="card"><p class="muted">Memuat data ujian…</p></section>`);
+
+  let daftar, cfgSitus, exams;
+  try {
+    daftar = await muatIndeks(kuliah.id, kuliah.ujian === true);
+    cfgSitus = await ambilJson('data/config.json').catch(() => ({ kelas: ['A', 'B', 'C', 'D'] }));
+    exams = Object.fromEntries(await Promise.all(daftar.map(async (u) => [u.id, await ambilJson(`data/kuliah/${kuliah.id}/ujian/${u.id}/exam.json`).catch(() => null)])));
+  } catch (e) {
+    show(isi, html`<section class="card"><p class="verdict fail">${e.message}</p></section>`);
+    return;
+  }
+  if (!daftar.length) {
+    show(isi, html`<section class="card"><p class="muted">Belum ada ujian untuk mata kuliah ini.</p></section>`);
+    return;
+  }
+
+  let data;
+  const muat = async () => {
+    const [jadwal, akomodasi, sesi, profil] = await Promise.all([server.bacaJadwal(kuliah.id), server.bacaAkomodasi(kuliah.id), server.bacaSesi(kuliah.id), server.bacaProfil()]);
+    data = { jadwal, akomodasi, sesi, profil: Object.fromEntries(profil.map((p) => [p.id, p])), profilList: profil };
+  };
+  try {
+    await muat();
+  } catch (e) {
+    show(isi, html`<section class="card"><h2>Ujian belum siap di server</h2><p>${e.jenis === 'belum-siap' ? 'Tabel ujian belum ada. Jalankan supabase/migrations/0010_ujian.sql di Supabase SQL Editor, lalu kunci ujian (kunci/ujian_kunci.sql).' : e.message}</p></section>`);
+    return;
+  }
+
+  const kelasPilihan = [['*', 'Semua kelas'], ...(cfgSitus.kelas || []).map((k) => [k, `Kelas ${k}`])];
+
+  const kartu = (u) => {
+    const ex = exams[u.id];
+    const menitBawaan = ex?.config?.tahap1Minutes || 60;
+    const jd = data.jadwal.filter((j) => j.ujian_id === u.id).sort((a, b) => (a.kelas === '*' ? -1 : b.kelas === '*' ? 1 : a.kelas.localeCompare(b.kelas)));
+    const ak = data.akomodasi.filter((a) => a.ujian_id === u.id);
+    const ss = data.sesi.filter((s) => s.ujian_id === u.id).map((s) => ({ ...s, p: data.profil[s.user_id] || {} })).sort((a, b) => (a.p.kelas || '').localeCompare(b.p.kelas || '') || (a.p.nama || '').localeCompare(b.p.nama || ''));
+    const sekarang = new Date();
+    const nanti = new Date(sekarang.getTime() + 2 * 3600 * 1000);
+    return html`
+    <section class="card" data-ujian="${u.id}">
+      <div class="task-head"><h2>${u.judul} <span class="muted small">Bab ${u.babDari}–${u.babSampai}</span></h2>${u.latihan ? html`<span class="badge info">Simulasi</span>` : ''}</div>
+      <p class="small muted">Tahap 1 bawaan ${menitBawaan} menit. Peserta hanya bisa mulai saat jadwal kelasnya buka; jadwal kelas tertentu didahulukan dari "Semua kelas".</p>
+
+      <h3>Jadwal</h3>
+      ${jd.length ? html`<div class="tablewrap"><table><thead><tr><th>Kelas</th><th>Buka</th><th>Tutup</th><th>Durasi Tahap 1</th><th>Boleh diulang</th><th>Status</th><th></th></tr></thead><tbody>
+        ${jd.map((j) => { const [c, t] = statusJadwal(j); return html`<tr><td>${j.kelas === '*' ? 'Semua kelas' : j.kelas}</td><td>${fmtWaktu(j.buka)}</td><td>${fmtWaktu(j.tutup)}</td><td>${j.menit || menitBawaan} menit</td><td>${j.boleh_ulang ? 'Ya' : 'Tidak'}</td><td><span class="badge ${c}">${t}</span></td>
+          <td class="uj-aksi"><button class="btn btn-sm" type="button" data-ubah-jadwal="${j.kelas}">Ubah</button><button class="btn btn-sm btn-ghost" type="button" data-tutup-jadwal="${j.kelas}">Tutup sekarang</button><button class="btn btn-sm btn-ghost" type="button" data-hapus-jadwal="${j.kelas}">Hapus</button></td></tr>`; })}
+      </tbody></table></div>` : html`<p class="callout warn">Belum ada jadwal: peserta belum bisa memulai ujian ini.</p>`}
+      <form class="uj-form" data-form-jadwal>
+        <label class="field"><span>Kelas</span><select name="kelas">${kelasPilihan.map(([v, l]) => html`<option value="${v}">${l}</option>`)}</select></label>
+        <label class="field"><span>Buka</span><input type="datetime-local" name="buka" value="${keInput(sekarang.toISOString())}" required></label>
+        <label class="field"><span>Tutup</span><input type="datetime-local" name="tutup" value="${keInput(nanti.toISOString())}" required></label>
+        <label class="field"><span>Durasi Tahap 1 (menit)</span><input type="number" name="menit" min="5" max="600" placeholder="${menitBawaan}"></label>
+        <label class="field uj-cek"><input type="checkbox" name="boleh_ulang" ${u.latihan ? 'checked' : ''}> <span>Peserta boleh mengulang</span></label>
+        <div class="field"><button class="btn btn-primary" type="submit">Simpan jadwal</button></div>
+      </form>
+      <p class="small muted">Menyimpan jadwal untuk kelas yang sudah punya jadwal akan menggantinya. "Tutup" adalah batas untuk MEMULAI; peserta yang sudah mulai tetap menyelesaikan waktunya.</p>
+
+      <h3>Akomodasi waktu</h3>
+      ${ak.length ? html`<ul class="uj-ak">${ak.map((a) => { const p = data.profil[a.user_id] || {}; return html`<li>${p.nama || a.user_id} <span class="muted small">${p.nim || ''} · ${p.kelas || ''}</span> · waktu ×${Number(a.faktor)} <button class="btn btn-sm btn-ghost" type="button" data-hapus-ak="${a.user_id}">Hapus</button></li>`; })}</ul>` : html`<p class="small muted">Belum ada. Akomodasi mengalikan durasi Tahap 1 untuk peserta tertentu, dan berlaku saat peserta itu menekan Mulai.</p>`}
+      <form class="uj-form" data-form-ak>
+        <label class="field"><span>NIM</span><input type="text" name="nim" required autocomplete="off"></label>
+        <label class="field"><span>Faktor waktu</span><select name="faktor"><option value="1.25">×1,25</option><option value="1.5" selected>×1,5</option><option value="2">×2</option></select></label>
+        <div class="field"><button class="btn" type="submit">Tambah akomodasi</button></div>
+      </form>
+
+      <h3>Peserta dan nilai <span class="muted small">(${ss.length} sesi)</span></h3>
+      ${ss.length ? html`<div class="tablewrap"><table><thead><tr><th>Nama</th><th>NIM</th><th>Kelas</th><th>Status</th><th>Mulai</th><th>Terkunci</th><th>S1</th><th>S2</th><th>Nilai</th><th>Keterangan</th><th></th></tr></thead><tbody>
+        ${ss.map((s) => { const h = s.hasil || {}; return html`<tr><td>${s.p.nama || '?'}</td><td>${s.p.nim || ''}</td><td>${s.p.kelas || s.kelas || ''}</td><td>${STATUS[h.tahap] || (s.terkunci_pada ? 'Tahap 2' : 'Tahap 1')}</td><td>${fmtWaktu(s.mulai_pada)}${Number(s.faktor) > 1 ? html` <span class="badge info">×${Number(s.faktor)}</span>` : ''}</td><td>${fmtWaktu(s.terkunci_pada)}${s.terlambat ? html` <span class="badge warn">terlambat</span>` : ''}</td><td>${h.s1 ?? '–'}</td><td>${h.s2 ?? '–'}</td><td><strong>${h.nilai ?? '–'}</strong></td><td>${h.keterangan || ''}${h.flag ? html` <span class="badge warn">ditinjau</span>` : ''}</td>
+          <td><button class="btn btn-sm btn-ghost" type="button" data-hapus-sesi="${s.user_id}">Izinkan mengulang</button></td></tr>`; })}
+      </tbody></table></div>
+      <div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" data-csv>Unduh CSV</button></div>` : html`<p class="small muted">Belum ada peserta yang memulai.</p>`}
+      <div data-pesan></div>
+    </section>`;
+  };
+
+  const gambar = () => {
+    show(isi, html`
+      <section class="card"><h2>Ujian</h2><p class="muted">Atur kapan tiap kelas boleh memulai, waktu tambahan untuk peserta tertentu, dan lihat nilai otomatis. Nilai dihitung di perangkat peserta (rumus diumumkan di halaman hasil) dan dikirim ke sini.</p>
+        <div class="row"><button class="btn btn-sm" type="button" data-muat-ulang>Muat ulang</button></div></section>
+      ${daftar.map(kartu)}`);
+    pasang();
+  };
+
+  const jalankan = async (el, fn) => {
+    const pesan = $('[data-pesan]', el.closest('[data-ujian]')) || null;
+    try {
+      await fn();
+      await muat();
+      gambar();
+    } catch (e) {
+      if (pesan) show(pesan, html`<p class="callout bad" role="alert">${e.message}</p>`);
+      else alert(e.message);
+    }
+  };
+
+  function pasang() {
+    $('[data-muat-ulang]', isi)?.addEventListener('click', (e) => jalankan(e.currentTarget, async () => {}));
+    for (const sec of $$('[data-ujian]', isi)) {
+      const uid = sec.dataset.ujian;
+      const u = daftar.find((x) => x.id === uid);
+      $('[data-form-jadwal]', sec).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget);
+        const buka = f.get('buka'), tutup = f.get('tutup');
+        if (!buka || !tutup || Date.parse(tutup) <= Date.parse(buka)) { show($('[data-pesan]', sec), html`<p class="callout bad">Waktu tutup harus setelah waktu buka.</p>`); return; }
+        const menit = f.get('menit') ? Number(f.get('menit')) : null;
+        jalankan(sec, () => server.simpanJadwal({ matakuliah_id: kuliah.id, ujian_id: uid, kelas: f.get('kelas'), buka: dariInput(buka), tutup: dariInput(tutup), menit, boleh_ulang: f.get('boleh_ulang') === 'on' }));
+      });
+      $$('[data-ubah-jadwal]', sec).forEach((b) => b.addEventListener('click', () => {
+        const j = data.jadwal.find((x) => x.ujian_id === uid && x.kelas === b.dataset.ubahJadwal);
+        const f = $('[data-form-jadwal]', sec);
+        f.kelas.value = j.kelas;
+        f.buka.value = keInput(j.buka);
+        f.tutup.value = keInput(j.tutup);
+        f.menit.value = j.menit || '';
+        f.boleh_ulang.checked = !!j.boleh_ulang;
+        f.scrollIntoView({ block: 'center' });
+      }));
+      $$('[data-tutup-jadwal]', sec).forEach((b) => b.addEventListener('click', async () => {
+        const j = data.jadwal.find((x) => x.ujian_id === uid && x.kelas === b.dataset.tutupJadwal);
+        if (!(await ask(`Tutup ${u.judul} untuk ${j.kelas === '*' ? 'semua kelas' : 'kelas ' + j.kelas} sekarang? Peserta yang sudah mulai tetap bisa menyelesaikan.`, 'Tutup'))) return;
+        const t = Date.now();
+        jalankan(sec, () => server.simpanJadwal({ ...j, buka: new Date(Math.min(Date.parse(j.buka), t - 60000)).toISOString(), tutup: new Date(t).toISOString(), diperbarui_pada: undefined }));
+      }));
+      $$('[data-hapus-jadwal]', sec).forEach((b) => b.addEventListener('click', async () => {
+        if (!(await ask('Hapus jadwal ini?', 'Hapus'))) return;
+        jalankan(sec, () => server.hapusJadwal(kuliah.id, uid, b.dataset.hapusJadwal));
+      }));
+      $('[data-form-ak]', sec).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget);
+        const nim = String(f.get('nim')).trim();
+        const p = data.profilList.find((x) => x.nim === nim);
+        if (!p) { show($('[data-pesan]', sec), html`<p class="callout bad">NIM ${nim} tidak ditemukan di daftar peserta.</p>`); return; }
+        jalankan(sec, () => server.simpanAkomodasi({ matakuliah_id: kuliah.id, ujian_id: uid, user_id: p.id, faktor: Number(f.get('faktor')) }));
+      });
+      $$('[data-hapus-ak]', sec).forEach((b) => b.addEventListener('click', () => jalankan(sec, () => server.hapusAkomodasi(kuliah.id, uid, b.dataset.hapusAk))));
+      $$('[data-hapus-sesi]', sec).forEach((b) => b.addEventListener('click', async () => {
+        const p = data.profil[b.dataset.hapusSesi] || {};
+        if (!(await ask(`Hapus sesi ${p.nama || 'peserta ini'} untuk ${u.judul}? Jawaban dan nilainya hilang, dan ia bisa mulai lagi selama jadwal kelasnya buka.`, 'Hapus dan izinkan'))) return;
+        jalankan(sec, () => server.hapusSesi(kuliah.id, uid, b.dataset.hapusSesi));
+      }));
+      $('[data-csv]', sec)?.addEventListener('click', () => {
+        const rows = data.sesi.filter((s) => s.ujian_id === uid).map((s) => ({ ...s, p: data.profil[s.user_id] || {}, h: s.hasil || {} }));
+        const csv = toCsv(rows, [
+          { label: 'nama', get: (r) => r.p.nama }, { label: 'nim', get: (r) => r.p.nim }, { label: 'kelas', get: (r) => r.p.kelas || r.kelas },
+          { label: 'status', get: (r) => STATUS[r.h.tahap] || '' }, { label: 'mulai', get: (r) => r.mulai_pada }, { label: 'terkunci', get: (r) => r.terkunci_pada },
+          { label: 'terlambat', get: (r) => (r.terlambat ? 'ya' : '') }, { label: 'faktor_waktu', get: (r) => Number(r.faktor) },
+          { label: 's1', get: (r) => r.h.s1 }, { label: 's2', get: (r) => r.h.s2 }, { label: 'nilai', get: (r) => r.h.nilai },
+          { label: 'butir_benar', get: (r) => r.h.benar }, { label: 'butir', get: (r) => r.h.butir }, { label: 'percobaan_tahap2', get: (r) => r.h.percobaan },
+          { label: 'keterangan', get: (r) => r.h.keterangan }, { label: 'perlu_ditinjau', get: (r) => (r.h.flag ? 'ya' : '') },
+        ]);
+        download(`nilai-${kuliah.id}-${uid}.csv`, csv, 'text/csv');
+      });
+    }
+  }
+
+  gambar();
+}

@@ -1,7 +1,9 @@
-// Keadaan ujian peserta di browser (sementara, sebelum tersambung ke Supabase pada langkah berikutnya).
+// Keadaan ujian peserta di browser: cadangan lokal dari pekerjaan yang juga dikirim ke server (kolom keadaan).
 // Satu kunci per akun, mata kuliah, dan ujian, jadi dua akun di satu perangkat tidak saling melihat.
+// _t = waktu perubahan terakhir (jam perangkat), dipakai memilih versi terbaru antara browser dan server.
 let KEY = null;
 let state = {};
+let pendengar = () => {};
 
 function load() {
   try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
@@ -16,6 +18,16 @@ export function pakai(userId, mk, ujianId) {
   if (k !== KEY) { KEY = k; state = load(); }
 }
 
+// Dipanggil setiap ada perubahan pekerjaan (untuk dikirim ke server).
+export const onSimpan = (fn) => { pendengar = fn; };
+
 export const get = () => state;
-export function update(fn) { fn(state); persist(); }
+// diam: perubahan dari server (waktu sesi), tidak perlu dikirim balik.
+export function update(fn, { diam = false } = {}) {
+  fn(state);
+  if (!diam) state._t = Date.now();
+  persist();
+  if (!diam) pendengar();
+}
+export function ganti(baru) { state = baru || {}; persist(); }
 export function reset() { state = {}; persist(); }

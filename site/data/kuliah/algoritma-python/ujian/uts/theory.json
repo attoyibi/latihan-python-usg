@@ -9,41 +9,7 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa yang dimaksud algoritma dan lima syarat agar sebuah urutan langkah layak disebut algoritma; (b) perbedaan flowchart dan pseudocode sebagai alat merancang algoritma.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 5,
-      "keyPoints": [
-        { "id": "q1a", "label": "Algoritma adalah urutan langkah untuk menyelesaikan suatu masalah", "all": [["urutan langkah", "langkah-langkah", "langkah demi langkah", "serangkaian langkah", "rangkaian langkah", "urutan instruksi", "prosedur"], ["masalah", "permasalahan", "persoalan", "menyelesaikan", "pekerjaan", "tugas"]] },
-        { "id": "q1b", "label": "Syarat: ada masukan dan keluaran", "all": [["masukan", "input"], ["keluaran", "output"]] },
-        { "id": "q1c", "label": "Syarat: tiap langkah pasti maknanya (tanpa tafsir ganda)", "all": [["pasti", "jelas maknanya", "tidak ambigu", "tafsir ganda", "satu tafsir", "tidak menimbulkan tafsir", "definit"]] },
-        { "id": "q1d", "label": "Syarat: prosesnya berhenti", "all": [["berhenti", "terhingga", "ada akhir", "finite", "tidak berputar"]] },
-        { "id": "q1e", "label": "Syarat: tiap langkah benar-benar bisa dikerjakan", "all": [["bisa dikerjakan", "dapat dikerjakan", "dapat dilaksanakan", "bisa dilaksanakan", "benar-benar bisa"]] },
-        { "id": "q1f", "label": "Flowchart: bentuk visual dengan simbol baku", "all": [["flowchart", "diagram alir", "bagan alir"], ["simbol", "visual", "gambar", "diagram", "oval", "belah ketupat"]] },
-        { "id": "q1g", "label": "Pseudocode: teks yang tidak terikat sintaks bahasa pemrograman", "all": [["pseudocode", "kode semu", "pseudo"], ["teks", "tulisan", "tertulis", "tanpa terikat", "tidak terikat", "sintaks", "bahasa pemrograman"]] }
-      ],
-      "sample": "Algoritma adalah urutan langkah yang jelas untuk menyelesaikan suatu masalah. Lima syaratnya: ada masukan, ada keluaran, setiap langkah pasti maknanya sehingga tidak menimbulkan tafsir ganda, prosesnya berhenti pada suatu titik, dan setiap langkah benar-benar bisa dikerjakan pelaksananya. Flowchart menggambarkan alur dengan simbol baku seperti oval, kotak, dan belah ketupat sehingga mudah dibaca secara visual, sedangkan pseudocode ditulis sebagai teks tanpa terikat sintaks bahasa pemrograman tertentu dan lebih cepat ditulis untuk logika yang panjang.",
-      "concepts": [
-        {
-          "id": "Q1-a",
-          "stem": "Manakah pernyataan yang BENAR tentang algoritma?",
-          "correct": "Sebuah urutan langkah yang berputar tanpa pernah berhenti tidak memenuhi syarat sebagai algoritma.",
-          "wrong": [
-            "Algoritma baru dianggap sah bila ditulis dalam bahasa pemrograman tertentu.",
-            "Algoritma boleh memuat langkah yang ditafsirkan berbeda oleh tiap pelaksana asalkan hasil akhirnya sama.",
-            "Algoritma tidak harus menghasilkan keluaran selama semua langkahnya benar.",
-            "Langkah yang tidak mungkin dikerjakan pelaksananya tetap boleh ada karena nanti bisa diganti."
-          ]
-        },
-        {
-          "id": "Q1-b",
-          "stem": "Manakah pernyataan yang BENAR tentang flowchart dan pseudocode?",
-          "correct": "Pseudocode menuliskan logika sebagai teks tanpa terikat sintaks satu bahasa pemrograman, sedangkan flowchart memakai simbol baku.",
-          "wrong": [
-            "Belah ketupat pada flowchart dipakai untuk menandai mulai dan selesai.",
-            "Pseudocode harus mengikuti sintaks Python supaya bisa dijalankan.",
-            "Flowchart tidak bisa menggambarkan percabangan.",
-            "Penelusuran dengan tabel cukup memakai angka di tengah rentang yang aman."
-          ]
-        }
-      ]
+      "need": 5
     },
     {
       "id": "Q2",
@@ -53,40 +19,7 @@
         "Jelaskan dengan kata-katamu sendiri: (a) perbedaan perulangan for dan while serta kapan memakai masing-masing; (b) perbedaan list dan string dalam hal bisa tidaknya isinya diubah. Sertakan satu contoh singkat.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 4,
-      "keyPoints": [
-        { "id": "q2a", "label": "for dipakai bila jumlah pengulangan sudah pasti sejak awal", "all": [["for"], ["pasti", "diketahui", "tertentu", "sejumlah", "range", "sudah jelas", "ditentukan"]] },
-        { "id": "q2b", "label": "while berjalan selama/sampai syarat berubah, jumlah belum diketahui", "all": [["while"], ["syarat", "kondisi", "sampai", "selama", "tidak diketahui", "belum diketahui", "belum pasti", "tidak pasti"]] },
-        { "id": "q2c", "label": "List bersifat mutable (isinya bisa diubah)", "all": [["list"], ["mutable", "bisa diubah", "dapat diubah", "bisa dimodifikasi", "dapat dimodifikasi", "bisa diganti", "append"]] },
-        { "id": "q2d", "label": "String bersifat immutable (mengubah berarti membuat string baru)", "all": [["string", "str", "teks"], ["immutable", "tidak bisa diubah", "tidak dapat diubah", "tidak bisa dimodifikasi", "tidak dapat dimodifikasi", "string baru", "tidak bisa diganti", "error"]] },
-        { "id": "q2e", "label": "Indeks dimulai dari 0 (dan batas atas slicing tidak ikut)", "all": [["indeks", "index", "slicing", "slice"], ["0", "nol", "tidak ikut", "tidak termasuk"]] },
-        { "id": "q2f", "label": "Memberi contoh konkret", "all": [["contoh", "misalnya", "misal", "contohnya"]] }
-      ],
-      "sample": "Perulangan for dengan range() dipakai bila jumlah pengulangan sudah pasti sejak awal, misalnya memproses 10 pesanan. While dipakai bila pengulangan berlangsung sampai syarat tertentu berubah dan jumlahnya belum diketahui, misalnya membaca angka sampai pengguna mengetik 0. List bersifat mutable sehingga isinya bisa diubah, misalnya nilai[0] = 5 atau append(). String bersifat immutable, jadi mengubah string sebenarnya membuat string baru, dan teks[0] = \"A\" akan menimbulkan error.",
-      "concepts": [
-        {
-          "id": "Q2-a",
-          "stem": "Manakah pernyataan yang BENAR tentang for dan while?",
-          "correct": "for dengan range() cocok bila jumlah pengulangan sudah pasti sejak awal, sedangkan while berjalan selama syaratnya masih benar.",
-          "wrong": [
-            "continue menghentikan seluruh perulangan, sedangkan break hanya melompati satu putaran.",
-            "while selalu berhenti sendiri setelah beberapa putaran walaupun syaratnya tidak pernah berubah.",
-            "Perulangan for tidak boleh memakai break.",
-            "range(1, 5) menghasilkan lima angka, yaitu 1, 2, 3, 4, dan 5."
-          ]
-        },
-        {
-          "id": "Q2-b",
-          "stem": "Manakah pernyataan yang BENAR tentang list dan string?",
-          "correct": "List bersifat mutable sehingga isinya bisa diubah lewat indeks, sedangkan string immutable sehingga mengubahnya berarti membuat string baru.",
-          "wrong": [
-            "Indeks pertama pada list dan string adalah 1.",
-            "Pada slicing nilai[1:3], elemen berindeks 3 ikut diambil.",
-            "String bisa diubah langsung dengan teks[0] = \"A\".",
-            "split() menggabungkan isi list menjadi satu string."
-          ]
-        }
-      ]
+      "need": 4
     }
   ]
 }

@@ -9,7 +9,8 @@
 -- 0007 = jejak peserta dan riset (setiap Jalankan, hasil, jenis galat, persetujuan penelitian).
 -- 0008 = praktikum (berkas kerja, status tahap, riwayat versi, laporan praktikum).
 -- 0009 = kunci jawaban soal latihan (hanya dibaca instruktur).
--- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0009).
+-- 0010 = ujian UTS/UAS dan simulasi (jadwal, akomodasi, sesi dengan jam server, kunci ujian).
+-- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0010).
 
 select
   to_regclass('public.profiles') is not null as "0001_skema",
@@ -45,4 +46,7 @@ select
     and to_regclass('public.praktikum_tahap') is not null
     and to_regclass('public.praktikum_versi') is not null
     and to_regclass('public.praktikum_laporan') is not null as "0008_praktikum",
-  to_regclass('public.kunci_jawaban') is not null as "0009_kunci_jawaban";
+  to_regclass('public.kunci_jawaban') is not null as "0009_kunci_jawaban",
+  to_regclass('public.ujian_sesi') is not null
+    and to_regclass('public.ujian_kunci') is not null
+    and to_regprocedure('public.ujian_kunci_tahap1(text,text,jsonb,text)') is not null as "0010_ujian";

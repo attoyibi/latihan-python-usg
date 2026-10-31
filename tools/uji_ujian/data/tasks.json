@@ -1,0 +1,828 @@
+{
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Praktik cadangan · Tagihan pesanan",
+      "topic": "Percabangan (Bab 4)",
+      "statement": [
+        "UD Rasa Gresik menjual kue dalam boks. Harga satu boks Rp 25.000. Tulis program yang membaca jumlah boks (bilangan bulat) pada baris pertama dan jenis pelanggan pada baris kedua, yaitu reguler atau reseller, lalu mencetak tagihan.",
+        "Diskon volume: 50 boks atau lebih mendapat 10%, 20 sampai 49 boks mendapat 5%, kurang dari 20 boks tidak ada diskon. Pelanggan reseller mendapat tambahan diskon 2% dari subtotal. Semua perhitungan memakai bilangan bulat (gunakan //).",
+        "Cetak tiga baris: Subtotal: Rp ..., Diskon: Rp ... (total diskon), dan Total bayar: Rp .... Jika jenis pelanggan bukan reguler atau reseller, cetak hanya: Jenis pelanggan tidak dikenal"
+      ],
+      "starter": "# Baca jumlah boks dan jenis pelanggan\njumlah = int(input())\njenis = input()\n\n# Tulis aturan diskon dan cetak tagihan di bawah ini\n",
+      "visible": [
+        {
+          "input": [
+            "12",
+            "reguler"
+          ],
+          "expected": "Subtotal: Rp 300000\nDiskon: Rp 0\nTotal bayar: Rp 300000"
+        },
+        {
+          "input": [
+            "25",
+            "reseller"
+          ],
+          "expected": "Subtotal: Rp 625000\nDiskon: Rp 43750\nTotal bayar: Rp 581250"
+        }
+      ],
+      "hidden": [
+        {
+          "input": [
+            "20",
+            "reguler"
+          ],
+          "expected": "Subtotal: Rp 500000\nDiskon: Rp 25000\nTotal bayar: Rp 475000"
+        },
+        {
+          "input": [
+            "50",
+            "reguler"
+          ],
+          "expected": "Subtotal: Rp 1250000\nDiskon: Rp 125000\nTotal bayar: Rp 1125000"
+        },
+        {
+          "input": [
+            "49",
+            "reseller"
+          ],
+          "expected": "Subtotal: Rp 1225000\nDiskon: Rp 85750\nTotal bayar: Rp 1139250"
+        },
+        {
+          "input": [
+            "1",
+            "reseller"
+          ],
+          "expected": "Subtotal: Rp 25000\nDiskon: Rp 500\nTotal bayar: Rp 24500"
+        },
+        {
+          "input": [
+            "30",
+            "agen"
+          ],
+          "expected": "Jenis pelanggan tidak dikenal"
+        },
+        {
+          "input": [
+            "100",
+            "reseller"
+          ],
+          "expected": "Subtotal: Rp 2500000\nDiskon: Rp 300000\nTotal bayar: Rp 2200000"
+        }
+      ],
+      "traceInputs": [
+        [
+          "19",
+          "reguler"
+        ],
+        [
+          "20",
+          "reseller"
+        ],
+        [
+          "49",
+          "reguler"
+        ],
+        [
+          "50",
+          "reseller"
+        ],
+        [
+          "35",
+          "reseller"
+        ],
+        [
+          "100",
+          "reguler"
+        ]
+      ],
+      "variants": [
+        {
+          "id": "v1",
+          "note": "Batas memakai > bukan >= (jumlah tepat 20 atau 50 salah tingkat)",
+          "code": "jumlah = int(input())\njenis = input()\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * 25000\n    if jumlah > 50:\n        persen = 10\n    elif jumlah > 20:\n        persen = 5\n    else:\n        persen = 0\n    diskon = subtotal * persen // 100\n    if jenis == \"reseller\":\n        diskon = diskon + subtotal * 2 // 100\n    print(f\"Subtotal: Rp {subtotal}\")\n    print(f\"Diskon: Rp {diskon}\")\n    print(f\"Total bayar: Rp {subtotal - diskon}\")\n"
+        },
+        {
+          "id": "v2",
+          "note": "Diskon reseller menimpa diskon volume, bukan ditambahkan",
+          "code": "jumlah = int(input())\njenis = input()\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * 25000\n    if jumlah >= 50:\n        persen = 10\n    elif jumlah >= 20:\n        persen = 5\n    else:\n        persen = 0\n    diskon = subtotal * persen // 100\n    if jenis == \"reseller\":\n        diskon = subtotal * 2 // 100\n    print(f\"Subtotal: Rp {subtotal}\")\n    print(f\"Diskon: Rp {diskon}\")\n    print(f\"Total bayar: Rp {subtotal - diskon}\")\n"
+        },
+        {
+          "id": "v3",
+          "note": "Diskon reseller dihitung dari subtotal setelah diskon volume",
+          "code": "jumlah = int(input())\njenis = input()\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * 25000\n    if jumlah >= 50:\n        persen = 10\n    elif jumlah >= 20:\n        persen = 5\n    else:\n        persen = 0\n    diskon = subtotal * persen // 100\n    if jenis == \"reseller\":\n        diskon = diskon + (subtotal - diskon) * 2 // 100\n    print(f\"Subtotal: Rp {subtotal}\")\n    print(f\"Diskon: Rp {diskon}\")\n    print(f\"Total bayar: Rp {subtotal - diskon}\")\n"
+        }
+      ],
+      "changes": [
+        {
+          "id": "C1a",
+          "title": "Jenis pelanggan baru: agen",
+          "text": "Ada jenis pelanggan baru, yaitu agen. Agen mendapat tambahan diskon 4% dari subtotal (reseller tetap 2%, reguler tidak ada). Diskon volume tidak berubah. Jenis selain reguler, reseller, dan agen tetap mencetak: Jenis pelanggan tidak dikenal",
+          "visible": [
+            {
+              "input": [
+                "30",
+                "agen"
+              ],
+              "expected": "Subtotal: Rp 750000\nDiskon: Rp 67500\nTotal bayar: Rp 682500"
+            },
+            {
+              "input": [
+                "12",
+                "reguler"
+              ],
+              "expected": "Subtotal: Rp 300000\nDiskon: Rp 0\nTotal bayar: Rp 300000"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "50",
+                "agen"
+              ],
+              "expected": "Subtotal: Rp 1250000\nDiskon: Rp 175000\nTotal bayar: Rp 1075000"
+            },
+            {
+              "input": [
+                "19",
+                "agen"
+              ],
+              "expected": "Subtotal: Rp 475000\nDiskon: Rp 19000\nTotal bayar: Rp 456000"
+            },
+            {
+              "input": [
+                "20",
+                "reseller"
+              ],
+              "expected": "Subtotal: Rp 500000\nDiskon: Rp 35000\nTotal bayar: Rp 465000"
+            },
+            {
+              "input": [
+                "100",
+                "agen"
+              ],
+              "expected": "Subtotal: Rp 2500000\nDiskon: Rp 350000\nTotal bayar: Rp 2150000"
+            },
+            {
+              "input": [
+                "10",
+                "pelanggan"
+              ],
+              "expected": "Jenis pelanggan tidak dikenal"
+            },
+            {
+              "input": [
+                "1",
+                "agen"
+              ],
+              "expected": "Subtotal: Rp 25000\nDiskon: Rp 1000\nTotal bayar: Rp 24000"
+            }
+          ]
+        },
+        {
+          "id": "C1b",
+          "title": "Tingkat diskon baru untuk pesanan besar",
+          "text": "Ditambah satu tingkat diskon volume: 100 boks atau lebih mendapat 15%. Tingkat lain tidak berubah (50 sampai 99 boks 10%, 20 sampai 49 boks 5%, kurang dari 20 boks tidak ada). Aturan reseller dan pengecekan jenis pelanggan tidak berubah.",
+          "visible": [
+            {
+              "input": [
+                "120",
+                "reguler"
+              ],
+              "expected": "Subtotal: Rp 3000000\nDiskon: Rp 450000\nTotal bayar: Rp 2550000"
+            },
+            {
+              "input": [
+                "60",
+                "reseller"
+              ],
+              "expected": "Subtotal: Rp 1500000\nDiskon: Rp 180000\nTotal bayar: Rp 1320000"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "100",
+                "reguler"
+              ],
+              "expected": "Subtotal: Rp 2500000\nDiskon: Rp 375000\nTotal bayar: Rp 2125000"
+            },
+            {
+              "input": [
+                "99",
+                "reguler"
+              ],
+              "expected": "Subtotal: Rp 2475000\nDiskon: Rp 247500\nTotal bayar: Rp 2227500"
+            },
+            {
+              "input": [
+                "50",
+                "reseller"
+              ],
+              "expected": "Subtotal: Rp 1250000\nDiskon: Rp 150000\nTotal bayar: Rp 1100000"
+            },
+            {
+              "input": [
+                "20",
+                "reguler"
+              ],
+              "expected": "Subtotal: Rp 500000\nDiskon: Rp 25000\nTotal bayar: Rp 475000"
+            },
+            {
+              "input": [
+                "19",
+                "reseller"
+              ],
+              "expected": "Subtotal: Rp 475000\nDiskon: Rp 9500\nTotal bayar: Rp 465500"
+            },
+            {
+              "input": [
+                "200",
+                "reseller"
+              ],
+              "expected": "Subtotal: Rp 5000000\nDiskon: Rp 850000\nTotal bayar: Rp 4150000"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "Praktik 1 · Rekap pesanan",
+      "topic": "Perulangan (Bab 5)",
+      "statement": [
+        "UD Rasa Gresik mencatat jumlah boks per pesanan. Tulis program yang membaca jumlah boks satu per satu sampai pengguna mengetik 0. Angka 0 hanya penanda selesai, bukan pesanan.",
+        "Jumlah negatif dianggap salah ketik: cetak Jumlah tidak valid, dilewati lalu abaikan angka itu. Setelah selesai cetak empat baris: Jumlah pesanan: ..., Total boks: ..., Rata-rata: ... (dua angka di belakang koma), dan Terbesar: ....",
+        "Jika tidak ada pesanan yang sah, cetak hanya: Tidak ada pesanan"
+      ],
+      "starter": "# Baca jumlah boks sampai pengguna mengetik 0\n\n",
+      "visible": [
+        {
+          "input": [
+            "10",
+            "20",
+            "0"
+          ],
+          "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+        },
+        {
+          "input": [
+            "5",
+            "-2",
+            "15",
+            "0"
+          ],
+          "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+        }
+      ],
+      "hidden": [
+        {
+          "input": [
+            "0"
+          ],
+          "expected": "Tidak ada pesanan"
+        },
+        {
+          "input": [
+            "-1",
+            "0"
+          ],
+          "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+        },
+        {
+          "input": [
+            "7",
+            "0",
+            "9"
+          ],
+          "expected": "Jumlah pesanan: 1\nTotal boks: 7\nRata-rata: 7.00\nTerbesar: 7"
+        },
+        {
+          "input": [
+            "3",
+            "3",
+            "4",
+            "0"
+          ],
+          "expected": "Jumlah pesanan: 3\nTotal boks: 10\nRata-rata: 3.33\nTerbesar: 4"
+        },
+        {
+          "input": [
+            "100",
+            "0"
+          ],
+          "expected": "Jumlah pesanan: 1\nTotal boks: 100\nRata-rata: 100.00\nTerbesar: 100"
+        },
+        {
+          "input": [
+            "2",
+            "-5",
+            "-6",
+            "8",
+            "0"
+          ],
+          "expected": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 8"
+        }
+      ],
+      "traceInputs": [
+        [
+          "8",
+          "4",
+          "0"
+        ],
+        [
+          "6",
+          "-3",
+          "9",
+          "0"
+        ],
+        [
+          "10",
+          "0"
+        ],
+        [
+          "5",
+          "5",
+          "7",
+          "7",
+          "0"
+        ],
+        [
+          "-4",
+          "0"
+        ],
+        [
+          "3",
+          "4",
+          "4",
+          "0"
+        ]
+      ],
+      "variants": [
+        {
+          "id": "v1",
+          "note": "Angka 0 penanda ikut dihitung sebagai pesanan",
+          "code": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    jumlah_pesanan += 1\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    total += boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n"
+        },
+        {
+          "id": "v2",
+          "note": "Rata-rata memakai pembagian bilangan bulat //",
+          "code": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    jumlah_pesanan += 1\n    total += boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total // jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n"
+        },
+        {
+          "id": "v3",
+          "note": "Lupa continue: jumlah negatif tetap dihitung",
+          "code": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    jumlah_pesanan += 1\n    total += boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n"
+        }
+      ],
+      "changes": [
+        {
+          "id": "C2a",
+          "title": "Penanda berhenti berupa kata",
+          "text": "Penanda berhenti bukan lagi angka 0, melainkan kata selesai (huruf kecil). Setiap baris sebelum kata itu adalah jumlah boks (bilangan bulat). Angka 0 sekarang dianggap tidak valid, sama seperti angka negatif: cetak Jumlah tidak valid, dilewati lalu abaikan. Keluaran akhir tidak berubah.",
+          "visible": [
+            {
+              "input": [
+                "10",
+                "20",
+                "selesai"
+              ],
+              "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+            },
+            {
+              "input": [
+                "5",
+                "0",
+                "15",
+                "selesai"
+              ],
+              "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "selesai"
+              ],
+              "expected": "Tidak ada pesanan"
+            },
+            {
+              "input": [
+                "-1",
+                "selesai"
+              ],
+              "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+            },
+            {
+              "input": [
+                "7",
+                "selesai",
+                "9"
+              ],
+              "expected": "Jumlah pesanan: 1\nTotal boks: 7\nRata-rata: 7.00\nTerbesar: 7"
+            },
+            {
+              "input": [
+                "3",
+                "3",
+                "4",
+                "selesai"
+              ],
+              "expected": "Jumlah pesanan: 3\nTotal boks: 10\nRata-rata: 3.33\nTerbesar: 4"
+            },
+            {
+              "input": [
+                "0",
+                "0",
+                "selesai"
+              ],
+              "expected": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nTidak ada pesanan"
+            },
+            {
+              "input": [
+                "100",
+                "selesai"
+              ],
+              "expected": "Jumlah pesanan: 1\nTotal boks: 100\nRata-rata: 100.00\nTerbesar: 100"
+            }
+          ]
+        },
+        {
+          "id": "C2b",
+          "title": "Pesanan negatif menjadi retur",
+          "text": "Jumlah negatif sekarang adalah retur: tidak mencetak pesan apa pun, ikut dihitung sebagai satu pesanan, dan mengurangi total boks. Angka 0 tetap penanda berhenti. Terbesar hanya dari pesanan bernilai positif (jika tidak ada, Terbesar: 0). Rata-rata = total dibagi jumlah pesanan. Jika tidak ada pesanan sama sekali, cetak Tidak ada pesanan.",
+          "visible": [
+            {
+              "input": [
+                "10",
+                "-4",
+                "20",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 3\nTotal boks: 26\nRata-rata: 8.67\nTerbesar: 20"
+            },
+            {
+              "input": [
+                "5",
+                "5",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 5"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "0"
+              ],
+              "expected": "Tidak ada pesanan"
+            },
+            {
+              "input": [
+                "-3",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 1\nTotal boks: -3\nRata-rata: -3.00\nTerbesar: 0"
+            },
+            {
+              "input": [
+                "10",
+                "-10",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 10"
+            },
+            {
+              "input": [
+                "7",
+                "-2",
+                "9",
+                "-1",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 4\nTotal boks: 13\nRata-rata: 3.25\nTerbesar: 9"
+            },
+            {
+              "input": [
+                "100",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 1\nTotal boks: 100\nRata-rata: 100.00\nTerbesar: 100"
+            },
+            {
+              "input": [
+                "-5",
+                "-5",
+                "0"
+              ],
+              "expected": "Jumlah pesanan: 2\nTotal boks: -10\nRata-rata: -5.00\nTerbesar: 0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T3",
+      "title": "Praktik 2 · Rekap produk",
+      "topic": "List dan string (Bab 6–7)",
+      "statement": [
+        "Setiap hari UD Rasa Gresik mencatat penjualan produk. Baris pertama masukan adalah n (banyak catatan, minimal 1). Berikutnya n baris berformat nama:jumlah, misalnya keripik:12. Nama produk tidak ada yang kembar dan ditulis huruf kecil.",
+        "Cetak tiga baris: Produk terlaris: NAMA (JUMLAH boks), lalu Total terjual: ..., lalu Daftar produk: diikuti semua nama dengan huruf kapital, dipisah koma dan spasi, urut abjad.",
+        "Bila ada beberapa produk dengan jumlah terbanyak yang sama, pilih yang muncul lebih dulu di masukan. Nama pada baris Produk terlaris tetap huruf kecil seperti di masukan."
+      ],
+      "starter": "# Baca n lalu n baris nama:jumlah\nn = int(input())\n\n",
+      "visible": [
+        {
+          "input": [
+            "3",
+            "keripik:12",
+            "stik:7",
+            "emping:9"
+          ],
+          "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK"
+        },
+        {
+          "input": [
+            "2",
+            "bandeng:5",
+            "otak:5"
+          ],
+          "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+        }
+      ],
+      "hidden": [
+        {
+          "input": [
+            "1",
+            "wingko:4"
+          ],
+          "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO"
+        },
+        {
+          "input": [
+            "4",
+            "lapis:3",
+            "dodol:8",
+            "jenang:8",
+            "kue:1"
+          ],
+          "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+        },
+        {
+          "input": [
+            "5",
+            "e:5",
+            "d:4",
+            "c:3",
+            "b:2",
+            "a:1"
+          ],
+          "expected": "Produk terlaris: e (5 boks)\nTotal terjual: 15\nDaftar produk: A, B, C, D, E"
+        },
+        {
+          "input": [
+            "3",
+            "nastar:2",
+            "kaastengel:15",
+            "putri:9"
+          ],
+          "expected": "Produk terlaris: kaastengel (15 boks)\nTotal terjual: 26\nDaftar produk: KAASTENGEL, NASTAR, PUTRI"
+        },
+        {
+          "input": [
+            "2",
+            "ab:10",
+            "aa:20"
+          ],
+          "expected": "Produk terlaris: aa (20 boks)\nTotal terjual: 30\nDaftar produk: AA, AB"
+        },
+        {
+          "input": [
+            "3",
+            "x:6",
+            "y:6",
+            "z:6"
+          ],
+          "expected": "Produk terlaris: x (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+        }
+      ],
+      "traceInputs": [
+        [
+          "3",
+          "roti:4",
+          "kue:9",
+          "dodol:2"
+        ],
+        [
+          "2",
+          "stik:5",
+          "emping:5"
+        ],
+        [
+          "4",
+          "lapis:7",
+          "bika:3",
+          "kue:7",
+          "ote:1"
+        ],
+        [
+          "1",
+          "wingko:9"
+        ],
+        [
+          "3",
+          "b:1",
+          "a:2",
+          "c:3"
+        ],
+        [
+          "4",
+          "mawar:10",
+          "melati:20",
+          "anggrek:15",
+          "dahlia:20"
+        ]
+      ],
+      "variants": [
+        {
+          "id": "v1",
+          "note": "Memakai >= sehingga yang seri terakhir terpilih",
+          "code": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 0\nfor i in range(1, n):\n    if jumlah[i] >= jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah)}\")\nurut = sorted(nama)\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n"
+        },
+        {
+          "id": "v2",
+          "note": "Daftar produk tidak diurutkan (urutan masukan)",
+          "code": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 0\nfor i in range(1, n):\n    if jumlah[i] > jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah)}\")\nurut = nama\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n"
+        },
+        {
+          "id": "v3",
+          "note": "Total terjual melewatkan catatan pertama",
+          "code": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 0\nfor i in range(1, n):\n    if jumlah[i] > jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah[1:])}\")\nurut = sorted(nama)\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n"
+        }
+      ],
+      "changes": [
+        {
+          "id": "C3a",
+          "title": "Catatan memuat harga",
+          "text": "Format catatan menjadi nama:jumlah:harga (harga satu boks, bilangan bulat). Terlaris tetap ditentukan dari jumlah. Tambahkan satu baris di akhir: Total pendapatan: ... (jumlah dikali harga, dijumlahkan untuk semua produk). Tiga baris lain tidak berubah.",
+          "visible": [
+            {
+              "input": [
+                "3",
+                "keripik:12:5000",
+                "stik:7:3000",
+                "emping:9:4000"
+              ],
+              "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK\nTotal pendapatan: 117000"
+            },
+            {
+              "input": [
+                "2",
+                "bandeng:5:20000",
+                "otak:5:15000"
+              ],
+              "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK\nTotal pendapatan: 175000"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "1",
+                "wingko:4:2500"
+              ],
+              "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO\nTotal pendapatan: 10000"
+            },
+            {
+              "input": [
+                "4",
+                "lapis:3:10000",
+                "dodol:8:6000",
+                "jenang:8:7000",
+                "kue:1:500"
+              ],
+              "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS\nTotal pendapatan: 134500"
+            },
+            {
+              "input": [
+                "3",
+                "nastar:2:50000",
+                "kaastengel:15:45000",
+                "putri:9:30000"
+              ],
+              "expected": "Produk terlaris: kaastengel (15 boks)\nTotal terjual: 26\nDaftar produk: KAASTENGEL, NASTAR, PUTRI\nTotal pendapatan: 1045000"
+            },
+            {
+              "input": [
+                "2",
+                "ab:10:1000",
+                "aa:20:100"
+              ],
+              "expected": "Produk terlaris: aa (20 boks)\nTotal terjual: 30\nDaftar produk: AA, AB\nTotal pendapatan: 12000"
+            },
+            {
+              "input": [
+                "3",
+                "x:6:100",
+                "y:6:200",
+                "z:6:300"
+              ],
+              "expected": "Produk terlaris: x (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z\nTotal pendapatan: 3600"
+            },
+            {
+              "input": [
+                "5",
+                "e:5:10",
+                "d:4:20",
+                "c:3:30",
+                "b:2:40",
+                "a:1:50"
+              ],
+              "expected": "Produk terlaris: e (5 boks)\nTotal terjual: 15\nDaftar produk: A, B, C, D, E\nTotal pendapatan: 350"
+            }
+          ]
+        },
+        {
+          "id": "C3b",
+          "title": "Produk seri terlaris dicetak semua",
+          "text": "Bila beberapa produk seri sebagai terlaris, cetak semuanya pada baris pertama dengan format: Produk terlaris: NAMA1, NAMA2 (JUMLAH boks), nama dipisah koma dan spasi sesuai urutan masukan. Dua baris lain tidak berubah.",
+          "visible": [
+            {
+              "input": [
+                "3",
+                "keripik:12",
+                "stik:7",
+                "emping:9"
+              ],
+              "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK"
+            },
+            {
+              "input": [
+                "2",
+                "bandeng:5",
+                "otak:5"
+              ],
+              "expected": "Produk terlaris: bandeng, otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+            }
+          ],
+          "hidden": [
+            {
+              "input": [
+                "1",
+                "wingko:4"
+              ],
+              "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO"
+            },
+            {
+              "input": [
+                "4",
+                "lapis:3",
+                "dodol:8",
+                "jenang:8",
+                "kue:1"
+              ],
+              "expected": "Produk terlaris: dodol, jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+            },
+            {
+              "input": [
+                "3",
+                "x:6",
+                "y:6",
+                "z:6"
+              ],
+              "expected": "Produk terlaris: x, y, z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+            },
+            {
+              "input": [
+                "5",
+                "e:5",
+                "d:4",
+                "c:3",
+                "b:2",
+                "a:1"
+              ],
+              "expected": "Produk terlaris: e (5 boks)\nTotal terjual: 15\nDaftar produk: A, B, C, D, E"
+            },
+            {
+              "input": [
+                "2",
+                "ab:10",
+                "aa:20"
+              ],
+              "expected": "Produk terlaris: aa (20 boks)\nTotal terjual: 30\nDaftar produk: AA, AB"
+            },
+            {
+              "input": [
+                "4",
+                "a:2",
+                "b:9",
+                "c:1",
+                "d:9"
+              ],
+              "expected": "Produk terlaris: b, d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

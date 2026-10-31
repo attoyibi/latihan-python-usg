@@ -26,6 +26,9 @@
 -- delete from public.praktikum_berkas;
 -- delete from public.praktikum_tahap;
 -- delete from public.praktikum_laporan;
+-- Ujian (0010): sesi peserta (jawaban, nilai) dan akomodasi; jadwal dan kunci boleh disimpan untuk semester berikutnya.
+-- delete from public.ujian_sesi;
+-- delete from public.ujian_akomodasi;
 
 -- Contoh: hapus seluruh data peserta semester ini (akun, progres, laporan, unggahan).
 -- Berkas di Storage ('tugas') harus dihapus terpisah lewat dashboard Storage.

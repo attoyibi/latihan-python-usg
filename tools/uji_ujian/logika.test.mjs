@@ -21,7 +21,7 @@ import { sha256Fallback } from '../../site/js/ujian/ui.js';
 import { clampFont, parsePrefs, FONT_MIN, FONT_MAX } from '../../site/js/ujian/codetools.js';
 import { numbered } from '../../site/js/ujian/ui.js';
 
-const data = (f) => JSON.parse(readFileSync(new URL(f === 'cohort.json' ? './cohort.json' : `../../site/data/kuliah/algoritma-python/ujian/uts/${f}`, import.meta.url), 'utf8'));
+const data = (f) => JSON.parse(readFileSync(new URL(f === 'cohort.json' ? './cohort.json' : `./data/${f}`, import.meta.url), 'utf8'));
 const examJson = data('exam.json');
 const allTasks = data('tasks.json').tasks;
 const exam = { ...examJson, allTasks, tasks: allTasks.filter((t) => examJson.config.activeTasks.includes(t.id)), theory: data('theory.json').questions };

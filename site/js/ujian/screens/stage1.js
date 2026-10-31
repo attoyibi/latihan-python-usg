@@ -1,5 +1,5 @@
 import * as store from '../store.js';
-import { getExam, examSession, stage1EndsAt } from '../data.js';
+import { getExam, examSession, stage1EndsAt, kunciTahap1, simpanSekarang } from '../data.js';
 import * as Anticopas from '../../anticopas.js';
 import { getRunner } from '../runner.js';
 import { workbenchMarkup, examplesMarkup, mountWorkbench, renderResults } from '../workbench.js';
@@ -34,6 +34,7 @@ function stepsOf(exam) {
 const verdictBadge = (c) => {
   if (!c) return html`<span class="badge">belum diperiksa</span>`;
   if (c.kind === 'theory') return c.correct ? html`<span class="badge ok">✓ Lengkap</span>` : html`<span class="badge bad">✗ ${c.count}/${c.need} poin</span>`;
+  if (c.contohSaja) return c.correct ? html`<span class="badge ok">✓ Contoh lulus</span>` : html`<span class="badge bad">✗ ${c.passed}/${c.total} contoh</span>`;
   return c.correct ? html`<span class="badge ok">✓ Benar</span>` : html`<span class="badge bad">✗ ${c.passed}/${c.total} tes lulus</span>`;
 };
 
@@ -48,7 +49,9 @@ function verdictCard(c, stale, q) {
       <br><span class="small muted">Penilaian otomatis berdasarkan kata kunci; dosen dapat menimpa nilainya. Diperiksa ${c.attempts}×.</span>${staleNote}</div>`;
   }
   return html`<div class="callout ${c.correct ? 'ok' : 'warn'}" role="status">
-    <strong>${c.correct ? '✓ Benar' : '✗ Belum tepat'}</strong> · ${c.passed} dari ${c.total} tes lulus${c.correct ? '.' : ' (tes tersembunyi tidak dirinci).'}
+    ${c.contohSaja
+      ? html`<strong>${c.correct ? '✓ Semua contoh lulus' : '✗ Belum tepat'}</strong> · ${c.passed} dari ${c.total} contoh lulus. Tes tersembunyi dinilai saat Tahap 1 dikumpulkan.`
+      : html`<strong>${c.correct ? '✓ Benar' : '✗ Belum tepat'}</strong> · ${c.passed} dari ${c.total} tes lulus${c.correct ? '.' : ' (tes tersembunyi tidak dirinci).'}`}
     <span class="small muted"> · diperiksa ${c.attempts}×</span>${staleNote}</div>`;
 }
 
@@ -98,11 +101,11 @@ export function render(root, ctx) {
         <label class="field"><span>Jawabanmu <span class="hint">(${wMin}–${wMax} kata)</span></span>
           <textarea rows="11" id="theory-text" placeholder="Tulis dengan kata-katamu sendiri.">${text}</textarea></label>
         <div class="small muted" id="theory-wc">${wordCount(text)} kata</div>
-        <div class="row" style="margin-top:10px">
+        ${q.keyPoints ? html`<div class="row" style="margin-top:10px">
           <button class="btn btn-primary" type="button" id="check">✓ Periksa jawaban</button>
           <span class="small muted">Menampilkan poin kunci yang tertangkap. Boleh diulang setelah melengkapi jawaban.</span>
         </div>
-        <div id="verdict">${c ? verdictCard(c, stale, q) : ''}</div>
+        <div id="verdict">${c ? verdictCard(c, stale, q) : ''}</div>` : html`<p class="small muted" style="margin-top:10px">Jawaban tersimpan otomatis. Poin kuncinya dinilai setelah Tahap 1 dikumpulkan; pastikan penjelasanmu lengkap dengan kata-katamu sendiri.</p>`}
       </section>
       ${nav(idx)}`;
   } else if (idx < n) {
@@ -119,7 +122,7 @@ export function render(root, ctx) {
         ${workbenchMarkup(id, `Kode · ${t.title}`, { brief: html`<h3>${t.title}</h3>${t.statement.map((p) => html`<p>${p}</p>`)}${examplesMarkup(t.visible)}`, resetLabel: 'Kode awal' })}
         <div class="row" style="margin-top:10px">
           <button class="btn btn-primary" type="button" id="check">✓ Periksa jawaban</button>
-          <span class="small muted">Menjalankan semua tes (contoh + tersembunyi). Boleh diulang setelah memperbaiki.</span>
+          <span class="small muted">${t.hidden ? 'Menjalankan semua tes (contoh + tersembunyi).' : 'Menjalankan contoh yang terlihat; tes tersembunyi dinilai saat Tahap 1 dikumpulkan.'} Boleh diulang setelah memperbaiki.</span>
         </div>
         <div id="verdict">${c ? verdictCard(c, stale) : ''}</div>
       </section>
@@ -202,9 +205,9 @@ export function render(root, ctx) {
       $('#theory-wc', root).textContent = `${wordCount(ta.value)} kata`;
       debounce(`theory-${id}`, flush);
       const c = draft().checks?.[id];
-      if (c) show($('#verdict', root), verdictCard(c, ta.value !== c.text, q));
+      if (c && q.keyPoints) show($('#verdict', root), verdictCard(c, ta.value !== c.text, q));
     });
-    $('#check', root).addEventListener('click', () => {
+    $('#check', root)?.addEventListener('click', () => {
       flush();
       const text = ta.value;
       const r = scoreTheory(text, q, { minWords });
@@ -234,13 +237,13 @@ export function render(root, ctx) {
       const code = editor.getValue();
       checkBtn.disabled = true;
       checkBtn.textContent = 'Memeriksa…';
-      const tests = [...t.visible, ...t.hidden];
+      const tests = [...t.visible, ...(t.hidden || [])];
       const results = await runTests(code, tests, (c, i) => runner.run(c, i));
       const passed = passCount(results);
       saveDraft((d) => {
         (d.code ||= {})[id] = code;
         const prev = d.checks?.[id];
-        (d.checks ||= {})[id] = { kind: 'task', passed, total: tests.length, correct: passed === tests.length, code, attempts: (prev?.attempts || 0) + 1 };
+        (d.checks ||= {})[id] = { kind: 'task', passed, total: tests.length, correct: passed === tests.length, contohSaja: !t.hidden, code, attempts: (prev?.attempts || 0) + 1 };
       });
       const c = draft().checks[id];
       show($('#verdict', root), html`${verdictCard(c, false)}${c.correct ? '' : html`<details open style="margin-top:8px"><summary>Selisih pada contoh yang terlihat</summary>${renderResults(results.slice(0, t.visible.length))}</details>`}`);
@@ -279,7 +282,7 @@ export function render(root, ctx) {
       if (!(await ask('Kumpulkan dan kunci jawaban Tahap 1? Setelah ini jawaban tidak bisa diubah.', 'Kumpulkan'))) return;
 
       try { await lockStage1({ exam, runner, ctx, auto: false }); } catch (err) {
-        show(box, html`<div class="callout bad" role="alert"><strong>Tidak bisa memeriksa kodemu.</strong> ${err.message} Jawaban belum dikunci; coba lagi setelah penjalan siap.</div>`);
+        show(box, html`<div class="callout bad" role="alert"><strong>Jawaban belum terkunci.</strong> ${err.jenis === 'kunci' ? 'Kunci ujian belum dipasang oleh pengajar. Beri tahu pengajarmu; jawabanmu tetap tersimpan.' : err.jenis === 'jaringan' ? 'Koneksi ke server terputus. Periksa internet lalu tekan Kumpulkan lagi; jawabanmu tetap tersimpan.' : err.message}</div>`);
       }
     });
   }
@@ -303,22 +306,29 @@ async function lockStage1({ exam, runner, ctx, auto }) {
   overlay.innerHTML = `<div role="status"><div class="spinner"></div><div id="ov-text">${auto ? 'Waktu Tahap 1 habis. ' : ''}Menyiapkan penjalan Python…</div></div>`;
   document.body.append(overlay);
   try {
+    // 1. Jawaban dikunci di SERVER lebih dulu (jam server, sekali saja); baru setelah itu kunci ujian turun.
+    const snapshot = { code: codes, theory, ai: { level: dr.ai?.level || 'tidak-diisi', tools: dr.ai?.tools || '', how: dr.ai?.how || '' }, submittedAt: new Date().toISOString(), auto, tempelDiblokir: dr.tempel || 0 };
+    const hash = await sha256(JSON.stringify(snapshot));
+    overlay.querySelector('#ov-text').textContent = 'Mengunci jawaban di server…';
+    await kunciTahap1(snapshot, hash);
+    const lengkap = getExam(); // kini dengan tes tersembunyi, varian, dan ketentuan berubah
+    // 2. Kode dinilai dan butir Tahap 2 disusun di browser.
     let ev;
     try {
+      overlay.querySelector('#ov-text').textContent = 'Menyiapkan penjalan Python…';
       await runner.whenReady();
       ev = await evaluateSubmission({
-        tasks: exam.tasks, codes, run: (c, i) => runner.run(c, i),
+        tasks: lengkap.tasks, codes, run: (c, i) => runner.run(c, i),
         onProgress: (t) => { overlay.querySelector('#ov-text').textContent = t; },
       });
     } catch (err) {
-      if (!auto) throw err;
-      // Waktu sudah habis dan penjalan tidak tersedia: pakai hasil pemeriksaan terakhir di draf, tanpa butir dari kodenya.
-      const ratios = Object.fromEntries(exam.tasks.map((t) => { const c = dr.checks?.[t.id]; return [t.id, c ? c.passed / c.total : 0]; }));
-      ev = { taskResults: Object.fromEntries(exam.tasks.map((t) => { const c = dr.checks?.[t.id]; return [t.id, { passed: c?.passed ?? 0, total: c?.total ?? t.visible.length + t.hidden.length }]; })), traceCandidates: {}, debugCandidates: {}, changeCandidates: {}, s1Practice: s1Of(ratios), evalFailed: true };
+      // Jawaban sudah terkunci di server, jadi tidak bisa dibatalkan: pakai hasil pemeriksaan terakhir di draf,
+      // tanpa butir dari kodenya (pemeriksaan ulang oleh dosen bisa menyusul).
+      const ratios = Object.fromEntries(lengkap.tasks.map((t) => { const c = dr.checks?.[t.id]; return [t.id, c ? c.passed / c.total : 0]; }));
+      ev = { taskResults: Object.fromEntries(lengkap.tasks.map((t) => { const c = dr.checks?.[t.id]; return [t.id, { passed: c?.passed ?? 0, total: c?.total ?? t.visible.length + (t.hidden || []).length }]; })), traceCandidates: {}, debugCandidates: {}, changeCandidates: {}, s1Practice: s1Of(ratios), evalFailed: true, evalError: String(err.message || err) };
     }
-    const snapshot = { code: codes, theory, ai: { level: dr.ai?.level || 'tidak-diisi', tools: dr.ai?.tools || '', how: dr.ai?.how || '' }, submittedAt: new Date().toISOString(), auto, tempelDiblokir: dr.tempel || 0 };
-    const hash = await sha256(JSON.stringify(snapshot));
     store.update((s) => { (((s.demo ||= {}).stage1 ||= {})).submitted = { ...snapshot, hash, ...ev }; });
+    simpanSekarang().catch(() => {});
     ctx.rerender();
   } finally {
     overlay.remove();

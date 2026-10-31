@@ -1,5 +1,5 @@
 import * as store from '../store.js';
-import { getExam, demoStudent, attempts, ensureAttempt, s1For, theoryOverrides, finalOverrides, peserta, isLatihan } from '../data.js';
+import { getExam, demoStudent, attempts, ensureAttempt, s1For, theoryOverrides, finalOverrides, peserta, isLatihan, ulangi } from '../data.js';
 import { summarize } from '../logic/summary.js';
 import { cbmPoints } from '../logic/cbm.js';
 import { theoryResults } from '../logic/s1.js';
@@ -97,7 +97,7 @@ export function render(root, ctx) {
 
   $('#ulangi', root)?.addEventListener('click', async () => {
     if (!(await ask('Hapus hasil simulasi ini dan mulai lagi dari awal?', 'Ulangi'))) return;
-    store.reset();
+    try { await ulangi(); } catch (e) { alert(e.message); return; }
     ctx.rerender();
   });
   $('#retest', root)?.addEventListener('click', () => {
