@@ -53,7 +53,8 @@ function muatSesi() {
 }
 const simpanSesi = () => aman(() => sessionStorage.setItem(KUNCI_SESI, JSON.stringify({ jumlah: status.jumlah, sudah: sudahId, menunggu: status.menunggu })));
 
-const adaDialog = () => !!document.querySelector("dialog[open], [role=dialog], .modal, .overlay");
+// .uj = layar ujian sedang terbuka: promo menunggu sampai peserta meninggalkan ujian.
+const adaDialog = () => !!document.querySelector("dialog[open], [role=dialog], .modal, .overlay, .uj");
 
 function bangun(p) {
   const k = document.createElement("div");

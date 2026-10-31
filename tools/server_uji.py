@@ -93,8 +93,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
 
-class Server(socketserver.TCPServer):
+# Berulir: satu koneksi browser yang menggantung (mis. preconnect) tidak boleh menahan permintaan lain.
+class Server(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
+    daemon_threads = True
 
 
 if __name__ == "__main__":

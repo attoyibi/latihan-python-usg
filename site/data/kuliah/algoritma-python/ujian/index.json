@@ -1,0 +1,5 @@
+{
+  "ujian": [
+    { "id": "uts", "judul": "UTS Algoritma dan Pemrograman", "jenis": "UTS", "babDari": 1, "babSampai": 7 }
+  ]
+}

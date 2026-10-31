@@ -267,6 +267,20 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [ ] Status terkumpul, disetujui, perlu revisi
 - [ ] Peserta dan instruktur saja yang dapat melihat berkas
 
+## Tahap U: Ujian UTS/UAS (branch `fitur/ujian`, mulai 31 Okt 2026)
+
+Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/panduan-integrasi-situs-latihan.md`). Dikerjakan di branch `fitur/ujian`, BELUM digabung ke `main`. Ringkasan: `docs/UJIAN.md`.
+
+- [x] Logika murni (`site/js/ujian/logic/`, disalin utuh dari prototype) dan 50 unit test (`node --test tools/uji_ujian/logika.test.mjs`, masuk CI)
+- [x] Data UTS (Bab 1-7) di `site/data/kuliah/algoritma-python/ujian/`; aktif lewat `"ujian": true` di `matakuliah.json`
+- [x] Layar Mulai, Tahap 1, Tahap 2, Hasil di rute `#k/<mk>/ujian/<id>` dengan login, penjalan Python, dan blokir tempel situs; kartu Ujian di halaman mata kuliah; promo tidak muncul selama ujian
+- [x] Diuji di `tools/server_uji.py` (akun budi): Tahap 1 terkunci, 9 butir Tahap 2 dari kode, nilai, uji ulang, muat ulang di tengah Tahap 2 (waktu tetap berjalan), tampilan HP 375 px
+- [ ] **Belum aman untuk dipakai sungguhan:** keadaan ujian masih di browser (localStorage), jam dari perangkat, tes tersembunyi dan poin kunci teori masih ada di berkas publik `tasks.json`/`theory.json`. Jangan gabung ke `main` sebelum langkah server selesai
+- [ ] Migrasi `0010_ujian.sql` + fungsi RPC (jam server, kunci di tabel tertutup), diuji di proyek Supabase uji terpisah
+- [ ] Sambungkan klien ke fungsi; pindahkan kunci ke `kunci/` + tabel `ujian_kunci`
+- [ ] Tab "Ujian" di dashboard dosen (nilai, timpa, tinjauan, CSV, jadwal per kelas, akomodasi)
+- [ ] Pilot kecil di perangkat nyata; soal UAS Bab 8-14
+
 ## Tahap 8: Uji coba dan rilis
 
 - [ ] Uji coba 5 sampai 10 mahasiswa (ponsel dan laptop)

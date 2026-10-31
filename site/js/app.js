@@ -20,6 +20,7 @@ import * as PraktikData from "./praktik-data.js";
 import * as Kunci from "./kunci.js";
 import * as LaporanAkhirUI from "./laporan-akhir-ui.js";
 import * as Promo from "./promo.js";
+import * as UjianUI from "./ujian/index.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
 // Progres ditulis ke sini lebih dulu, lalu disusulkan ke Supabase oleh sinkron.js.
@@ -974,6 +975,7 @@ function renderCourse(c) {
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
     ready ? babGrid() : null,
+    ready && c.ujian === true && (Auth.getUserId() || Auth.localMode()) ? UjianUI.kartuUjian(c, Auth.getUserId()) : null,
     ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
   ].filter(Boolean));
 }
@@ -1523,7 +1525,7 @@ function setPage(kind) {
   document.body.classList.toggle("gate", gate);
   document.body.classList.toggle("home", kind !== "bab");
   $("#navHome").classList.toggle("on", kind === "beranda");
-  $("#navMateri").classList.toggle("on", kind === "kuliah" || kind === "course" || kind === "bab");
+  $("#navMateri").classList.toggle("on", kind === "kuliah" || kind === "course" || kind === "bab" || kind === "ujian");
   $("#navPanduan").classList.toggle("on", kind === "panduan");
   $("#navInstruktur").classList.toggle("on", kind === "instruktur");
   $("#navProfil").classList.toggle("on", kind === "profil");
@@ -1584,6 +1586,7 @@ async function keluar() {
 
 async function route() {
   Tata.bersihkan();
+  UjianUI.tinggalkan();
   const tok = ++routeTok;
   const stale = () => tok !== routeTok;
   const hash = location.hash;
@@ -1669,6 +1672,22 @@ async function route() {
     if (c.bahasa === "python") start();
     if (c.bahasa === "java") startJava();
     await renderBab(n);
+    return;
+  }
+  // Ujian (UTS/UAS): halaman fokus tanpa sidebar. Tahap ditentukan dari keadaan ujian, bukan dari alamat.
+  if ((m = /^#k\/([a-z0-9-]+)\/ujian\/([a-z0-9-]+)$/.exec(hash))) {
+    const c = await loadCourse(m[1]);
+    if (stale()) return;
+    if (!c || !c.aktif || c.ujian !== true || c.bahasa !== "python") {
+      setPage("kuliah");
+      renderTidakAda();
+      return;
+    }
+    useCourse(c, true);
+    setPage("ujian");
+    window.scrollTo(0, 0);
+    const p = Auth.getProfile() || {};
+    await UjianUI.renderUjian($("#main"), c, m[2], { id: Auth.getUserId() || "lokal", nama: p.nama || "Peserta", nim: p.nim || "-", kelas: p.kelas || "-", peran: p.peran || "peserta" });
     return;
   }
   if ((m = /^#k\/([a-z0-9-]+)$/.exec(hash))) {
