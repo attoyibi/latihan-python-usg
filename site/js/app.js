@@ -975,10 +975,10 @@ function renderCourse(c) {
       ready ? progressBar(done, total, "Bab selesai di " + c.nama) : null,
       ready ? h("div", { class: "cta", style: "margin-top:12px" }, h("a", { class: "btn btn-primary", href: "#k/" + c.id + "/bab-" + nextBab() }, done ? "Lanjutkan" : "Mulai belajar")) : null
     ),
-    ready && c.ujian === true && (Auth.getUserId() || Auth.localMode()) ? UjianUI.kartuUjian(c, Auth.getUserId()) : null,
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
     ready ? babGrid() : null,
+    ready && c.ujian === true && (Auth.getUserId() || Auth.localMode()) ? UjianUI.kartuUjian(c, Auth.getUserId()) : null,
     LAPORAN_AKHIR_TAMPIL && ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
   ].filter(Boolean));
 }
