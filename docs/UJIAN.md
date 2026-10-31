@@ -9,12 +9,14 @@ Ujian dua tahap yang berjalan sendiri, dari prototype *Double-Check Exam*:
 2. **Tahap 2**: butir pilihan ganda yang dibuat dari **kode peserta sendiri** (tebak keluaran, temukan baris yang salah, konsep teori, ketentuan berubah), batas waktu per butir.
 3. **Nilai** otomatis skala 100: tidak pernah melebihi nilai Tahap 1, turun bila pemahaman di Tahap 2 jauh di bawahnya (paling banyak 40 poin). Satu kali uji ulang bila hasilnya jauh berbeda.
 
+**UAS** (Bab 8–14) memakai alur dan bobot yang sama dengan UTS, Tahap 1 90 menit: praktik fungsi dan pengurutan (peringkat nilai) serta kelas dan CRUD (stok gudang), teori fungsi/rekursi dan searching/sorting.
+
 **Simulasi** (Bab 1–4) memakai alur yang sama dengan soal lebih mudah, Tahap 1 30 menit, 5 butir Tahap 2, nilai tidak dihitung, dan boleh diulang.
 
 ## Yang dipegang server (migrasi `0010_ujian.sql`)
 | Bagian | Cara kerja |
 |---|---|
-| Jadwal per kelas | Tabel `ujian_jadwal`. Peserta hanya bisa **memulai** saat jadwal kelasnya (rombel A–D atau "Semua kelas") buka. UTS tidak punya jadwal bawaan: tertutup sampai dosen membukanya. |
+| Jadwal per kelas | Tabel `ujian_jadwal`. Peserta hanya bisa **memulai** saat jadwal kelasnya (rombel A–D atau "Semua kelas") buka. UTS dan UAS tidak punya jadwal bawaan: tertutup sampai dosen membukanya. |
 | Jam | Waktu mulai, batas Tahap 1, dan waktu kunci diisi database. Peserta tidak bisa mengubahnya. |
 | Akomodasi | Tabel `ujian_akomodasi`: faktor waktu per peserta (×1,25 / ×1,5 / ×2), diatur dosen. |
 | Kunci | Tabel `ujian_kunci` tidak bisa dibaca lewat API oleh siapa pun. Tes tersembunyi, poin kunci teori, butir konsep, dan varian **baru turun setelah Tahap 1 dikunci** (`ujian_kunci_tahap1`). Jawaban yang sudah dikunci tidak bisa diganti. |
@@ -27,6 +29,7 @@ Diuji di PostgreSQL sungguhan (PGlite) oleh `tools/uji_sql`: ±50 uji khusus uji
 - Butir Tahap 2 disusun dan dinilai di browser peserta dari kunci yang sudah turun. Peserta yang membuka alat pengembang saat Tahap 2 bisa melihat kunci butir. Batas waktu per butir dihitung di browser (dari jam server saat halaman dibuka).
 - Ringkasan nilai di kolom `hasil` dikirim browser peserta. Jawaban mentahnya (`snapshot`, `keadaan`) tersimpan di server, jadi pemeriksaan ulang oleh dosen bisa ditambahkan nanti.
 - Tanpa pengawas, ujian ini tidak mencegah bantuan AI atau orang lain. Ini alat pengukur pemahaman, bukan detektor kecurangan.
+- Pernyataan soal (judul, teks, kode awal, contoh terlihat) ada di berkas publik situs, jadi bisa dibaca sebelum ujian dibuka. Yang rahasia hanya tes tersembunyi, poin kunci, dan butir Tahap 2.
 - **Soal UTS contoh (dari prototype) sudah pernah terbit** di repositori publik ini (riwayat git). Untuk UTS sungguhan, tulis soal baru (lihat di bawah); soal baru tidak pernah masuk repo.
 
 ## Untuk dosen (dashboard, tab Ujian)

@@ -668,6 +668,7 @@ console.log("\n== Tahap N: migrasi 0010 (ujian: jadwal, akomodasi, sesi dengan j
   cek("tabel lama tidak berubah", (await q("select count(*)::int as n from public.percobaan")).rows[0].n === sesiAwal);
   cek("simulasi terbuka untuk semua kelas dan boleh diulang (bawaan)", (await q("select boleh_ulang from public.ujian_jadwal where ujian_id = 'simulasi' and kelas = '*'")).rows[0]?.boleh_ulang === true);
   cek("UTS tanpa jadwal bawaan (tertutup sampai dosen membuka)", (await q("select count(*)::int as n from public.ujian_jadwal where ujian_id = 'uts'")).rows[0].n === 0);
+  cek("UAS tanpa jadwal bawaan (tertutup sampai dosen membuka)", (await q("select count(*)::int as n from public.ujian_jadwal where ujian_id = 'uas'")).rows[0].n === 0);
   const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
 
   // hak akses dasar

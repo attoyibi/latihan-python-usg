@@ -282,7 +282,8 @@ Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/pandu
 - [ ] **Jalankan 0010 dan `kunci/ujian_kunci.sql` di Supabase sungguhan** (sesi dengan folder kerja website-latihan, MCP), lalu uji dengan akun nyata di pratinjau
 - [ ] Soal UTS sungguhan yang belum pernah terbit (soal contoh sudah ada di riwayat repo publik)
 - [ ] Sisa celah: kunci butir Tahap 2 ada di browser selama Tahap 2; ringkasan nilai dikirim browser (lihat `docs/UJIAN.md`)
-- [ ] Pilot kecil di perangkat nyata; soal UAS Bab 8-14
+- [x] UAS (Bab 8-14, 90 menit): fungsi dan sorting, kelas dan CRUD, teori fungsi/rekursi dan searching/sorting; soal di `tools/ujian/uas_def.py` (diabaikan git karena berisi kunci) dan teori lengkap di `kunci/ujian/uas/`; tanpa jadwal bawaan (tertutup sampai dosen membuka)
+- [ ] Pilot kecil di perangkat nyata
 
 ## Tahap 8: Uji coba dan rilis
 

@@ -1,0 +1,25 @@
+{
+  "note": "Soal teori UAS (Bab 8-14). Dinilai otomatis dari poin kunci: poin tertangkap bila setiap kelompok kata punya minimal satu kata yang muncul. Skor = poin tertangkap / need.",
+  "questions": [
+    {
+      "id": "UQ1",
+      "title": "Teori 1 · Fungsi dan rekursi",
+      "topic": "Bab 8 dan 14",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa gunanya fungsi dan apa itu parameter; (b) beda return dan print di dalam fungsi; (c) apa itu fungsi rekursif dan kenapa ia wajib punya kasus dasar (base case). Beri satu contoh singkat.",
+        "Cukup satu sampai dua paragraf, sekitar 50–150 kata."
+      ],
+      "need": 5
+    },
+    {
+      "id": "UQ2",
+      "title": "Teori 2 · Searching dan sorting",
+      "topic": "Bab 12 dan 13",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) cara kerja linear search dan binary search; (b) syarat agar binary search bisa dipakai; (c) perkiraan banyak langkah (Big-O) keduanya dan Big-O bubble sort, serta apa artinya bila datanya sangat banyak.",
+        "Cukup satu sampai dua paragraf, sekitar 50–150 kata."
+      ],
+      "need": 4
+    }
+  ]
+}
