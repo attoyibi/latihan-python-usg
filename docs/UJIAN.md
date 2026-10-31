@@ -11,6 +11,9 @@ Ujian dua tahap yang berjalan sendiri, dari prototype *Double-Check Exam*:
 
 Batasan jujur: tanpa pengawas, Tahap 2 tidak bisa mencegah bantuan AI atau orang lain. Ini alat pengukur pemahaman, bukan detektor kecurangan.
 
+## Simulasi (latihan sebelum UTS/UAS)
+Ujian `simulasi` (Bab 1–4) memakai alur yang sama persis, dengan soal lebih mudah, Tahap 1 30 menit, dan 5 butir Tahap 2. Ditandai `"latihan": true` di `index.json`: nilainya ditulis "tidak dihitung" dan peserta bisa menekan **Ulangi simulasi dari awal**. Soal ada di `tools/ujian/simulasi_def.py`; bangun ulang datanya dengan `python tools/ujian/buat_ujian.py simulasi` (menjalankan kunci untuk menghitung tes dan memeriksa varian bug). Soal teori dan konfigurasi: `simulasi/theory.json`, `simulasi/exam.json`.
+
 ## Letak berkas
 | Bagian | Tempat |
 |---|---|

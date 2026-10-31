@@ -39,10 +39,10 @@ export function kartuUjian(kuliah, userId) {
   muatIndeks(kuliah.id, kuliah.ujian === true).then((daftar) => {
     if (!daftar.length) return;
     show(el, html`<h2>Ujian</h2>
-      <p class="muted">Ujian berjalan satu kali duduk: Tahap 1 (koding dan teori) lalu Tahap 2 (pertanyaan tentang kodemu sendiri), nilai keluar otomatis.</p>
+      <p class="muted">Ujian berjalan satu kali duduk: Tahap 1 (koding dan teori) lalu Tahap 2 (pertanyaan tentang kodemu sendiri), nilai keluar otomatis. Coba <strong>simulasi</strong> dulu supaya terbiasa dengan setiap tahap; soalnya lebih mudah dan nilainya tidak dihitung.</p>
       <div class="uj-daftar">${daftar.map((u) => {
         const st = statusLokal(userId, kuliah.id, u.id);
-        return html`<a class="uj-item" href="#k/${kuliah.id}/ujian/${u.id}"><span><strong>${u.judul}</strong><br><span class="muted small">Bab ${u.babDari}–${u.babSampai}</span></span><span class="badge ${st === 'selesai' ? 'ok' : st === 'belum' ? '' : 'warn'}">${LABEL[st]}</span></a>`;
+        return html`<a class="uj-item" href="#k/${kuliah.id}/ujian/${u.id}"><span><strong>${u.judul}</strong><br><span class="muted small">Bab ${u.babDari}–${u.babSampai}</span></span><span class="uj-lencana">${u.latihan ? html`<span class="badge info">Simulasi · boleh diulang</span>` : ''}<span class="badge ${st === 'selesai' ? 'ok' : st === 'belum' ? '' : 'warn'}">${LABEL[st]}</span></span></a>`;
       })}</div>`);
     el.hidden = false;
   });
@@ -63,7 +63,7 @@ export async function renderUjian(main, kuliah, ujianId, peserta) {
     return;
   }
   try {
-    await pakaiUjian(kuliah.id, ujianId, peserta);
+    await pakaiUjian(kuliah.id, ujianId, peserta, meta);
   } catch (e) {
     show(root, html`<section class="card"><h2>Data ujian tidak termuat</h2><p>${e.message}. Periksa koneksi lalu muat ulang halaman.</p></section>`);
     return;

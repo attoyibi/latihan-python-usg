@@ -275,6 +275,7 @@ Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/pandu
 - [x] Data UTS (Bab 1-7) di `site/data/kuliah/algoritma-python/ujian/`; aktif lewat `"ujian": true` di `matakuliah.json`
 - [x] Layar Mulai, Tahap 1, Tahap 2, Hasil di rute `#k/<mk>/ujian/<id>` dengan login, penjalan Python, dan blokir tempel situs; kartu Ujian di halaman mata kuliah; promo tidak muncul selama ujian
 - [x] Diuji di `tools/server_uji.py` (akun budi): Tahap 1 terkunci, 9 butir Tahap 2 dari kode, nilai, uji ulang, muat ulang di tengah Tahap 2 (waktu tetap berjalan), tampilan HP 375 px
+- [x] Simulasi ujian (Bab 1-4, lebih mudah, nilai tidak dihitung, bisa diulang) supaya peserta mencoba setiap tahap; soal di `tools/ujian/simulasi_def.py`
 - [ ] **Belum aman untuk dipakai sungguhan:** keadaan ujian masih di browser (localStorage), jam dari perangkat, tes tersembunyi dan poin kunci teori masih ada di berkas publik `tasks.json`/`theory.json`. Jangan gabung ke `main` sebelum langkah server selesai
 - [ ] Migrasi `0010_ujian.sql` + fungsi RPC (jam server, kunci di tabel tertutup), diuji di proyek Supabase uji terpisah
 - [ ] Sambungkan klien ke fungsi; pindahkan kunci ke `kunci/` + tabel `ujian_kunci`

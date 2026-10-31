@@ -29,18 +29,21 @@ export function muatIndeks(mk, ada = true) {
 }
 
 let base = null; // { exam, tasks, theory, templates }
-let ctx = { mk: null, ujianId: null, peserta: null };
+let ctx = { mk: null, ujianId: null, peserta: null, meta: {} };
 
 // Memuat definisi satu ujian dan memilih penyimpanan untuk akun ini. peserta = { id, nama, nim, kelas }.
-export async function pakaiUjian(mk, ujianId, peserta) {
+// meta = baris index.json ujian ini (judul, jenis, latihan: true untuk simulasi yang boleh diulang).
+export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
   const dir = `data/kuliah/${mk}/ujian/${ujianId}/`;
   const [exam, tasks, theory, templates] = await Promise.all(['exam', 'tasks', 'theory', 'templates'].map((f) => ambilJson(`${dir}${f}.json`)));
   base = { exam, tasks, theory, templates };
-  ctx = { mk, ujianId, peserta };
+  ctx = { mk, ujianId, peserta, meta };
   store.pakai(peserta.id, mk, ujianId);
 }
 
 export const peserta = () => ctx.peserta;
+// Simulasi: nilai tidak dihitung dan boleh diulang dari awal.
+export const isLatihan = () => ctx.meta.latihan === true;
 export const templates = () => base.templates;
 
 export function getExam() {

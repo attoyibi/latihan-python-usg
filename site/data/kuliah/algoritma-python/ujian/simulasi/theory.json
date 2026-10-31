@@ -1,0 +1,244 @@
+{
+  "note": "Soal teori SIMULASI (Bab 1-4, lebih mudah). Dinilai otomatis dari poin kunci: poin tertangkap bila setiap kelompok kata punya minimal satu kata yang muncul. Skor = poin tertangkap / need.",
+  "questions": [
+    {
+      "id": "SQ1",
+      "title": "Teori 1 · Variabel dan tipe data",
+      "topic": "Bab 2",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa itu variabel; (b) beda tipe data int, float, dan str, masing-masing dengan satu contoh; (c) kenapa hasil input() perlu diubah dengan int() sebelum dihitung.",
+        "Cukup satu paragraf, sekitar 30–80 kata."
+      ],
+      "need": 4,
+      "keyPoints": [
+        {
+          "id": "s1a",
+          "label": "Variabel adalah nama untuk menyimpan nilai",
+          "all": [
+            [
+              "variabel"
+            ],
+            [
+              "menyimpan",
+              "simpan",
+              "wadah",
+              "tempat",
+              "nama"
+            ]
+          ]
+        },
+        {
+          "id": "s1b",
+          "label": "int = bilangan bulat",
+          "all": [
+            [
+              "int",
+              "integer"
+            ],
+            [
+              "bulat"
+            ]
+          ]
+        },
+        {
+          "id": "s1c",
+          "label": "float = bilangan desimal/pecahan",
+          "all": [
+            [
+              "float"
+            ],
+            [
+              "desimal",
+              "pecahan",
+              "koma",
+              "titik"
+            ]
+          ]
+        },
+        {
+          "id": "s1d",
+          "label": "str = teks",
+          "all": [
+            [
+              "str",
+              "string"
+            ],
+            [
+              "teks",
+              "huruf",
+              "kata",
+              "karakter",
+              "tulisan"
+            ]
+          ]
+        },
+        {
+          "id": "s1e",
+          "label": "input() menghasilkan teks, jadi perlu int() agar bisa dihitung",
+          "all": [
+            [
+              "input"
+            ],
+            [
+              "teks",
+              "str",
+              "string"
+            ],
+            [
+              "int(",
+              "int ",
+              "angka",
+              "dihitung",
+              "hitung",
+              "bilangan"
+            ]
+          ]
+        }
+      ],
+      "sample": "Variabel adalah nama yang dipakai untuk menyimpan sebuah nilai supaya bisa dipakai lagi. Tipe int adalah bilangan bulat, misalnya 5. Float adalah bilangan desimal, misalnya 2.5. Str adalah teks, misalnya \"kue\". Hasil input() selalu berupa teks atau str, jadi harus diubah dengan int() dulu supaya bisa dihitung sebagai angka.",
+      "concepts": [
+        {
+          "id": "SQ1-a",
+          "stem": "Manakah pernyataan yang BENAR tentang tipe data di Python?",
+          "correct": "Nilai 3.0 bertipe float walaupun angkanya bulat.",
+          "wrong": [
+            "Nilai \"25\" (pakai tanda kutip) bertipe int.",
+            "Tipe str hanya boleh berisi huruf, tidak boleh angka.",
+            "int(\"2.5\") menghasilkan 2 tanpa galat.",
+            "Tipe data variabel tidak bisa berubah setelah pertama diisi."
+          ]
+        },
+        {
+          "id": "SQ1-b",
+          "stem": "Manakah pernyataan yang BENAR tentang input()?",
+          "correct": "input() selalu mengembalikan teks (str), jadi \"3\" + \"4\" menghasilkan \"34\".",
+          "wrong": [
+            "input() otomatis mengubah angka yang diketik menjadi int.",
+            "input() hanya bisa membaca satu huruf.",
+            "Hasil input() bertipe float bila pengguna mengetik angka.",
+            "input() mencetak nilai variabel ke layar."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SQ2",
+      "title": "Teori 2 · Percabangan if",
+      "topic": "Bab 4",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) kapan blok if, elif, dan else dijalankan; (b) beda operator = dan ==; (c) apa peran indentasi (spasi di awal baris) pada percabangan.",
+        "Cukup satu paragraf, sekitar 30–80 kata."
+      ],
+      "need": 4,
+      "keyPoints": [
+        {
+          "id": "s2a",
+          "label": "if dijalankan bila kondisinya benar",
+          "all": [
+            [
+              "if"
+            ],
+            [
+              "benar",
+              "true",
+              "terpenuhi"
+            ]
+          ]
+        },
+        {
+          "id": "s2b",
+          "label": "elif diperiksa bila kondisi sebelumnya salah",
+          "all": [
+            [
+              "elif"
+            ],
+            [
+              "salah",
+              "false",
+              "tidak terpenuhi",
+              "sebelumnya"
+            ]
+          ]
+        },
+        {
+          "id": "s2c",
+          "label": "else dijalankan bila semua kondisi salah",
+          "all": [
+            [
+              "else"
+            ],
+            [
+              "semua",
+              "selain",
+              "tidak ada",
+              "lainnya",
+              "salah"
+            ]
+          ]
+        },
+        {
+          "id": "s2d",
+          "label": "= mengisi nilai, == membandingkan",
+          "all": [
+            [
+              "mengisi",
+              "memberi nilai",
+              "menyimpan",
+              "penugasan",
+              "assign"
+            ],
+            [
+              "membandingkan",
+              "perbandingan",
+              "sama dengan",
+              "cek"
+            ]
+          ]
+        },
+        {
+          "id": "s2e",
+          "label": "Indentasi menentukan baris mana yang masuk blok",
+          "all": [
+            [
+              "indentasi",
+              "spasi",
+              "menjorok"
+            ],
+            [
+              "blok",
+              "masuk",
+              "bagian",
+              "milik",
+              "di dalam"
+            ]
+          ]
+        }
+      ],
+      "sample": "Blok if dijalankan kalau kondisinya benar. Kalau salah, elif diperiksa sebagai kondisi berikutnya, dan else dijalankan kalau semua kondisi sebelumnya salah. Tanda = dipakai untuk mengisi nilai ke variabel, sedangkan == dipakai untuk membandingkan dua nilai. Indentasi atau spasi di awal baris menentukan baris mana yang masuk ke dalam blok if.",
+      "concepts": [
+        {
+          "id": "SQ2-a",
+          "stem": "Manakah pernyataan yang BENAR tentang if, elif, dan else?",
+          "correct": "Dari satu rangkaian if-elif-else, paling banyak satu blok yang dijalankan.",
+          "wrong": [
+            "Semua blok elif yang kondisinya benar akan dijalankan berurutan.",
+            "else wajib ada setiap kali menulis if.",
+            "elif boleh ditulis tanpa if sebelumnya.",
+            "else dijalankan bila kondisi if benar."
+          ]
+        },
+        {
+          "id": "SQ2-b",
+          "stem": "Manakah pernyataan yang BENAR tentang operator dan indentasi?",
+          "correct": "if x = 5: menimbulkan galat karena = mengisi nilai, bukan membandingkan.",
+          "wrong": [
+            "== dipakai untuk mengisi nilai ke variabel.",
+            "Indentasi di Python hanya hiasan dan tidak mengubah arti program.",
+            "Kondisi jumlah >= 10 bernilai salah bila jumlah tepat 10.",
+            "Baris setelah if boleh tidak menjorok asalkan ada titik dua."
+          ]
+        }
+      ]
+    }
+  ]
+}

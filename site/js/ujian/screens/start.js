@@ -1,4 +1,4 @@
-import { getExam, startExam, peserta } from '../data.js';
+import { getExam, startExam, peserta, isLatihan } from '../data.js';
 import { getRunner } from '../runner.js';
 import { html, show, $ } from '../ui.js';
 
@@ -21,9 +21,10 @@ export function render(root, ctx) {
         <li><strong>Tahap 2 · Verifikasi</strong> (±${Math.ceil(s2Sec / 60)} menit). Dimulai otomatis setelah Tahap 1. Semua pilihan ganda tentang kodemu sendiri; tiap butir punya batas waktu, lalu berpindah sendiri.</li>
         <li><strong>Nilai</strong> keluar otomatis (skala 100) di akhir. Bila hasil Tahap 2 jauh di bawah Tahap 1, kamu ditawari satu kali uji ulang dengan butir baru.</li>
       </ol>
+      ${isLatihan() ? html`<div class="callout ok"><strong>Ini simulasi.</strong> Soalnya lebih mudah dan nilainya tidak dihitung. Alur, batas waktu, dan cara kerjanya sama dengan UTS dan UAS, jadi pakai untuk membiasakan diri. Setelah selesai kamu boleh mengulang dari awal.</div>` : ''}
       <div class="callout warn"><strong>Penting.</strong> Kerjakan sendiri. Tahap 2 menguji apakah kamu memahami kodemu; jangan menutup halaman di tengah tahap karena waktu tetap berjalan. AI boleh dipakai di Tahap 1 asal dideklarasikan. Salin dan tempel dimatikan seperti di halaman latihan.</div>
       <div class="row" style="margin-top:14px">
-        <button class="btn btn-primary" id="mulai" type="button" disabled>Mulai ujian</button>
+        <button class="btn btn-primary" id="mulai" type="button" disabled>${isLatihan() ? 'Mulai simulasi' : 'Mulai ujian'}</button>
         <span class="runner-chip" id="runner-chip"><i></i><span>Penjalan Python: memuat…</span></span>
         <button class="btn btn-sm" id="runner-retry" type="button" hidden>Coba lagi</button>
       </div>

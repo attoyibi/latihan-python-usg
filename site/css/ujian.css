@@ -125,3 +125,5 @@ body.noscroll{overflow:hidden}
 .uj-dosen .uj-item-dosen ul{margin:6px 0 0;padding-left:1.2em}
 .uj-dosen .callout{border-left:4px solid var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:0 10px 10px 0}
 .uj-kartu .badge.ok{background:var(--ok-bg);color:var(--ok)}
+.uj-lencana{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.uj-kartu .badge.info{background:var(--brand-soft);color:var(--brand-strong)}

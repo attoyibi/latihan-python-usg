@@ -1,12 +1,12 @@
 import * as store from '../store.js';
-import { getExam, demoStudent, attempts, ensureAttempt, s1For, theoryOverrides, finalOverrides, peserta } from '../data.js';
+import { getExam, demoStudent, attempts, ensureAttempt, s1For, theoryOverrides, finalOverrides, peserta, isLatihan } from '../data.js';
 import { summarize } from '../logic/summary.js';
 import { cbmPoints } from '../logic/cbm.js';
 import { theoryResults } from '../logic/s1.js';
 import { computeGrade, retestAdvice, studentGrade, EVIDENCE_LABEL } from '../logic/grade.js';
 import { codeViewer } from '../codetools.js';
 import { numbered } from '../ui.js';
-import { html, show, $, fmt, pt, TYPE_LABEL } from '../ui.js';
+import { html, show, $, fmt, pt, TYPE_LABEL, ask } from '../ui.js';
 
 const CORRECT_LABEL = { trace: 'hasil kodemu', bugline: 'baris yang diubah', concept: 'pernyataan benar', transfer: 'keluaran ketentuan baru' };
 
@@ -61,7 +61,8 @@ export function render(root, ctx) {
 
   const appeal = demo.appeal;
   show(root, html`
-    <div class="page-head"><h1>Hasil saya</h1><p>Peserta: ${peserta().nama} (${peserta().nim} · ${peserta().kelas}). Nilai dihitung otomatis dengan rumus yang diumumkan di bawah; kamu boleh banding.</p></div>
+    ${isLatihan() ? html`<div class="callout ok"><strong>Ini hasil simulasi.</strong> Nilainya tidak dihitung. Lihat butir yang salah di bawah, lalu ulangi bila ingin mencoba lagi. <div class="row" style="margin-top:8px"><button class="btn btn-primary btn-sm" id="ulangi" type="button">Ulangi simulasi dari awal</button></div></div>` : ''}
+    <div class="page-head"><h1>Hasil saya${isLatihan() ? ' · simulasi' : ''}</h1><p>Peserta: ${peserta().nama} (${peserta().nim} · ${peserta().kelas}). Nilai dihitung otomatis dengan rumus yang diumumkan di bawah; kamu boleh banding.</p></div>
     <div class="grid g4">
       <div class="card stat"><div class="v num">${final.value}</div><div class="l">Nilai akhir (skala 100) · ${final.note}</div></div>
       <div class="card stat"><div class="v num">${pt(s1)}</div><div class="l">S1 · Tahap 1 (praktik ${pt(student.s1Practice)} · teori ${pt(tr.reduce((s, x) => s + x.score, 0) / tr.length)})</div></div>
@@ -94,6 +95,11 @@ export function render(root, ctx) {
     </section>
   `);
 
+  $('#ulangi', root)?.addEventListener('click', async () => {
+    if (!(await ask('Hapus hasil simulasi ini dan mulai lagi dari awal?', 'Ulangi'))) return;
+    store.reset();
+    ctx.rerender();
+  });
   $('#retest', root)?.addEventListener('click', () => {
     ensureAttempt(atts.length + 1);
     ctx.rerender();

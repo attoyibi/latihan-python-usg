@@ -1,5 +1,19 @@
 {
   "ujian": [
-    { "id": "uts", "judul": "UTS Algoritma dan Pemrograman", "jenis": "UTS", "babDari": 1, "babSampai": 7 }
+    {
+      "id": "simulasi",
+      "judul": "Simulasi ujian (latihan)",
+      "jenis": "Simulasi",
+      "babDari": 1,
+      "babSampai": 4,
+      "latihan": true
+    },
+    {
+      "id": "uts",
+      "judul": "UTS Algoritma dan Pemrograman",
+      "jenis": "UTS",
+      "babDari": 1,
+      "babSampai": 7
+    }
   ]
 }
