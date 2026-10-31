@@ -957,6 +957,9 @@ function renderKuliah(publik) {
   );
 }
 
+// Kartu Laporan akhir disembunyikan sementara (fokus ke Ujian). Kode dan data tetap ada; ubah ke true untuk menampilkan lagi.
+const LAPORAN_AKHIR_TAMPIL = false;
+
 function renderCourse(c) {
   const { total, done } = courseProgress(c);
   const ready = c.aktif && total > 0;
@@ -976,7 +979,7 @@ function renderCourse(c) {
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
     ready ? babGrid() : null,
-    ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
+    LAPORAN_AKHIR_TAMPIL && ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
   ].filter(Boolean));
 }
 
@@ -1742,6 +1745,11 @@ async function init() {
     document.title = CFG.namaSitus || "Latihan";
   } catch (e) {}
   window.addEventListener("hashchange", route);
+  // Tinggi kepala halaman (berubah di tablet/ponsel karena menu turun ke baris kedua) untuk sidebar dan bilah waktu ujian.
+  const kepala = document.querySelector("header.top");
+  const ukurKepala = () => document.documentElement.style.setProperty("--top-h", kepala.offsetHeight + "px");
+  ukurKepala();
+  if (window.ResizeObserver) new ResizeObserver(ukurKepala).observe(kepala);
   Promo.mulai();
   $("#logoutBtn").addEventListener("click", keluar);
   $("#menuBtn").addEventListener("click", () => {

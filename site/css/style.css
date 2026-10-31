@@ -127,12 +127,16 @@ main{padding:22px 28px 60px;display:flex;flex-direction:column;gap:16px;min-widt
 
 @media (max-width:900px){
   .top{padding:8px 14px;gap:10px}
-  .nav{display:none}
+  /* Menu utama tetap ada di tablet dan ponsel: baris kedua di bawah logo, bisa digeser ke samping bila tidak muat */
+  .nav{order:3;flex:1 0 100%;margin:0 -14px;padding:2px 14px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none;white-space:nowrap;padding:8px 12px;min-height:40px;display:inline-flex;align-items:center}
+  .nav a.on{background:var(--brand-soft)}
   .top .right{margin-left:auto}
   #menuBtn{display:inline-flex}
   body.home #menuBtn{display:none}
   .layout{grid-template-columns:minmax(0,1fr)}
-  #sidebar{position:fixed;left:0;top:57px;bottom:0;width:280px;z-index:9;transform:translateX(-102%);transition:transform .2s;max-height:none;background:var(--card)}
+  #sidebar{position:fixed;left:0;top:var(--top-h,57px);bottom:0;width:280px;z-index:9;transform:translateX(-102%);transition:transform .2s;max-height:none;background:var(--card)}
   #sidebar.open{transform:none;box-shadow:var(--shadow)}
   .cols,.hero{grid-template-columns:minmax(0,1fr)}
   .cols{gap:16px}

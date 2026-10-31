@@ -87,7 +87,7 @@ body.noscroll{overflow:hidden}
   .uj .workbench.fs .wb-side{max-height:none;height:100%;border-left:1px solid var(--line);padding:0 0 0 12px}
 }
 /* bilah waktu */
-.uj .timerbar{position:sticky;top:64px;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--card);box-shadow:var(--shadow)}
+.uj .timerbar{position:sticky;top:calc(var(--top-h,57px) + 8px);z-index:5;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--card);box-shadow:var(--shadow)}
 .uj .timerbar .clock{font-variant-numeric:tabular-nums;font-weight:800;font-size:1.15rem}
 .uj .timerbar.low{background:var(--warn-bg);border-color:var(--warn)}.uj .timerbar.low .clock{color:var(--warn)}
 .uj .timerbar.crit{background:var(--danger-bg);border-color:var(--danger)}.uj .timerbar.crit .clock{color:var(--danger)}
@@ -117,7 +117,6 @@ body.noscroll{overflow:hidden}
   .uj .g2,.uj .g4{grid-template-columns:1fr}.uj .example{grid-template-columns:1fr}
   .uj input[type=text],.uj textarea{font-size:16px}
   .uj .btn{min-height:42px}.uj .seg button{padding:10px 14px}.uj .opt{padding:12px}
-  .uj .timerbar{top:56px}
 }
 @media (prefers-reduced-motion:reduce){.uj *{transition:none!important;animation:none!important}}
 /* tab Ujian di dashboard instruktur */
