@@ -82,5 +82,40 @@ export async function renderUjian(main, kuliah, ujianId, peserta) {
   ctx.rerender();
 }
 
+// Tab "Ujian" di dashboard instruktur. Rekap nilai peserta belum ada: jawaban masih tersimpan di perangkat
+// masing-masing sampai ujian tersambung ke Supabase. Untuk sekarang: daftar ujian, aturannya, dan tautan mencoba.
+export async function renderTabDosen({ main, kepala, kuliah }) {
+  const isi = document.createElement('section');
+  isi.className = 'card uj-dosen';
+  main.replaceChildren(kepala, isi);
+  show(isi, html`<p class="muted">Memuat daftar ujian…</p>`);
+  const daftar = await muatIndeks(kuliah.id, kuliah.ujian === true);
+  const ujian = await Promise.all(daftar.map(async (u) => {
+    try {
+      const r = await fetch(`data/kuliah/${kuliah.id}/ujian/${u.id}/exam.json`, { cache: 'no-cache' });
+      return { ...u, exam: r.ok ? await r.json() : null };
+    } catch { return { ...u, exam: null }; }
+  }));
+  const ringkas = (e) => {
+    if (!e) return html`<span class="muted">Konfigurasi tidak termuat.</span>`;
+    const c = e.config;
+    const n2 = Object.values(c.stage2.itemsPerType).reduce((a, b) => a + b, 0);
+    const s2 = Object.entries(c.stage2.itemsPerType).reduce((s, [t, n]) => s + n * c.stage2.limitSec[t], 0);
+    return html`<ul class="small">
+      <li>Tahap 1: ${c.tahap1Minutes} menit, ${c.tahap1Order.length} soal (teori dan praktik).</li>
+      <li>Tahap 2: ${n2} butir pilihan ganda dari kode peserta, ±${Math.ceil(s2 / 60)} menit.</li>
+      <li>Nilai otomatis, tidak pernah melebihi Tahap 1; pengurangan paling banyak ${Math.round(c.grade.maxCut * 100)} poin.</li>
+      <li>Akomodasi waktu: ${c.accommodations.length ? `${c.accommodations.length} NIM, ×${c.accommodationFactor}` : 'belum ada'}.</li>
+    </ul>`;
+  };
+  show(isi, html`
+    <h2>Ujian</h2>
+    ${ujian.length ? html`<div class="stack">${ujian.map((u) => html`
+      <div class="uj-item uj-item-dosen"><div><strong>${u.judul}</strong> <span class="muted small">Bab ${u.babDari}–${u.babSampai}</span>${ringkas(u.exam)}</div>
+        <a class="btn btn-primary btn-sm" href="#k/${kuliah.id}/ujian/${u.id}">Coba alurnya</a></div>`)}</div>` : html`<p class="muted">Belum ada ujian untuk mata kuliah ini.</p>`}
+    <div class="callout warn" style="margin-top:14px"><strong>Rekap nilai peserta belum tersedia.</strong> Saat ini jawaban dan nilai ujian masih tersimpan di perangkat masing-masing peserta, belum dikirim ke server. Rekap, jadwal per kelas, dan pengaturan akomodasi muncul di tab ini setelah ujian tersambung ke Supabase. Jangan dipakai untuk ujian sungguhan sebelum itu.</div>
+    <p class="small muted">Mencoba alurnya memakai akun dosen ini dan tersimpan di browser ini saja.</p>`);
+}
+
 // Hanya untuk uji lokal (server_uji): menghapus keadaan ujian akun ini di browser.
 export function hapusLokal() { store.reset(); }

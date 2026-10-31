@@ -120,3 +120,9 @@ body.noscroll{overflow:hidden}
   .uj .timerbar{top:56px}
 }
 @media (prefers-reduced-motion:reduce){.uj *{transition:none!important;animation:none!important}}
+/* tab Ujian di dashboard instruktur */
+.uj-dosen .stack>*+*{margin-top:10px}
+.uj-dosen .uj-item-dosen{align-items:flex-start}
+.uj-dosen .uj-item-dosen ul{margin:6px 0 0;padding-left:1.2em}
+.uj-dosen .callout{border-left:4px solid var(--warn);background:var(--warn-bg);padding:10px 14px;border-radius:0 10px 10px 0}
+.uj-kartu .badge.ok{background:var(--ok-bg);color:var(--ok)}

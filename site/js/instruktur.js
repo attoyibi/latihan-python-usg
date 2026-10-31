@@ -14,6 +14,7 @@ import { kolomBelumAda } from "./sinkron.js";
 import { muatIndeks } from "./praktik-data.js";
 import { rekapPraktik, masihBelum, MODE_BELUM } from "./praktik.js";
 import { SEL, SEL_TEKS, susunRekap, saringPeserta, pilihanSaringan, buatCsv, ambilSemua, AMBANG_TERSANGKUT } from "./rekap.js";
+import * as UjianUI from "./ujian/index.js";
 
 const LAMBANG = { "selesai-langsung": "✓", "selesai-bantuan": "✓*", sedang: "◐", belum: "○", unggah: "–" };
 
@@ -133,11 +134,15 @@ function tampilkan(main, kuliahAktif, kuliah) {
     "section",
     { class: "card" },
     h("h2", {}, "Dashboard instruktur"),
-    h("p", { class: "muted" }, keadaan.tab === "jejak" ? "Semua peserta yang masuk, apa yang mereka kerjakan (berhasil maupun gagal), dan putar ulang cara mereka menulis." : keadaan.tab === "akhir" ? "Laporan akhir tiap peserta: gabungan semua bab (kode latihan, kode praktik, refleksi) dan form akhir, bisa dibuka dan diunduh sebagai PDF." : keadaan.tab === "praktik" ? "Kemajuan peserta pada praktik tiap bab: yang sudah lulus, yang macet, dan kode praktik mereka." : keadaan.tab === "riset" ? "Perilaku belajar peserta yang menyetujui, dan ekspor data anonim untuk penelitian." : keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
-    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran"), tab("jejak", "Jejak peserta"), tab("riset", "Riset"), tab("praktik", "Praktik"), tab("akhir", "Laporan akhir")),
+    h("p", { class: "muted" }, keadaan.tab === "ujian" ? "Ujian UTS/UAS mata kuliah ini: jadwal, aturan, dan coba alurnya sendiri." : keadaan.tab === "jejak" ? "Semua peserta yang masuk, apa yang mereka kerjakan (berhasil maupun gagal), dan putar ulang cara mereka menulis." : keadaan.tab === "akhir" ? "Laporan akhir tiap peserta: gabungan semua bab (kode latihan, kode praktik, refleksi) dan form akhir, bisa dibuka dan diunduh sebagai PDF." : keadaan.tab === "praktik" ? "Kemajuan peserta pada praktik tiap bab: yang sudah lulus, yang macet, dan kode praktik mereka." : keadaan.tab === "riset" ? "Perilaku belajar peserta yang menyetujui, dan ekspor data anonim untuk penelitian." : keadaan.tab === "kehadiran" ? "Kesiapan sebelum kelas, kehadiran per pertemuan, aktivitas per hari dan minggu, dan keaktifan, mengikuti jadwal tiap kelas." : keadaan.tab === "laporan" ? "Baca laporan praktikum peserta dan beri nilai dengan rubrik." : keadaan.tab === "progres" ? "Siapa yang sudah paham, siapa yang masih memakai bantuan, dan siapa yang tersangkut. Data diambil dari akun peserta di Supabase." : "Sinyal untuk memilih siapa yang perlu ditanya langsung. Bukan bukti kecurangan."),
+    h("div", { class: "tabs", role: "tablist", "aria-label": "Bagian dashboard" }, tab("progres", "Progres"), tab("integritas", "Sinyal integritas"), tab("laporan", "Laporan"), tab("kehadiran", "Kehadiran"), tab("jejak", "Jejak peserta"), tab("riset", "Riset"), tab("praktik", "Praktik"), tab("akhir", "Laporan akhir"), kuliah.ujian === true ? tab("ujian", "Ujian") : null),
     h("div", { class: "filters" }, h("label", {}, "Mata kuliah ", selKuliah), h("button", { type: "button", class: "btn btn-sm", onclick: baru }, "Muat ulang"))
   );
 
+  if (keadaan.tab === "ujian") {
+    UjianUI.renderTabDosen({ main, kepala, kuliah });
+    return;
+  }
   if (keadaan.tab === "jejak") {
     JejakUI.render({ main, kepala, kuliah, unduh, peserta: keadaan.data ? keadaan.data.peserta : null });
     return;
