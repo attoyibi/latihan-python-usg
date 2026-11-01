@@ -810,14 +810,39 @@ console.log("\n== Tahap N3: migrasi 0012 (contoh jawaban UTS/UAS hanya untuk ins
   cek("peserta tidak bisa menulis tabel contoh", ditolak(await rpc(U2, "insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values ($1, 'uas', '{}')", MK), RLS));
 }
 
+console.log("\n== Tahap N4: migrasi 0013 (dosen tidak dihalangi jadwal ujian) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0013_ujian_dosen_bebas.sql berjalan", migrasi("0013_ujian_dosen_bebas.sql")))) process.exit(1);
+  cek("0013 aman dijalankan ulang", await jalankan("0013 diulang", migrasi("0013_ujian_dosen_bebas.sql")));
+  await q("delete from public.ujian_sesi where ujian_id = 'uas'");
+  await q("delete from public.ujian_jadwal where ujian_id = 'uas'");
+  const mulai = (uid) => rpc(uid, "select public.ujian_mulai($1, 'uas', 90) as s", MK);
+  cek("peserta tetap ditolak bila UAS belum dijadwalkan", ditolak(await mulai(U2), "P0001"));
+  const d = await mulai(IN);
+  cek("dosen bisa memulai UAS walau belum ada jadwal", !d.error && !!d.rows[0].s.sesi, d.error);
+  const dur = d.rows ? (Date.parse(d.rows[0].s.sesi.batas_tahap1) - Date.parse(d.rows[0].s.sesi.mulai_pada)) / 60000 : 0;
+  cek("durasi dosen dari parameter (90 menit)", Math.abs(dur - 90) < 0.01, String(dur));
+  cek("keterangan jadwal tetap null bagi dosen tanpa jadwal", d.rows[0].s.jadwal === null && d.rows[0].s.buka === false);
+  await q("insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uas', '*', now() + interval '1 day', now() + interval '2 days')", [MK]);
+  cek("peserta tetap ditolak sebelum jadwal buka", ditolak(await mulai(U2), "P0001"));
+  const st = await rpc(IN, "select public.ujian_status($1, 'uas') as s", MK);
+  cek("dosen tetap melihat keterangan jadwal (belum buka)", !st.error && st.rows[0].s.buka === false && st.rows[0].s.jadwal.kelas === "*");
+  cek("dosen mengulang UAS (tanpa boleh_ulang)", !(await rpc(IN, "select public.ujian_ulang($1, 'uas')", MK)).error && (await q("select count(*)::int as n from public.ujian_sesi where user_id = $1 and ujian_id = 'uas'", [IN])).rows[0].n === 0);
+  cek("peserta tetap tidak bisa mengulang UAS", ditolak(await rpc(U2, "select public.ujian_ulang($1, 'uas')", MK), RLS));
+  await q("delete from public.ujian_jadwal where ujian_id = 'uas'");
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat dua belas kolom", !r.error && kolom.length === 12, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0012 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat tiga belas kolom", !r.error && kolom.length === 13, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0013 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

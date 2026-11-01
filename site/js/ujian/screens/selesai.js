@@ -10,6 +10,7 @@ export function render(root, ctx) {
   const me = peserta();
   const sal = () => salinan({ keadaan: keadaanSekarang(), exam, peserta: me, ujian: exam.title });
   const latihan = isLatihan();
+  const bisaUlang = latihan || me.peran === 'instruktur'; // dosen boleh mengulang ujian apa pun untuk memeriksa
   show(root, html`
     <div class="exam-focus">
       <div class="page-head"><h1>${latihan ? 'Simulasi selesai' : 'Ujian selesai'}</h1><p>Terima kasih, ${me.nama}.</p></div>
@@ -19,7 +20,7 @@ export function render(root, ctx) {
         <div class="row" style="margin-top:12px">
           <button class="btn btn-primary" id="pdf" type="button">Unduh jawabanku (PDF)</button>
           <button class="btn" id="coba-lagi" type="button" hidden>Coba simpan lagi</button>
-          ${latihan ? html`<button class="btn btn-ghost" id="ulangi" type="button">Ulangi simulasi dari awal</button>` : ''}
+          ${bisaUlang ? html`<button class="btn btn-ghost" id="ulangi" type="button">Ulangi ${latihan ? 'simulasi' : 'ujian'} dari awal</button>` : ''}
         </div>
         <div id="pdf-galat"></div>
       </section>
@@ -42,7 +43,7 @@ export function render(root, ctx) {
     e.currentTarget.disabled = false;
   });
   $('#ulangi', root)?.addEventListener('click', async () => {
-    if (!(await ask('Hapus hasil simulasi ini dan mulai lagi dari awal?', 'Ulangi'))) return;
+    if (!(await ask('Hapus hasil ini dan mulai lagi dari awal?', 'Ulangi'))) return;
     try { await ulangi(); } catch (err) { alert(err.message); return; }
     ctx.rerender();
   });

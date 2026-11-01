@@ -17,11 +17,13 @@ export function render(root, ctx) {
   const menit = j.info?.menit || c.tahap1Minutes;
   const runner = getRunner();
   runner.start();
+  // Dosen tidak dihalangi jadwal: keterangan jadwal tetap tampil, tetapi ia boleh memulai kapan saja untuk memeriksa soal.
+  const dosen = me.peran === 'instruktur';
   const infoJadwal = !j.info
-    ? html`<div class="callout warn"><strong>Belum dijadwalkan.</strong> Pengajar belum membuka ujian ini untuk kelasmu (${me.kelas}). Halaman ini akan bisa dipakai setelah jadwalnya dibuka.</div>`
+    ? html`<div class="callout warn"><strong>Belum dijadwalkan.</strong> Pengajar belum membuka ujian ini untuk kelasmu (${me.kelas}). Ujian baru bisa dibuka dan dimulai setelah pengajar mengatur jadwalnya.</div>`
     : j.buka
       ? html`<div class="callout ok"><strong>Dibuka untuk ${j.info.kelas === '*' ? 'semua kelas' : `kelas ${j.info.kelas}`}</strong> sampai ${waktu(j.info.tutup)}. Mulai sebelum waktu itu.</div>`
-      : html`<div class="callout warn"><strong>Belum dibuka.</strong> Jadwal ${j.info.kelas === '*' ? 'semua kelas' : `kelas ${j.info.kelas}`}: ${waktu(j.info.buka)} sampai ${waktu(j.info.tutup)}. ${Date.parse(j.info.tutup) < Date.now() ? 'Jadwal ini sudah lewat; hubungi pengajarmu.' : 'Muat ulang halaman saat waktunya tiba.'}</div>`;
+      : html`<div class="callout warn"><strong>Belum dibuka.</strong> Ujian ini baru bisa dibuka dan dimulai pada ${waktu(j.info.buka)} (ditutup ${waktu(j.info.tutup)}), jadwal ${j.info.kelas === '*' ? 'semua kelas' : `kelas ${j.info.kelas}`}. ${Date.parse(j.info.tutup) < Date.now() ? 'Jadwal ini sudah lewat; hubungi pengajarmu.' : 'Muat ulang halaman saat waktunya tiba.'}</div>`;
   show(root, html`
     <div class="page-head"><h1>${exam.title}</h1><p>Halo, ${me.nama}. Ujian ini berjalan sendiri dari awal sampai nilai keluar, dalam satu kali duduk.</p></div>
     <section class="card">
@@ -33,6 +35,7 @@ export function render(root, ctx) {
       </ol>
       ${isLatihan() ? html`<div class="callout ok"><strong>Ini simulasi.</strong> Soalnya lebih mudah dan nilainya tidak dihitung. Alur, batas waktu, dan cara kerjanya sama dengan UTS dan UAS, jadi pakai untuk membiasakan diri. Setelah selesai kamu boleh mengulang dari awal.</div>` : ''}
       ${infoJadwal}
+      ${dosen ? html`<div class="callout ok"><strong>Mode dosen.</strong> Kamu bisa memulai kapan saja, walau jadwal belum dibuka atau sudah lewat, untuk memeriksa soal dan alurnya. Sesi ini tercatat seperti sesi peserta; hapus lewat tab Ujian (Izinkan mengulang) atau pakai tombol Ulangi di akhir.</div>` : ''}
       <div class="callout warn"><strong>Penting.</strong> Kerjakan sendiri; jangan menutup halaman di tengah tahap karena waktu tetap berjalan (jam dari server). Jawabanmu tersimpan di server, jadi bila perangkat bermasalah kamu bisa melanjutkan dari perangkat lain.</div>
       <div class="callout"><strong>Memakai AI dengan bertanggung jawab.</strong> AI boleh dipakai di Tahap 1 sebagai teman berpikir (menjelaskan, memberi contoh, memeriksa idemu) dan harus kamu deklarasikan. Tetapi jawabanmu harus kamu <em>ramu sendiri</em> dengan kata-katamu (parafrase) sehingga bisa kamu pertanggungjawabkan: di Tahap 2 kamu ditanya lagi tentang jawaban dan kodemu. Salin dan tempel dimatikan, dan berpindah tab atau jendela selama ujian tercatat (jumlah dan lama, bukan isinya) dan dilihat dosen.</div>
       <div class="callout ok"><strong>Kodingmu tidak harus benar semua.</strong> Kerjakan sebisamu; bila kamu sudah yakin dengan jawabanmu, kumpulkan. Apa pun hasil tesnya, kamu tetap lanjut ke Tahap 2.</div>
@@ -48,7 +51,7 @@ export function render(root, ctx) {
   const chip = $('#runner-chip', root);
   const retry = $('#runner-retry', root);
   const unsub = runner.subscribe(({ ready, failed }) => {
-    btn.disabled = !ready || !j.buka;
+    btn.disabled = !ready || !(j.buka || dosen);
     chip.className = `runner-chip ${ready ? 'ready' : failed ? 'fail' : ''}`;
     chip.lastElementChild.textContent = ready ? `Penjalan ${bahasa().nama}: siap` : failed ? `Penjalan gagal: ${failed}` : `Penjalan ${bahasa().nama}: memuat (sekali, ${bahasa().unduh})…`;
     retry.hidden = !failed;

@@ -12,7 +12,8 @@
 -- 0010 = ujian UTS/UAS dan simulasi (jadwal, akomodasi, sesi dengan jam server, kunci ujian).
 -- 0011 = jawaban ujian dikunci setelah selesai dan hasil analisis (Tahap 2 terbuka).
 -- 0012 = contoh jawaban UTS/UAS hanya untuk dosen (tabel ujian_contoh).
--- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0012).
+-- 0013 = dosen tidak dihalangi jadwal ujian (boleh memulai dan mengulang kapan saja).
+-- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0013).
 
 select
   to_regclass('public.profiles') is not null as "0001_skema",
@@ -57,4 +58,8 @@ select
       select 1 from information_schema.columns
       where table_schema = 'public' and table_name = 'ujian_sesi' and column_name = 'analisis'
     ) as "0011_ujian_selesai",
-  to_regprocedure('public.ujian_contoh_dosen(text,text)') is not null as "0012_ujian_contoh";
+  to_regprocedure('public.ujian_contoh_dosen(text,text)') is not null as "0012_ujian_contoh",
+  exists (
+    select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public' and p.proname = 'ujian_mulai' and p.prosrc like '%is_instruktur%'
+  ) as "0013_ujian_dosen_bebas";

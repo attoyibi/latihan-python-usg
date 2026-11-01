@@ -346,8 +346,8 @@
     if (nama === "ujian_mulai") {
       if (!sesi()) {
         const st = statusUjian(a.p_mk, a.p_ujian);
-        if (!st.buka) return { data: null, error: { code: "P0001", message: "ujian belum dibuka untuk kelasmu", hint: "jadwal" } };
-        const m = st.jadwal.menit || a.p_menit;
+        if (!st.buka && !instruktur()) return { data: null, error: { code: "P0001", message: "ujian belum dibuka untuk kelasmu", hint: "jadwal" } };
+        const m = (st.jadwal || {}).menit || a.p_menit;
         if (!(m >= 5 && m <= 600)) return { data: null, error: { code: "22023", message: "durasi tidak sah" } };
         const ak = ujianTabel("ujian_akomodasi").find((x) => x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian && x.user_id === uid);
         const f = ak ? Number(ak.faktor) : 1;
@@ -398,7 +398,7 @@
     }
     if (nama === "ujian_ulang") {
       const j = jadwalSaya(a.p_mk, a.p_ujian);
-      if (!j || !j.boleh_ulang) return { data: null, error: { code: "42501", message: "ujian ini tidak bisa diulang" } };
+      if (!instruktur() && (!j || !j.boleh_ulang)) return { data: null, error: { code: "42501", message: "ujian ini tidak bisa diulang" } };
       const lama = sesi();
       db.ujian_sesi = ujianTabel("ujian_sesi").filter((x) => x !== lama);
       save();
