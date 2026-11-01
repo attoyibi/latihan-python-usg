@@ -26,8 +26,11 @@ function pickDistinct(len, seed, reroll, used, keyOf) {
 }
 
 // Baris kode yang layak jadi pilihan: bukan kosong dan bukan komentar. Hasil: [{ n, text }] dengan n = nomor baris (mulai 1).
-export function codeLines(code) {
-  return code.split('\n').map((text, i) => ({ n: i + 1, text })).filter((l) => l.text.trim() && !l.text.trim().startsWith('#'));
+// Java: baris yang hanya kurung kurawal, import/package, komentar, atau anotasi tidak dipakai (tak bisa jadi bug).
+export function codeLines(code, language = 'python') {
+  const java = language === 'java';
+  const skip = (t) => (java ? /^(\/\/|\/\*|\*)/.test(t) || /^[{}();]*$/.test(t) || /^(import|package)\s/.test(t) || t.startsWith('@') : t.startsWith('#'));
+  return code.split('\n').map((text, i) => ({ n: i + 1, text })).filter((l) => l.text.trim() && !skip(l.text.trim()));
 }
 
 export const itemLimitSec = (item, exam) => exam.config.stage2.limitSec[item.type];
@@ -91,7 +94,7 @@ export function buildItems(student, { exam, templates, rerolls = {}, attempt = 1
     const it = base('bugline', i + 1, taskId);
     const rng = makeRng(it.seed);
     const c = dc[taskId][pickDistinct(dc[taskId].length, `${seedSalt}|${key}:bugline:${it.slot}|0`, it.reroll, usedBug, (k) => `${taskId}:${k}`)];
-    const lines = codeLines(c.code);
+    const lines = codeLines(c.code, exam.language);
     const others = shuffle(lines.filter((l) => l.n !== c.line), rng).slice(0, optionsPerItem - 1);
     if (others.length < optionsPerItem - 1) continue; // kode terlalu pendek untuk butir ini: dilewati
     const mine = lines.find((l) => l.n === c.line);

@@ -1,11 +1,12 @@
 import { getExam, startExam, peserta, isLatihan, jadwal } from '../data.js';
 import { getRunner } from '../runner.js';
+import { bahasa } from '../bahasa.js';
 import { html, show, $ } from '../ui.js';
 
 const waktu = (iso) => new Date(iso).toLocaleString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
 // Halaman awal peserta: aturan main satu kali jalan, jadwal kelasnya (dari server), lalu tombol Mulai.
-// Tombol Mulai aktif bila jadwal kelasnya sedang buka DAN penjalan Python siap (±10 MB), supaya waktu Tahap 1 tidak habis
+// Tombol Mulai aktif bila jadwal kelasnya sedang buka DAN penjalan bahasanya siap (Python ±10 MB, Java ±20 MB), supaya waktu Tahap 1 tidak habis
 // untuk mengunduh. Waktu mulai dan batas Tahap 1 dicatat server.
 export function render(root, ctx) {
   const exam = getExam();
@@ -26,7 +27,7 @@ export function render(root, ctx) {
     <section class="card">
       <h2>Alurnya</h2>
       <ol>
-        <li><strong>Tahap 1 · Koding dan teori</strong> (${menit} menit). ${c.tahap1Order.length} soal: ${exam.theory.length} soal teori (esai singkat) dan ${exam.tasks.length} soal praktik (koding Python). Jawaban terkunci sendiri saat waktu habis atau saat kamu mengumpulkan.</li>
+        <li><strong>Tahap 1 · Koding dan teori</strong> (${menit} menit). ${c.tahap1Order.length} soal: ${exam.theory.length} soal teori (esai singkat) dan ${exam.tasks.length} soal praktik (koding ${bahasa().nama}). Jawaban terkunci sendiri saat waktu habis atau saat kamu mengumpulkan.</li>
         <li><strong>Tahap 2 · Verifikasi</strong> (±${Math.ceil(s2Sec / 60)} menit). Dimulai otomatis setelah Tahap 1. Semua pilihan ganda tentang kodemu sendiri; tiap butir punya batas waktu, lalu berpindah sendiri.</li>
         <li><strong>Nilai</strong> keluar otomatis (skala 100) di akhir. Bila hasil Tahap 2 jauh di bawah Tahap 1, kamu ditawari satu kali uji ulang dengan butir baru.</li>
       </ol>
@@ -35,11 +36,11 @@ export function render(root, ctx) {
       <div class="callout warn"><strong>Penting.</strong> Kerjakan sendiri. Tahap 2 menguji apakah kamu memahami kodemu; jangan menutup halaman di tengah tahap karena waktu tetap berjalan (jam dari server). Jawabanmu tersimpan di server, jadi bila perangkat bermasalah kamu bisa melanjutkan dari perangkat lain. AI boleh dipakai di Tahap 1 asal dideklarasikan. Salin dan tempel dimatikan seperti di halaman latihan.</div>
       <div class="row" style="margin-top:14px">
         <button class="btn btn-primary" id="mulai" type="button" disabled>${isLatihan() ? 'Mulai simulasi' : 'Mulai ujian'}</button>
-        <span class="runner-chip" id="runner-chip"><i></i><span>Penjalan Python: memuat…</span></span>
+        <span class="runner-chip" id="runner-chip"><i></i><span>Penjalan ${bahasa().nama}: memuat…</span></span>
         <button class="btn btn-sm" id="runner-retry" type="button" hidden>Coba lagi</button>
       </div>
       <div id="mulai-galat"></div>
-      <p class="small muted">Tombol Mulai aktif setelah penjalan Python siap. Waktu Tahap 1 baru berjalan setelah kamu menekan Mulai.</p>
+      <p class="small muted">Tombol Mulai aktif setelah penjalan ${bahasa().nama} siap. Waktu Tahap 1 baru berjalan setelah kamu menekan Mulai.</p>
     </section>`);
   const btn = $('#mulai', root);
   const chip = $('#runner-chip', root);
@@ -47,7 +48,7 @@ export function render(root, ctx) {
   const unsub = runner.subscribe(({ ready, failed }) => {
     btn.disabled = !ready || !j.buka;
     chip.className = `runner-chip ${ready ? 'ready' : failed ? 'fail' : ''}`;
-    chip.lastElementChild.textContent = ready ? 'Penjalan Python: siap' : failed ? `Penjalan gagal: ${failed}` : 'Penjalan Python: memuat (sekali, ±10 MB)…';
+    chip.lastElementChild.textContent = ready ? `Penjalan ${bahasa().nama}: siap` : failed ? `Penjalan gagal: ${failed}` : `Penjalan ${bahasa().nama}: memuat (sekali, ${bahasa().unduh})…`;
     retry.hidden = !failed;
   });
   ctx.onLeave(unsub);

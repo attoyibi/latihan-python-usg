@@ -11,7 +11,7 @@ const CHANGE_ROWS = 4;
 //  3. bila kode lulus semua tes, mencari bug sejati hasil mutasi kecil kode itu -> kandidat butir "Temukan baris yang salah";
 //  4. menjalankan kode peserta pada tes ketentuan baru -> kandidat butir "Ketentuan berubah" (keluaran lama vs kunci baru).
 // onProgress(teks) dipanggil untuk indikator kemajuan.
-export async function evaluateSubmission({ tasks, codes, run, onProgress = () => {} }) {
+export async function evaluateSubmission({ tasks, codes, run, language = 'python', onProgress = () => {} }) {
   const taskResults = {};
   const traceCandidates = {};
   const debugCandidates = {};
@@ -61,7 +61,7 @@ export async function evaluateSubmission({ tasks, codes, run, onProgress = () =>
 
     if (passed === results.length) {
       onProgress(`Menyiapkan butir Tahap 2 dari ${t.title}…`);
-      const found = await findDebugCandidates({ code, tests, run, runTestsFn: runTests, seed: `mut|${t.id}|${code.length}`, want: 2 });
+      const found = await findDebugCandidates({ code, tests, run, runTestsFn: runTests, seed: `mut|${t.id}|${code.length}`, want: 2, language });
       if (found.length) debugCandidates[t.id] = found;
     }
   }

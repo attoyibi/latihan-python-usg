@@ -2,6 +2,7 @@ import * as store from '../store.js';
 import { getExam, examSession, stage1EndsAt, kunciTahap1, simpanSekarang } from '../data.js';
 import * as Anticopas from '../../anticopas.js';
 import { getRunner } from '../runner.js';
+import { bahasa } from '../bahasa.js';
 import { workbenchMarkup, examplesMarkup, mountWorkbench, renderResults } from '../workbench.js';
 import { runTests, passCount, s1Of } from '../logic/tests.js';
 import { scoreTheory } from '../logic/theory.js';
@@ -80,7 +81,7 @@ export function render(root, ctx) {
     <div class="page-head">
       <h1>Tahap 1 · ${exam.title}</h1>
       <p>${exam.intro}</p>
-      <div class="row"><span class="runner-chip" id="runner-chip"><i></i><span>Penjalan Python: memuat…</span></span><button class="btn btn-sm" id="runner-retry" type="button" hidden>Coba lagi</button></div>
+      <div class="row"><span class="runner-chip" id="runner-chip"><i></i><span>Penjalan ${bahasa().nama}: memuat…</span></span><button class="btn btn-sm" id="runner-retry" type="button" hidden>Coba lagi</button></div>
     </div>
     ${dots}`;
 
@@ -169,7 +170,7 @@ export function render(root, ctx) {
   const retry = $('#runner-retry', root);
   const unsub = runner.subscribe(({ ready, failed }) => {
     chip.className = `runner-chip ${ready ? 'ready' : failed ? 'fail' : ''}`;
-    chip.lastElementChild.textContent = ready ? 'Penjalan Python: siap' : failed ? `Penjalan gagal: ${failed}` : 'Penjalan Python: memuat (sekali, ±10 MB; berikutnya lebih cepat)…';
+    chip.lastElementChild.textContent = ready ? `Penjalan ${bahasa().nama}: siap` : failed ? `Penjalan gagal: ${failed}` : `Penjalan ${bahasa().nama}: memuat (sekali, ${bahasa().unduh}; berikutnya lebih cepat)…`;
     retry.hidden = !failed;
   });
   ctx.onLeave(unsub);
@@ -303,7 +304,7 @@ async function lockStage1({ exam, runner, ctx, auto }) {
   const { codes, theory } = collect(exam, dr);
   const overlay = document.createElement('div');
   overlay.className = 'uj-overlay';
-  overlay.innerHTML = `<div role="status"><div class="spinner"></div><div id="ov-text">${auto ? 'Waktu Tahap 1 habis. ' : ''}Menyiapkan penjalan Python…</div></div>`;
+  overlay.innerHTML = `<div role="status"><div class="spinner"></div><div id="ov-text">${auto ? 'Waktu Tahap 1 habis. ' : ''}Menyiapkan penjalan ${bahasa().nama}…</div></div>`;
   document.body.append(overlay);
   try {
     // 1. Jawaban dikunci di SERVER lebih dulu (jam server, sekali saja); baru setelah itu kunci ujian turun.
@@ -315,10 +316,10 @@ async function lockStage1({ exam, runner, ctx, auto }) {
     // 2. Kode dinilai dan butir Tahap 2 disusun di browser.
     let ev;
     try {
-      overlay.querySelector('#ov-text').textContent = 'Menyiapkan penjalan Python…';
+      overlay.querySelector('#ov-text').textContent = `Menyiapkan penjalan ${bahasa().nama}…`;
       await runner.whenReady();
       ev = await evaluateSubmission({
-        tasks: lengkap.tasks, codes, run: (c, i) => runner.run(c, i),
+        tasks: lengkap.tasks, codes, run: (c, i) => runner.run(c, i), language: bahasa().id,
         onProgress: (t) => { overlay.querySelector('#ov-text').textContent = t; },
       });
     } catch (err) {

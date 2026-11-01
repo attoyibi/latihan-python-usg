@@ -3,6 +3,7 @@
 //   renderUjian(main, kuliah, ujianId, peserta) -> layar ujian; tahap ditentukan dari keadaan, bukan dari alamat
 // Satu kali jalan: Mulai -> Tahap 1 -> Tahap 2 (otomatis) -> Hasil. Peserta tidak bisa melompat antar tahap.
 // Diadaptasi dari prototype double-check-exam; logika murni di ./logic disalin utuh dan diuji tools/uji_ujian.
+import { setBahasa } from './bahasa.js';
 import { muatIndeks, pakaiUjian, examStage, simpanSekarang } from './data.js';
 import * as store from './store.js';
 import { initCodeTools, syncScrollLock } from './codetools.js';
@@ -52,6 +53,7 @@ export function kartuUjian(kuliah, userId) {
 // peserta = { id, nama, nim, kelas, peran }
 export async function renderUjian(main, kuliah, ujianId, peserta) {
   bersihkan();
+  setBahasa(kuliah.bahasa);
   initCodeTools();
   const daftar = await muatIndeks(kuliah.id, kuliah.ujian === true);
   const meta = daftar.find((u) => u.id === ujianId);

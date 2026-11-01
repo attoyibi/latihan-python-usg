@@ -1699,7 +1699,7 @@ async function route() {
   if ((m = /^#k\/([a-z0-9-]+)\/ujian\/([a-z0-9-]+)$/.exec(hash))) {
     const c = await loadCourse(m[1]);
     if (stale()) return;
-    if (!c || !c.aktif || c.ujian !== true || c.bahasa !== "python") {
+    if (!c || !c.aktif || c.ujian !== true || (c.bahasa !== "python" && c.bahasa !== "java")) {
       setPage("kuliah");
       renderTidakAda();
       return;

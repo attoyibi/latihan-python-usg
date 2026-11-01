@@ -519,3 +519,39 @@ test('items: tebak keluaran mengutamakan masukan pendek', () => {
     }
   }
 });
+
+// ---- Java (mata kuliah pbo-java): mutasi bug, nama galat, dan pilihan baris ----
+test('java: maskCode membuang komentar //, /* */, string, dan karakter', () => {
+  const code = 'int a = 1; // a >= 2\nString s = "x >= 3"; /* b == 4\n */ char c = \'>\';';
+  const m = maskCode(code, 'java');
+  assert.equal(m.length, code.length);
+  assert.equal(m.split('\n').length, code.split('\n').length);
+  assert.ok(!/[>=]/.test(m.replace(/=/g, '')) && !m.includes('x') && !m.includes('b =='));
+});
+
+test('java: findMutations memakai aturan Java dan tidak menyentuh isi string', () => {
+  const code = 'if (a >= 10 && b < 5) {\n    total = harga * jumlah - 1;\n    System.out.println("a >= 3 || b");\n}\nint n = 0;\nfor (int i = 1; i <= n; i++) {}\n';
+  const rules = new Set(findMutations(code, 'java').map((m) => m.rule));
+  for (const r of ['compare', 'boundary', 'and-or', 'times-div', 'plus-minus', 'init', 'range-start']) assert.ok(rules.has(r), r);
+  assert.ok(!rules.has('loop-flow') && !rules.has('floor-div'));
+  assert.ok(findMutations(code, 'java').every((m) => m.line !== 3), 'tidak ada mutasi di dalam string');
+  const orEx = findMutations(code, 'java').find((m) => m.rule === 'and-or');
+  assert.ok(applyMutation(code, orEx).includes('a >= 10 || b < 5'));
+  // Python tetap sama: tanpa argumen bahasa, && tidak dikenal dan "and" dikenal
+  assert.ok(findMutations('if a and b:\n    pass').some((m) => m.rule === 'and-or'));
+  assert.ok(!findMutations(code).some((m) => m.rule === 'times-div'));
+});
+
+test('java: errorName dan traceKey mengenali eksepsi dan galat kompilasi', () => {
+  assert.equal(errorName('Exception in thread "main" java.lang.ArithmeticException: / by zero\n\tat Main.main(Main.java:5)'), 'ArithmeticException');
+  assert.equal(errorName('Exception in thread "main" NilaiException: terlalu besar\n\tat Main.main(Main.java:5)'), 'NilaiException');
+  assert.equal(errorName('Galat kompilasi:\nMain.java:3: cannot find symbol'), 'CompileError');
+  assert.equal(errorName('Traceback (most recent call last):\n  File "<x>", line 1\nValueError: x'), 'ValueError');
+  assert.equal(traceKey({ stdout: 'a\n', error: 'Exception in thread "main" java.lang.NumberFormatException: For input string: "x"\n\tat X', timeout: false }), 'a\n[Galat: NumberFormatException]');
+});
+
+test('java: codeLines melewati kurung kurawal, import, komentar, dan anotasi', () => {
+  const code = 'import java.util.*;\n\n// komentar\nclass A {\n    @Override\n    int f() {\n        return 1;\n    }\n}\n';
+  assert.deepEqual(codeLines(code, 'java').map((l) => l.n), [4, 6, 7]);
+  assert.equal(codeLines('# c\nx = 1\n\ny = 2').length, 2); // Python tidak berubah
+});

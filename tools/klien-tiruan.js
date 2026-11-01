@@ -312,9 +312,10 @@
   // ---------- Ujian (migrasi 0010) ditiru secukupnya: jadwal per kelas, akomodasi, sesi dengan "jam server", kunci ----------
   // Kunci diambil dari kunci/ujian/<id>.json lewat server uji (/__kunci/...), seperti tabel ujian_kunci yang tak terbaca API.
   const ujianTabel = (n) => (db[n] = db[n] || []);
-  if (!db.seedUjian) {
-    db.seedUjian = true;
-    ujianTabel("ujian_jadwal").push({ matakuliah_id: "algoritma-python", ujian_id: "simulasi", kelas: "*", buka: new Date().toISOString(), tutup: new Date(Date.now() + 365 * 86400000).toISOString(), menit: null, boleh_ulang: true, diperbarui_pada: new Date().toISOString() });
+  // Simulasi dibuka untuk semua kelas (seperti seed 0010 untuk algoritma-python); pbo-java diberi jadwal yang sama hanya di server uji.
+  for (const mk of ["algoritma-python", "pbo-java"]) {
+    if (ujianTabel("ujian_jadwal").some((j) => j.matakuliah_id === mk && j.ujian_id === "simulasi")) continue;
+    ujianTabel("ujian_jadwal").push({ matakuliah_id: mk, ujian_id: "simulasi", kelas: "*", buka: new Date().toISOString(), tutup: new Date(Date.now() + 365 * 86400000).toISOString(), menit: null, boleh_ulang: true, diperbarui_pada: new Date().toISOString() });
     save();
   }
   const rombelDari = (kelas) => { const m = /^[A-Z]+-\d{4}-([A-Z])$/.exec(kelas || ""); return m ? m[1] : null; };
@@ -340,7 +341,7 @@
     if (!db.session) return { data: null, error: { code: "42501", message: "harus masuk dulu" } };
     const uid = uidSaya();
     const sesi = () => ujianTabel("ujian_sesi").find((x) => x.user_id === uid && x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian);
-    const kunciUjian = async () => { const r = await fetch("/__kunci/ujian/" + a.p_ujian + ".json"); return r.ok ? r.json() : null; };
+    const kunciUjian = async () => { const r = await fetch("/__kunci/ujian/" + (a.p_mk === "algoritma-python" ? "" : a.p_mk + "/") + a.p_ujian + ".json"); return r.ok ? r.json() : null; };
     if (nama === "ujian_status") return { data: statusUjian(a.p_mk, a.p_ujian), error: null };
     if (nama === "ujian_mulai") {
       if (!sesi()) {

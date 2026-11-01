@@ -7,6 +7,7 @@
 // Diadaptasi dari prototype double-check-exam (js/data.js).
 import * as store from './store.js';
 import * as server from './server.js';
+import { bahasa } from './bahasa.js';
 import { buildItems, ITEM_TYPES } from './logic/items.js';
 import { summarize } from './logic/summary.js';
 import { computeS1 } from './logic/s1.js';
@@ -85,6 +86,7 @@ export const kunciTersedia = () => ctx.kunci;
 
 export function getExam() {
   const exam = structuredClone(base.exam);
+  exam.language = bahasa().id; // dipakai logika murni (mutasi bug, pilihan baris) tanpa bergantung pada layar
   // Soal praktik yang dipakai ujian ini (sisanya cadangan) dan soal teori.
   exam.allTasks = structuredClone(base.tasks.tasks);
   exam.tasks = exam.allTasks.filter((t) => exam.config.activeTasks.includes(t.id));

@@ -1,6 +1,7 @@
 // Blok kerja koding bersama (Tahap 1 dan Tahap 2): editor, tombol simbol, jalankan contoh, coba masukan sendiri, hasil tes.
 // Markup: workbenchMarkup(id, title, opts). Perilaku: mountWorkbench(root, id, opts).
-import { createEditor, SYMBOLS, symbolLabel } from './editor.js';
+import { createEditor, symbols, symbolLabel } from './editor.js';
+import { bahasa } from './bahasa.js';
 import { codeBar } from './codetools.js';
 import { runTests, passCount } from './logic/tests.js';
 import { html, show, $, $$, ask } from './ui.js';
@@ -19,7 +20,7 @@ export function renderResults(results) {
         <div class="stack" style="margin-top:8px">
           <div><div class="small muted">Masukan</div><pre class="block">${r.test.input.join('\n')}</pre></div>
           <div><div class="small muted">Keluaran yang diharapkan</div><pre class="block good">${r.test.expected}</pre></div>
-          <div><div class="small muted">Keluaran programmu</div><pre class="block ${r.status === 'pass' ? '' : 'bad'}">${r.status === 'timeout' ? 'Program berjalan lebih dari 5 detik (kemungkinan perulangan tanpa henti).' : r.error || r.actual || '(tidak ada keluaran)'}</pre></div>
+          <div><div class="small muted">Keluaran programmu</div><pre class="block ${r.status === 'pass' ? '' : 'bad'}">${r.status === 'timeout' ? `Program berjalan lebih dari ${bahasa().batasDetik} detik (kemungkinan perulangan tanpa henti).` : r.error || r.actual || '(tidak ada keluaran)'}</pre></div>
         </div></details>`;
     })}</div>`;
 }
@@ -33,7 +34,7 @@ export function workbenchMarkup(id, title, { brief = '', runLabel = '▶ Jalanka
     ${codeBar(title, { brief: !!brief })}
     <div class="wb-main">
       <div class="codebox" data-editor></div>
-      <div class="symbols" aria-label="Simbol cepat">${SYMBOLS.map((s) => html`<button type="button" data-sym="${s}" aria-label="${s === '    ' ? 'Tab' : s}">${symbolLabel(s)}</button>`)}</div>
+      <div class="symbols" aria-label="Simbol cepat">${symbols().map((s) => html`<button type="button" data-sym="${s}" aria-label="${s === '    ' ? 'Tab' : s}">${symbolLabel(s)}</button>`)}</div>
       <div class="row">
         <button class="btn btn-primary" type="button" data-act="run" title="Ctrl+Enter">${runLabel}</button>
         <button class="btn" type="button" data-act="undo">↶ Urungkan</button>
@@ -44,7 +45,7 @@ export function workbenchMarkup(id, title, { brief = '', runLabel = '▶ Jalanka
       ${brief ? html`<div class="wb-brief">${brief}</div>` : ''}
       <div data-results></div>
       <details style="margin-top:10px"><summary>Coba dengan masukanmu sendiri</summary>
-        <label class="field" style="margin-top:8px"><span>Masukan <span class="hint">(satu baris untuk tiap input())</span></span><textarea rows="3" data-custom></textarea></label>
+        <label class="field" style="margin-top:8px"><span>Masukan <span class="hint">(${bahasa().masukan})</span></span><textarea rows="3" data-custom></textarea></label>
         <div class="row" style="margin:8px 0"><button class="btn" type="button" data-act="run-custom">Jalankan</button></div>
         <div data-custom-out></div>
       </details>
@@ -85,7 +86,7 @@ export function mountWorkbench(root, id, { runner, tests, value, resetValue, run
     const out = $('[data-custom-out]', wb);
     customBtn.disabled = true;
     const r = await runner.run(editor.getValue(), $('[data-custom]', wb).value.split('\n'));
-    show(out, html`<div class="small muted">Keluaran</div><pre class="block ${r.error || r.timeout ? 'bad' : ''}">${r.timeout ? 'Program berjalan lebih dari 5 detik.' : r.error || r.stdout || '(tidak ada keluaran)'}</pre>${r.error && r.stdout ? html`<div class="small muted" style="margin-top:6px">Keluaran sebelum galat</div><pre class="block">${r.stdout}</pre>` : ''}`);
+    show(out, html`<div class="small muted">Keluaran</div><pre class="block ${r.error || r.timeout ? 'bad' : ''}">${r.timeout ? `Program berjalan lebih dari ${bahasa().batasDetik} detik.` : r.error || r.stdout || '(tidak ada keluaran)'}</pre>${r.error && r.stdout ? html`<div class="small muted" style="margin-top:6px">Keluaran sebelum galat</div><pre class="block">${r.stdout}</pre>` : ''}`);
     customBtn.disabled = false;
   });
 

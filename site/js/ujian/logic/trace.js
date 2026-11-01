@@ -1,8 +1,13 @@
 import { normalize } from './normalize.js';
 
-// Nama galat dari teks traceback Python: baris terakhir "ValueError: ...".
+// Nama galat dari teks traceback Python (baris terakhir "ValueError: ...") atau galat Java (nama kelas eksepsi).
 export function errorName(err) {
-  const last = String(err).trim().split('\n').filter((l) => l.trim()).pop() || '';
+  const s = String(err);
+  // Java: "Galat kompilasi:" dari penjalan, atau jejak tumpukan "Exception in thread "main" java.lang.XxxException: pesan".
+  if (s.startsWith('Galat kompilasi')) return 'CompileError';
+  const j = /Exception in thread "[^"]*" ([\w.$]+)/.exec(s);
+  if (j) return j[1].split('.').pop();
+  const last = s.trim().split('\n').filter((l) => l.trim()).pop() || '';
   return (/^([A-Za-z_][A-Za-z0-9_]*)/.exec(last) || [])[1] || 'Error';
 }
 
