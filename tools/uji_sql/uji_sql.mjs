@@ -760,14 +760,45 @@ console.log("\n== Tahap N: migrasi 0010 (ujian: jadwal, akomodasi, sesi dengan j
   } else console.log("LEWAT kunci/ujian_kunci.sql tidak ada (normal di CI)");
 }
 
+console.log("\n== Tahap N2: migrasi 0011 (jawaban ujian dikunci setelah selesai, hasil analisis) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0011_ujian_selesai.sql berjalan", migrasi("0011_ujian_selesai.sql")))) process.exit(1);
+  cek("0011 aman dijalankan ulang", await jalankan("0011 diulang", migrasi("0011_ujian_selesai.sql")));
+  await q("delete from public.ujian_sesi where ujian_id = 'simulasi'");
+  await rpc(U2, "select public.ujian_mulai($1, 'simulasi', 40)", MK);
+  cek("selesai ditolak sebelum Tahap 1 dikunci", ditolak(await rpc(U2, "select public.ujian_selesai($1, 'simulasi')", MK), RLS));
+  await q("update public.ujian_sesi set terkunci_pada = now() where user_id = $1 and ujian_id = 'simulasi'", [U2]);
+  cek("peserta menyimpan jawaban Tahap 2 sebelum selesai", (await rpc(U2, "update public.ujian_sesi set keadaan = '{\"a\":1}'::jsonb where user_id = $1 and ujian_id = 'simulasi'", U2)).n === 1);
+  cek("peserta tanpa sesi tidak bisa menyelesaikan", ditolak(await rpc("99999999-9999-9999-9999-999999999999", "select public.ujian_selesai($1, 'simulasi')", MK), RLS));
+  const sel = await rpc(U2, "select public.ujian_selesai($1, 'simulasi') as t", MK);
+  cek("peserta menutup jawaban: waktu dari jam server", !sel.error && !!sel.rows[0].t, sel.error);
+  const sel2 = await rpc(U2, "select public.ujian_selesai($1, 'simulasi') as t", MK);
+  cek("menutup lagi tidak mengubah waktu selesai", !sel2.error && String(sel2.rows[0].t) === String(sel.rows[0].t));
+  cek("setelah selesai peserta tidak bisa mengubah keadaan", /sudah dikumpulkan/.test((await rpc(U2, "update public.ujian_sesi set keadaan = '{\"a\":2}'::jsonb where user_id = $1", U2)).error || ""));
+  cek("setelah selesai peserta tidak bisa mengubah ringkasan nilai", /sudah dikumpulkan/.test((await rpc(U2, "update public.ujian_sesi set hasil = '{\"nilai\":100}'::jsonb where user_id = $1", U2)).error || ""));
+  cek("peserta tidak bisa membuka kunci selesai_pada", ditolak(await rpc(U2, "update public.ujian_sesi set selesai_pada = null where user_id = $1", U2), RLS));
+  cek("peserta tidak bisa menulis kolom analisis", ditolak(await rpc(U2, "update public.ujian_sesi set analisis = '{\"x\":1}'::jsonb where user_id = $1", U2), RLS));
+  cek("peserta tidak bisa memanggil ujian_analisis_simpan", ditolak(await rpc(U2, "select public.ujian_analisis_simpan($1, 'simulasi', $2, '{}'::jsonb)", MK, U2), RLS));
+  const an = JSON.stringify({ rows: { "b:probe:1": { konsistensi: "tidak_konsisten", skor: 20, catatan: "x" } } });
+  const simp = await rpc(IN, "select public.ujian_analisis_simpan($1, 'simulasi', $2, $3::jsonb)", MK, U2, an);
+  cek("instruktur menyimpan analisis peserta", !simp.error && (await q("select analisis->'rows'->'b:probe:1'->>'skor' as s from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", [U2])).rows[0].s === "20", simp.error);
+  cek("instruktur tetap tidak bisa mengubah jawaban peserta", (await rpc(IN, "update public.ujian_sesi set keadaan = '{}'::jsonb where user_id = $1", U2)).n === 0);
+  cek("instruktur membaca analisis dan waktu selesai", (await rpc(IN, "select analisis, selesai_pada from public.ujian_sesi where user_id = $1", U2)).rows[0].selesai_pada !== null);
+  cek("sesi yang tidak ada ditolak jelas", ditolak(await rpc(IN, "select public.ujian_analisis_simpan($1, 'uas', $2, '{}'::jsonb)", MK, U2), "P0002"));
+  cek("instruktur menghapus sesi selesai (izinkan mengulang)", (await rpc(IN, "delete from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", U2)).n === 1);
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat sepuluh kolom", !r.error && kolom.length === 10, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0010 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat sebelas kolom", !r.error && kolom.length === 11, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0011 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);
