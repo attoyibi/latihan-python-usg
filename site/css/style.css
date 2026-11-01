@@ -14,6 +14,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-outline{background:transparent;border-color:var(--brand);color:var(--brand)}
 .btn-ghost{background:transparent;border-color:var(--line)}
 .btn-sm{padding:6px 12px;font-size:13px}
+.masuk-google{margin-top:14px}
+.masuk-google .atau{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:0 0 12px}
+.masuk-google .atau::before,.masuk-google .atau::after{content:"";flex:1;border-top:1px solid var(--line)}
+.btn-google{width:100%;justify-content:center;gap:10px;background:var(--card);border-color:var(--line);color:inherit}
+.btn-google .g-logo{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#fff;color:#4285f4;font-weight:700;font-size:13px;border:1px solid #dadce0}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
 .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:22px;padding:10px 28px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}

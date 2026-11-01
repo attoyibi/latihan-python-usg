@@ -23,6 +23,9 @@ export const needsSetup = () => !enabled() && !localMode();
 // Pendaftaran mandiri: "tutup" (bawaan, fitur Daftar disembunyikan) atau "buka". Pada kelas tertutup, dosen mendaftarkan peserta
 // lebih dulu (tools/impor_peserta.mjs) dan peserta hanya masuk.
 export const pendaftaranTerbuka = () => (cfg().PENDAFTARAN || "buka") === "buka";
+// Tombol "Masuk dengan Google" hanya tampil bila dinyalakan (MASUK_GOOGLE) dan pendaftaran terbuka: akun Google yang
+// belum terdaftar otomatis dibuatkan akun oleh Supabase, jadi saat pendaftaran ditutup tombol ini disembunyikan.
+export const masukGoogleAktif = () => cfg().MASUK_GOOGLE === true && pendaftaranTerbuka();
 export const getSession = () => session;
 // Klien Supabase untuk modul lain (sinkron progres, dashboard instruktur). null sebelum init() atau bila tidak tersambung.
 export const getClient = () => client;
@@ -163,6 +166,22 @@ export async function signUp(email, sandi) {
   return { perluKonfirmasi: !(data && data.session) };
 }
 
+// Pindah ke halaman pilih akun Google; Google mengembalikan ke Supabase, lalu Supabase ke alamat ini dengan token di
+// bagian # (alur implicit, ditangani seperti tautan email). Alamat situs harus terdaftar di Supabase > URL Configuration.
+export async function signInGoogle() {
+  const { error } = await client.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: location.origin + location.pathname, queryParams: { prompt: "select_account" } },
+  });
+  if (error) throw new Error(friendly(error));
+}
+
+// Nama dari akun Google (bila masuk dengan Google), untuk mengisi awal formulir profil.
+export function namaAkun() {
+  const m = (session && session.user && session.user.user_metadata) || {};
+  return String(m.full_name || m.name || "").trim();
+}
+
 export async function resendConfirmation(email) {
   const { error } = await client.auth.resend({ type: "signup", email: email.trim(), options: { emailRedirectTo: balik() } });
   if (error) throw new Error(friendly(error));
@@ -190,6 +209,7 @@ export function galatDariUrl() {
   if (!/(^#|&)(error|error_code)=/.test(h)) return null;
   const p = new URLSearchParams(h.replace(/^#/, ""));
   const teks = (p.get("error_code") || "") + " " + (p.get("error_description") || "") + " " + (p.get("error") || "");
+  if (/access_denied|oauth|provider|external|identity/i.test(teks)) return "Masuk dengan Google dibatalkan atau gagal. Coba lagi, atau masuk dengan email dan kata sandi.";
   if (/expired|otp_expired/i.test(teks)) return "Tautan di email sudah kedaluwarsa atau sudah dipakai. Minta tautan baru (Lupa kata sandi) atau masuk dengan kata sandimu.";
   return "Tautan di email tidak valid. Minta tautan baru.";
 }

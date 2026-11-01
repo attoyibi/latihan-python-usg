@@ -656,6 +656,8 @@
 
   window.APP_CONFIG = {
     PENDAFTARAN: TERBUKA || TANPA_KONFIRMASI ? "buka" : "tutup",
+    // Tombol Google tiruan (tampil bila pendaftaran terbuka, mis. ?terbuka=1). ?googlebatal=1 meniru pembatalan di halaman Google.
+    MASUK_GOOGLE: true,
     // ?muatmaks=4000 memperpendek batas waktu muat penjalan (untuk menguji gagal muat bersama /__gagal/... di server uji).
     MUAT_MAKS_MS: Number((/[?&]muatmaks=(\d+)/.exec(location.search) || [])[1]) || 0,
     client: {
@@ -671,6 +673,22 @@
           if (!u.confirmed) return { data: {}, error: { message: "Email not confirmed", code: "email_not_confirmed" } };
           setSession(mkSession(email), "SIGNED_IN");
           return { data: { session: db.session }, error: null };
+        },
+        // Meniru alur OAuth implicit: "kembali dari Google" ke redirectTo dengan token di bagian #.
+        signInWithOAuth: async ({ provider, options }) => {
+          if (provider !== "google") return { data: {}, error: { message: "Unsupported provider", code: "validation_failed" } };
+          if (/[?&]googlebatal=1/.test(location.search)) {
+            location.assign(options.redirectTo + location.search + "#error=access_denied&error_code=access_denied&error_description=User+cancelled");
+            location.reload(); // hanya bagian # yang berubah; peramban tidak memuat ulang sendiri
+            return { data: {}, error: null };
+          }
+          const email = "gani.google@gmail.com";
+          db.users[email] = db.users[email] || { id: idDari(email), password: null, confirmed: true, meta: { full_name: "Gani Pratama", provider: "google" } };
+          db.session = mkSession(email);
+          save();
+          location.assign(options.redirectTo + location.search + "#access_token=tiruan&token_type=bearer&expires_in=3600");
+            location.reload(); // hanya bagian # yang berubah; peramban tidak memuat ulang sendiri
+          return { data: {}, error: null };
         },
         signUp: async ({ email, password }) => {
           if (!TERBUKA && !TANPA_KONFIRMASI) return { data: { user: null, session: null }, error: { message: "Signups not allowed for this instance", code: "signup_disabled" } };

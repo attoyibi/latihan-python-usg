@@ -1083,6 +1083,23 @@ function kirimUlangBtn(kirim, pesanEl, galatEl, label) {
   return { btn, jeda };
 }
 
+// Tombol "Masuk dengan Google" beserta pemisah "atau"; null bila fitur tidak dinyalakan.
+function tombolGoogle(errEl) {
+  if (!Auth.masukGoogleAktif()) return null;
+  const btn = h("button", { type: "button", class: "btn btn-google" }, h("span", { class: "g-logo", "aria-hidden": "true" }, "G"), "Masuk dengan Google");
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    errEl.textContent = "";
+    try {
+      await Auth.signInGoogle();
+    } catch (e) {
+      errEl.textContent = e.message;
+      btn.disabled = false;
+    }
+  });
+  return h("div", { class: "masuk-google" }, h("p", { class: "atau" }, h("span", {}, "atau")), btn, errEl);
+}
+
 function renderMasuk(konteks) {
   const terbuka = Auth.pendaftaranTerbuka();
   // div (bukan p): bisa memuat tombol kirim ulang dan paragraf info saat email belum dikonfirmasi.
@@ -1136,7 +1153,8 @@ function renderMasuk(konteks) {
       btn.disabled = false;
     }
   });
-  $("#main").replaceChildren(gateCard(konteks ? "Masuk untuk membuka " + konteks : "Masuk", lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form, bawah));
+  const google = tombolGoogle(h("p", { class: "field-err", role: "alert" }));
+  $("#main").replaceChildren(gateCard(konteks ? "Masuk untuk membuka " + konteks : "Masuk", lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form, google, bawah));
   fe.input.focus();
 }
 
@@ -1152,7 +1170,7 @@ function renderDaftar(konteks) {
   const btn = h("button", { type: "submit", class: "btn btn-primary" }, "Daftar");
   const form = h("form", { novalidate: "" }, fe.node, fs.node, h("p", { class: "muted" }, "Minimal " + Auth.MIN_SANDI + " karakter, memuat huruf dan angka."), fu.node, h("div", { class: "actions" }, btn), msg);
   const bawah = h("p", { class: "alt-link" }, "Sudah punya akun? ", h("a", { href: "#masuk" }, "Masuk"));
-  const card = gateCard(konteks ? "Daftar untuk membuka " + konteks : "Daftar", "Buat akun dengan email dan kata sandi. Setelah itu kamu mengisi nama, NIM, dan kelas satu kali.", form, bawah);
+  const card = gateCard(konteks ? "Daftar untuk membuka " + konteks : "Daftar", "Buat akun dengan email dan kata sandi. Setelah itu kamu mengisi nama, NIM, dan kelas satu kali.", form, tombolGoogle(h("p", { class: "field-err", role: "alert" })), bawah);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     fe.err.textContent = "";
@@ -1325,7 +1343,7 @@ function renderProfilForm() {
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { inputmode: "text", autocomplete: "off", maxlength: "30", required: "" }, "Tulis seperti di kartu mahasiswa.");
   const fk = kelasField(p.kelas);
-  fn.input.value = p.nama || "";
+  fn.input.value = p.nama || Auth.namaAkun();
   fi.input.value = p.nim || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan dan mulai");
@@ -1399,7 +1417,7 @@ function renderProfil() {
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { autocomplete: "off", maxlength: "30", required: "" });
   const fk = kelasField(p.kelas);
-  fn.input.value = p.nama || "";
+  fn.input.value = p.nama || Auth.namaAkun();
   fi.input.value = p.nim || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan perubahan");
