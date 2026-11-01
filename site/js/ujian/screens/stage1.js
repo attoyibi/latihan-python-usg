@@ -1,5 +1,5 @@
 import * as store from '../store.js';
-import { getExam, examSession, stage1EndsAt, kunciTahap1, simpanSekarang } from '../data.js';
+import { getExam, examSession, stage1EndsAt, kunciTahap1, simpanSekarang, contohJawaban } from '../data.js';
 import * as Anticopas from '../../anticopas.js';
 import { getRunner } from '../runner.js';
 import { bahasa } from '../bahasa.js';
@@ -58,6 +58,7 @@ function verdictCard(c, stale, q) {
 
 export function render(root, ctx) {
   const exam = getExam();
+  const contoh = contohJawaban(); // hanya simulasi; null di UTS dan UAS
   const runner = getRunner();
   runner.start();
   const endsAt = stage1EndsAt();
@@ -102,6 +103,7 @@ export function render(root, ctx) {
         <label class="field"><span>Jawabanmu <span class="hint">(${wMin}–${wMax} kata)</span></span>
           <textarea rows="11" id="theory-text" placeholder="Tulis dengan kata-katamu sendiri.">${text}</textarea></label>
         <div class="small muted" id="theory-wc">${wordCount(text)} kata</div>
+        ${contoh?.theory?.[id] ? html`<div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" id="isi-contoh">Isi dengan contoh jawaban benar</button><span class="small muted">Khusus simulasi, supaya kamu tahu bentuk jawaban yang benar.</span></div>` : ''}
         ${q.keyPoints ? html`<div class="row" style="margin-top:10px">
           <button class="btn btn-primary" type="button" id="check">✓ Periksa jawaban</button>
           <span class="small muted">Menampilkan poin kunci yang tertangkap. Boleh diulang setelah melengkapi jawaban.</span>
@@ -121,6 +123,7 @@ export function render(root, ctx) {
         ${examplesMarkup(t.visible)}
         <h3 style="margin-top:14px">Kodemu</h3>
         ${workbenchMarkup(id, `Kode · ${t.title}`, { brief: html`<h3>${t.title}</h3>${t.statement.map((p) => html`<p>${p}</p>`)}${examplesMarkup(t.visible)}`, resetLabel: 'Kode awal' })}
+        ${contoh?.code?.[id] ? html`<div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" id="isi-contoh">Isi dengan contoh jawaban benar</button><span class="small muted">Khusus simulasi, supaya kamu tahu bentuk jawaban yang benar. Menimpa kodemu sekarang.</span></div>` : ''}
         <div class="row" style="margin-top:10px">
           <button class="btn btn-primary" type="button" id="check">✓ Periksa jawaban</button>
           <span class="small muted">${t.hidden ? 'Menjalankan semua tes (contoh + tersembunyi).' : 'Menjalankan contoh yang terlihat; tes tersembunyi dinilai saat Tahap 1 dikumpulkan.'} Boleh diulang setelah memperbaiki.</span>
@@ -208,6 +211,12 @@ export function render(root, ctx) {
       const c = draft().checks?.[id];
       if (c && q.keyPoints) show($('#verdict', root), verdictCard(c, ta.value !== c.text, q));
     });
+    $('#isi-contoh', root)?.addEventListener('click', async () => {
+      if (ta.value.trim() && !(await ask('Isi dengan contoh jawaban? Tulisanmu sekarang akan terganti.', 'Isi contoh'))) return;
+      ta.value = contoh.theory[id];
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      saveDraft((d) => { (d.contoh ||= {})[id] = true; });
+    });
     $('#check', root)?.addEventListener('click', () => {
       flush();
       const text = ta.value;
@@ -231,6 +240,11 @@ export function render(root, ctx) {
       },
     }).editor;
     if (editor.cm) Anticopas.blokirDiCodeMirror(editor.cm, jagaTempel);
+    $('#isi-contoh', root)?.addEventListener('click', async () => {
+      if (editor.getValue() !== t.starter && !(await ask('Isi dengan contoh jawaban? Kodemu sekarang akan terganti (tombol Urungkan bisa mengembalikannya).', 'Isi contoh'))) return;
+      editor.setValue(contoh.code[id]);
+      saveDraft((d) => { (d.contoh ||= {})[id] = true; });
+    });
     flush = () => saveDraft((d) => { (d.code ||= {})[id] = editor.getValue(); });
 
     const checkBtn = $('#check', root);
@@ -308,7 +322,7 @@ async function lockStage1({ exam, runner, ctx, auto }) {
   document.body.append(overlay);
   try {
     // 1. Jawaban dikunci di SERVER lebih dulu (jam server, sekali saja); baru setelah itu kunci ujian turun.
-    const snapshot = { code: codes, theory, ai: { level: dr.ai?.level || 'tidak-diisi', tools: dr.ai?.tools || '', how: dr.ai?.how || '' }, submittedAt: new Date().toISOString(), auto, tempelDiblokir: dr.tempel || 0 };
+    const snapshot = { code: codes, theory, ai: { level: dr.ai?.level || 'tidak-diisi', tools: dr.ai?.tools || '', how: dr.ai?.how || '' }, submittedAt: new Date().toISOString(), auto, tempelDiblokir: dr.tempel || 0, contohDiisi: Object.keys(dr.contoh || {}) };
     const hash = await sha256(JSON.stringify(snapshot));
     overlay.querySelector('#ov-text').textContent = 'Mengunci jawaban di server…';
     await kunciTahap1(snapshot, hash);

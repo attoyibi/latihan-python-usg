@@ -25,6 +25,7 @@ export function render(root, ctx) {
   const tr = theoryResults(student, exam, theoryOverrides());
   const nCorrect = Object.values(r.correct).reduce((a, b) => a + b, 0);
 
+  const contohDiisi = sub.contohDiisi || [];
   const retest = advice.available ? html`
     <section class="card">
       <h2>Uji ulang</h2>
@@ -73,6 +74,7 @@ export function render(root, ctx) {
       <h2>Bagaimana nilai ini dihitung <span class="badge ${grade.evidence === 'dikurangi' ? 'warn' : 'ok'}">${EVIDENCE_LABEL[grade.evidence]}</span></h2>
       <ul class="small">${grade.reasons.map((x) => html`<li>${x}</li>`)}</ul>
     </section>
+    ${contohDiisi.length ? html`<div class="callout warn"><strong>Sebagian jawaban diisi dari contoh.</strong> Soal ${contohDiisi.join(', ')} memakai tombol contoh jawaban, jadi nilai simulasi ini tidak mencerminkan kemampuanmu. Ulangi simulasi tanpa tombol itu untuk mengukur dirimu.</div>` : ''}
     ${retest}
     <section class="card">
       <h2>Rumus nilai (diumumkan sejak awal)</h2>

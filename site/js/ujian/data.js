@@ -33,7 +33,7 @@ export function muatIndeks(mk, ada = true) {
   return cacheIdx.get(mk);
 }
 
-let base = null; // { exam, tasks, theory, templates }
+let base = null; // { exam, tasks, theory, templates, contoh }
 let ctx = { mk: null, ujianId: null, peserta: null, meta: {}, status: null, kunci: false };
 
 // Kunci dari server digabung ke definisi soal (tes tersembunyi, varian, ketentuan berubah, poin kunci, butir konsep).
@@ -57,7 +57,9 @@ function terapkanSesi(sesi) {
 export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
   const dir = `data/kuliah/${mk}/ujian/${ujianId}/`;
   const [exam, tasks, theory, templates] = await Promise.all(['exam', 'tasks', 'theory', 'templates'].map((f) => ambilJson(`${dir}${f}.json`)));
-  base = { exam, tasks, theory, templates };
+  // Contoh jawaban benar hanya ada untuk simulasi (berkas publik contoh.json). UTS dan UAS tidak pernah memilikinya.
+  const contoh = meta.latihan === true ? await ambilJson(`${dir}contoh.json`).catch(() => null) : null;
+  base = { exam, tasks, theory, templates, contoh };
   ctx = { mk, ujianId, peserta, meta, status: null, kunci: false };
   store.pakai(peserta.id, mk, ujianId);
   store.onSimpan(jadwalkanSimpan);
@@ -80,6 +82,8 @@ export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
 export const peserta = () => ctx.peserta;
 // Simulasi: nilai tidak dihitung dan boleh diulang dari awal (server memeriksa lewat jadwal boleh_ulang).
 export const isLatihan = () => ctx.meta.latihan === true;
+// { code: {idSoal: kode}, theory: {idSoal: teks} } atau null (selain simulasi).
+export const contohJawaban = () => (ctx.meta.latihan === true ? base.contoh : null);
 export const templates = () => base.templates;
 export const jadwal = () => (ctx.status ? { info: ctx.status.jadwal, buka: !!ctx.status.buka } : { info: null, buka: false });
 export const kunciTersedia = () => ctx.kunci;

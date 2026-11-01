@@ -70,6 +70,14 @@ def buat(mk):
             "theory": {q["id"]: {"keyPoints": q["keyPoints"], "concepts": q["concepts"]} for q in theory["questions"]},
         }
         tulis(keluar / f"{uid}.json", isi)
+        # Simulasi (latihan: true di index.json) mendapat contoh jawaban PUBLIK supaya peserta tahu bentuk jawaban benar.
+        # UTS dan UAS tidak pernah: contoh.json hanya dibuat bila ujiannya simulasi, dan dihapus bila bukan.
+        meta = {u["id"]: u for u in baca(publik.parent / "index.json")["ujian"]}.get(uid, {})
+        if meta.get("latihan") is True:
+            solusi = baca(d / "solutions.json")["code"]
+            tulis(publik / "contoh.json", {"code": {t["id"]: solusi[t["id"]] for t in tasks}, "theory": {q["id"]: q["sample"] for q in theory["questions"]}})
+        elif (publik / "contoh.json").exists():
+            (publik / "contoh.json").unlink()
         baris.append(f"({sql_teks(mk)}, {sql_teks(uid)}, {sql_teks(json.dumps(isi, ensure_ascii=False))}::jsonb)")
         print(f"{mk}/{uid}: {len(tasks)} soal praktik, {len(theory['questions'])} soal teori -> publik dan kunci dipisah")
     if not baris:

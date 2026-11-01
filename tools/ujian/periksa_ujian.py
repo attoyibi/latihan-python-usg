@@ -55,6 +55,8 @@ def periksa(mk, uid, run, trace_key, norm):
         cek(all(x in u["visible"] for x in t["visible"]), f"{uid}/{tid} contoh publik = contoh kunci")
     teks = (publik / "tasks.json").read_text(encoding="utf8") + (publik / "theory.json").read_text(encoding="utf8")
     cek(not any(k in teks for k in ('"keyPoints"', '"concepts"', '"hidden"', '"variants"')), f"{uid} berkas publik (tasks, theory) tanpa rahasia")
+    latihan = {u["id"]: u.get("latihan") is True for u in baca(publik.parent / "index.json")["ujian"]}[uid]
+    cek(latihan or not (publik / "contoh.json").exists(), f"{uid} " + ("simulasi boleh punya contoh.json" if latihan else "bukan simulasi: tanpa contoh.json publik"))
     return gagal
 
 
