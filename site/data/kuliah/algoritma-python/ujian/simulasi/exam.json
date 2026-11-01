@@ -2,7 +2,7 @@
   "id": "AP-SIMULASI-2026",
   "title": "Simulasi ujian Algoritma dan Pemrograman",
   "course": "Algoritma dan Pemrograman (Python)",
-  "intro": "Simulasi untuk mencoba alur UTS dan UAS dengan soal yang lebih mudah (Bab 1–4). Tahap 1: 2 soal teori + 2 soal praktik. Tahap 2: pertanyaan pilihan tentang kodemu sendiri, mulai otomatis. Nilainya tidak dihitung dan simulasi boleh diulang.",
+  "intro": "Simulasi untuk mencoba alur UTS dan UAS dengan soal yang lebih mudah (Bab 1–4). Tahap 1: 2 soal teori + 2 soal praktik. Tahap 2: pertanyaan singkat yang dijawab satu kalimat, mulai otomatis. Nilainya tidak dihitung dan simulasi boleh diulang.",
   "aiDeclarationOptions": [
     {
       "id": "none",
@@ -31,14 +31,15 @@
       },
       "optionsPerItem": 4,
       "limitSec": {
-        "trace": 120,
-        "bugline": 90,
-        "concept": 60,
-        "transfer": 120
+        "probe": 90,
+        "line": 90,
+        "change": 120
       },
       "beginDelaySec": 10,
       "maxAttempts": 2,
-      "seedSalt": "DCE-AP-SIMULASI-2026"
+      "seedSalt": "DCE-AP-SIMULASI-2026",
+      "mode": "open",
+      "minWords": 3
     },
     "runner": {
       "timeoutMs": 5000,

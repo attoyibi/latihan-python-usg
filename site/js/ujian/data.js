@@ -9,6 +9,7 @@ import * as store from './store.js';
 import * as server from './server.js';
 import { bahasa } from './bahasa.js';
 import { buildItems, ITEM_TYPES } from './logic/items.js';
+import { buildOpenItems, isOpen } from './logic/open.js';
 import { summarize } from './logic/summary.js';
 import { computeS1 } from './logic/s1.js';
 import { computeGrade, studentGrade, EVIDENCE_LABEL } from './logic/grade.js';
@@ -80,6 +81,12 @@ export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
 }
 
 export const peserta = () => ctx.peserta;
+export const keadaanSekarang = () => store.get();
+// Menandai jawaban terkirim dan terkunci di server (migrasi 0011). Gagal diam-diam bila migrasi belum dijalankan.
+export async function tandaiSelesai() {
+  await simpanSekarang();
+  try { await server.selesai(ctx.mk, ctx.ujianId); } catch (e) { if (e.jenis !== 'belum-siap') throw e; }
+}
 // Simulasi: nilai tidak dihitung dan boleh diulang dari awal (server memeriksa lewat jadwal boleh_ulang).
 export const isLatihan = () => ctx.meta.latihan === true;
 // { code: {idSoal: kode}, theory: {idSoal: teks} } atau null (selain simulasi).
@@ -156,7 +163,7 @@ export function ensureAttempt(n = 1) {
   if (attempts().some((a) => a.n === n)) return;
   const exam = getExam();
   const ses = examSession();
-  const items = buildItems(studentBase(), { exam, templates: base.templates, rerolls: {}, attempt: n });
+  const items = isOpen(exam) ? buildOpenItems(studentBase(), { exam, templates: base.templates, attempt: n }) : buildItems(studentBase(), { exam, templates: base.templates, rerolls: {}, attempt: n });
   const delay = (exam.config.stage2.beginDelaySec * 1000) / ses.speed;
   const from = n === 1 ? Date.parse(demo().stage1.submitted.submittedAt) : Date.now();
   const beginAt = from + delay;
@@ -189,8 +196,16 @@ function ringkasan() {
   const sub = demo().stage1?.submitted;
   const out = { tahap };
   if (sub) out.terlambat = !!sub.auto;
-  if (tahap !== 'selesai' || !ctx.kunci) return out;
   const exam = getExam();
+  if (isOpen(exam)) {
+    // Tahap 2 terbuka tidak dinilai otomatis; dosen melihat S1 (tes dan poin kunci) dan membaca jawaban S2 dari ekspor.
+    if (!ctx.kunci || !demo().stage1?.submitted) return out;
+    const atts = attempts();
+    const butir = atts.flatMap((a) => a.items);
+    const terjawab = atts.flatMap((a) => a.items.filter((i) => String(a.answers[i.id]?.text || '').trim()));
+    return { ...out, mode: 'terbuka', s1: Math.round(s1For(demoStudent()) * 100), butir: butir.length, terjawab: terjawab.length, latihan: isLatihan() };
+  }
+  if (tahap !== 'selesai' || !ctx.kunci) return out;
   const student = demoStudent();
   const r = summarize(student, exam, theoryOverrides());
   const g = computeGrade(r, exam.config);
@@ -226,6 +241,7 @@ export async function simpanSekarang() {
     await berjalan;
     setStatus('tersimpan');
   } catch (e) {
+    if (e.jenis === 'terkunci') { setStatus('tersimpan'); return; } // jawaban sudah dikumpulkan dan dikunci di server
     setStatus('gagal');
     clearTimeout(timer);
     timer = setTimeout(() => simpanSekarang().catch(() => {}), 10000);

@@ -9,7 +9,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa gunanya fungsi dan apa itu parameter; (b) beda return dan print di dalam fungsi; (c) apa itu fungsi rekursif dan kenapa ia wajib punya kasus dasar (base case). Beri satu contoh singkat.",
         "Cukup satu sampai dua paragraf, sekitar 50–150 kata."
       ],
-      "need": 5
+      "need": 5,
+      "probe": "Dalam satu kalimat: kenapa fungsi rekursif wajib punya kasus dasar (base case)?"
     },
     {
       "id": "UQ2",
@@ -19,7 +20,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) cara kerja linear search dan binary search; (b) syarat agar binary search bisa dipakai; (c) perkiraan banyak langkah (Big-O) keduanya dan Big-O bubble sort, serta apa artinya bila datanya sangat banyak.",
         "Cukup satu sampai dua paragraf, sekitar 50–150 kata."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: apa syarat agar binary search bisa dipakai?"
     }
   ]
 }

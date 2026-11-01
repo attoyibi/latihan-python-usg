@@ -9,7 +9,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa beda kelas dan objek; (b) apa itu atribut dan method; (c) apa fungsi constructor.",
         "Cukup satu paragraf, sekitar 30–80 kata."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: apa beda kelas dan objek?"
     },
     {
       "id": "SQ2",
@@ -19,7 +20,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa itu enkapsulasi dan kenapa atribut dibuat private; (b) apa fungsi getter dan setter; (c) apa arti tanda - dan + pada diagram kelas UML.",
         "Cukup satu paragraf, sekitar 30–80 kata."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: kenapa atribut sebuah kelas dibuat private?"
     }
   ]
 }

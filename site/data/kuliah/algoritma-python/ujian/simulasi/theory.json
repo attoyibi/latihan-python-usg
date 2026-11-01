@@ -9,7 +9,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa itu variabel; (b) beda tipe data int, float, dan str, masing-masing dengan satu contoh; (c) kenapa hasil input() perlu diubah dengan int() sebelum dihitung.",
         "Cukup satu paragraf, sekitar 30–80 kata."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: kenapa hasil input() perlu diubah dengan int() sebelum dipakai menghitung?"
     },
     {
       "id": "SQ2",
@@ -19,7 +20,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) kapan blok if, elif, dan else dijalankan; (b) beda operator = dan ==; (c) apa peran indentasi (spasi di awal baris) pada percabangan.",
         "Cukup satu paragraf, sekitar 30–80 kata."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: apa beda tanda = dan == di Python?"
     }
   ]
 }

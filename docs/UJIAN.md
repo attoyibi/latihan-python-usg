@@ -13,6 +13,12 @@ Ujian dua tahap yang berjalan sendiri, dari prototype *Double-Check Exam*:
 
 **Simulasi** (Bab 1–4) memakai alur yang sama dengan soal lebih mudah, Tahap 1 30 menit, 5 butir Tahap 2, nilai tidak dihitung, dan boleh diulang.
 
+## Tahap 2 terbuka (mode bawaan sekarang)
+Pilihan ganda Tahap 2 diganti **pertanyaan terbuka kecil** (`config.stage2.mode = "open"` di `exam.json`; mode lama tetap ada di kode). Per ujian: satu pertanyaan konsep untuk tiap soal teori (`probe` di `theory.json`, dijawab satu kalimat), serta untuk tiap soal praktik satu pertanyaan "apa yang dikerjakan baris N kodemu" (baris dipilih dari kodenya sendiri) dan satu "ketentuan berubah: bagian mana yang kamu ubah". Tidak dinilai otomatis: jawabannya dibandingkan dengan jawaban teori, kode, dan hasil tes Tahap 1 untuk melihat apakah Tahap 1 mencerminkan pemahaman peserta.
+- **Peserta** tidak melihat nilai. Setelah selesai ia hanya melihat "tersimpan dan dikunci" dan bisa mengunduh PDF jawabannya. Jawaban dikunci di server oleh `ujian_selesai` (migrasi `0011_ujian_selesai.sql`): sesudahnya server menolak perubahan.
+- **Dosen** (tab Ujian di dashboard): unduh CSV untuk analisis (satu baris per pertanyaan per peserta, dengan pembanding Tahap 1), unduh format hasil analisis (`id_baris, peserta_id, konsistensi, skor, catatan`), unggah hasil analisis yang sudah diisi AI (disimpan di server dan tampil di bawah tiap jawaban), unduh PDF satu peserta atau semua peserta. `konsistensi` salah satu dari `konsisten`, `sebagian`, `tidak_konsisten`, `tidak_jelas`; `skor` 0-100 (boleh kosong).
+- Tanpa migrasi 0011 semuanya tetap jalan kecuali penguncian di server dan penyimpanan analisis (dosen mendapat pesan jelas).
+
 ## Yang dipegang server (migrasi `0010_ujian.sql`)
 | Bagian | Cara kerja |
 |---|---|

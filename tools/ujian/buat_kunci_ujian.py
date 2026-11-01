@@ -21,7 +21,7 @@ import sys
 AKAR = pathlib.Path(__file__).resolve().parents[2]
 MK_LAMA = "algoritma-python"
 PUBLIK_TUGAS = ("id", "title", "topic", "statement", "starter", "visible")
-PUBLIK_TEORI = ("id", "title", "topic", "prompt", "need")
+PUBLIK_TEORI = ("id", "title", "topic", "prompt", "need")  # ditambah "probe" (pertanyaan Tahap 2) bila ada
 
 
 def baca(p):
@@ -64,7 +64,7 @@ def buat(mk):
             print(f"lewati {mk}/{uid}: tidak ada {publik / 'exam.json'}", file=sys.stderr)
             continue
         tulis(publik / "tasks.json", {"tasks": [{k: t[k] for k in PUBLIK_TUGAS} for t in tasks]})
-        tulis(publik / "theory.json", {"note": theory.get("note", ""), "questions": [{k: q[k] for k in PUBLIK_TEORI} for q in theory["questions"]]})
+        tulis(publik / "theory.json", {"note": theory.get("note", ""), "questions": [{k: q[k] for k in PUBLIK_TEORI + (("probe",) if "probe" in q else ())} for q in theory["questions"]]})
         isi = {
             "tasks": {t["id"]: {"hidden": t["hidden"], "traceInputs": t["traceInputs"], "variants": t["variants"], "changes": t["changes"]} for t in tasks},
             "theory": {q["id"]: {"keyPoints": q["keyPoints"], "concepts": q["concepts"]} for q in theory["questions"]},

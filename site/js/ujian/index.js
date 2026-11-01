@@ -4,7 +4,8 @@
 // Satu kali jalan: Mulai -> Tahap 1 -> Tahap 2 (otomatis) -> Hasil. Peserta tidak bisa melompat antar tahap.
 // Diadaptasi dari prototype double-check-exam; logika murni di ./logic disalin utuh dan diuji tools/uji_ujian.
 import { setBahasa } from './bahasa.js';
-import { muatIndeks, pakaiUjian, examStage, simpanSekarang } from './data.js';
+import { muatIndeks, pakaiUjian, examStage, simpanSekarang, getExam } from './data.js';
+import { isOpen } from './logic/open.js';
 import * as store from './store.js';
 import { initCodeTools, syncScrollLock } from './codetools.js';
 import { html, show } from './ui.js';
@@ -12,6 +13,7 @@ import * as start from './screens/start.js';
 import * as stage1 from './screens/stage1.js';
 import * as stage2 from './screens/stage2.js';
 import * as result from './screens/result.js';
+import * as selesai from './screens/selesai.js';
 
 const LAYAR = { belum: start, stage1, stage2, selesai: result };
 const LABEL = { belum: 'Belum dimulai', stage1: 'Tahap 1 berjalan', stage2: 'Tahap 2 berjalan', selesai: 'Selesai' };
@@ -79,7 +81,8 @@ export async function renderUjian(main, kuliah, ujianId, peserta) {
     rerender: () => {
       bersihkan();
       const t = examStage();
-      LAYAR[t].render(root, ctx);
+      // Tahap 2 terbuka tidak punya nilai untuk peserta: layar akhirnya hanya konfirmasi dan PDF.
+      (t === 'selesai' && isOpen(getExam()) ? selesai : LAYAR[t]).render(root, ctx);
       syncScrollLock();
       if (t !== tahap) {
         // Pindah tahap (terutama selesai): kirim segera, jangan menunggu jeda simpan otomatis.

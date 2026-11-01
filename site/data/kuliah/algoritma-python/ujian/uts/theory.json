@@ -9,7 +9,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa yang dimaksud algoritma dan lima syarat agar sebuah urutan langkah layak disebut algoritma; (b) perbedaan flowchart dan pseudocode sebagai alat merancang algoritma.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 5
+      "need": 5,
+      "probe": "Dalam satu kalimat: apa beda flowchart dan pseudocode sebagai alat merancang algoritma?"
     },
     {
       "id": "Q2",
@@ -19,7 +20,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) perbedaan perulangan for dan while serta kapan memakai masing-masing; (b) perbedaan list dan string dalam hal bisa tidaknya isinya diubah. Sertakan satu contoh singkat.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 4
+      "need": 4,
+      "probe": "Dalam satu kalimat: kapan kamu memilih while dan bukan for?"
     }
   ]
 }

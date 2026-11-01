@@ -9,7 +9,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa itu eksepsi dan bagaimana try, catch, finally, throw, dan throws bekerja bersama; (b) perbedaan List, Set, dan Map serta kegunaan generics; (c) cara menyimpan data ke berkas dan membacanya kembali, dan mengapa sumber daya berkas harus ditutup.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 5
+      "need": 5,
+      "probe": "Dalam satu kalimat: kapan blok finally dijalankan?"
     },
     {
       "id": "UQ2",
@@ -19,7 +20,8 @@
         "Jelaskan dengan kata-katamu sendiri: (a) apa fungsi JDBC dan mengapa PreparedStatement lebih aman daripada Statement; (b) bagaimana event handling bekerja pada antarmuka grafis (sumber event dan listener); (c) prinsip Single Responsibility dan Open-Closed; (d) fungsi design pattern, dengan contoh Singleton atau Factory.",
         "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
       ],
-      "need": 5
+      "need": 5,
+      "probe": "Dalam satu kalimat: kenapa PreparedStatement lebih aman daripada Statement biasa?"
     }
   ]
 }

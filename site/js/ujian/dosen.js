@@ -2,7 +2,9 @@
 // Semua perubahan langsung ke Supabase lewat aturan RLS (hanya instruktur yang boleh menulis jadwal dan akomodasi).
 import * as server from './server.js';
 import { muatIndeks } from './data.js';
-import { toCsv } from './logic/csv.js';
+import { toCsv, parseCsv } from './logic/csv.js';
+import { salinan, isOpen, uraikanHasil, OPEN_LABEL } from './logic/open.js';
+import { unduhPdfPeserta, unduhPdfSemua, unduhCsvAnalisis, unduhFormatHasil } from './ekspor.js';
 import { html, show, $, $$, ask, download } from './ui.js';
 
 const STATUS = { belum: 'Belum mulai', stage1: 'Tahap 1', stage2: 'Tahap 2', selesai: 'Selesai' };
@@ -24,11 +26,16 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
   main.replaceChildren(kepala, isi);
   show(isi, html`<section class="card"><p class="muted">Memuat data ujian…</p></section>`);
 
-  let daftar, cfgSitus, exams;
+  let daftar, cfgSitus, exams, soal;
   try {
     daftar = await muatIndeks(kuliah.id, kuliah.ujian === true);
     cfgSitus = await ambilJson('data/config.json').catch(() => ({ kelas: ['A', 'B', 'C', 'D'] }));
     exams = Object.fromEntries(await Promise.all(daftar.map(async (u) => [u.id, await ambilJson(`data/kuliah/${kuliah.id}/ujian/${u.id}/exam.json`).catch(() => null)])));
+    soal = Object.fromEntries(await Promise.all(daftar.map(async (u) => {
+      const dir = `data/kuliah/${kuliah.id}/ujian/${u.id}`;
+      const [tasks, theory] = await Promise.all([ambilJson(`${dir}/tasks.json`).catch(() => ({ tasks: [] })), ambilJson(`${dir}/theory.json`).catch(() => ({ questions: [] }))]);
+      return [u.id, { tasks: tasks.tasks, theory: theory.questions }];
+    })));
   } catch (e) {
     show(isi, html`<section class="card"><p class="verdict fail">${e.message}</p></section>`);
     return;
@@ -49,6 +56,48 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
     show(isi, html`<section class="card"><h2>Ujian belum siap di server</h2><p>${e.jenis === 'belum-siap' ? 'Tabel ujian belum ada. Jalankan supabase/migrations/0010_ujian.sql di Supabase SQL Editor, lalu kunci ujian (kunci/ujian_kunci.sql).' : e.message}</p></section>`);
     return;
   }
+
+  // Definisi ujian lengkap (publik) untuk menyusun salinan jawaban; hanya ujian dengan Tahap 2 terbuka yang punya salinan Tahap 2.
+  const examLengkap = (uid) => {
+    const e = exams[uid];
+    if (!e) return null;
+    return { ...e, language: kuliah.bahasa || 'python', tasks: soal[uid].tasks.filter((t) => e.config.activeTasks.includes(t.id)), theory: soal[uid].theory };
+  };
+  const salinanSesi = (uid) => {
+    const ex = examLengkap(uid);
+    if (!ex || !isOpen(ex)) return [];
+    return data.sesi.filter((s) => s.ujian_id === uid && s.keadaan?.demo?.stage1?.submitted).map((s) => {
+      const p = data.profil[s.user_id] || {};
+      return { ...salinan({ keadaan: s.keadaan, exam: ex, peserta: { id: s.user_id, nama: p.nama || '?', nim: p.nim || '', kelas: p.kelas || s.kelas || '' }, ujian: ex.title }), sesi: s };
+    });
+  };
+  const KONS_BADGE = { konsisten: ['ok', 'konsisten'], sebagian: ['warn', 'sebagian'], tidak_konsisten: ['bad', 'tidak konsisten'], tidak_jelas: ['', 'tidak jelas'] };
+  const panelJawaban = (uid) => {
+    const daftarS = salinanSesi(uid);
+    if (!daftarS.length) return '';
+    return html`<h3>Jawaban Tahap 2 dan pembandingnya <span class="muted small">(${daftarS.length} peserta)</span></h3>
+      <p class="small muted">Tahap 2 berupa pertanyaan terbuka dan tidak dinilai otomatis. Unduh CSV, berikan ke AI bersama prompt-mu, lalu unggah hasilnya di sini; hasil analisis tersimpan di server dan muncul di bawah tiap jawaban.</p>
+      <div class="row uj-aksi">
+        <button class="btn btn-sm" type="button" data-unduh-analisis>Unduh CSV untuk analisis</button>
+        <button class="btn btn-sm" type="button" data-unduh-format>Unduh format hasil analisis</button>
+        <label class="btn btn-sm">Unggah hasil analisis (CSV)<input type="file" accept=".csv,text/csv" data-unggah-hasil hidden></label>
+        <button class="btn btn-sm" type="button" data-pdf-semua>Unduh PDF semua jawaban</button>
+      </div>
+      <div class="stack" style="margin-top:8px">${daftarS.map((s) => {
+        const rows = (s.sesi.analisis || {}).rows || {};
+        return html`<details class="card" style="margin:0" data-peserta="${s.peserta.id}"><summary><strong>${s.peserta.nama}</strong> <span class="muted small">${s.peserta.nim} · ${s.peserta.kelas}</span> ${s.s2.length ? html`<span class="badge">${s.s2.filter((x) => !x.kosong).length}/${s.s2.length} terjawab</span>` : html`<span class="badge warn">belum Tahap 2</span>`}${s.sesi.selesai_pada ? html` <span class="badge ok">dikunci</span>` : ''}${Object.keys(rows).length ? html` <span class="badge info">dianalisis</span>` : ''}</summary>
+          <div class="stack" style="margin-top:8px">${s.s2.map((x) => { const a = rows[x.id]; const [kc, kl] = KONS_BADGE[a?.konsistensi] || ['', '']; return html`<div class="card" style="margin:0">
+            <div><span class="badge info">${OPEN_LABEL[x.jenis] || x.jenis}</span> <strong>${x.pertanyaan}</strong></div>
+            <div class="small muted" style="margin-top:6px">Jawaban Tahap 2 · ${x.kata} kata · ${x.detik === '' ? '–' : x.detik + ' dtk'}${x.tempel ? ` · tempel ${x.tempel}×` : ''}</div>
+            <div class="quote">${x.jawaban || '(tidak dijawab)'}</div>
+            ${x.jawabanS1 ? html`<div class="small muted">Jawaban teori Tahap 1</div><div class="quote">${x.jawabanS1}</div>` : ''}
+            ${x.kodeS1 ? html`<details><summary class="small">Kode Tahap 1 ${x.tesS1 ? `(tes lulus ${x.tesS1})` : ''}${x.konteks ? ` · ${x.konteks}` : ''}</summary><pre class="block">${x.kodeS1}</pre></details>` : ''}
+            ${a ? html`<div class="callout ${kc === 'bad' ? 'warn' : 'ok'}" style="margin-top:8px"><strong>Analisis:</strong> ${kl ? html`<span class="badge ${kc}">${kl}</span>` : ''}${a.skor !== null && a.skor !== undefined ? html` skor ${a.skor}` : ''}${a.catatan ? html` · ${a.catatan}` : ''}</div>` : ''}
+          </div>`; })}</div>
+          <div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" data-pdf-peserta="${s.peserta.id}">Unduh PDF peserta ini</button></div>
+        </details>`;
+      })}</div>`;
+  };
 
   const kelasPilihan = [['*', 'Semua kelas'], ...(cfgSitus.kelas || []).map((k) => [k, `Kelas ${k}`])];
 
@@ -94,6 +143,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
           <td><button class="btn btn-sm btn-ghost" type="button" data-hapus-sesi="${s.user_id}">Izinkan mengulang</button></td></tr>`; })}
       </tbody></table></div>
       <div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" data-csv>Unduh CSV</button></div>` : html`<p class="small muted">Belum ada peserta yang memulai.</p>`}
+      ${panelJawaban(u.id)}
       <div data-pesan></div>
     </section>`;
   };
@@ -117,6 +167,12 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
       else alert(e.message);
     }
   };
+
+  async function galatPdf(sec, tombol, fn) {
+    tombol.disabled = true;
+    try { await fn(); } catch (e) { show($('[data-pesan]', sec), html`<p class="callout bad" role="alert">${e.message}</p>`); }
+    tombol.disabled = false;
+  }
 
   function pasang() {
     $('[data-muat-ulang]', isi)?.addEventListener('click', (e) => jalankan(e.currentTarget, async () => {}));
@@ -165,6 +221,41 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
         if (!(await ask(`Hapus sesi ${p.nama || 'peserta ini'} untuk ${u.judul}? Jawaban dan nilainya hilang, dan ia bisa mulai lagi selama jadwal kelasnya buka.`, 'Hapus dan izinkan'))) return;
         jalankan(sec, () => server.hapusSesi(kuliah.id, uid, b.dataset.hapusSesi));
       }));
+      const namaBerkas = (x) => `${x}-${kuliah.id}-${uid}`;
+      const dosen = () => salinanSesi(uid);
+      $('[data-unduh-analisis]', sec)?.addEventListener('click', () => unduhCsvAnalisis(dosen(), namaBerkas('jawaban-s2')));
+      $('[data-unduh-format]', sec)?.addEventListener('click', () => unduhFormatHasil(dosen(), namaBerkas('format-hasil-analisis')));
+      $('[data-pdf-semua]', sec)?.addEventListener('click', (e) => galatPdf(sec, e.currentTarget, () => unduhPdfSemua(dosen(), u.judul)));
+      $$('[data-pdf-peserta]', sec).forEach((b) => b.addEventListener('click', () => galatPdf(sec, b, () => unduhPdfPeserta(dosen().find((s) => s.peserta.id === b.dataset.pdfPeserta)))));
+      $('[data-unggah-hasil]', sec)?.addEventListener('change', async (e) => {
+        const berkas = e.target.files[0];
+        e.target.value = '';
+        if (!berkas) return;
+        const pesan = $('[data-pesan]', sec);
+        const { rows, galat } = uraikanHasil(await berkas.text(), parseCsv);
+        if (!rows.length) { show(pesan, html`<p class="callout bad" role="alert">${galat.join(' ') || 'Tidak ada baris hasil.'}</p>`); return; }
+        // Hanya baris yang cocok dengan butir peserta di ujian ini yang diterima.
+        const peta = new Map(dosen().map((s) => [s.peserta.id, s]));
+        const baru = new Map();
+        let dipakai = 0;
+        for (const r of rows) {
+          const s = peta.get(r.peserta_id);
+          if (!s || !s.s2.some((x) => x.id === r.id_baris)) { galat.push(`id_baris ${r.id_baris}: tidak cocok dengan peserta di ujian ini, dilewati.`); continue; }
+          if (!baru.has(r.peserta_id)) baru.set(r.peserta_id, { ...((s.sesi.analisis || {}).rows || {}) });
+          baru.get(r.peserta_id)[r.id_baris] = { konsistensi: r.konsistensi, skor: r.skor, catatan: r.catatan };
+          dipakai += 1;
+        }
+        if (!dipakai) { show(pesan, html`<p class="callout bad" role="alert">Tidak ada baris yang cocok dengan ujian ini. ${galat.slice(0, 3).join(' ')}</p>`); return; }
+        try {
+          for (const [id, rowsBaru] of baru) await server.simpanAnalisis(kuliah.id, uid, id, { rows: rowsBaru, diimpor: new Date().toISOString() });
+        } catch (err) {
+          show(pesan, html`<p class="callout bad" role="alert">${err.jenis === 'belum-siap' ? 'Fungsi penyimpan analisis belum ada di server: jalankan supabase/migrations/0011_ujian_selesai.sql.' : err.message}</p>`);
+          return;
+        }
+        await muat();
+        gambar();
+        show($('[data-pesan]', isi.querySelector(`[data-ujian="${uid}"]`)), html`<p class="callout ok" role="status">${dipakai} baris analisis tersimpan untuk ${baru.size} peserta.${galat.length ? ` ${galat.length} baris dilewati: ${galat.slice(0, 3).join(' ')}` : ''}</p>`);
+      });
       $('[data-csv]', sec)?.addEventListener('click', () => {
         const rows = data.sesi.filter((s) => s.ujian_id === uid).map((s) => ({ ...s, p: data.profil[s.user_id] || {}, h: s.hasil || {} }));
         const csv = toCsv(rows, [

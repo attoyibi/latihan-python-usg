@@ -555,3 +555,87 @@ test('java: codeLines melewati kurung kurawal, import, komentar, dan anotasi', (
   assert.deepEqual(codeLines(code, 'java').map((l) => l.n), [4, 6, 7]);
   assert.equal(codeLines('# c\nx = 1\n\ny = 2').length, 2); // Python tidak berubah
 });
+
+// ---- Tahap 2 terbuka: butir, salinan jawaban, CSV analisis ----
+import { buildOpenItems, isOpen, salinan, barisAnalisis, uraikanHasil, blokPdf, KOLOM_ANALISIS } from '../../site/js/ujian/logic/open.js';
+import { parseCsv } from '../../site/js/ujian/logic/csv.js';
+
+const examOpen = {
+  title: 'Ujian X', language: 'python',
+  config: { stage2: { mode: 'open', seedSalt: 'S' }, tahap1Order: ['Q1', 'T1', 'T2'] },
+  theory: [{ id: 'Q1', title: 'Teori 1', prompt: ['Jelaskan variabel.'], probe: 'Apa itu variabel?' }],
+  tasks: [
+    { id: 'T1', title: 'Praktik 1', statement: ['Hitung total.'], changes: [{ id: 'C1', text: 'Harga naik.' }] },
+    { id: 'T2', title: 'Praktik 2', statement: ['Cetak.'], changes: [] },
+  ],
+};
+const tplOpen = { version: 'v1', probe: { text: '{pertanyaan}' }, line: { text: 'Di {tugas}, apa fungsi baris {baris}?' }, change: { text: '{tugas} berubah: {perubahan}' } };
+const siswa = { id: 'u1', code: { T1: 'total = harga * jumlah\nprint(total)\n', T2: '' } };
+
+test('terbuka: butir mengikuti urutan Tahap 1, soal tanpa kode dilewati', () => {
+  assert.ok(isOpen(examOpen) && !isOpen({ config: { stage2: {} } }));
+  const items = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen });
+  assert.deepEqual(items.map((i) => i.type), ['probe', 'line', 'change']);
+  assert.equal(items[0].text, 'Apa itu variabel?');
+  assert.equal(items[0].questionId, 'Q1');
+  assert.match(items[1].text, /Praktik 1.*baris \d/);
+  assert.ok(['total = harga * jumlah', 'print(total)'].includes(items[1].lineText));
+  assert.match(items[2].text, /Praktik 1 berubah: Harga naik\./);
+  assert.equal(new Set(items.map((i) => i.id)).size, 3);
+});
+
+test('terbuka: butir deterministik per peserta dan berbeda antar percobaan', () => {
+  const a = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen });
+  const b = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen });
+  const c = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen, attempt: 2 });
+  assert.deepEqual(a, b);
+  assert.notEqual(a[0].id, c[0].id);
+});
+
+const keadaan = (jawab) => ({ demo: { stage1: { submitted: { code: { T1: siswa.code.T1, T2: '' }, theory: { Q1: 'Variabel adalah wadah nilai.' }, taskResults: { T1: { passed: 3, total: 4 }, T2: { passed: 0, total: 4 } }, hash: 'ab'.repeat(32), tempelDiblokir: 2, ai: { level: 'none' }, submittedAt: '2026-11-01T10:00:00Z' } }, stage2: { attempts: [{ n: 1, items: buildOpenItems(siswa, { exam: examOpen, templates: tplOpen }), answers: jawab }] } } });
+
+test('terbuka: salinan memuat jawaban S2 beserta pembanding S1', () => {
+  const items = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen });
+  const sal = salinan({ keadaan: keadaan({ [items[0].id]: { text: 'Tempat menyimpan nilai', latencySec: 12, tempel: 1 }, [items[1].id]: { text: '' } }), exam: examOpen, peserta: { id: 'u1', nama: 'Ani', nim: '1', kelas: 'A' }, ujian: 'Ujian X' });
+  assert.equal(sal.s2.length, 3);
+  assert.equal(sal.s2[0].jawaban, 'Tempat menyimpan nilai');
+  assert.equal(sal.s2[0].jawabanS1, 'Variabel adalah wadah nilai.');
+  assert.equal(sal.s2[0].tempel, 1);
+  assert.equal(sal.s2[1].kosong, true);
+  assert.equal(sal.s2[1].tesS1, '3/4');
+  assert.match(sal.s2[1].kodeS1, /harga \* jumlah/);
+  assert.equal(sal.kode, 'ab'.repeat(8));
+  assert.equal(sal.tempelS1, 2);
+  const txt = JSON.stringify(blokPdf(sal));
+  assert.ok(txt.includes('Tempat menyimpan nilai') && txt.includes('(tidak dijawab)') && txt.includes('Ani'));
+});
+
+test('terbuka: CSV analisis satu baris per pertanyaan dan dapat dibaca kembali', () => {
+  const items = buildOpenItems(siswa, { exam: examOpen, templates: tplOpen });
+  const sal = salinan({ keadaan: keadaan({ [items[0].id]: { text: 'Teks, dengan "koma"\ndan baris baru' } }), exam: examOpen, peserta: { id: 'u1', nama: 'Ani', nim: '1', kelas: 'A' }, ujian: 'Ujian X' });
+  const rows = barisAnalisis([sal]);
+  assert.equal(rows.length, 3);
+  const csv = toCsv(rows, KOLOM_ANALISIS);
+  const t = parseCsv(csv);
+  assert.equal(t.length, 4);
+  assert.equal(t[0][0], 'id_baris');
+  assert.equal(t[1][t[0].indexOf('jawaban_s2')], 'Teks, dengan "koma"\ndan baris baru');
+  assert.equal(t[1][t[0].indexOf('peserta_id')], 'u1');
+});
+
+test('terbuka: unggah hasil analisis divalidasi', () => {
+  const ok = uraikanHasil('id_baris,peserta_id,konsistensi,skor,catatan\nu1:probe:1,u1,konsisten,"85,5","bagus, jelas"\nu1:line:2,u1,tidak_konsisten,20,beda dari kode\n,,,,\n', parseCsv);
+  assert.deepEqual(ok.galat, []);
+  assert.equal(ok.rows.length, 2);
+  assert.equal(ok.rows[0].skor, 85.5);
+  assert.equal(ok.rows[0].catatan, 'bagus, jelas');
+  const buruk = uraikanHasil('id_baris,peserta_id,konsistensi,skor\nx,u1,mungkin,50\ny,u1,konsisten,150\n', parseCsv);
+  assert.equal(buruk.rows.length, 0);
+  assert.equal(buruk.galat.length, 2);
+  assert.ok(uraikanHasil('nama,nilai\na,1\n', parseCsv).galat.length >= 2);
+  assert.ok(uraikanHasil('', parseCsv).galat.length === 1);
+});
+
+test('csv: parseCsv menangani CRLF, kutipan ganda, dan BOM', () => {
+  assert.deepEqual(parseCsv('\uFEFFa,b\r\n"x ""y""",\r\n1,2'), [['a', 'b'], ['x "y"', ''], ['1', '2']]);
+});

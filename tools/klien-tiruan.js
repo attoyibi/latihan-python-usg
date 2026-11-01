@@ -376,6 +376,21 @@
       if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci" } };
       return { data: await kunciUjian(), error: null };
     }
+    if (nama === "ujian_selesai") {
+      const s = sesi();
+      if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci atau ujian belum dimulai" } };
+      s.selesai_pada = s.selesai_pada || new Date().toISOString();
+      save();
+      return { data: s.selesai_pada, error: null };
+    }
+    if (nama === "ujian_analisis_simpan") {
+      if (!instruktur()) return { data: null, error: { code: "42501", message: "hanya instruktur" } };
+      const s = ujianTabel("ujian_sesi").find((x) => x.user_id === a.p_user && x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian);
+      if (!s) return { data: null, error: { code: "P0002", message: "sesi peserta tidak ditemukan" } };
+      s.analisis = a.p_analisis || {};
+      save();
+      return { data: null, error: null };
+    }
     if (nama === "ujian_ulang") {
       const j = jadwalSaya(a.p_mk, a.p_ujian);
       if (!j || !j.boleh_ulang) return { data: null, error: { code: "42501", message: "ujian ini tidak bisa diulang" } };
@@ -401,6 +416,7 @@
     if (q.op === "update") {
       if (nama !== "ujian_sesi") return { data: null, error: { code: "42501", message: "permission denied" } };
       if (Object.keys(q.vals).some((k) => k !== "keadaan" && k !== "hasil")) return { data: null, error: { code: "42501", message: "permission denied for table ujian_sesi" } };
+      if (t.some((r) => cocok(r) && r.user_id === uidSaya() && r.selesai_pada)) return { data: null, error: { code: "42501", message: "jawaban sudah dikumpulkan dan dikunci" } };
       for (const r of t.filter((r) => cocok(r) && r.user_id === uidSaya())) Object.assign(r, q.vals, { diperbarui_pada: new Date().toISOString() });
       save();
       return { data: null, error: null };
