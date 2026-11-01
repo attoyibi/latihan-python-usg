@@ -27,6 +27,11 @@ Tujuannya mengukur penggunaan AI yang terarah, bukan melarangnya: AI boleh dipak
 - UTS dan UAS: Tahap 1 60 menit. Simulasi tetap 30 menit (Python) dan 40 menit (Java).
 - **Contoh jawaban:** simulasi punya tombol untuk semua peserta (`contoh.json` publik). UTS/UAS hanya memberinya kepada **instruktur** lewat fungsi `ujian_contoh_dosen` (migrasi `0012_ujian_contoh.sql`; isinya di tabel `ujian_contoh` yang tidak bisa dibaca peserta, berbeda dari `ujian_kunci` yang turun ke peserta setelah Tahap 1). Isi tabel dari `kunci/ujian_contoh.sql` dan `kunci/ujian_contoh_pbo-java.sql` buatan `buat_kunci_ujian.py`.
 
+## Memantau ujian dan peserta dummy
+Tab Ujian dosen punya panel **Pantau peserta** per ujian: semua peserta dari data profil, dengan status Belum masuk, Tahap 1 (ditandai bila lewat batas waktu), Tahap 2, atau Selesai; waktu mulai, sisa waktu Tahap 1, jumlah keluar tab dan percobaan tempel. Bisa disaring menurut prodi, angkatan, kelas, status, dan nama/NIM, serta diurutkan menurut status, nama, NIM, angkatan, kelas, waktu mulai, atau keluar tab (naik/turun). Disegarkan otomatis tiap 20 detik dengan pembacaan ringan (tanpa jawaban lengkap). Logikanya murni di `site/js/ujian/logic/pantau.js` (diuji).
+
+Untuk **simulasi** ada tombol "Tampilkan peserta dummy": 8 peserta contoh dibuat di browser dosen dari soal simulasi (`site/js/ujian/dummy.js`), dengan berbagai keadaan (selesai konsisten, Tahap 2 berbeda dari Tahap 1, jawaban kosong, sedang Tahap 2, sedang Tahap 1, lewat batas, belum masuk) dan analisis contoh. Mereka ikut tampil di pantauan, CSV, PDF, dan panel analisis supaya bentuk hasilnya terlihat. Tidak pernah ditulis ke server.
+
 ## Yang dipegang server (migrasi `0010_ujian.sql`)
 | Bagian | Cara kerja |
 |---|---|

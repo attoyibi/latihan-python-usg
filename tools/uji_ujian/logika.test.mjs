@@ -639,3 +639,79 @@ test('terbuka: unggah hasil analisis divalidasi', () => {
 test('csv: parseCsv menangani CRLF, kutipan ganda, dan BOM', () => {
   assert.deepEqual(parseCsv('\uFEFFa,b\r\n"x ""y""",\r\n1,2'), [['a', 'b'], ['x "y"', ''], ['1', '2']]);
 });
+
+// ---- Pantauan dosen dan peserta dummy ----
+import { statusPeserta, barisPantau, saringPantau, urutkanPantau, ringkasPantau, teksSisa } from '../../site/js/ujian/logic/pantau.js';
+import { buatDummy } from '../../site/js/ujian/dummy.js';
+
+const NOW = Date.parse('2026-11-01T10:00:00Z');
+const prof = [
+  { id: 'a', nama: 'Ani', nim: '2024001', kelas: 'SI-2024-A', prodi: 'SI', angkatan: 2024, rombel: 'A' },
+  { id: 'b', nama: 'Budi', nim: '2023002', kelas: 'SI-2023-B', prodi: 'SI', angkatan: 2023, rombel: 'B' },
+  { id: 'c', nama: 'Citra', nim: '2024003', kelas: 'SI-2024-B', prodi: 'SI', angkatan: 2024, rombel: 'B' },
+  { id: 'd', nama: 'Dewi', nim: '2024004', kelas: 'SI-2024-A', prodi: 'SI', angkatan: 2024, rombel: 'A' },
+];
+const iso = (ms) => new Date(NOW + ms).toISOString();
+const sesiP = [
+  { user_id: 'a', mulai_pada: iso(-600000), batas_tahap1: iso(1800000), terkunci_pada: null, hasil: {} },
+  { user_id: 'b', mulai_pada: iso(-5400000), batas_tahap1: iso(-1800000), terkunci_pada: null, hasil: {} },
+  { user_id: 'c', mulai_pada: iso(-3000000), batas_tahap1: iso(0), terkunci_pada: iso(-1000000), hasil: { tahap: 'stage2', keluar: 5 } },
+];
+
+test('pantau: status belum masuk, Tahap 1, lewat batas, Tahap 2, selesai', () => {
+  assert.equal(statusPeserta(null, NOW).kode, 'belum');
+  assert.equal(statusPeserta(sesiP[0], NOW).kode, 'tahap1');
+  assert.equal(statusPeserta(sesiP[1], NOW).lewat, true);
+  assert.equal(statusPeserta(sesiP[2], NOW).kode, 'tahap2');
+  assert.equal(statusPeserta({ ...sesiP[2], selesai_pada: iso(-1) }, NOW).kode, 'selesai');
+  assert.equal(statusPeserta({ ...sesiP[2], hasil: { tahap: 'selesai' } }, NOW).kode, 'selesai');
+});
+
+test('pantau: peserta tanpa sesi tampil sebagai belum masuk, ringkasan dan sisa waktu benar', () => {
+  const b = barisPantau(prof, sesiP, NOW);
+  assert.equal(b.length, 4);
+  assert.equal(b.find((x) => x.id === 'd').status, 'belum');
+  assert.equal(b.find((x) => x.id === 'a').sisaDetik, 1800);
+  assert.equal(teksSisa(1800), '30:00');
+  assert.equal(teksSisa(-5), 'lewat batas');
+  assert.equal(b.find((x) => x.id === 'c').keluar, 5);
+  const r = ringkasPantau(b);
+  assert.deepEqual([r.total, r.masuk, r.belum, r.tahap1, r.tahap2, r.selesai, r.lewat, r.keluarBanyak], [4, 3, 1, 2, 1, 0, 1, 1]);
+  // sesi tanpa profil tetap terlihat
+  assert.equal(barisPantau(prof.slice(0, 1), sesiP, NOW).length, 3);
+});
+
+test('pantau: saringan prodi/angkatan/kelas/status/cari dan urutan', () => {
+  const b = barisPantau(prof, sesiP, NOW);
+  assert.deepEqual(saringPantau(b, { angkatan: '2024' }).map((x) => x.id).sort(), ['a', 'c', 'd']);
+  assert.deepEqual(saringPantau(b, { rombel: 'B' }).map((x) => x.id).sort(), ['b', 'c']);
+  assert.deepEqual(saringPantau(b, { status: 'belum' }).map((x) => x.id), ['d']);
+  assert.deepEqual(saringPantau(b, { cari: '2023' }).map((x) => x.id), ['b']);
+  assert.deepEqual(saringPantau(b, { cari: 'cit' }).map((x) => x.id), ['c']);
+  assert.deepEqual(urutkanPantau(b, 'status', 1).map((x) => x.id), ['d', 'b', 'a', 'c']);
+  assert.deepEqual(urutkanPantau(b, 'status', -1)[0].id, 'c');
+  assert.deepEqual(urutkanPantau(b, 'kelas', 1).map((x) => x.id), ['b', 'a', 'd', 'c']); // 2023-B, 2024-A (Ani, Dewi), 2024-B
+  assert.deepEqual(urutkanPantau(b, 'angkatan', -1)[3].id, 'b');
+  assert.deepEqual(urutkanPantau(b, 'nama', 1).map((x) => x.nama), ['Ani', 'Budi', 'Citra', 'Dewi']);
+  assert.equal(urutkanPantau(b, 'keluar', -1)[0].id, 'c');
+});
+
+test('dummy: peserta bervariasi tahap, jawaban Tahap 2 lengkap, tidak memakai id nyata', () => {
+  const exam = { config: { tahap1Minutes: 40, tahap1Order: ['Q1', 'T1'], stage2: { mode: 'open', seedSalt: 'X' } }, language: 'python',
+    theory: [{ id: 'Q1', title: 'Teori', prompt: ['Jelaskan.'], probe: 'Apa itu variabel?' }],
+    tasks: [{ id: 'T1', title: 'Praktik', statement: ['Hitung.'], starter: '# awal\n', visible: [{ input: ['1'], expected: '1' }], changes: [] }] };
+  const contoh = { code: { T1: 'x = int(input())\nprint(x * 2)\n' }, theory: { Q1: 'Variabel adalah nama untuk menyimpan nilai. Contohnya x.' }, changes: { T1: [{ id: 'C1', text: 'Harga naik.' }] } };
+  const tpl = { version: 'v', probe: { text: '{pertanyaan}' }, line: { text: '{tugas} baris {baris}' }, change: { text: '{tugas}: {perubahan}' } };
+  const d = buatDummy({ exam, contoh, templates: tpl, ujianId: 'simulasi', kuliahId: 'mk', sekarang: NOW });
+  assert.equal(d.profil.length, 8);
+  assert.ok(d.profil.every((p) => p.id.startsWith('dummy-') && p.dummy));
+  const b = barisPantau(d.profil, d.sesi, NOW);
+  const hit = ringkasPantau(b);
+  assert.deepEqual([hit.belum, hit.selesai, hit.tahap2], [1, 4, 1]);
+  assert.ok(hit.tahap1 === 2 && hit.lewat === 1 && hit.keluarBanyak >= 1);
+  const selesai = d.sesi.find((s) => s.user_id === 'dummy-1');
+  const items = selesai.keadaan.demo.stage2.attempts[0].items;
+  assert.deepEqual(items.map((i) => i.type), ['probe', 'line', 'change']);
+  assert.ok(items.every((i) => selesai.keadaan.demo.stage2.attempts[0].answers[i.id].text));
+  assert.ok(d.analisis['dummy-2'] && Object.values(d.analisis['dummy-2'].rows)[0].konsistensi === 'tidak_konsisten');
+});

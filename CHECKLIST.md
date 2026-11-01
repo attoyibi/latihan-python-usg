@@ -286,6 +286,7 @@ Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/pandu
 - [x] Ujian PBO Java (`pbo-java`): simulasi (Bab 1-4), UTS (Bab 1-7), UAS (Bab 8-15); mesin ujian memilih penjalan, editor, dan teks menurut `bahasa` mata kuliah (`site/js/ujian/bahasa.js`); soal dan kunci di `kunci/ujian/pbo-java/` (rahasia), diperiksa dengan `tools/ujian/periksa_ujian.py` dan `uji_ujian_java.mjs`; lihat `docs/UJIAN.md`
 - [x] Tahap 2 terbuka (pertanyaan satu kalimat dibandingkan dengan Tahap 1), peserta tanpa nilai + PDF, dosen ekspor CSV/PDF dan unggah hasil analisis; migrasi `0011_ujian_selesai.sql` (diuji di `tools/uji_sql`, Tahap N2)
 - [x] AI bertanggung jawab: teori lebih panjang dan parafrase, UTS/UAS 60 menit, catat keluar tab, kode tak harus benar untuk masuk Tahap 2, contoh jawaban UTS/UAS untuk dosen (migrasi `0012_ujian_contoh.sql`)
+- [x] Pantau peserta di tab Ujian dosen (belum masuk/Tahap 1/Tahap 2/selesai, saringan prodi-angkatan-kelas, urutan, segar otomatis) dan peserta dummy untuk simulasi
 - [ ] **Jalankan `supabase/migrations/0013_ujian_dosen_bebas.sql`** (dosen bisa memulai dan mengulang ujian kapan saja untuk memeriksa; peserta tetap terikat jadwal)
 - [ ] **Jalankan `0012_ujian_contoh.sql`, lalu `kunci/ujian_contoh.sql` dan `kunci/ujian_contoh_pbo-java.sql` di Supabase** (tanpa ini dosen tidak melihat tombol contoh di UTS/UAS)
 - [ ] **Jalankan `supabase/migrations/0011_ujian_selesai.sql` di Supabase** (sebelum ujian dipakai; tanpa ini jawaban belum terkunci di server)

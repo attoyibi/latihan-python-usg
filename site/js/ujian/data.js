@@ -196,7 +196,7 @@ export const s1For = (student) => computeS1(student, getExam(), theoryOverrides(
 function ringkasan() {
   const tahap = examStage();
   const sub = demo().stage1?.submitted;
-  const out = { tahap, keluar: demo().fokus?.n || 0, keluarDetik: demo().fokus?.detik || 0 };
+  const out = { tahap, keluar: demo().fokus?.n || 0, keluarDetik: demo().fokus?.detik || 0, tempel: demo().stage1?.submitted?.tempelDiblokir || 0 };
   if (sub) out.terlambat = !!sub.auto;
   const exam = getExam();
   if (isOpen(exam)) {

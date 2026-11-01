@@ -103,12 +103,20 @@ export async function simpanAnalisis(mk, ujian, userId, analisis) {
   const { error } = await klien().rpc('ujian_analisis_simpan', { p_mk: mk, p_ujian: ujian, p_user: userId, p_analisis: analisis });
   if (error) throw galat(error);
 }
+// Pantauan berkala: tanpa kolom keadaan (jawaban lengkap) supaya ringan walau pesertanya banyak.
+export async function bacaSesiRingan(mk) {
+  const dasar = 'user_id,ujian_id,kelas,mulai_pada,batas_tahap1,faktor,terkunci_pada,terlambat,hasil,diperbarui_pada';
+  let { data, error } = await klien().from('ujian_sesi').select(`${dasar},selesai_pada`).eq('matakuliah_id', mk);
+  if (error && /selesai_pada|column/i.test(error.message || '')) ({ data, error } = await klien().from('ujian_sesi').select(dasar).eq('matakuliah_id', mk));
+  if (error) throw galat(error);
+  return data || [];
+}
 export async function hapusSesi(mk, ujian, userId) {
   const { error } = await klien().from('ujian_sesi').delete().eq('matakuliah_id', mk).eq('ujian_id', ujian).eq('user_id', userId);
   if (error) throw galat(error);
 }
 export async function bacaProfil() {
-  const { data, error } = await klien().from('profiles').select('id,nama,nim,kelas,peran');
+  const { data, error } = await klien().from('profiles').select('id,nama,nim,kelas,prodi,angkatan,rombel,peran');
   if (error) throw galat(error);
   return data || [];
 }

@@ -6,5 +6,19 @@
   "theory": {
     "SQ1": "Kelas adalah cetak biru atau rancangan, sedangkan objek adalah wujud nyata (instance) yang dibuat dari kelas itu dengan new. Atribut adalah data yang disimpan objek, misalnya nama dan harga, sedangkan method adalah perilaku yang bisa dilakukan objek. Constructor dijalankan saat objek dibuat dan dipakai untuk memberi nilai awal pada atribut.",
     "SQ2": "Enkapsulasi berarti menyembunyikan data di dalam kelas, jadi atribut dibuat private agar tidak bisa diakses langsung dari luar. Getter dipakai untuk membaca nilai atribut dan setter untuk mengubahnya, biasanya dengan validasi supaya data tetap valid dan aman. Di diagram UML tanda - berarti private dan tanda + berarti public."
+  },
+  "changes": {
+    "S1": [
+      {
+        "id": "CS1a",
+        "text": "Pembelian 10 barang atau lebih mendapat potongan 10% dari total (pakai pembagian bilangan bulat: total dikurangi total / 10). Di bawah 10 barang tidak ada potongan. Bentuk keluaran tidak berubah; Total: Rp ... adalah total setelah potongan."
+      }
+    ],
+    "S2": [
+      {
+        "id": "CS2a",
+        "text": "Setiap penarikan yang berhasil dikenai biaya admin Rp 500 yang ikut mengurangi saldo. Penarikan hanya diterima bila saldo cukup untuk jumlah ditambah 500 (dan jumlahnya lebih dari 0). Pengisian tidak berubah."
+      }
+    ]
   }
 }

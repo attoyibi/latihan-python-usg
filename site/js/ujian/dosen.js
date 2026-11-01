@@ -4,6 +4,9 @@ import * as server from './server.js';
 import { muatIndeks } from './data.js';
 import { toCsv, parseCsv } from './logic/csv.js';
 import { salinan, isOpen, uraikanHasil, OPEN_LABEL } from './logic/open.js';
+import { barisPantau, saringPantau, urutkanPantau, ringkasPantau, teksSisa, KUNCI_URUT, STATUS as STATUS_PANTAU } from './logic/pantau.js';
+import { pilihanSaringan } from '../rekap.js';
+import { buatDummy } from './dummy.js';
 import { unduhPdfPeserta, unduhPdfSemua, unduhCsvAnalisis, unduhFormatHasil } from './ekspor.js';
 import { html, show, $, $$, ask, download } from './ui.js';
 
@@ -20,6 +23,8 @@ async function ambilJson(path) {
   return r.json();
 }
 
+let pantauTimer = null;
+
 export async function renderTabDosen({ main, kepala, kuliah }) {
   const isi = document.createElement('div');
   isi.className = 'uj-dosen';
@@ -34,7 +39,9 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
     soal = Object.fromEntries(await Promise.all(daftar.map(async (u) => {
       const dir = `data/kuliah/${kuliah.id}/ujian/${u.id}`;
       const [tasks, theory] = await Promise.all([ambilJson(`${dir}/tasks.json`).catch(() => ({ tasks: [] })), ambilJson(`${dir}/theory.json`).catch(() => ({ questions: [] }))]);
-      return [u.id, { tasks: tasks.tasks, theory: theory.questions }];
+      const templates = await ambilJson(`${dir}/templates.json`).catch(() => null);
+      const contoh = u.latihan ? await ambilJson(`${dir}/contoh.json`).catch(() => null) : null;
+      return [u.id, { tasks: tasks.tasks, theory: theory.questions, templates, contoh }];
     })));
   } catch (e) {
     show(isi, html`<section class="card"><p class="verdict fail">${e.message}</p></section>`);
@@ -46,10 +53,41 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
   }
 
   let data;
+  // Peserta DUMMY (hanya simulasi, hanya di browser ini, tidak ke server): untuk melihat bentuk pantauan dan ekspor.
+  const dummyAktif = new Set();
+  const dummyAnalisis = {};
+  const dummyDari = (uid) => {
+    const ex = examLengkap(uid);
+    const sl = soal[uid];
+    if (!ex || !sl?.contoh || !sl.templates) return null;
+    const d = buatDummy({ exam: ex, contoh: sl.contoh, templates: sl.templates, ujianId: uid, kuliahId: kuliah.id });
+    d.sesi.forEach((s) => { if (dummyAnalisis[s.user_id]) s.analisis = dummyAnalisis[s.user_id]; else if (d.analisis[s.user_id]) s.analisis = d.analisis[s.user_id]; });
+    return d;
+  };
+  const gabungDummy = () => {
+    data.dummy = {};
+    for (const uid of dummyAktif) {
+      const d = dummyDari(uid);
+      if (!d) continue;
+      data.dummy[uid] = d;
+      data.sesi = [...data.sesi, ...d.sesi];
+      d.profil.forEach((p) => { data.profil[p.id] = p; });
+    }
+  };
   const muat = async () => {
     const [jadwal, akomodasi, sesi, profil] = await Promise.all([server.bacaJadwal(kuliah.id), server.bacaAkomodasi(kuliah.id), server.bacaSesi(kuliah.id), server.bacaProfil()]);
-    data = { jadwal, akomodasi, sesi, profil: Object.fromEntries(profil.map((p) => [p.id, p])), profilList: profil };
+    data = { jadwal, akomodasi, sesi, profil: Object.fromEntries(profil.map((p) => [p.id, p])), profilList: profil, dummy: {} };
+    gabungDummy();
+    data.sesiPantau = data.sesi;
   };
+  // Pantauan berkala memakai pembacaan ringan (tanpa jawaban lengkap).
+  const muatPantau = async () => {
+    const ringan = await server.bacaSesiRingan(kuliah.id);
+    const dum = Object.values(data.dummy).flatMap((d) => d.sesi);
+    data.sesiPantau = [...ringan, ...dum];
+  };
+  const pantau = {}; // keadaan penyaring dan urutan per ujian (bertahan saat tabel digambar ulang)
+  const stp = (uid) => (pantau[uid] ||= { kunci: 'status', arah: 1, prodi: '', angkatan: '', rombel: '', status: '', cari: '', auto: true });
   try {
     await muat();
   } catch (e) {
@@ -99,6 +137,69 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
       })}</div>`;
   };
 
+  const rosterUntuk = (uid) => {
+    // Semua peserta, ditambah akun dosen yang punya sesi (mis. sedang mencoba ujian) supaya namanya tampil.
+    const adaSesi = new Set((data.sesiPantau || data.sesi).filter((s) => s.ujian_id === uid).map((s) => s.user_id));
+    const nyata = data.profilList.filter((p) => p.peran !== 'instruktur' || adaSesi.has(p.id));
+    return [...nyata, ...(data.dummy[uid]?.profil || [])];
+  };
+  const barisUntuk = (uid) => barisPantau(rosterUntuk(uid), (data.sesiPantau || data.sesi).filter((s) => s.ujian_id === uid), Date.now());
+  const panelPantau = (u) => {
+    const st = stp(u.id);
+    const semua = barisUntuk(u.id);
+    const pil = pilihanSaringan(semua);
+    const menu = (nama, label, opsi) => html`<select data-pf="${nama}" aria-label="${label}"><option value="">${label}: semua</option>${opsi.map((o) => html`<option value="${o}" ${String(st[nama]) === String(o) ? 'selected' : ''}>${o}</option>`)}</select>`;
+    return html`<h3>Pantau peserta <span class="muted small" data-pantau-ringkas></span></h3>
+      <p class="small muted">Siapa yang sudah masuk, di tahap mana, dan siapa yang belum. Daftar peserta dari data profil; peserta tanpa sesi berarti belum masuk. Disegarkan otomatis tiap 20 detik.</p>
+      <div class="filters" style="flex-wrap:wrap;gap:6px">
+        ${menu('prodi', 'Prodi', pil.prodi)}${menu('angkatan', 'Angkatan', pil.angkatan)}${menu('rombel', 'Kelas', pil.rombel)}
+        <select data-pf="status" aria-label="Status"><option value="">Status: semua</option>${Object.entries(STATUS_PANTAU).map(([k, l]) => html`<option value="${k}" ${st.status === k ? 'selected' : ''}>${l}</option>`)}</select>
+        <select data-pf="kunci" aria-label="Urutkan">${Object.entries(KUNCI_URUT).map(([k, l]) => html`<option value="${k}" ${st.kunci === k ? 'selected' : ''}>Urutkan: ${l}</option>`)}</select>
+        <button class="btn btn-sm" type="button" data-pf-arah>${st.arah === 1 ? '↑ naik' : '↓ turun'}</button>
+        <input type="search" data-pf="cari" placeholder="Cari nama atau NIM" value="${st.cari}" aria-label="Cari nama atau NIM">
+      </div>
+      <div class="row" style="margin:6px 0;gap:8px;flex-wrap:wrap">
+        <label class="small"><input type="checkbox" data-pf-auto ${st.auto ? 'checked' : ''}> Segarkan otomatis</label>
+        <button class="btn btn-sm" type="button" data-pf-segar>Segarkan sekarang</button>
+        ${u.latihan ? html`<button class="btn btn-sm btn-ghost" type="button" data-dummy>${dummyAktif.has(u.id) ? 'Sembunyikan peserta dummy' : 'Tampilkan peserta dummy (contoh hasil)'}</button>` : ''}
+        <span class="small muted" data-pf-waktu></span>
+      </div>
+      ${dummyAktif.has(u.id) ? html`<div class="callout warn small"><strong>Mode contoh.</strong> Peserta berlabel DUMMY dibuat di browser ini dari contoh jawaban simulasi, tidak tersimpan di server, dan ikut muncul di CSV/PDF/analisis di bawah supaya Bapak melihat bentuk hasilnya. Mulai dari nol: sembunyikan peserta dummy.</div>` : ''}
+      <div data-pantau-tabel></div>`;
+  };
+  const isiPantau = (sec) => {
+    const uid = sec.dataset.ujian;
+    const st = stp(uid);
+    const semua = barisUntuk(uid);
+    const terpilih = urutkanPantau(saringPantau(semua, st), st.kunci, st.arah);
+    const r = ringkasPantau(semua);
+    const kecil = (iso) => (iso ? new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '–');
+    const lencana = { belum: ['', 'Belum masuk'], tahap1: ['warn', 'Tahap 1'], tahap2: ['info', 'Tahap 2'], selesai: ['ok', 'Selesai'] };
+    show($('[data-pantau-ringkas]', sec), html`· ${r.masuk} dari ${r.total} sudah masuk · belum ${r.belum} · Tahap 1 ${r.tahap1}${r.lewat ? html` (${r.lewat} lewat batas)` : ''} · Tahap 2 ${r.tahap2} · selesai ${r.selesai}`);
+    show($('[data-pantau-tabel]', sec), r.total ? html`<div class="tablewrap"><table><thead><tr><th>Nama</th><th>NIM</th><th>Angkatan</th><th>Kelas</th><th>Status</th><th>Mulai</th><th>Sisa Tahap 1</th><th>Selesai</th><th>Keluar tab</th><th>Tempel</th></tr></thead><tbody>
+      ${terpilih.map((b) => { const [c, l] = lencana[b.status]; return html`<tr><td>${b.nama}${b.dummy ? html` <span class="badge info">DUMMY</span>` : ''}</td><td>${b.nim}</td><td>${b.angkatan ?? ''}</td><td>${b.rombel || b.kelas}</td><td><span class="badge ${c}">${l}</span>${b.lewat ? html` <span class="badge bad">lewat batas</span>` : ''}${b.terlambat ? html` <span class="badge warn">terlambat</span>` : ''}${b.dianalisis ? html` <span class="badge info">dianalisis</span>` : ''}</td><td>${kecil(b.mulai)}</td><td>${b.status === 'tahap1' ? teksSisa(b.sisaDetik) : ''}</td><td>${kecil(b.selesai)}</td><td>${b.keluar ? html`<span class="${b.keluar > 3 ? 'badge warn' : ''}">${b.keluar}× (${b.keluarDetik} dtk)</span>` : '–'}</td><td>${b.tempel || '–'}</td></tr>`; })}
+      </tbody></table></div>${terpilih.length ? '' : html`<p class="small muted">Tidak ada peserta yang cocok dengan saringan.</p>`}` : html`<p class="small muted">Belum ada data peserta di profil.</p>`);
+    const w = $('[data-pf-waktu]', sec);
+    if (w) w.textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
+  };
+  const isiPantauSemua = () => $$('[data-ujian]', isi).forEach(isiPantau);
+  const pasangPantau = (sec) => {
+    const uid = sec.dataset.ujian;
+    const st = stp(uid);
+    $$('[data-pf]', sec).forEach((el) => el.addEventListener(el.type === 'search' ? 'input' : 'change', () => { st[el.dataset.pf] = el.value; isiPantau(sec); }));
+    $('[data-pf-arah]', sec)?.addEventListener('click', (e) => { st.arah = -st.arah; e.currentTarget.textContent = st.arah === 1 ? '↑ naik' : '↓ turun'; isiPantau(sec); });
+    $('[data-pf-auto]', sec)?.addEventListener('change', (e) => { st.auto = e.currentTarget.checked; });
+    $('[data-pf-segar]', sec)?.addEventListener('click', () => segarkanPantau());
+    $('[data-dummy]', sec)?.addEventListener('click', async () => { if (dummyAktif.has(uid)) dummyAktif.delete(uid); else dummyAktif.add(uid); await muat(); gambar(); });
+    isiPantau(sec);
+  };
+  let sibukPantau = false;
+  async function segarkanPantau() {
+    if (sibukPantau) return;
+    sibukPantau = true;
+    try { await muatPantau(); isiPantauSemua(); } catch { /* gagal sementara: coba lagi pada putaran berikutnya */ } finally { sibukPantau = false; }
+  }
+
   const kelasPilihan = [['*', 'Semua kelas'], ...(cfgSitus.kelas || []).map((k) => [k, `Kelas ${k}`])];
 
   const kartu = (u) => {
@@ -136,6 +237,8 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
         <label class="field"><span>Faktor waktu</span><select name="faktor"><option value="1.25">×1,25</option><option value="1.5" selected>×1,5</option><option value="2">×2</option></select></label>
         <div class="field"><button class="btn" type="submit">Tambah akomodasi</button></div>
       </form>
+
+      ${panelPantau(u)}
 
       <h3>Peserta dan nilai <span class="muted small">(${ss.length} sesi)</span></h3>
       ${ss.length ? html`<div class="tablewrap"><table><thead><tr><th>Nama</th><th>NIM</th><th>Kelas</th><th>Status</th><th>Mulai</th><th>Terkunci</th><th>S1</th><th>S2</th><th>Nilai</th><th>Keterangan</th><th>Keluar tab</th><th></th></tr></thead><tbody>
@@ -179,6 +282,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
     for (const sec of $$('[data-ujian]', isi)) {
       const uid = sec.dataset.ujian;
       const u = daftar.find((x) => x.id === uid);
+      pasangPantau(sec);
       $('[data-form-jadwal]', sec).addEventListener('submit', (e) => {
         e.preventDefault();
         const f = new FormData(e.currentTarget);
@@ -219,6 +323,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
       $$('[data-hapus-sesi]', sec).forEach((b) => b.addEventListener('click', async () => {
         const p = data.profil[b.dataset.hapusSesi] || {};
         if (!(await ask(`Hapus sesi ${p.nama || 'peserta ini'} untuk ${u.judul}? Jawaban dan nilainya hilang, dan ia bisa mulai lagi selama jadwal kelasnya buka.`, 'Hapus dan izinkan'))) return;
+        if (String(b.dataset.hapusSesi).startsWith('dummy-')) { show($('[data-pesan]', sec), html`<p class="callout ok">Itu peserta dummy; sembunyikan lewat tombol di bagian Pantau peserta.</p>`); return; }
         jalankan(sec, () => server.hapusSesi(kuliah.id, uid, b.dataset.hapusSesi));
       }));
       const namaBerkas = (x) => `${x}-${kuliah.id}-${uid}`;
@@ -247,7 +352,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
         }
         if (!dipakai) { show(pesan, html`<p class="callout bad" role="alert">Tidak ada baris yang cocok dengan ujian ini. ${galat.slice(0, 3).join(' ')}</p>`); return; }
         try {
-          for (const [id, rowsBaru] of baru) await server.simpanAnalisis(kuliah.id, uid, id, { rows: rowsBaru, diimpor: new Date().toISOString() });
+          for (const [id, rowsBaru] of baru) if (String(id).startsWith('dummy-')) dummyAnalisis[id] = { rows: rowsBaru, diimpor: new Date().toISOString() }; else await server.simpanAnalisis(kuliah.id, uid, id, { rows: rowsBaru, diimpor: new Date().toISOString() });
         } catch (err) {
           show(pesan, html`<p class="callout bad" role="alert">${err.jenis === 'belum-siap' ? 'Fungsi penyimpan analisis belum ada di server: jalankan supabase/migrations/0011_ujian_selesai.sql.' : err.message}</p>`);
           return;
@@ -272,4 +377,10 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
   }
 
   gambar();
+  // Segarkan pantauan tiap 20 detik selama tab ini masih tampil dan penyegaran otomatis menyala.
+  clearInterval(pantauTimer);
+  pantauTimer = setInterval(() => {
+    if (!document.contains(isi)) { clearInterval(pantauTimer); return; }
+    if (Object.values(pantau).some((p) => p.auto) || !Object.keys(pantau).length) segarkanPantau();
+  }, 20000);
 }

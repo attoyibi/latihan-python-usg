@@ -75,7 +75,8 @@ def buat(mk):
         # UTS dan UAS tidak pernah: contoh.json hanya dibuat bila ujiannya simulasi, dan dihapus bila bukan.
         meta = {u["id"]: u for u in baca(publik.parent / "index.json")["ujian"]}.get(uid, {})
         solusi = baca(d / "solutions.json")["code"]
-        contoh = {"code": {t["id"]: solusi[t["id"]] for t in tasks}, "theory": {q["id"]: q["sample"] for q in theory["questions"]}}
+        contoh = {"code": {t["id"]: solusi[t["id"]] for t in tasks}, "theory": {q["id"]: q["sample"] for q in theory["questions"]},
+                  "changes": {t["id"]: [{"id": c["id"], "text": c["text"]} for c in t["changes"]] for t in tasks}}
         if meta.get("latihan") is True:
             tulis(publik / "contoh.json", contoh)
         elif (publik / "contoh.json").exists():
