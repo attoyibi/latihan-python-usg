@@ -283,6 +283,8 @@ Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/pandu
 - [ ] Soal UTS sungguhan yang belum pernah terbit (soal contoh sudah ada di riwayat repo publik)
 - [ ] Sisa celah: kunci butir Tahap 2 ada di browser selama Tahap 2; ringkasan nilai dikirim browser (lihat `docs/UJIAN.md`)
 - [x] UAS (Bab 8-14, 90 menit): fungsi dan sorting, kelas dan CRUD, teori fungsi/rekursi dan searching/sorting; soal di `tools/ujian/uas_def.py` (diabaikan git karena berisi kunci) dan teori lengkap di `kunci/ujian/uas/`; tanpa jadwal bawaan (tertutup sampai dosen membuka)
+- [x] Ujian PBO Java (`pbo-java`): simulasi (Bab 1-4), UTS (Bab 1-7), UAS (Bab 8-15); mesin ujian memilih penjalan, editor, dan teks menurut `bahasa` mata kuliah (`site/js/ujian/bahasa.js`); soal dan kunci di `kunci/ujian/pbo-java/` (rahasia), diperiksa dengan `tools/ujian/periksa_ujian.py` dan `uji_ujian_java.mjs`; lihat `docs/UJIAN.md`
+- [ ] **Jalankan `kunci/ujian_kunci_pbo-java.sql` di Supabase SQL Editor** (hanya berkas ini; baris algoritma-python tidak disentuh), lalu buka jadwal UTS/UAS pbo-java dari tab Ujian
 - [ ] Pilot kecil di perangkat nyata
 
 ## Tahap 8: Uji coba dan rilis

@@ -1,0 +1,25 @@
+{
+  "note": "Soal teori UAS PBO Java (Bab 8–15). Dinilai otomatis dari poin kunci: poin tertangkap bila SETIAP kelompok kata punya minimal satu kata yang muncul. Skor = poin tertangkap / need (maksimal 1). Dosen bisa menimpa.",
+  "questions": [
+    {
+      "id": "UQ1",
+      "title": "Teori 1 · Eksepsi, collection, dan berkas",
+      "topic": "Bab 8–10",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa itu eksepsi dan bagaimana try, catch, finally, throw, dan throws bekerja bersama; (b) perbedaan List, Set, dan Map serta kegunaan generics; (c) cara menyimpan data ke berkas dan membacanya kembali, dan mengapa sumber daya berkas harus ditutup.",
+        "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
+      ],
+      "need": 5
+    },
+    {
+      "id": "UQ2",
+      "title": "Teori 2 · JDBC, event, SOLID, dan design pattern",
+      "topic": "Bab 11–15",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa fungsi JDBC dan mengapa PreparedStatement lebih aman daripada Statement; (b) bagaimana event handling bekerja pada antarmuka grafis (sumber event dan listener); (c) prinsip Single Responsibility dan Open-Closed; (d) fungsi design pattern, dengan contoh Singleton atau Factory.",
+        "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
+      ],
+      "need": 5
+    }
+  ]
+}

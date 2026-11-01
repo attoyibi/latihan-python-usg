@@ -18,6 +18,7 @@
     "jenis": "kode",
     "aktif": true,
     "praktik": true,
+    "ujian": true,
     "urutan": 20
   }
 ]

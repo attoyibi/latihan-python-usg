@@ -50,6 +50,18 @@ python tools/ujian/buat_kunci_ujian.py       # memisahkan publik (site/...) dan 
 ```
 Soal teori lengkap (`theory.json` dengan `keyPoints` dan `concepts`) disimpan di `kunci/ujian/<id>/`. Folder `kunci/` diabaikan git. Untuk ujian baru, tambahkan juga `site/data/kuliah/<mk>/ujian/<id>/exam.json` dan barisnya di `index.json`.
 
+## Ujian mata kuliah Java (pbo-java)
+Mesin yang sama dipakai untuk `pbo-java`; bahasanya diambil dari `bahasa` di `matakuliah.json` (`site/js/ujian/bahasa.js`): penjalan CheerpJ + ECJ (Java 8, lihat `PENJALAN-JAVA.md`), editor `text/x-java`, tombol simbol Java, dan teks layar "Java". Soal praktik berupa satu berkas dengan kelas `Main`, masukan lewat `Scanner`. Butir "temukan baris yang salah" memakai aturan mutasi Java (tanpa `+=`/`-=` dan `break`/`continue` karena mudah membuat perulangan tanpa henti, dan penjalan yang kena batas waktu harus dimulai ulang). Ujian: simulasi (Bab 1-4), UTS (Bab 1-7, 90 menit), UAS (Bab 8-15, 100 menit; JDBC dan GUI diuji lewat soal teori karena tidak bisa dijalankan di browser). Tanpa jadwal bawaan; dosen membukanya dari tab Ujian.
+
+Definisi soal Java memuat kunci jawaban dan masukan tes tersembunyi, jadi disimpan RAHASIA di `kunci/ujian/pbo-java/<id>_def.py` (diabaikan git; soal teorinya `THEORY` ada di berkas yang sama):
+```
+python tools/ujian/buat_ujian.py <id> pbo-java      # menjalankan kunci dengan JDK (javac --release 8) -> kunci/ujian/pbo-java/<id>/
+python tools/ujian/buat_kunci_ujian.py pbo-java     # berkas publik + kunci/ujian_kunci_pbo-java.sql (hanya baris pbo-java)
+python tools/ujian/periksa_ujian.py pbo-java        # kunci lulus, kode awal gagal, varian bug salah, publik tanpa rahasia
+node tools/ujian/uji_ujian_java.mjs pbo-java        # Tahap 1 dan butir Tahap 2 ujung ke ujung dengan JDK
+```
+`buat_kunci_ujian.py` tanpa argumen membuat berkas untuk semua mata kuliah; tiap mata kuliah punya berkas SQL sendiri, jadi menjalankan `ujian_kunci_pbo-java.sql` tidak menyentuh baris `algoritma-python`. Server uji lokal membaca kunci pbo-java dari `kunci/ujian/pbo-java/<id>.json` dan memberi simulasi pbo-java jadwal terbuka (di Supabase sungguhan, simulasi pbo-java ditutup sampai dosen membuka jadwalnya).
+
 ## Letak berkas
 | Bagian | Tempat |
 |---|---|

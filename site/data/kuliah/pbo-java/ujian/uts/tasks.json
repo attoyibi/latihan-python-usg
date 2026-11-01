@@ -1,0 +1,61 @@
+{
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Praktik 1 · Gaji pegawai",
+      "topic": "Pewarisan dan polimorfisme (Bab 5–6)",
+      "statement": [
+        "Baris pertama masukan berisi n (bilangan bulat, minimal 1). Tiap n baris berikutnya berisi jenis pegawai, nama (satu kata), dan gaji pokok (bilangan bulat), dipisah spasi. Jenis: tetap, manajer, atau jenis lain (dianggap kontrak).",
+        "Gunakan pewarisan: kelas Pegawai (gaji = gaji pokok) untuk kontrak; PegawaiTetap mewarisi Pegawai dan gajinya gaji pokok ditambah tunjangan 10% dari gaji pokok (pembagian bilangan bulat: pokok / 10); Manajer mewarisi PegawaiTetap dan gajinya gaji pegawai tetap ditambah tunjangan jabatan Rp 500000. Simpan semua pegawai dalam satu List<Pegawai> dan panggil gaji() secara polimorfis.",
+        "Cetak satu baris per pegawai (NAMA: Rp GAJI) menurut urutan masukan, lalu Total gaji: Rp ... dan Tertinggi: NAMA. Bila gaji tertinggi sama, pilih yang lebih dulu dimasukkan."
+      ],
+      "starter": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.Scanner;\n\n// Tulis kelas Pegawai, PegawaiTetap, dan Manajer di sini\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        int n = Integer.parseInt(in.nextLine().trim());\n        // baca n baris \"jenis nama pokok\", buat objek yang sesuai, lalu cetak\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "3",
+            "tetap Ani 3000000",
+            "kontrak Budi 2500000",
+            "manajer Citra 5000000"
+          ],
+          "expected": "Ani: Rp 3300000\nBudi: Rp 2500000\nCitra: Rp 6000000\nTotal gaji: Rp 11800000\nTertinggi: Citra"
+        },
+        {
+          "input": [
+            "1",
+            "kontrak Dewi 2000000"
+          ],
+          "expected": "Dewi: Rp 2000000\nTotal gaji: Rp 2000000\nTertinggi: Dewi"
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "Praktik 2 · Tarif parkir",
+      "topic": "Kelas abstrak dan interface (Bab 7)",
+      "statement": [
+        "Masukan berupa baris-baris jenis kendaraan, plat nomor, dan lama parkir dalam jam (bilangan bulat minimal 1), dipisah spasi, sampai baris selesai. Jenis yang dikenal: motor, mobil, truk.",
+        "Buat interface Bertarif (method tarif(int jam)) dan kelas abstrak Kendaraan yang mengimplementasikannya (menyimpan plat, punya method abstrak jenis()). Tarif motor: Rp 2000 untuk jam pertama ditambah Rp 1000 tiap jam berikutnya, maksimal Rp 10000. Tarif mobil: Rp 5000 jam pertama ditambah Rp 3000 tiap jam berikutnya. Tarif truk: Rp 10000 jam pertama ditambah Rp 5000 tiap jam berikutnya.",
+        "Untuk tiap kendaraan yang dikenal cetak PLAT (Jenis) J jam: Rp BIAYA, dengan Jenis berupa Motor, Mobil, atau Truk. Jenis yang tidak dikenal dicetak sebagai Jenis tidak dikenal: JENIS saat dibaca dan tidak dihitung. Terakhir cetak Jumlah kendaraan: ... dan Total pendapatan: Rp ...."
+      ],
+      "starter": "import java.util.ArrayList;\nimport java.util.List;\nimport java.util.Scanner;\n\n// Tulis interface Bertarif, kelas abstrak Kendaraan, dan Motor, Mobil, Truk di sini\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        // baca baris \"jenis plat jam\" sampai \"selesai\"\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "motor B1234AB 3",
+            "mobil D5678CD 2",
+            "selesai"
+          ],
+          "expected": "B1234AB (Motor) 3 jam: Rp 4000\nD5678CD (Mobil) 2 jam: Rp 8000\nJumlah kendaraan: 2\nTotal pendapatan: Rp 12000"
+        },
+        {
+          "input": [
+            "truk L9012EF 1",
+            "selesai"
+          ],
+          "expected": "L9012EF (Truk) 1 jam: Rp 10000\nJumlah kendaraan: 1\nTotal pendapatan: Rp 10000"
+        }
+      ]
+    }
+  ]
+}

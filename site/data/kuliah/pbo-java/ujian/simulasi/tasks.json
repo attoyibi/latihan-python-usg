@@ -1,0 +1,61 @@
+{
+  "tasks": [
+    {
+      "id": "S1",
+      "title": "Praktik 1 · Kartu barang",
+      "topic": "Kelas, objek, dan constructor (Bab 2)",
+      "statement": [
+        "Toko Buku Gresik mencatat barang dengan kelas. Baris pertama masukan berisi nama barang (boleh memuat spasi), baris kedua harga satuan (bilangan bulat), dan baris ketiga jumlah (bilangan bulat).",
+        "Buat kelas Barang dengan atribut nama, harga, dan jumlah, sebuah constructor, dan method total() yang mengembalikan harga dikali jumlah. Di main, buat satu objek Barang lalu cetak empat baris: Barang: NAMA, Harga: Rp ..., Jumlah: ..., dan Total: Rp ...."
+      ],
+      "starter": "import java.util.Scanner;\n\n// Tulis kelas Barang (atribut, constructor, method total) di sini\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        String nama = in.nextLine();\n        // baca harga dan jumlah, buat objek Barang, lalu cetak\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "Pensil",
+            "2500",
+            "4"
+          ],
+          "expected": "Barang: Pensil\nHarga: Rp 2500\nJumlah: 4\nTotal: Rp 10000"
+        },
+        {
+          "input": [
+            "Buku Tulis",
+            "12000",
+            "1"
+          ],
+          "expected": "Barang: Buku Tulis\nHarga: Rp 12000\nJumlah: 1\nTotal: Rp 12000"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Praktik 2 · Dompet digital",
+      "topic": "Enkapsulasi (Bab 3)",
+      "statement": [
+        "Buat kelas Dompet dengan atribut saldo yang private (awalnya 0), method getSaldo(), isi(int) dan tarik(int). Keduanya mengembalikan boolean: isi ditolak bila jumlah 0 atau negatif; tarik ditolak bila jumlah 0 atau negatif, atau lebih besar dari saldo (menarik tepat sebesar saldo boleh).",
+        "Masukan berupa perintah, satu per baris, sampai baris SELESAI: ISI jumlah atau TARIK jumlah. Untuk tiap perintah cetak Saldo: ... bila diterima atau Ditolak bila ditolak. Setelah SELESAI cetak Saldo akhir: ...."
+      ],
+      "starter": "import java.util.Scanner;\n\n// Tulis kelas Dompet (saldo private, getSaldo, isi, tarik) di sini\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        // baca perintah satu per baris sampai SELESAI\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "ISI 5000",
+            "TARIK 2000",
+            "SELESAI"
+          ],
+          "expected": "Saldo: 5000\nSaldo: 3000\nSaldo akhir: 3000"
+        },
+        {
+          "input": [
+            "ISI 100",
+            "TARIK 500",
+            "TARIK 100",
+            "SELESAI"
+          ],
+          "expected": "Saldo: 100\nDitolak\nSaldo: 0\nSaldo akhir: 0"
+        }
+      ]
+    }
+  ]
+}

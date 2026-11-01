@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "id": "U1",
+      "title": "Praktik 1 · Rekap nilai dengan penanganan eksepsi",
+      "topic": "Eksepsi dan Collection (Bab 8–9)",
+      "statement": [
+        "Masukan berupa baris-baris NAMA NILAI (dua kata dipisah satu spasi) sampai baris selesai. Nilai harus bilangan bulat 0 sampai 100.",
+        "Baris yang salah tidak boleh menghentikan program. Buat kelas eksepsi DataTidakValidException (turunan Exception) dan tangkap dengan try-catch. Cetak saat dibaca: Data tidak valid: BARIS (bukan angka) bila nilai bukan bilangan bulat, Data tidak valid: BARIS (di luar 0-100) bila di luar rentang, atau Data tidak valid: BARIS (format salah) bila baris tidak terdiri dari tepat dua kata. BARIS adalah baris aslinya.",
+        "Simpan nilai valid dalam Map berkunci nama. Bila nama yang sama muncul lagi, simpan nilai yang tertinggi (urutan kemunculan pertama nama tetap dipakai). Setelah selesai, cetak peringkat dari nilai tertinggi ke terendah (nilai sama tetap menurut urutan masuk) dengan bentuk 1. NAMA NILAI, lalu Valid: A, tidak valid: B, lalu Rata-rata: ... dengan satu angka di belakang titik (hanya bila ada data valid; pakai Locale.US supaya pemisahnya titik)."
+      ],
+      "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        // baca baris \"nama nilai\" sampai \"selesai\"\n        // tangkap data yang salah dengan try-catch\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "Ani 80",
+            "Budi 95",
+            "Citra 70",
+            "selesai"
+          ],
+          "expected": "1. Budi 95\n2. Ani 80\n3. Citra 70\nValid: 3, tidak valid: 0\nRata-rata: 81.7"
+        },
+        {
+          "input": [
+            "Dewi 60",
+            "Eko abc",
+            "Fajar 101",
+            "selesai"
+          ],
+          "expected": "Data tidak valid: Eko abc (bukan angka)\nData tidak valid: Fajar 101 (di luar 0-100)\n1. Dewi 60\nValid: 1, tidak valid: 2\nRata-rata: 60.0"
+        }
+      ]
+    },
+    {
+      "id": "U2",
+      "title": "Praktik 2 · Biaya pembayaran",
+      "topic": "Interface, Factory, dan prinsip Open-Closed (Bab 13–14)",
+      "statement": [
+        "Masukan berupa baris-baris METODE JUMLAH sampai baris selesai. JUMLAH bilangan bulat. Metode: tunai (biaya 0), transfer (biaya tetap Rp 2500), kartu (biaya 2% dari jumlah dengan pembagian bilangan bulat, minimal Rp 1000), dan qris (biaya 0,7% dari jumlah: jumlah * 7 / 1000 dengan pembagian bilangan bulat).",
+        "Rancang dengan interface Pembayaran (method biaya(int jumlah)) dan satu kelas per metode, dan pusatkan pembuatan objeknya di kelas PembayaranFactory (Factory Method) supaya metode baru bisa ditambah tanpa mengubah kode lain.",
+        "Untuk tiap baris cetak METODE JUMLAH: biaya B, total T dengan T = jumlah + biaya. Metode yang tidak dikenal dicetak sebagai Metode tidak didukung: METODE dan tidak dihitung. Terakhir cetak Transaksi: ... (yang dihitung) dan Total biaya: Rp ...."
+      ],
+      "starter": "import java.util.Scanner;\n\n// Tulis interface Pembayaran, kelas tiap metode, dan PembayaranFactory di sini\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        // baca baris \"metode jumlah\" sampai \"selesai\"\n    }\n}\n",
+      "visible": [
+        {
+          "input": [
+            "tunai 50000",
+            "kartu 20000",
+            "selesai"
+          ],
+          "expected": "tunai 50000: biaya 0, total 50000\nkartu 20000: biaya 1000, total 21000\nTransaksi: 2\nTotal biaya: Rp 1000"
+        },
+        {
+          "input": [
+            "transfer 100000",
+            "qris 150000",
+            "selesai"
+          ],
+          "expected": "transfer 100000: biaya 2500, total 102500\nqris 150000: biaya 1050, total 151050\nTransaksi: 2\nTotal biaya: Rp 3550"
+        }
+      ]
+    }
+  ]
+}
