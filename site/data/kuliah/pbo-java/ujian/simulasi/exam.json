@@ -84,10 +84,10 @@
       "theory": 0.5
     },
     "theory": {
-      "minWords": 15,
+      "minWords": 35,
       "wordRange": [
-        30,
-        80
+        50,
+        120
       ]
     },
     "tahap1Minutes": 40,

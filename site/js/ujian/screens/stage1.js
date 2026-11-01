@@ -6,6 +6,7 @@ import { bahasa } from '../bahasa.js';
 import { workbenchMarkup, examplesMarkup, mountWorkbench, renderResults } from '../workbench.js';
 import { runTests, passCount, s1Of } from '../logic/tests.js';
 import { scoreTheory } from '../logic/theory.js';
+import { isOpen } from '../logic/open.js';
 import { evaluateSubmission } from '../submission.js';
 import { html, show, $, $$, sha256, ask, wordCount, mmss } from '../ui.js';
 
@@ -100,7 +101,8 @@ export function render(root, ctx) {
       <section class="card task" data-step="${id}">
         <div class="task-head"><div><span class="badge info">Soal ${idx + 1} dari ${n}</span> <span class="badge warn">Teori</span> <h2 style="display:inline">${q.title}</h2> <span class="badge">${q.topic}</span></div><span id="verdict-badge">${verdictBadge(c)}</span></div>
         ${q.prompt.map((p) => html`<p>${p}</p>`)}
-        <label class="field"><span>Jawabanmu <span class="hint">(${wMin}–${wMax} kata)</span></span>
+        <div class="callout" style="margin:8px 0"><strong>Pakai kata-katamu sendiri.</strong> Jelaskan dengan parafrase dan contohmu sendiri, jangan salin dari buku, catatan, atau AI. Jawabanmu akan ditanyakan lagi di Tahap 2, dan tempel dimatikan.</div>
+        <label class="field"><span>Jawabanmu <span class="hint">(${wMin}–${wMax} kata; tulis cukup lengkap)</span></span>
           <textarea rows="11" id="theory-text" placeholder="Tulis dengan kata-katamu sendiri.">${text}</textarea></label>
         <div class="small muted" id="theory-wc">${wordCount(text)} kata</div>
         ${contoh?.theory?.[id] ? html`<div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" id="isi-contoh">Isi dengan contoh jawaban benar</button><span class="small muted">Khusus simulasi, supaya kamu tahu bentuk jawaban yang benar.</span></div>` : ''}
@@ -140,7 +142,7 @@ export function render(root, ctx) {
           const c = dr.checks?.[st.id];
           return html`<tr><td><strong>${titleOf(st)}</strong> <span class="badge ${st.kind === 'theory' ? 'warn' : 'ok'}">${st.kind === 'theory' ? 'Teori' : 'Praktik'}</span></td><td>${verdictBadge(c)}</td><td><button class="btn btn-sm" type="button" data-goto="${i}">${c ? 'Buka lagi' : 'Kerjakan'}</button></td></tr>`;
         })}</tbody></table></div>
-        <p class="small muted">Nilai Tahap 1 (S1) = ${Math.round(exam.config.s1.practice * 100)}% praktik (tes) + ${Math.round(exam.config.s1.theory * 100)}% teori (poin kunci, boleh ditimpa dosen). Soal yang belum benar tetap boleh dikumpulkan, tetapi kembali dulu bila masih ingin memperbaikinya.</p>
+        <p class="small muted">Nilai Tahap 1 (S1) = ${Math.round(exam.config.s1.practice * 100)}% praktik (tes) + ${Math.round(exam.config.s1.theory * 100)}% teori (poin kunci, boleh ditimpa dosen). Kodingmu tidak harus benar semua: bila sudah yakin, kumpulkan; apa pun hasil tesnya kamu tetap lanjut ke Tahap 2. Kembali dulu hanya bila masih ingin memperbaiki.</p>
       </section>
       <form id="s1form" novalidate>
         <section class="card">
@@ -333,7 +335,7 @@ async function lockStage1({ exam, runner, ctx, auto }) {
       overlay.querySelector('#ov-text').textContent = `Menyiapkan penjalan ${bahasa().nama}…`;
       await runner.whenReady();
       ev = await evaluateSubmission({
-        tasks: lengkap.tasks, codes, run: (c, i) => runner.run(c, i), language: bahasa().id,
+        tasks: lengkap.tasks, codes, run: (c, i) => runner.run(c, i), language: bahasa().id, terbuka: isOpen(exam),
         onProgress: (t) => { overlay.querySelector('#ov-text').textContent = t; },
       });
     } catch (err) {

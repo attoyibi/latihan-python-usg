@@ -2,7 +2,7 @@
   "id": "AP-UAS-2026",
   "title": "UAS Algoritma dan Pemrograman",
   "course": "Algoritma dan Pemrograman (Python)",
-  "intro": "Satu kali jalan: Tahap 1 (4 soal: 2 teori + 2 praktik, Bab 8–14) lalu Tahap 2 (pertanyaan singkat yang dijawab satu kalimat) dimulai otomatis begitu Tahap 1 selesai. Kedua tahap berbatas waktu. Soal praktik dinilai tes, soal teori dinilai dari poin kunci, Tahap 2 dinilai otomatis. Boleh lewat HP.",
+  "intro": "Satu kali jalan: Tahap 1 (60 menit, 4 soal: 2 teori + 2 praktik, Bab 8–14) lalu Tahap 2 (pertanyaan singkat yang dijawab satu kalimat) dimulai otomatis begitu Tahap 1 selesai. Kedua tahap berbatas waktu. Soal praktik dinilai tes, soal teori dinilai dari poin kunci, Tahap 2 dinilai otomatis. Boleh lewat HP.",
   "aiDeclarationOptions": [
     {
       "id": "none",
@@ -84,13 +84,13 @@
       "theory": 0.5
     },
     "theory": {
-      "minWords": 25,
+      "minWords": 60,
       "wordRange": [
-        50,
-        150
+        80,
+        200
       ]
     },
-    "tahap1Minutes": 90,
+    "tahap1Minutes": 60,
     "accommodations": [],
     "accommodationFactor": 1.5,
     "grade": {

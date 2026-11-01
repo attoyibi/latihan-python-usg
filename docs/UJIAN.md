@@ -19,6 +19,14 @@ Pilihan ganda Tahap 2 diganti **pertanyaan terbuka kecil** (`config.stage2.mode 
 - **Dosen** (tab Ujian di dashboard): unduh CSV untuk analisis (satu baris per pertanyaan per peserta, dengan pembanding Tahap 1), unduh format hasil analisis (`id_baris, peserta_id, konsistensi, skor, catatan`), unggah hasil analisis yang sudah diisi AI (disimpan di server dan tampil di bawah tiap jawaban), unduh PDF satu peserta atau semua peserta. `konsistensi` salah satu dari `konsisten`, `sebagian`, `tidak_konsisten`, `tidak_jelas`; `skor` 0-100 (boleh kosong).
 - Tanpa migrasi 0011 semuanya tetap jalan kecuali penguncian di server dan penyimpanan analisis (dosen mendapat pesan jelas).
 
+## Penggunaan AI yang bertanggung jawab
+Tujuannya mengukur penggunaan AI yang terarah, bukan melarangnya: AI boleh dipakai di Tahap 1 (dan dideklarasikan), tetapi jawaban harus diramu sendiri dan bisa dipertanggungjawabkan di Tahap 2.
+- Layar peserta menekankan parafrase: teori minimal 60 kata (rentang 80-200 kata untuk UTS/UAS), dengan kalimat sendiri dan contoh sendiri.
+- Salin, tempel, dan seret-lepas dimatikan di Tahap 1 dan Tahap 2 (percobaan dihitung). Berpindah tab atau jendela dicatat oleh `site/js/ujian/fokus.js` (jumlah, lama, jam; bukan isi tab lain, yang memang tidak terlihat dari halaman web) dan tampil di tab Ujian dosen, di CSV, dan di PDF. Ini petunjuk, bukan bukti.
+- Kode tidak harus benar: apa pun hasil tesnya, peserta yang sudah mengumpulkan tetap masuk Tahap 2. Pada Tahap 2 terbuka, kandidat butir pilihan ganda tidak dihitung lagi (jauh lebih sedikit penjalanan, terutama di Java).
+- UTS dan UAS: Tahap 1 60 menit. Simulasi tetap 30 menit (Python) dan 40 menit (Java).
+- **Contoh jawaban:** simulasi punya tombol untuk semua peserta (`contoh.json` publik). UTS/UAS hanya memberinya kepada **instruktur** lewat fungsi `ujian_contoh_dosen` (migrasi `0012_ujian_contoh.sql`; isinya di tabel `ujian_contoh` yang tidak bisa dibaca peserta, berbeda dari `ujian_kunci` yang turun ke peserta setelah Tahap 1). Isi tabel dari `kunci/ujian_contoh.sql` dan `kunci/ujian_contoh_pbo-java.sql` buatan `buat_kunci_ujian.py`.
+
 ## Yang dipegang server (migrasi `0010_ujian.sql`)
 | Bagian | Cara kerja |
 |---|---|

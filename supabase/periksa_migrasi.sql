@@ -11,7 +11,8 @@
 -- 0009 = kunci jawaban soal latihan (hanya dibaca instruktur).
 -- 0010 = ujian UTS/UAS dan simulasi (jadwal, akomodasi, sesi dengan jam server, kunci ujian).
 -- 0011 = jawaban ujian dikunci setelah selesai dan hasil analisis (Tahap 2 terbuka).
--- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0011).
+-- 0012 = contoh jawaban UTS/UAS hanya untuk dosen (tabel ujian_contoh).
+-- Jalankan hanya migrasi yang masih false, berurutan (0001 sampai 0012).
 
 select
   to_regclass('public.profiles') is not null as "0001_skema",
@@ -55,4 +56,5 @@ select
     and exists (
       select 1 from information_schema.columns
       where table_schema = 'public' and table_name = 'ujian_sesi' and column_name = 'analisis'
-    ) as "0011_ujian_selesai";
+    ) as "0011_ujian_selesai",
+  to_regprocedure('public.ujian_contoh_dosen(text,text)') is not null as "0012_ujian_contoh";

@@ -7,7 +7,7 @@
       "topic": "Bab 1–4",
       "prompt": [
         "Jelaskan dengan kata-katamu sendiri: (a) beda kelas dan objek, dan apa yang dimaksud atribut serta method; (b) apa itu enkapsulasi dan bagaimana getter, setter, dan access modifier private mewujudkannya; (c) tiga bagian kotak kelas pada diagram kelas UML dan arti tanda - serta + di depan anggota kelas.",
-        "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
+        "Tulis satu sampai dua paragraf (sekitar 80–200 kata) dengan KALIMATMU SENDIRI (parafrase): jangan menyalin definisi dari buku, catatan, atau AI, dan sertakan contohmu sendiri. Jawaban yang disalin tanpa dipahami akan terlihat di Tahap 2."
       ],
       "need": 5,
       "probe": "Dalam satu kalimat: apa manfaat getter dan setter dibanding membuat atribut public?"
@@ -18,7 +18,7 @@
       "topic": "Bab 5–7",
       "prompt": [
         "Jelaskan dengan kata-katamu sendiri: (a) apa itu pewarisan (inheritance) dan fungsi kata kunci extends serta super; (b) apa itu polimorfisme, kaitkan dengan overriding dan variabel bertipe kelas induk; (c) perbedaan kelas abstrak dan interface.",
-        "Tulis dalam satu atau dua paragraf, sekitar 60–150 kata. Menyalin definisi tanpa memahaminya akan terlihat di Tahap 2."
+        "Tulis satu sampai dua paragraf (sekitar 80–200 kata) dengan KALIMATMU SENDIRI (parafrase): jangan menyalin definisi dari buku, catatan, atau AI, dan sertakan contohmu sendiri. Jawaban yang disalin tanpa dipahami akan terlihat di Tahap 2."
       ],
       "need": 5,
       "probe": "Dalam satu kalimat: apa yang terjadi bila variabel bertipe kelas induk menunjuk objek subclass lalu method yang di-override dipanggil?"

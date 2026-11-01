@@ -11,7 +11,7 @@ const CHANGE_ROWS = 4;
 //  3. bila kode lulus semua tes, mencari bug sejati hasil mutasi kecil kode itu -> kandidat butir "Temukan baris yang salah";
 //  4. menjalankan kode peserta pada tes ketentuan baru -> kandidat butir "Ketentuan berubah" (keluaran lama vs kunci baru).
 // onProgress(teks) dipanggil untuk indikator kemajuan.
-export async function evaluateSubmission({ tasks, codes, run, language = 'python', onProgress = () => {} }) {
+export async function evaluateSubmission({ tasks, codes, run, language = 'python', terbuka = false, onProgress = () => {} }) {
   const taskResults = {};
   const traceCandidates = {};
   const debugCandidates = {};
@@ -35,6 +35,8 @@ export async function evaluateSubmission({ tasks, codes, run, language = 'python
     };
     ratios[t.id] = passed / results.length;
 
+    // Tahap 2 terbuka tidak butuh kandidat pilihan ganda (menghemat banyak penjalanan, terutama di Java).
+    if (terbuka) continue;
     const rows = [];
     for (const input of t.traceInputs) {
       const res = await run(code, input);

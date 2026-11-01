@@ -376,6 +376,11 @@
       if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci" } };
       return { data: await kunciUjian(), error: null };
     }
+    if (nama === "ujian_contoh_dosen") {
+      if (!instruktur()) return { data: null, error: { code: "42501", message: "hanya instruktur" } };
+      const r = await fetch("/__kunci/ujian/" + (a.p_mk === "algoritma-python" ? "" : a.p_mk + "/") + a.p_ujian + ".contoh.json");
+      return { data: r.ok ? await r.json() : null, error: null };
+    }
     if (nama === "ujian_selesai") {
       const s = sesi();
       if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci atau ujian belum dimulai" } };

@@ -8,6 +8,7 @@ import { muatIndeks, pakaiUjian, examStage, simpanSekarang, getExam } from './da
 import { isOpen } from './logic/open.js';
 import * as store from './store.js';
 import { initCodeTools, syncScrollLock } from './codetools.js';
+import { pasangPenjagaFokus } from './fokus.js';
 import { html, show } from './ui.js';
 import * as start from './screens/start.js';
 import * as stage1 from './screens/stage1.js';
@@ -22,7 +23,8 @@ let cleanups = [];
 const bersihkan = () => { cleanups.forEach((fn) => { try { fn(); } catch { /* abaikan */ } }); cleanups = []; };
 
 // Dipanggil app.js setiap pindah halaman, supaya hitung mundur dan penjaga tempel tidak tertinggal.
-export function tinggalkan() { bersihkan(); syncScrollLock(); }
+let lepasFokus = () => {};
+export function tinggalkan() { bersihkan(); lepasFokus(); lepasFokus = () => {}; syncScrollLock(); }
 
 // Status ujian akun ini tanpa memuat definisinya (dibaca langsung dari penyimpanan lokal).
 function statusLokal(userId, mk, ujianId) {
@@ -75,6 +77,9 @@ export async function renderUjian(main, kuliah, ujianId, peserta) {
     show(root, html`<section class="card"><h2>Ujian belum bisa dibuka</h2><p>${pesan}</p><a class="btn btn-primary" href="#k/${kuliah.id}">Kembali ke mata kuliah</a></section>`);
     return;
   }
+  // Pindah tab atau jendela selama Tahap 1 dan 2 dicatat (jumlah dan lama) untuk dilihat dosen.
+  lepasFokus();
+  lepasFokus = pasangPenjagaFokus(() => ['stage1', 'stage2'].includes(examStage()));
   let tahap = null;
   const ctx = {
     onLeave: (fn) => cleanups.push(fn),

@@ -69,6 +69,7 @@ export function salinan({ keadaan, exam, peserta, ujian }) {
   return {
     peserta, ujian,
     kode: sub?.hash ? sub.hash.slice(0, 16) : '',
+    keluar: demo.fokus?.n || 0, keluarDetik: demo.fokus?.detik || 0,
     terkunci: sub?.submittedAt || '', otomatis: !!sub?.auto, tempelS1: sub?.tempelDiblokir || 0, ai: sub?.ai || null, contohDiisi: sub?.contohDiisi || [],
     teori: exam.theory.map((q) => ({ id: q.id, judul: q.title, soal: q.prompt.join(' '), jawaban: sub?.theory?.[q.id] || '' })),
     praktik: exam.tasks.map((t) => ({ id: t.id, judul: t.title, soal: t.statement.join(' '), kode: sub?.code?.[t.id] || '', tes: sub?.taskResults?.[t.id] ? `${sub.taskResults[t.id].passed}/${sub.taskResults[t.id].total}` : '' })),
@@ -85,7 +86,7 @@ export const KOLOM_ANALISIS = [
   { label: 'pertanyaan_s2', get: (r) => r.pertanyaan }, { label: 'konteks_baris', get: (r) => r.konteks },
   { label: 'jawaban_s2', get: (r) => r.jawaban }, { label: 'kata_s2', get: (r) => r.kata }, { label: 'detik_s2', get: (r) => r.detik }, { label: 'tempel_s2', get: (r) => r.tempel },
   { label: 'soal_s1', get: (r) => r.soalS1 }, { label: 'jawaban_s1_teori', get: (r) => r.jawabanS1 }, { label: 'kode_s1', get: (r) => r.kodeS1 }, { label: 'tes_s1_lulus', get: (r) => r.tesS1 },
-  { label: 'tempel_s1', get: (r) => r.tempelS1 }, { label: 'deklarasi_ai', get: (r) => r.ai },
+  { label: 'tempel_s1', get: (r) => r.tempelS1 }, { label: 'keluar_tab_kali', get: (r) => r.keluar }, { label: 'keluar_tab_detik', get: (r) => r.keluarDetik }, { label: 'deklarasi_ai', get: (r) => r.ai },
 ];
 // Kolom yang diisi AI/dosen lalu diunggah kembali; id_baris dan peserta_id menautkannya ke baris di atas.
 export const KOLOM_HASIL = ['id_baris', 'peserta_id', 'konsistensi', 'skor', 'catatan'];
@@ -95,7 +96,7 @@ export const KONSISTENSI = ['konsisten', 'sebagian', 'tidak_konsisten', 'tidak_j
 export function barisAnalisis(salinanList) {
   return salinanList.flatMap((s) => s.s2.map((x) => ({
     ...x, idBaris: x.id, pesertaId: s.peserta.id, nama: s.peserta.nama, nim: s.peserta.nim, kelas: s.peserta.kelas, ujian: s.ujian,
-    tempelS1: s.tempelS1, ai: s.ai ? [s.ai.level, s.ai.tools, s.ai.how].filter(Boolean).join(' / ') : '',
+    tempelS1: s.tempelS1, keluar: s.keluar, keluarDetik: s.keluarDetik, ai: s.ai ? [s.ai.level, s.ai.tools, s.ai.how].filter(Boolean).join(' / ') : '',
   })));
 }
 
@@ -128,7 +129,7 @@ export function blokPdf(s, { judul = true } = {}) {
   const b = [];
   if (judul) b.push({ t: 'judul', teks: s.ujian });
   else b.push({ t: 'bagian', teks: `${s.peserta.nama} (${s.peserta.nim || '-'}, ${s.peserta.kelas || '-'})` });
-  b.push({ t: 'kv', baris: [['Nama', s.peserta.nama || '-'], ['NIM', s.peserta.nim || '-'], ['Kelas', s.peserta.kelas || '-'], ['Dikunci', WAKTU(s.terkunci) + (s.otomatis ? ' (otomatis)' : '')], ['Kode', s.kode || '-']] });
+  b.push({ t: 'kv', baris: [['Nama', s.peserta.nama || '-'], ['NIM', s.peserta.nim || '-'], ['Kelas', s.peserta.kelas || '-'], ['Dikunci', WAKTU(s.terkunci) + (s.otomatis ? ' (otomatis)' : '')], ['Keluar tab', `${s.keluar} kali, ${s.keluarDetik} detik; tempel diblokir ${s.tempelS1}x`], ['Kode', s.kode || '-']] });
   b.push({ t: 'catatan', teks: 'Salinan jawaban Tahap 1 dan Tahap 2. Jawaban sudah dikunci di server dan tidak bisa diubah.' });
   if (s.contohDiisi.length) b.push({ t: 'catatan', teks: `Sebagian jawaban simulasi diisi dari contoh: ${s.contohDiisi.join(', ')}.` });
   b.push({ t: 'bagian', teks: 'Tahap 1 - Teori' });

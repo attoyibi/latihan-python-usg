@@ -85,7 +85,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
       </div>
       <div class="stack" style="margin-top:8px">${daftarS.map((s) => {
         const rows = (s.sesi.analisis || {}).rows || {};
-        return html`<details class="card" style="margin:0" data-peserta="${s.peserta.id}"><summary><strong>${s.peserta.nama}</strong> <span class="muted small">${s.peserta.nim} · ${s.peserta.kelas}</span> ${s.s2.length ? html`<span class="badge">${s.s2.filter((x) => !x.kosong).length}/${s.s2.length} terjawab</span>` : html`<span class="badge warn">belum Tahap 2</span>`}${s.sesi.selesai_pada ? html` <span class="badge ok">dikunci</span>` : ''}${Object.keys(rows).length ? html` <span class="badge info">dianalisis</span>` : ''}</summary>
+        return html`<details class="card" style="margin:0" data-peserta="${s.peserta.id}"><summary><strong>${s.peserta.nama}</strong> <span class="muted small">${s.peserta.nim} · ${s.peserta.kelas}</span> ${s.s2.length ? html`<span class="badge">${s.s2.filter((x) => !x.kosong).length}/${s.s2.length} terjawab</span>` : html`<span class="badge warn">belum Tahap 2</span>`}${s.sesi.selesai_pada ? html` <span class="badge ok">dikunci</span>` : ''}${s.keluar ? html` <span class="badge ${s.keluar > 3 ? 'warn' : ''}">keluar tab ${s.keluar}× (${s.keluarDetik} dtk)</span>` : ''}${s.tempelS1 ? html` <span class="badge warn">tempel diblokir ${s.tempelS1}×</span>` : ''}${Object.keys(rows).length ? html` <span class="badge info">dianalisis</span>` : ''}</summary>
           <div class="stack" style="margin-top:8px">${s.s2.map((x) => { const a = rows[x.id]; const [kc, kl] = KONS_BADGE[a?.konsistensi] || ['', '']; return html`<div class="card" style="margin:0">
             <div><span class="badge info">${OPEN_LABEL[x.jenis] || x.jenis}</span> <strong>${x.pertanyaan}</strong></div>
             <div class="small muted" style="margin-top:6px">Jawaban Tahap 2 · ${x.kata} kata · ${x.detik === '' ? '–' : x.detik + ' dtk'}${x.tempel ? ` · tempel ${x.tempel}×` : ''}</div>
@@ -138,8 +138,8 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
       </form>
 
       <h3>Peserta dan nilai <span class="muted small">(${ss.length} sesi)</span></h3>
-      ${ss.length ? html`<div class="tablewrap"><table><thead><tr><th>Nama</th><th>NIM</th><th>Kelas</th><th>Status</th><th>Mulai</th><th>Terkunci</th><th>S1</th><th>S2</th><th>Nilai</th><th>Keterangan</th><th></th></tr></thead><tbody>
-        ${ss.map((s) => { const h = s.hasil || {}; return html`<tr><td>${s.p.nama || '?'}</td><td>${s.p.nim || ''}</td><td>${s.p.kelas || s.kelas || ''}</td><td>${STATUS[h.tahap] || (s.terkunci_pada ? 'Tahap 2' : 'Tahap 1')}</td><td>${fmtWaktu(s.mulai_pada)}${Number(s.faktor) > 1 ? html` <span class="badge info">×${Number(s.faktor)}</span>` : ''}</td><td>${fmtWaktu(s.terkunci_pada)}${s.terlambat ? html` <span class="badge warn">terlambat</span>` : ''}</td><td>${h.s1 ?? '–'}</td><td>${h.s2 ?? '–'}</td><td><strong>${h.nilai ?? '–'}</strong></td><td>${h.keterangan || ''}${h.flag ? html` <span class="badge warn">ditinjau</span>` : ''}</td>
+      ${ss.length ? html`<div class="tablewrap"><table><thead><tr><th>Nama</th><th>NIM</th><th>Kelas</th><th>Status</th><th>Mulai</th><th>Terkunci</th><th>S1</th><th>S2</th><th>Nilai</th><th>Keterangan</th><th>Keluar tab</th><th></th></tr></thead><tbody>
+        ${ss.map((s) => { const h = s.hasil || {}; return html`<tr><td>${s.p.nama || '?'}</td><td>${s.p.nim || ''}</td><td>${s.p.kelas || s.kelas || ''}</td><td>${STATUS[h.tahap] || (s.terkunci_pada ? 'Tahap 2' : 'Tahap 1')}</td><td>${fmtWaktu(s.mulai_pada)}${Number(s.faktor) > 1 ? html` <span class="badge info">×${Number(s.faktor)}</span>` : ''}</td><td>${fmtWaktu(s.terkunci_pada)}${s.terlambat ? html` <span class="badge warn">terlambat</span>` : ''}</td><td>${h.s1 ?? '–'}</td><td>${h.s2 ?? '–'}</td><td><strong>${h.nilai ?? '–'}</strong></td><td>${h.keterangan || ''}${h.flag ? html` <span class="badge warn">ditinjau</span>` : ''}</td><td>${h.keluar ? `${h.keluar}× (${h.keluarDetik} dtk)` : '–'}</td>
           <td><button class="btn btn-sm btn-ghost" type="button" data-hapus-sesi="${s.user_id}">Izinkan mengulang</button></td></tr>`; })}
       </tbody></table></div>
       <div class="row" style="margin-top:8px"><button class="btn btn-sm" type="button" data-csv>Unduh CSV</button></div>` : html`<p class="small muted">Belum ada peserta yang memulai.</p>`}
@@ -264,7 +264,7 @@ export async function renderTabDosen({ main, kepala, kuliah }) {
           { label: 'terlambat', get: (r) => (r.terlambat ? 'ya' : '') }, { label: 'faktor_waktu', get: (r) => Number(r.faktor) },
           { label: 's1', get: (r) => r.h.s1 }, { label: 's2', get: (r) => r.h.s2 }, { label: 'nilai', get: (r) => r.h.nilai },
           { label: 'butir_benar', get: (r) => r.h.benar }, { label: 'butir', get: (r) => r.h.butir }, { label: 'percobaan_tahap2', get: (r) => r.h.percobaan },
-          { label: 'keterangan', get: (r) => r.h.keterangan }, { label: 'perlu_ditinjau', get: (r) => (r.h.flag ? 'ya' : '') },
+          { label: 'keterangan', get: (r) => r.h.keterangan }, { label: 'keluar_tab_kali', get: (r) => r.h.keluar }, { label: 'keluar_tab_detik', get: (r) => r.h.keluarDetik }, { label: 'perlu_ditinjau', get: (r) => (r.h.flag ? 'ya' : '') },
         ]);
         download(`nilai-${kuliah.id}-${uid}.csv`, csv, 'text/csv');
       });

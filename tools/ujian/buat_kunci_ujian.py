@@ -54,6 +54,7 @@ def daftar_mk():
 def buat(mk):
     sumber, keluar, berkas_sql = ujian_mk(mk)
     baris = []
+    contoh_baris = []
     for d in sorted(p for p in sumber.iterdir() if p.is_dir()):
         if not (d / "tasks.json").exists() or not (d / "theory.json").exists():
             continue
@@ -73,12 +74,17 @@ def buat(mk):
         # Simulasi (latihan: true di index.json) mendapat contoh jawaban PUBLIK supaya peserta tahu bentuk jawaban benar.
         # UTS dan UAS tidak pernah: contoh.json hanya dibuat bila ujiannya simulasi, dan dihapus bila bukan.
         meta = {u["id"]: u for u in baca(publik.parent / "index.json")["ujian"]}.get(uid, {})
+        solusi = baca(d / "solutions.json")["code"]
+        contoh = {"code": {t["id"]: solusi[t["id"]] for t in tasks}, "theory": {q["id"]: q["sample"] for q in theory["questions"]}}
         if meta.get("latihan") is True:
-            solusi = baca(d / "solutions.json")["code"]
-            tulis(publik / "contoh.json", {"code": {t["id"]: solusi[t["id"]] for t in tasks}, "theory": {q["id"]: q["sample"] for q in theory["questions"]}})
+            tulis(publik / "contoh.json", contoh)
         elif (publik / "contoh.json").exists():
             (publik / "contoh.json").unlink()
         baris.append(f"({sql_teks(mk)}, {sql_teks(uid)}, {sql_teks(json.dumps(isi, ensure_ascii=False))}::jsonb)")
+        # Contoh jawaban UTS/UAS (hanya untuk dosen lewat ujian_contoh_dosen, migrasi 0012); simulasi sudah publik (contoh.json).
+        if meta.get("latihan") is not True:
+            contoh_baris.append(f"({sql_teks(mk)}, {sql_teks(uid)}, {sql_teks(json.dumps(contoh, ensure_ascii=False))}::jsonb)")
+            tulis(keluar / f"{uid}.contoh.json", contoh)  # dibaca server uji lokal
         print(f"{mk}/{uid}: {len(tasks)} soal praktik, {len(theory['questions'])} soal teori -> publik dan kunci dipisah")
     if not baris:
         return False
@@ -90,6 +96,17 @@ def buat(mk):
         + "\non conflict (matakuliah_id, ujian_id) do update set isi = excluded.isi, diperbarui_pada = now();\n"
     )
     berkas_sql.write_text(sql, encoding="utf8")
+    if contoh_baris:
+        sql_c = (
+            "-- Dibuat otomatis oleh tools/ujian/buat_kunci_ujian.py. RAHASIA: jangan dimasukkan ke repositori." + chr(10)
+            + f"-- Contoh jawaban UTS/UAS {mk} untuk dosen (setelah migrasi 0012). Hanya menyentuh baris {mk}; aman dijalankan ulang." + chr(10)
+            + "insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values" + chr(10) + "  "
+            + ("," + chr(10) + "  ").join(contoh_baris)
+            + chr(10) + "on conflict (matakuliah_id, ujian_id) do update set isi = excluded.isi, diperbarui_pada = now();" + chr(10)
+        )
+        berkas_c = berkas_sql.with_name(berkas_sql.name.replace("ujian_kunci", "ujian_contoh"))
+        berkas_c.write_text(sql_c, encoding="utf8")
+        print(f"ditulis: {berkas_c}")
     print(f"ditulis: {berkas_sql}")
     return True
 

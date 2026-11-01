@@ -52,6 +52,8 @@ export async function kunciTahap1(mk, ujian, snapshot, hash) {
 export const ambilKunci = (mk, ujian) => rpc('ujian_ambil_kunci', { p_mk: mk, p_ujian: ujian });
 // Menutup jawaban peserta (migrasi 0011): sesudahnya server menolak perubahan keadaan dan hasil.
 export const selesai = (mk, ujian) => rpc('ujian_selesai', { p_mk: mk, p_ujian: ujian });
+// Contoh jawaban UTS/UAS, hanya untuk instruktur (migrasi 0012).
+export const contohDosen = (mk, ujian) => rpc('ujian_contoh_dosen', { p_mk: mk, p_ujian: ujian });
 export const ulang = (mk, ujian) => rpc('ujian_ulang', { p_mk: mk, p_ujian: ujian });
 
 // Pekerjaan peserta (keadaan) dan ringkasan nilai. Peserta hanya boleh mengubah dua kolom ini (lihat migrasi).

@@ -791,14 +791,33 @@ console.log("\n== Tahap N2: migrasi 0011 (jawaban ujian dikunci setelah selesai,
   cek("instruktur menghapus sesi selesai (izinkan mengulang)", (await rpc(IN, "delete from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", U2)).n === 1);
 }
 
+console.log("\n== Tahap N3: migrasi 0012 (contoh jawaban UTS/UAS hanya untuk instruktur) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0012_ujian_contoh.sql berjalan", migrasi("0012_ujian_contoh.sql")))) process.exit(1);
+  cek("0012 aman dijalankan ulang", await jalankan("0012 diulang", migrasi("0012_ujian_contoh.sql")));
+  await q("insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values ($1, 'uts', $2::jsonb) on conflict do nothing", [MK, JSON.stringify({ code: { T2: "kode contoh" }, theory: { Q1: "jawaban contoh" } })]);
+  cek("pengunjung (anon) tidak bisa membaca tabel contoh", ditolak(await sebagai("anon", null, () => q("select * from public.ujian_contoh")), RLS));
+  cek("peserta tidak bisa membaca tabel contoh langsung", ditolak(await rpc(U2, "select * from public.ujian_contoh"), RLS));
+  cek("instruktur pun tidak membaca tabel contoh langsung (hanya lewat fungsi)", ditolak(await rpc(IN, "select * from public.ujian_contoh"), RLS));
+  cek("peserta tidak bisa memanggil ujian_contoh_dosen", ditolak(await rpc(U2, "select public.ujian_contoh_dosen($1, 'uts')", MK), RLS));
+  cek("pengunjung (anon) tidak bisa memanggil ujian_contoh_dosen", ditolak(await sebagai("anon", null, () => q("select public.ujian_contoh_dosen('algoritma-python', 'uts')")), RLS));
+  const ok = await rpc(IN, "select public.ujian_contoh_dosen($1, 'uts') as c", MK);
+  cek("instruktur mengambil contoh jawaban UTS", !ok.error && ok.rows[0].c.code.T2 === "kode contoh", ok.error);
+  cek("ujian tanpa contoh mengembalikan kosong, bukan galat", !(await rpc(IN, "select public.ujian_contoh_dosen($1, 'uas') as c", MK)).error);
+  cek("peserta tidak bisa menulis tabel contoh", ditolak(await rpc(U2, "insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values ($1, 'uas', '{}')", MK), RLS));
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat sebelas kolom", !r.error && kolom.length === 11, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0011 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat dua belas kolom", !r.error && kolom.length === 12, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0012 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

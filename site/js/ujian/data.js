@@ -59,7 +59,9 @@ export async function pakaiUjian(mk, ujianId, peserta, meta = {}) {
   const dir = `data/kuliah/${mk}/ujian/${ujianId}/`;
   const [exam, tasks, theory, templates] = await Promise.all(['exam', 'tasks', 'theory', 'templates'].map((f) => ambilJson(`${dir}${f}.json`)));
   // Contoh jawaban benar hanya ada untuk simulasi (berkas publik contoh.json). UTS dan UAS tidak pernah memilikinya.
-  const contoh = meta.latihan === true ? await ambilJson(`${dir}contoh.json`).catch(() => null) : null;
+  let contoh = meta.latihan === true ? await ambilJson(`${dir}contoh.json`).catch(() => null) : null;
+  // UTS dan UAS: contoh jawaban hanya untuk instruktur, diambil dari server (migrasi 0012); peserta tidak pernah menerimanya.
+  if (!contoh && peserta.peran === 'instruktur') contoh = await server.contohDosen(mk, ujianId).catch(() => null);
   base = { exam, tasks, theory, templates, contoh };
   ctx = { mk, ujianId, peserta, meta, status: null, kunci: false };
   store.pakai(peserta.id, mk, ujianId);
@@ -89,8 +91,8 @@ export async function tandaiSelesai() {
 }
 // Simulasi: nilai tidak dihitung dan boleh diulang dari awal (server memeriksa lewat jadwal boleh_ulang).
 export const isLatihan = () => ctx.meta.latihan === true;
-// { code: {idSoal: kode}, theory: {idSoal: teks} } atau null (selain simulasi).
-export const contohJawaban = () => (ctx.meta.latihan === true ? base.contoh : null);
+// { code: {idSoal: kode}, theory: {idSoal: teks} }: simulasi (semua peserta) atau UTS/UAS (hanya instruktur); selain itu null.
+export const contohJawaban = () => base?.contoh || null;
 export const templates = () => base.templates;
 export const jadwal = () => (ctx.status ? { info: ctx.status.jadwal, buka: !!ctx.status.buka } : { info: null, buka: false });
 export const kunciTersedia = () => ctx.kunci;
@@ -194,7 +196,7 @@ export const s1For = (student) => computeS1(student, getExam(), theoryOverrides(
 function ringkasan() {
   const tahap = examStage();
   const sub = demo().stage1?.submitted;
-  const out = { tahap };
+  const out = { tahap, keluar: demo().fokus?.n || 0, keluarDetik: demo().fokus?.detik || 0 };
   if (sub) out.terlambat = !!sub.auto;
   const exam = getExam();
   if (isOpen(exam)) {

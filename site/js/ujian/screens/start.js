@@ -33,7 +33,9 @@ export function render(root, ctx) {
       </ol>
       ${isLatihan() ? html`<div class="callout ok"><strong>Ini simulasi.</strong> Soalnya lebih mudah dan nilainya tidak dihitung. Alur, batas waktu, dan cara kerjanya sama dengan UTS dan UAS, jadi pakai untuk membiasakan diri. Setelah selesai kamu boleh mengulang dari awal.</div>` : ''}
       ${infoJadwal}
-      <div class="callout warn"><strong>Penting.</strong> Kerjakan sendiri. Tahap 2 menguji apakah kamu memahami kodemu; jangan menutup halaman di tengah tahap karena waktu tetap berjalan (jam dari server). Jawabanmu tersimpan di server, jadi bila perangkat bermasalah kamu bisa melanjutkan dari perangkat lain. AI boleh dipakai di Tahap 1 asal dideklarasikan. Salin dan tempel dimatikan seperti di halaman latihan.</div>
+      <div class="callout warn"><strong>Penting.</strong> Kerjakan sendiri; jangan menutup halaman di tengah tahap karena waktu tetap berjalan (jam dari server). Jawabanmu tersimpan di server, jadi bila perangkat bermasalah kamu bisa melanjutkan dari perangkat lain.</div>
+      <div class="callout"><strong>Memakai AI dengan bertanggung jawab.</strong> AI boleh dipakai di Tahap 1 sebagai teman berpikir (menjelaskan, memberi contoh, memeriksa idemu) dan harus kamu deklarasikan. Tetapi jawabanmu harus kamu <em>ramu sendiri</em> dengan kata-katamu (parafrase) sehingga bisa kamu pertanggungjawabkan: di Tahap 2 kamu ditanya lagi tentang jawaban dan kodemu. Salin dan tempel dimatikan, dan berpindah tab atau jendela selama ujian tercatat (jumlah dan lama, bukan isinya) dan dilihat dosen.</div>
+      <div class="callout ok"><strong>Kodingmu tidak harus benar semua.</strong> Kerjakan sebisamu; bila kamu sudah yakin dengan jawabanmu, kumpulkan. Apa pun hasil tesnya, kamu tetap lanjut ke Tahap 2.</div>
       <div class="row" style="margin-top:14px">
         <button class="btn btn-primary" id="mulai" type="button" disabled>${isLatihan() ? 'Mulai simulasi' : 'Mulai ujian'}</button>
         <span class="runner-chip" id="runner-chip"><i></i><span>Penjalan ${bahasa().nama}: memuat…</span></span>
