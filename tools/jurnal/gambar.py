@@ -74,6 +74,29 @@ def grafik_bar(jalur, label, nilai, judul_y, horizontal=False, ukuran=(6.2, 2.6)
     fig.tight_layout(); fig.savefig(jalur, dpi=DPI); plt.close(fig)
 
 
+def grafik_bab(jalur, py, jv):
+    """py, jv: daftar dict {bab, membuka, lulus}. Dua panel: peserta yang membuka dan yang menyelesaikan tiap bab."""
+    fig, axs = plt.subplots(1, 2, figsize=(6.2, 2.6), sharey=True, gridspec_kw={"width_ratios": [len(py), len(jv)]})
+    for ax, data, judul in ((axs[0], py, "Algoritma dan Pemrograman (Python)"), (axs[1], jv, "Pemrograman Berorientasi Objek (Java)")):
+        x = range(len(data))
+        ax.bar([i - 0.2 for i in x], [d["membuka"] for d in data], 0.4, color="#d0d0d0", edgecolor="black", lw=0.6, label="membuka")
+        ax.bar([i + 0.2 for i in x], [d["lulus"] for d in data], 0.4, color="#505050", edgecolor="black", lw=0.6, label="menyelesaikan")
+        ax.set_xticks(list(x)); ax.set_xticklabels([str(d["bab"]) for d in data]); ax.set_xlabel("Bab"); ax.set_title(judul, fontsize=8)
+        for sp in ("top", "right"):
+            ax.spines[sp].set_visible(False)
+    axs[0].set_ylabel("Jumlah peserta"); axs[1].legend(fontsize=7, frameon=False)
+    fig.tight_layout(); fig.savefig(jalur, dpi=DPI); plt.close(fig)
+
+
+def grafik_jam(jalur, per_jam):
+    fig, ax = plt.subplots(figsize=(6.2, 2.2))
+    ax.bar(range(24), per_jam, color="#7f7f7f", edgecolor="black", lw=0.5)
+    ax.set_xticks(range(0, 24, 2)); ax.set_xlabel("Jam mulai sesi (WIB)"); ax.set_ylabel("Jumlah sesi")
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    fig.tight_layout(); fig.savefig(jalur, dpi=DPI); plt.close(fig)
+
+
 if __name__ == "__main__":
     out = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ".") if (sys := __import__("sys")) else None
     arsitektur(out / "gambar-arsitektur.png")

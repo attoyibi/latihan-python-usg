@@ -48,8 +48,8 @@ dibiarkan seperti di template.
 
 ## Cara membuat naskah
 ```bash
-python tools/jurnal/gambar.py docs/jurnal/naskah/gambar   # gambar tanpa data
-python tools/jurnal/bangun_naskah.py                      # DOCX dari template + isi_naskah.py + isi_hasil.py
+python tools/jurnal/siapkan_angka.py                      # angka naskah dari data agregat (docs/jurnal/data, tidak di-commit) dan repositori
+python tools/jurnal/bangun_naskah.py                      # gambar + DOCX dari template + isi_naskah.py + isi_hasil.py
 # ekspor PDF (LibreOffice), lalu:
 python tools/jurnal/periksa_naskah.py docs/jurnal/naskah/<berkas>.docx <jumlah-halaman-pdf>
 python tools/jurnal/verifikasi_doi.py docs/jurnal/naskah/<berkas>.docx
@@ -63,3 +63,11 @@ Data mentah dari Supabase **tidak** disimpan di repositori.
 - [ ] Nama penulis, afiliasi, email korespondensi, dan ORCID (bila ada) sudah benar.
 - [ ] Kemiripan (similarity) maksimal 25%.
 - [ ] Berkas final dalam DOCX (PDF hanya untuk dokumentasi dan pratinjau).
+
+## Naskah yang sudah ada
+- [`naskah/naskah-jurnal-abdiwiguna-platform-latihan-pemrograman.docx`](naskah/naskah-jurnal-abdiwiguna-platform-latihan-pemrograman.docx) dan versi `.pdf` (dokumentasi).
+  Judul: *Pendampingan Keterampilan Digital Pemrograman Mahasiswa melalui Platform Latihan Berbasis Browser: Implementasi dan Evaluasi Penggunaan*.
+  11 halaman, 27 referensi (2021 sampai 2026), semua DOI lulus `verifikasi_doi.py`, semua pemeriksaan `periksa_naskah.py` lulus.
+- Data: rekaman agregat anonim 7 Oktober sampai 2 November 2026 (diambil 2 November 2026). Ini data awal sekitar empat minggu pertama;
+  jangan diklaim sebagai efek pembelajaran. Pencatatan waktu aktif (hampir semua nol) dan pengumpulan laporan bab (semua masih draf)
+  belum berfungsi baik, dan kedua hal itu tertulis sebagai keterbatasan di naskah.

@@ -22,3 +22,7 @@ sandi-awal*.csv
 # Definisi soal ujian berisi kunci jawaban (REF dan varian bug): jangan terbit. Simulasi boleh publik.
 tools/ujian/*_def.py
 !tools/ujian/simulasi_def.py
+
+# Data mentah agregat dari Supabase situs: jangan di-commit (hanya angka di naskah yang terbit)
+docs/jurnal/data/
+__pycache__/

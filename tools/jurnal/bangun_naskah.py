@@ -106,10 +106,10 @@ class Naskah:
         r = p.add_run(teks); _font(r, 11, True, miring)
 
     def abstrak(self, teks, kata_kunci, label_kk):
-        p = self.doc.add_paragraph(); _fmt(p, "both", before=8, after=0); _runs(p, teks, 11, italic=(label_kk == "Keywords:"))
+        p = self.doc.add_paragraph(); _fmt(p, "both", before=8, after=0); _runs(p, teks, 11)
         k = self.doc.add_paragraph(); _fmt(k, "both", before=4)
-        r = k.add_run(label_kk + " "); _font(r, 11, False, label_kk == "Keywords:")
-        r = k.add_run(kata_kunci); _font(r, 11, False, label_kk == "Keywords:")
+        r = k.add_run(label_kk + " "); _font(r, 11)
+        r = k.add_run(kata_kunci); _font(r, 11)
 
     # ---- badan ----
     def bagian(self, teks):
@@ -141,6 +141,7 @@ class Naskah:
             e = OxmlElement("w:" + sisi); e.set(qn("w:val"), nilai); e.set(qn("w:sz"), "6"); e.set(qn("w:space"), "0"); e.set(qn("w:color"), "000000"); borders.append(e)
         tblPr.append(borders)
         rata = rata or ["left"] + ["center"] * (len(kolom) - 1)
+        trh = t.rows[0]._tr.get_or_add_trPr(); th = OxmlElement("w:tblHeader"); trh.append(th)  # judul kolom diulang bila tabel pindah halaman
         for i, row in enumerate([kolom] + baris):
             for j, sel in enumerate(row):
                 c = t.cell(i, j); c.width = Cm(lebar_cm[j])
@@ -169,10 +170,10 @@ class Naskah:
 
 def main():
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-    import isi_naskah
+    import isi_hasil
     n = Naskah()
-    isi_naskah.susun(n)
-    keluar = AKAR / "docs" / "jurnal" / "naskah" / isi_naskah.NAMA_BERKAS
+    isi_hasil.susun(n)
+    keluar = AKAR / "docs" / "jurnal" / "naskah" / isi_hasil.NAMA_BERKAS
     keluar.parent.mkdir(parents=True, exist_ok=True)
     n.simpan(keluar)
     print("ditulis:", keluar)

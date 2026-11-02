@@ -51,8 +51,8 @@ def main(berkas, halaman=None):
     i_met, i_has, i_kes, i_pus = P.index("METODE"), P.index("HASIL DAN PEMBAHASAN"), P.index("KESIMPULAN"), P.index("DAFTAR PUSTAKA")
     total = kata(" ".join(P[i_pen:i_pus]))
     pen, met = kata(" ".join(P[i_pen:i_met])), kata(" ".join(P[i_met:i_has]))
-    cek("Pendahuluan maks 20%% isi", pen / total <= 0.20, "%.1f%%" % (pen / total * 100))
-    cek("Metode maks 15%% isi", met / total <= 0.15, "%.1f%%" % (met / total * 100))
+    cek("Pendahuluan maks 20 persen isi", pen / total <= 0.20, "%.1f%%" % (pen / total * 100))
+    cek("Metode maks 15 persen isi", met / total <= 0.15, "%.1f%%" % (met / total * 100))
 
     refs = [t for t in P[i_pus + 1:] if t]
     tahun = [int(re.search(r"\((20\d\d)\)", r).group(1)) for r in refs]

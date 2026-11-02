@@ -1,0 +1,415 @@
+{
+ "sistem": {
+  "pyodide": "0.26.4",
+  "batas_detik": 5,
+  "berkas_js": 46,
+  "baris_js": 9927,
+  "migrasi": 13,
+  "python": {
+   "bab": 14,
+   "soal_koding": 13,
+   "soal_konsep": 1,
+   "kasus_uji": 67,
+   "praktik": 14
+  },
+  "java": {
+   "bab": 15,
+   "soal_koding": 11,
+   "soal_konsep": 4,
+   "kasus_uji": 50,
+   "praktik": 12
+  }
+ },
+ "periode": {
+  "mulai": "2026-10-07",
+  "akhir": "2026-11-02",
+  "diambil": "2026-11-02"
+ },
+ "populasi": {
+  "peserta": 99,
+  "setuju": 40,
+  "menolak": 1,
+  "belum": 58,
+  "angk_2026": 43,
+  "angk_2025_ke_bawah": 56,
+  "aktif_python": 58,
+  "aktif_java": 59
+ },
+ "bab": {
+  "python": [
+   {
+    "bab": 1,
+    "membuka": 22,
+    "lulus": 9,
+    "kirim": [
+     2,
+     2,
+     5
+    ],
+    "langsung": 7,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 2,
+    "membuka": 11,
+    "lulus": 5,
+    "kirim": [
+     1,
+     1,
+     1
+    ],
+    "langsung": 5,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 3,
+    "membuka": 42,
+    "lulus": 41,
+    "kirim": [
+     2,
+     3,
+     5
+    ],
+    "langsung": 40,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 4,
+    "membuka": 41,
+    "lulus": 41,
+    "kirim": [
+     2,
+     3,
+     6
+    ],
+    "langsung": 22,
+    "bantuan": 19
+   },
+   {
+    "bab": 5,
+    "membuka": 42,
+    "lulus": 37,
+    "kirim": [
+     1,
+     2,
+     4
+    ],
+    "langsung": 25,
+    "bantuan": 12
+   },
+   {
+    "bab": 6,
+    "membuka": 40,
+    "lulus": 33,
+    "kirim": [
+     1,
+     1,
+     2
+    ],
+    "langsung": 26,
+    "bantuan": 7
+   }
+  ],
+  "java": [
+   {
+    "bab": 1,
+    "membuka": 36,
+    "lulus": 25,
+    "kirim": [
+     1,
+     1,
+     2
+    ],
+    "langsung": 22,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 2,
+    "membuka": 37,
+    "lulus": 33,
+    "kirim": [
+     1,
+     1,
+     2
+    ],
+    "langsung": 23,
+    "bantuan": 10
+   },
+   {
+    "bab": 3,
+    "membuka": 48,
+    "lulus": 43,
+    "kirim": [
+     1,
+     2,
+     3
+    ],
+    "langsung": 26,
+    "bantuan": 17
+   },
+   {
+    "bab": 4,
+    "membuka": 52,
+    "lulus": 51,
+    "kirim": [
+     2,
+     3,
+     7.5
+    ],
+    "langsung": 48,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 5,
+    "membuka": 51,
+    "lulus": 43,
+    "kirim": [
+     1,
+     1,
+     2
+    ],
+    "langsung": 28,
+    "bantuan": 15
+   },
+   {
+    "bab": 6,
+    "membuka": 45,
+    "lulus": 36,
+    "kirim": [
+     1,
+     1,
+     3
+    ],
+    "langsung": 27,
+    "bantuan": 9
+   },
+   {
+    "bab": 7,
+    "membuka": 38,
+    "lulus": 31,
+    "kirim": [
+     1,
+     1,
+     2
+    ],
+    "langsung": 24,
+    "bantuan": 7
+   },
+   {
+    "bab": 8,
+    "membuka": 31,
+    "lulus": 27,
+    "kirim": [
+     1,
+     1,
+     1
+    ],
+    "langsung": 27,
+    "bantuan": "<5"
+   },
+   {
+    "bab": 9,
+    "membuka": 10,
+    "lulus": 9,
+    "kirim": [
+     1,
+     1,
+     1
+    ],
+    "langsung": 7,
+    "bantuan": "<5"
+   }
+  ]
+ },
+ "jalur": {
+  "py_3_6_lulus": 152,
+  "py_3_6_bantuan": 39,
+  "jv_1_9_lulus": 298,
+  "jv_1_9_bantuan": 66
+ },
+ "percobaan": {
+  "baris": 5870,
+  "peserta": 96,
+  "jalankan": 4315,
+  "kirim": 1555,
+  "py_jalankan": 2245,
+  "py_kirim": 675,
+  "jv_jalankan": 2070,
+  "jv_kirim": 880,
+  "kirim_lulus": 944,
+  "kirim_gagal": 611,
+  "prop_lulus": 0.607,
+  "prop_lulus_setuju": 0.664,
+  "baris_setuju": 2409,
+  "rasio_kasus": [
+   0.429,
+   0.897,
+   1.0
+  ],
+  "hasil": {
+   "jalan": 2280,
+   "galat": 1934,
+   "lulus": 931,
+   "gagal": 594,
+   "timeout": 101,
+   "kosong": 30
+  }
+ },
+ "galat": {
+  "daftar": [
+   [
+    "CannotResolve",
+    659,
+    "Java"
+   ],
+   [
+    "SyntaxError",
+    597,
+    "Python"
+   ],
+   [
+    "IndentationError",
+    373,
+    "Python"
+   ],
+   [
+    "Timeout",
+    101,
+    "Python dan Java"
+   ],
+   [
+    "GalatKompilasi",
+    93,
+    "Java"
+   ],
+   [
+    "NameError",
+    62,
+    "Python"
+   ],
+   [
+    "ValueError",
+    44,
+    "Python"
+   ],
+   [
+    "EOFError",
+    32,
+    "Python"
+   ],
+   [
+    "TypeError",
+    24,
+    "Python"
+   ],
+   [
+    "TypeMismatch",
+    21,
+    "Java"
+   ]
+  ],
+  "dasar": 2035
+ },
+ "petunjuk": {
+  "sebaran": {
+   "0": 4085,
+   "1": 781,
+   "2": 185,
+   "3": 789
+  },
+  "total": 5840
+ },
+ "pola": {
+  "diketik": [
+   0,
+   38,
+   201
+  ],
+  "dihapus": [
+   0,
+   36,
+   193
+  ],
+  "rasio_hapus": [
+   0,
+   0.295,
+   0.79
+  ],
+  "cps": [
+   0.41,
+   0.62,
+   0.9
+  ],
+  "lompat": [
+   0,
+   1,
+   3
+  ],
+  "jalankan": [
+   1,
+   3,
+   7
+  ]
+ },
+ "pola_n": 2186,
+ "sesi": {
+  "sesi": 30110,
+  "nol": 28372,
+  "total_jam": 447.4,
+  "per_peserta": [
+   18.5,
+   43,
+   207
+  ],
+  "jam_per_peserta": [
+   2.52,
+   3.98,
+   5.67
+  ],
+  "per_jam": [
+   1672,
+   1144,
+   1021,
+   956,
+   653,
+   578,
+   473,
+   403,
+   957,
+   1558,
+   1610,
+   1717,
+   1063,
+   1185,
+   946,
+   1003,
+   632,
+   887,
+   1219,
+   1428,
+   1808,
+   2395,
+   2484,
+   2318
+  ]
+ },
+ "laporan": {
+  "baris": 273,
+  "draf": 273,
+  "dikumpulkan": 0,
+  "dengan_tempel": 32,
+  "dari": 273,
+  "dinilai": 0
+ },
+ "praktikum": {
+  "baris": 625,
+  "peserta": 90,
+  "lulus": 539,
+  "prop": 0.862,
+  "kirim": [
+   1,
+   2,
+   4
+  ]
+ }
+}
