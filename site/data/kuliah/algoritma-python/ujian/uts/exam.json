@@ -1,6 +1,6 @@
 {
   "id": "AP-UTS-2026",
-  "title": "UTS Algoritma dan Pemrograman (pilot)",
+  "title": "UTS Algoritma dan Pemrograman",
   "course": "Algoritma dan Pemrograman (Python)",
   "intro": "Satu kali jalan: Tahap 1 (60 menit, 4 soal: 2 teori + 2 praktik, Bab 1–7) lalu Tahap 2 (pertanyaan singkat yang dijawab satu kalimat) dimulai otomatis begitu Tahap 1 selesai. Kedua tahap berbatas waktu. Soal praktik dinilai tes, soal teori dinilai dari poin kunci, Tahap 2 dinilai otomatis. Boleh lewat HP.",
   "aiDeclarationOptions": [
