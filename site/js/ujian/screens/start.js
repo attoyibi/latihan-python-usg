@@ -3,7 +3,8 @@ import { getRunner } from '../runner.js';
 import { bahasa } from '../bahasa.js';
 import { html, show, $ } from '../ui.js';
 
-const waktu = (iso) => new Date(iso).toLocaleString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+// Tahun ikut ditampilkan bila bukan tahun ini (jadwal simulasi berlaku setahun, jangan terbaca "besok").
+const waktu = (iso) => new Date(iso).toLocaleString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: new Date(iso).getFullYear() === new Date().getFullYear() ? undefined : 'numeric', hour: '2-digit', minute: '2-digit' });
 
 // Halaman awal peserta: aturan main satu kali jalan, jadwal kelasnya (dari server), lalu tombol Mulai.
 // Tombol Mulai aktif bila jadwal kelasnya sedang buka DAN penjalan bahasanya siap (Python ±10 MB, Java ±20 MB), supaya waktu Tahap 1 tidak habis
