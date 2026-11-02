@@ -1,0 +1,54 @@
+{
+  "tasks": [
+    {
+      "id": "S1",
+      "title": "Praktik 1 · Struk sederhana",
+      "topic": "Variabel dan input (Bab 2)",
+      "statement": [
+        "UD Rasa Gresik menjual kue Rp 20.000 per boks. Tulis program yang membaca nama pembeli pada baris pertama dan jumlah boks (bilangan bulat) pada baris kedua.",
+        "Cetak tiga baris: Halo, NAMA! lalu Jumlah boks: ... lalu Total: Rp ... (jumlah dikali 20000)."
+      ],
+      "starter": "# Baca nama dan jumlah boks\nnama = input()\n\n",
+      "visible": [
+        {
+          "input": [
+            "Ani",
+            "3"
+          ],
+          "expected": "Halo, Ani!\nJumlah boks: 3\nTotal: Rp 60000"
+        },
+        {
+          "input": [
+            "Budi",
+            "1"
+          ],
+          "expected": "Halo, Budi!\nJumlah boks: 1\nTotal: Rp 20000"
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Praktik 2 · Ongkos kirim",
+      "topic": "Percabangan (Bab 4)",
+      "statement": [
+        "Harga kue Rp 20.000 per boks. Pesanan 10 boks atau lebih gratis ongkos kirim; di bawah 10 boks ongkos kirimnya Rp 10.000. Tulis program yang membaca jumlah boks (bilangan bulat).",
+        "Cetak tiga baris: Subtotal: Rp ... (jumlah dikali 20000), Ongkir: Rp ... (0 bila gratis), dan Total bayar: Rp ... (subtotal ditambah ongkir)."
+      ],
+      "starter": "# Baca jumlah boks\njumlah = int(input())\n\n",
+      "visible": [
+        {
+          "input": [
+            "3"
+          ],
+          "expected": "Subtotal: Rp 60000\nOngkir: Rp 10000\nTotal bayar: Rp 70000"
+        },
+        {
+          "input": [
+            "12"
+          ],
+          "expected": "Subtotal: Rp 240000\nOngkir: Rp 0\nTotal bayar: Rp 240000"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "ujian": [
+    {
+      "id": "simulasi",
+      "judul": "Simulasi ujian (latihan)",
+      "jenis": "Simulasi",
+      "babDari": 1,
+      "babSampai": 4,
+      "latihan": true
+    },
+    {
+      "id": "uts",
+      "judul": "UTS Algoritma dan Pemrograman",
+      "jenis": "UTS",
+      "babDari": 1,
+      "babSampai": 7
+    },
+    {
+      "id": "uas",
+      "judul": "UAS Algoritma dan Pemrograman",
+      "jenis": "UAS",
+      "babDari": 8,
+      "babSampai": 14
+    }
+  ]
+}

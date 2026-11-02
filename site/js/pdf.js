@@ -120,6 +120,9 @@ export function gambarPdf(JsPDF, blok, kodeVerifikasi) {
         y += Math.max(1, nilai.length) * 5 + 0.6;
       }
       y += 3;
+    } else if (b.t === "halaman") {
+      doc.addPage();
+      y = T;
     } else if (b.t === "catatan") {
       tulis(b.teks, 9.5, "italic", false, 4);
     } else if (b.t === "bagian") {

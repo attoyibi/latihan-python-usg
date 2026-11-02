@@ -267,6 +267,32 @@ Tiap bab: ringkasan, tautan sub-bab buku, video, challenge, test case (diverifik
 - [ ] Status terkumpul, disetujui, perlu revisi
 - [ ] Peserta dan instruktur saja yang dapat melihat berkas
 
+## Tahap U: Ujian UTS/UAS (branch `fitur/ujian`, mulai 31 Okt 2026)
+
+Fitur dari prototype `double-check-exam` (panduan: `double-check-exam/docs/panduan-integrasi-situs-latihan.md`). Dikerjakan di branch `fitur/ujian`, BELUM digabung ke `main`. Ringkasan: `docs/UJIAN.md`.
+
+- [x] Logika murni (`site/js/ujian/logic/`, disalin utuh dari prototype) dan 50 unit test (`node --test tools/uji_ujian/logika.test.mjs`, masuk CI)
+- [x] Data UTS (Bab 1-7) di `site/data/kuliah/algoritma-python/ujian/`; aktif lewat `"ujian": true` di `matakuliah.json`
+- [x] Layar Mulai, Tahap 1, Tahap 2, Hasil di rute `#k/<mk>/ujian/<id>` dengan login, penjalan Python, dan blokir tempel situs; kartu Ujian di halaman mata kuliah; promo tidak muncul selama ujian
+- [x] Diuji di `tools/server_uji.py` (akun budi): Tahap 1 terkunci, 9 butir Tahap 2 dari kode, nilai, uji ulang, muat ulang di tengah Tahap 2 (waktu tetap berjalan), tampilan HP 375 px
+- [x] Simulasi ujian (Bab 1-4, lebih mudah, nilai tidak dihitung, bisa diulang) supaya peserta mencoba setiap tahap; soal di `tools/ujian/simulasi_def.py`
+- [x] Migrasi `0010_ujian.sql`: jadwal per kelas, akomodasi, sesi dengan jam server, kunci yang turun setelah Tahap 1 dikunci; diuji di PGlite (Tahap N di `tools/uji_sql`)
+- [x] Klien tersambung ke fungsi server; tes tersembunyi, poin kunci, butir konsep dipindah ke `kunci/` + tabel `ujian_kunci` (`tools/ujian/buat_kunci_ujian.py`)
+- [x] Tab "Ujian" di dashboard dosen: jadwal, tutup sekarang, akomodasi per NIM, rekap nilai, CSV, izinkan mengulang
+- [ ] **Jalankan 0010 dan `kunci/ujian_kunci.sql` di Supabase sungguhan** (sesi dengan folder kerja website-latihan, MCP), lalu uji dengan akun nyata di pratinjau
+- [ ] Soal UTS sungguhan yang belum pernah terbit (soal contoh sudah ada di riwayat repo publik)
+- [ ] Sisa celah: kunci butir Tahap 2 ada di browser selama Tahap 2; ringkasan nilai dikirim browser (lihat `docs/UJIAN.md`)
+- [x] UAS (Bab 8-14, 90 menit): fungsi dan sorting, kelas dan CRUD, teori fungsi/rekursi dan searching/sorting; soal di `tools/ujian/uas_def.py` (diabaikan git karena berisi kunci) dan teori lengkap di `kunci/ujian/uas/`; tanpa jadwal bawaan (tertutup sampai dosen membuka)
+- [x] Ujian PBO Java (`pbo-java`): simulasi (Bab 1-4), UTS (Bab 1-7), UAS (Bab 8-15); mesin ujian memilih penjalan, editor, dan teks menurut `bahasa` mata kuliah (`site/js/ujian/bahasa.js`); soal dan kunci di `kunci/ujian/pbo-java/` (rahasia), diperiksa dengan `tools/ujian/periksa_ujian.py` dan `uji_ujian_java.mjs`; lihat `docs/UJIAN.md`
+- [x] Tahap 2 terbuka (pertanyaan satu kalimat dibandingkan dengan Tahap 1), peserta tanpa nilai + PDF, dosen ekspor CSV/PDF dan unggah hasil analisis; migrasi `0011_ujian_selesai.sql` (diuji di `tools/uji_sql`, Tahap N2)
+- [x] AI bertanggung jawab: teori lebih panjang dan parafrase, UTS/UAS 60 menit, catat keluar tab, kode tak harus benar untuk masuk Tahap 2, contoh jawaban UTS/UAS untuk dosen (migrasi `0012_ujian_contoh.sql`)
+- [x] Pantau peserta di tab Ujian dosen (belum masuk/Tahap 1/Tahap 2/selesai, saringan prodi-angkatan-kelas, urutan, segar otomatis) dan peserta dummy untuk simulasi
+- [ ] **Jalankan `supabase/migrations/0013_ujian_dosen_bebas.sql`** (dosen bisa memulai dan mengulang ujian kapan saja untuk memeriksa; peserta tetap terikat jadwal)
+- [ ] **Jalankan `0012_ujian_contoh.sql`, lalu `kunci/ujian_contoh.sql` dan `kunci/ujian_contoh_pbo-java.sql` di Supabase** (tanpa ini dosen tidak melihat tombol contoh di UTS/UAS)
+- [ ] **Jalankan `supabase/migrations/0011_ujian_selesai.sql` di Supabase** (sebelum ujian dipakai; tanpa ini jawaban belum terkunci di server)
+- [ ] **Jalankan `kunci/ujian_kunci_pbo-java.sql` di Supabase SQL Editor** (hanya berkas ini; baris algoritma-python tidak disentuh), lalu buka jadwal UTS/UAS pbo-java dari tab Ujian
+- [ ] Pilot kecil di perangkat nyata
+
 ## Tahap 8: Uji coba dan rilis
 
 - [ ] Uji coba 5 sampai 10 mahasiswa (ponsel dan laptop)

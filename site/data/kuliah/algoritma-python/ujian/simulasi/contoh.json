@@ -1,0 +1,24 @@
+{
+  "code": {
+    "S1": "nama = input()\njumlah = int(input())\ntotal = jumlah * 20000\nprint(f\"Halo, {nama}!\")\nprint(f\"Jumlah boks: {jumlah}\")\nprint(f\"Total: Rp {total}\")\n",
+    "S2": "jumlah = int(input())\nsubtotal = jumlah * 20000\nif jumlah >= 10:\n    ongkir = 0\nelse:\n    ongkir = 10000\nprint(f\"Subtotal: Rp {subtotal}\")\nprint(f\"Ongkir: Rp {ongkir}\")\nprint(f\"Total bayar: Rp {subtotal + ongkir}\")\n"
+  },
+  "theory": {
+    "SQ1": "Variabel adalah nama yang dipakai untuk menyimpan sebuah nilai supaya bisa dipakai lagi. Tipe int adalah bilangan bulat, misalnya 5. Float adalah bilangan desimal, misalnya 2.5. Str adalah teks, misalnya \"kue\". Hasil input() selalu berupa teks atau str, jadi harus diubah dengan int() dulu supaya bisa dihitung sebagai angka.",
+    "SQ2": "Blok if dijalankan kalau kondisinya benar. Kalau salah, elif diperiksa sebagai kondisi berikutnya, dan else dijalankan kalau semua kondisi sebelumnya salah. Tanda = dipakai untuk mengisi nilai ke variabel, sedangkan == dipakai untuk membandingkan dua nilai. Indentasi atau spasi di awal baris menentukan baris mana yang masuk ke dalam blok if."
+  },
+  "changes": {
+    "S1": [
+      {
+        "id": "CS1a",
+        "text": "Harga satu boks naik menjadi Rp 25.000. Bentuk keluaran tidak berubah."
+      }
+    ],
+    "S2": [
+      {
+        "id": "CS2a",
+        "text": "Gratis ongkos kirim kini berlaku mulai 5 boks (bukan 10). Di bawah 5 boks ongkirnya tetap Rp 10.000."
+      }
+    ]
+  }
+}

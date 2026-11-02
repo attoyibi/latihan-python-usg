@@ -654,14 +654,195 @@ console.log("\n== Tahap M: migrasi 0009 (kunci jawaban, hanya dibaca instruktur)
   } else console.log("LEWAT kunci/kunci_jawaban.sql tidak ada (normal di CI)");
 }
 
+console.log("\n== Tahap N: migrasi 0010 (ujian: jadwal, akomodasi, sesi dengan jam server, kunci) ==");
+{
+  const MK = "algoritma-python";
+  await q("update public.profiles set kelas = 'SI-2024-A' where id = $1", [U1]);
+  // U2 sudah dijadikan instruktur di uji sebelumnya: pakai peserta baru (rombel B) untuk sisi peserta.
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  await q("insert into auth.users (id, email) values ($1, 'u7@x.id') on conflict do nothing", [U2]);
+  await q("insert into public.profiles (id, nama, nim, kelas) values ($1, 'Peserta Ujian', '2024119977', 'SI-2024-B') on conflict (id) do update set kelas = excluded.kelas", [U2]);
+  const sesiAwal = (await q("select count(*)::int as n from public.percobaan")).rows[0].n;
+  if (!(await jalankan("0010_ujian.sql berjalan di atas data lama", migrasi("0010_ujian.sql")))) process.exit(1);
+  cek("0010 aman dijalankan ulang", await jalankan("0010 diulang", migrasi("0010_ujian.sql")));
+  cek("tabel lama tidak berubah", (await q("select count(*)::int as n from public.percobaan")).rows[0].n === sesiAwal);
+  cek("simulasi terbuka untuk semua kelas dan boleh diulang (bawaan)", (await q("select boleh_ulang from public.ujian_jadwal where ujian_id = 'simulasi' and kelas = '*'")).rows[0]?.boleh_ulang === true);
+  cek("UTS tanpa jadwal bawaan (tertutup sampai dosen membuka)", (await q("select count(*)::int as n from public.ujian_jadwal where ujian_id = 'uts'")).rows[0].n === 0);
+  cek("UAS tanpa jadwal bawaan (tertutup sampai dosen membuka)", (await q("select count(*)::int as n from public.ujian_jadwal where ujian_id = 'uas'")).rows[0].n === 0);
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+
+  // hak akses dasar
+  cek("pengunjung (anon) ditolak membaca jadwal dan sesi", ditolak(await sebagai("anon", null, () => q("select * from public.ujian_jadwal")), RLS) && ditolak(await sebagai("anon", null, () => q("select * from public.ujian_sesi")), RLS));
+  cek("pengunjung (anon) tidak bisa memanggil ujian_mulai", ditolak(await sebagai("anon", null, () => q("select public.ujian_mulai('algoritma-python', 'uts', 75)")), RLS));
+  cek("peserta membaca jadwal", (await rpc(U1, "select * from public.ujian_jadwal")).rows.length >= 1);
+  cek("peserta tidak bisa membuat jadwal", ditolak(await rpc(U1, "insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uts', '*', now(), now() + interval '1 hour')", MK), RLS));
+  cek("peserta tidak bisa membaca kunci ujian", ditolak(await rpc(U1, "select * from public.ujian_kunci"), RLS));
+  cek("instruktur pun tidak bisa membaca kunci ujian lewat API", ditolak(await rpc(IN, "select * from public.ujian_kunci"), RLS));
+  cek("instruktur tidak bisa menulis kunci ujian lewat API", ditolak(await rpc(IN, "insert into public.ujian_kunci (matakuliah_id, ujian_id, isi) values ($1, 'uts', '{}')", MK), RLS));
+
+  // UTS belum dibuka
+  const mulai = (uid, uj = "uts", menit = 75) => rpc(uid, "select public.ujian_mulai($1, $2, $3) as s", MK, uj, menit);
+  const tutup = await mulai(U1);
+  cek("UTS belum bisa dimulai tanpa jadwal", ditolak(tutup, "P0001") && /belum dibuka/.test(tutup.error), tutup.error);
+  cek("jadwal dengan tutup sebelum buka ditolak", ditolak(await rpc(IN, "insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uts', '*', now(), now() - interval '1 hour')", MK), "23514"));
+  cek("kelas berpola aneh ditolak", ditolak(await rpc(IN, "insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uts', 'A B;', now(), now() + interval '1 hour')", MK), "23514"));
+  // dosen membuka UTS untuk rombel A saja; rombel B dijadwalkan besok
+  cek("instruktur membuka UTS untuk rombel A", !(await rpc(IN, "insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uts', 'A', now() - interval '5 minutes', now() + interval '2 hours')", MK)).error);
+  cek("instruktur menjadwalkan rombel B besok", !(await rpc(IN, "insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uts', 'B', now() + interval '1 day', now() + interval '1 day 2 hours')", MK)).error);
+  const st2 = await rpc(U2, "select public.ujian_status($1, 'uts') as s", MK);
+  cek("peserta rombel B melihat jadwalnya sendiri dan status belum buka", !st2.error && st2.rows[0].s.buka === false && st2.rows[0].s.jadwal.kelas === "B", st2.error || JSON.stringify(st2.rows[0]));
+  cek("peserta rombel B belum bisa mulai", ditolak(await mulai(U2), "P0001"));
+  const m1 = await mulai(U1);
+  cek("peserta rombel A mulai UTS", !m1.error && !!m1.rows[0].s.sesi, m1.error);
+  const s1 = m1.rows ? m1.rows[0].s.sesi : {};
+  const durasi = (Date.parse(s1.batas_tahap1) - Date.parse(s1.mulai_pada)) / 60000;
+  cek("batas Tahap 1 = 75 menit dari jam server", Math.abs(durasi - 75) < 0.01, String(durasi));
+  const m1b = await mulai(U1);
+  cek("memanggil mulai lagi tidak mereset waktu", !m1b.error && m1b.rows[0].s.sesi.mulai_pada === s1.mulai_pada);
+  cek("durasi tidak sah ditolak", ditolak(await rpc(U2, "select public.ujian_mulai($1, 'simulasi', 1)", MK), "22023"));
+
+  // akomodasi dan durasi dari jadwal
+  cek("peserta tidak bisa memberi dirinya akomodasi", ditolak(await rpc(U2, "insert into public.ujian_akomodasi (matakuliah_id, ujian_id, user_id, faktor) values ($1, 'simulasi', $2, 3)", MK, U2), RLS));
+  cek("instruktur memberi akomodasi 1,5", !(await rpc(IN, "insert into public.ujian_akomodasi (matakuliah_id, ujian_id, user_id, faktor) values ($1, 'simulasi', $2, 1.5)", MK, U2)).error);
+  cek("faktor di luar 1 sampai 3 ditolak", ditolak(await rpc(IN, "insert into public.ujian_akomodasi (matakuliah_id, ujian_id, user_id, faktor) values ($1, 'uts', $2, 5)", MK, U2), "23514"));
+  await rpc(IN, "update public.ujian_jadwal set menit = 30 where ujian_id = 'simulasi' and kelas = '*'");
+  const m2 = await rpc(U2, "select public.ujian_mulai($1, 'simulasi', 40) as s", MK);
+  const s2 = m2.rows ? m2.rows[0].s.sesi : {};
+  cek("durasi dari jadwal dosen dikali akomodasi (30 x 1,5 = 45 menit)", !m2.error && Math.abs((Date.parse(s2.batas_tahap1) - Date.parse(s2.mulai_pada)) / 60000 - 45) < 0.01, m2.error || JSON.stringify(s2));
+  cek("peserta membaca akomodasinya sendiri saja", (await rpc(U2, "select * from public.ujian_akomodasi")).rows.length === 1 && (await rpc(U1, "select * from public.ujian_akomodasi")).rows.length === 0);
+
+  // sesi: siapa boleh apa
+  cek("peserta tidak bisa membuat sesi langsung", ditolak(await rpc(U1, "insert into public.ujian_sesi (user_id, matakuliah_id, ujian_id, batas_tahap1) values ($1, $2, 'simulasi', now() + interval '9 hours')", U1, MK), RLS));
+  cek("peserta tidak bisa memperpanjang batas waktunya", ditolak(await rpc(U1, "update public.ujian_sesi set batas_tahap1 = now() + interval '9 hours' where user_id = $1", U1), RLS));
+  cek("peserta tidak bisa memalsukan waktu mulai atau kunci", ditolak(await rpc(U1, "update public.ujian_sesi set mulai_pada = now(), terkunci_pada = null where user_id = $1", U1), RLS));
+  cek("peserta menyimpan pekerjaannya (keadaan) dan ringkasan nilai", (await rpc(U1, "update public.ujian_sesi set keadaan = $2::jsonb, hasil = '{\"nilai\": 80}' where user_id = $1 and ujian_id = 'uts'", U1, JSON.stringify({ draf: "x" }))).n === 1);
+  cek("keadaan lebih dari 600 ribu byte ditolak", ditolak(await rpc(U1, "update public.ujian_sesi set keadaan = jsonb_build_object('x', repeat('a', 610000)) where user_id = $1", U1), "23514"));
+  cek("peserta lain tidak membaca atau mengubah sesi orang lain", (await rpc(U2, "select * from public.ujian_sesi where user_id = $1", U1)).rows.length === 0 && (await rpc(U2, "update public.ujian_sesi set hasil = '{}' where user_id = $1", U1)).n === 0);
+  cek("instruktur membaca semua sesi", (await rpc(IN, "select user_id from public.ujian_sesi")).rows.length === 2);
+  cek("instruktur tidak bisa mengubah pekerjaan peserta", (await rpc(IN, "update public.ujian_sesi set hasil = '{}' where user_id = $1", U1)).n === 0);
+  cek("peserta tidak bisa menghapus sesinya sendiri (mengulang UTS)", (await rpc(U1, "delete from public.ujian_sesi where user_id = $1 and ujian_id = 'uts'", U1)).n === 0);
+
+  // kunci hanya setelah terkunci
+  const snap = JSON.stringify({ code: { T2: "print(1)" } });
+  const HASH = "a".repeat(64);
+  const kunciBelum = await rpc(U1, "select public.ujian_kunci_tahap1($1, 'uts', $2::jsonb, $3) as k", MK, snap, HASH);
+  cek("mengunci ditolak jelas bila kunci ujian belum dipasang pengajar", ditolak(kunciBelum, "P0001") && /kunci ujian belum dipasang/.test(kunciBelum.error), kunciBelum.error);
+  cek("gagal mengunci tidak meninggalkan waktu kunci", (await q("select terkunci_pada from public.ujian_sesi where user_id = $1 and ujian_id = 'uts'", [U1])).rows[0].terkunci_pada === null);
+  await q("insert into public.ujian_kunci (matakuliah_id, ujian_id, isi) values ($1, 'uts', $2::jsonb), ($1, 'simulasi', $2::jsonb)", [MK, JSON.stringify({ tasks: { T2: { hidden: [{ input: ["1"], expected: "rahasia" }] } } })]);
+  cek("kunci tidak bisa diambil sebelum Tahap 1 dikunci", ditolak(await rpc(U1, "select public.ujian_ambil_kunci($1, 'uts')", MK), RLS));
+  cek("kunci tidak bisa diambil tanpa sesi", ditolak(await rpc(U2, "select public.ujian_ambil_kunci($1, 'uts')", MK), RLS));
+  const k1 = await rpc(U1, "select public.ujian_kunci_tahap1($1, 'uts', $2::jsonb, $3) as k", MK, snap, HASH);
+  cek("mengunci Tahap 1 mengembalikan kunci", !k1.error && k1.rows[0].k.kunci.tasks.T2.hidden[0].expected === "rahasia", k1.error);
+  const t1 = (await q("select terkunci_pada, terlambat, snapshot from public.ujian_sesi where user_id = $1 and ujian_id = 'uts'", [U1])).rows[0];
+  cek("waktu kunci dari jam server, tidak terlambat", !!t1.terkunci_pada && t1.terlambat === false);
+  await rpc(U1, "select public.ujian_kunci_tahap1($1, 'uts', $2::jsonb, $3) as k", MK, JSON.stringify({ code: { T2: "kode baru" } }), "b".repeat(64));
+  const t1b = (await q("select terkunci_pada, snapshot, hash from public.ujian_sesi where user_id = $1 and ujian_id = 'uts'", [U1])).rows[0];
+  cek("jawaban yang sudah terkunci tidak bisa diganti", t1b.snapshot.code.T2 === "print(1)" && t1b.hash === HASH && String(t1b.terkunci_pada) === String(t1.terkunci_pada));
+  cek("setelah terkunci kunci bisa diambil lagi (muat ulang halaman)", !(await rpc(U1, "select public.ujian_ambil_kunci($1, 'uts')", MK)).error);
+  cek("hash yang bukan sha256 ditolak", ditolak(await rpc(U2, "select public.ujian_kunci_tahap1($1, 'simulasi', '{}'::jsonb, 'bukan-hash')", MK), "23514"));
+  // terlambat: batas dimundurkan oleh superuser, lalu dikunci
+  await q("update public.ujian_sesi set batas_tahap1 = now() - interval '10 minutes' where user_id = $1 and ujian_id = 'simulasi'", [U2]);
+  await rpc(U2, "select public.ujian_kunci_tahap1($1, 'simulasi', '{}'::jsonb, $2)", MK, HASH);
+  cek("mengunci jauh lewat batas ditandai terlambat", (await q("select terlambat from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", [U2])).rows[0].terlambat === true);
+
+  // mengulang
+  cek("UTS tidak bisa diulang peserta", ditolak(await rpc(U1, "select public.ujian_ulang($1, 'uts')", MK), RLS));
+  const ul = await rpc(U2, "select public.ujian_ulang($1, 'simulasi') as u", MK);
+  cek("simulasi bisa diulang: sesi lama dihapus", !ul.error && (await q("select count(*)::int as n from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", [U2])).rows[0].n === 0, ul.error);
+  cek("instruktur mengizinkan peserta mengulang UTS (hapus sesi)", (await rpc(IN, "delete from public.ujian_sesi where user_id = $1 and ujian_id = 'uts'", U1)).n === 1);
+  cek("jadwal ditutup dosen: peserta tidak bisa mulai lagi", !(await rpc(IN, "update public.ujian_jadwal set buka = now() - interval '2 hours', tutup = now() - interval '1 minute' where ujian_id = 'uts' and kelas = 'A'")).error && ditolak(await mulai(U1), "P0001"));
+  // SQL kunci buatan alat (hanya ada di komputer pemilik)
+  const berkasKunciUjian = join(root, "kunci", "ujian_kunci.sql");
+  if (existsSync(berkasKunciUjian)) {
+    const sqlKU = readFileSync(berkasKunciUjian, "utf8");
+    cek("ujian_kunci.sql buatan alat berjalan dan aman diulang", (await jalankan("ujian_kunci.sql", sqlKU)) && (await jalankan("ujian_kunci.sql diulang", sqlKU)));
+    cek("kunci UTS dari alat berisi tes tersembunyi", (await q("select jsonb_array_length(isi->'tasks'->'T2'->'hidden') as n from public.ujian_kunci where ujian_id = 'uts'")).rows[0].n > 0);
+  } else console.log("LEWAT kunci/ujian_kunci.sql tidak ada (normal di CI)");
+}
+
+console.log("\n== Tahap N2: migrasi 0011 (jawaban ujian dikunci setelah selesai, hasil analisis) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0011_ujian_selesai.sql berjalan", migrasi("0011_ujian_selesai.sql")))) process.exit(1);
+  cek("0011 aman dijalankan ulang", await jalankan("0011 diulang", migrasi("0011_ujian_selesai.sql")));
+  await q("delete from public.ujian_sesi where ujian_id = 'simulasi'");
+  await rpc(U2, "select public.ujian_mulai($1, 'simulasi', 40)", MK);
+  cek("selesai ditolak sebelum Tahap 1 dikunci", ditolak(await rpc(U2, "select public.ujian_selesai($1, 'simulasi')", MK), RLS));
+  await q("update public.ujian_sesi set terkunci_pada = now() where user_id = $1 and ujian_id = 'simulasi'", [U2]);
+  cek("peserta menyimpan jawaban Tahap 2 sebelum selesai", (await rpc(U2, "update public.ujian_sesi set keadaan = '{\"a\":1}'::jsonb where user_id = $1 and ujian_id = 'simulasi'", U2)).n === 1);
+  cek("peserta tanpa sesi tidak bisa menyelesaikan", ditolak(await rpc("99999999-9999-9999-9999-999999999999", "select public.ujian_selesai($1, 'simulasi')", MK), RLS));
+  const sel = await rpc(U2, "select public.ujian_selesai($1, 'simulasi') as t", MK);
+  cek("peserta menutup jawaban: waktu dari jam server", !sel.error && !!sel.rows[0].t, sel.error);
+  const sel2 = await rpc(U2, "select public.ujian_selesai($1, 'simulasi') as t", MK);
+  cek("menutup lagi tidak mengubah waktu selesai", !sel2.error && String(sel2.rows[0].t) === String(sel.rows[0].t));
+  cek("setelah selesai peserta tidak bisa mengubah keadaan", /sudah dikumpulkan/.test((await rpc(U2, "update public.ujian_sesi set keadaan = '{\"a\":2}'::jsonb where user_id = $1", U2)).error || ""));
+  cek("setelah selesai peserta tidak bisa mengubah ringkasan nilai", /sudah dikumpulkan/.test((await rpc(U2, "update public.ujian_sesi set hasil = '{\"nilai\":100}'::jsonb where user_id = $1", U2)).error || ""));
+  cek("peserta tidak bisa membuka kunci selesai_pada", ditolak(await rpc(U2, "update public.ujian_sesi set selesai_pada = null where user_id = $1", U2), RLS));
+  cek("peserta tidak bisa menulis kolom analisis", ditolak(await rpc(U2, "update public.ujian_sesi set analisis = '{\"x\":1}'::jsonb where user_id = $1", U2), RLS));
+  cek("peserta tidak bisa memanggil ujian_analisis_simpan", ditolak(await rpc(U2, "select public.ujian_analisis_simpan($1, 'simulasi', $2, '{}'::jsonb)", MK, U2), RLS));
+  const an = JSON.stringify({ rows: { "b:probe:1": { konsistensi: "tidak_konsisten", skor: 20, catatan: "x" } } });
+  const simp = await rpc(IN, "select public.ujian_analisis_simpan($1, 'simulasi', $2, $3::jsonb)", MK, U2, an);
+  cek("instruktur menyimpan analisis peserta", !simp.error && (await q("select analisis->'rows'->'b:probe:1'->>'skor' as s from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", [U2])).rows[0].s === "20", simp.error);
+  cek("instruktur tetap tidak bisa mengubah jawaban peserta", (await rpc(IN, "update public.ujian_sesi set keadaan = '{}'::jsonb where user_id = $1", U2)).n === 0);
+  cek("instruktur membaca analisis dan waktu selesai", (await rpc(IN, "select analisis, selesai_pada from public.ujian_sesi where user_id = $1", U2)).rows[0].selesai_pada !== null);
+  cek("sesi yang tidak ada ditolak jelas", ditolak(await rpc(IN, "select public.ujian_analisis_simpan($1, 'uas', $2, '{}'::jsonb)", MK, U2), "P0002"));
+  cek("instruktur menghapus sesi selesai (izinkan mengulang)", (await rpc(IN, "delete from public.ujian_sesi where user_id = $1 and ujian_id = 'simulasi'", U2)).n === 1);
+}
+
+console.log("\n== Tahap N3: migrasi 0012 (contoh jawaban UTS/UAS hanya untuk instruktur) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0012_ujian_contoh.sql berjalan", migrasi("0012_ujian_contoh.sql")))) process.exit(1);
+  cek("0012 aman dijalankan ulang", await jalankan("0012 diulang", migrasi("0012_ujian_contoh.sql")));
+  await q("insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values ($1, 'uts', $2::jsonb) on conflict do nothing", [MK, JSON.stringify({ code: { T2: "kode contoh" }, theory: { Q1: "jawaban contoh" } })]);
+  cek("pengunjung (anon) tidak bisa membaca tabel contoh", ditolak(await sebagai("anon", null, () => q("select * from public.ujian_contoh")), RLS));
+  cek("peserta tidak bisa membaca tabel contoh langsung", ditolak(await rpc(U2, "select * from public.ujian_contoh"), RLS));
+  cek("instruktur pun tidak membaca tabel contoh langsung (hanya lewat fungsi)", ditolak(await rpc(IN, "select * from public.ujian_contoh"), RLS));
+  cek("peserta tidak bisa memanggil ujian_contoh_dosen", ditolak(await rpc(U2, "select public.ujian_contoh_dosen($1, 'uts')", MK), RLS));
+  cek("pengunjung (anon) tidak bisa memanggil ujian_contoh_dosen", ditolak(await sebagai("anon", null, () => q("select public.ujian_contoh_dosen('algoritma-python', 'uts')")), RLS));
+  const ok = await rpc(IN, "select public.ujian_contoh_dosen($1, 'uts') as c", MK);
+  cek("instruktur mengambil contoh jawaban UTS", !ok.error && ok.rows[0].c.code.T2 === "kode contoh", ok.error);
+  cek("ujian tanpa contoh mengembalikan kosong, bukan galat", !(await rpc(IN, "select public.ujian_contoh_dosen($1, 'uas') as c", MK)).error);
+  cek("peserta tidak bisa menulis tabel contoh", ditolak(await rpc(U2, "insert into public.ujian_contoh (matakuliah_id, ujian_id, isi) values ($1, 'uas', '{}')", MK), RLS));
+}
+
+console.log("\n== Tahap N4: migrasi 0013 (dosen tidak dihalangi jadwal ujian) ==");
+{
+  const MK = "algoritma-python";
+  const U2 = "77777777-7777-7777-7777-777777777777";
+  const rpc = (uid, sql, ...p) => sebagai("authenticated", uid, () => q(sql, p));
+  if (!(await jalankan("0013_ujian_dosen_bebas.sql berjalan", migrasi("0013_ujian_dosen_bebas.sql")))) process.exit(1);
+  cek("0013 aman dijalankan ulang", await jalankan("0013 diulang", migrasi("0013_ujian_dosen_bebas.sql")));
+  await q("delete from public.ujian_sesi where ujian_id = 'uas'");
+  await q("delete from public.ujian_jadwal where ujian_id = 'uas'");
+  const mulai = (uid) => rpc(uid, "select public.ujian_mulai($1, 'uas', 90) as s", MK);
+  cek("peserta tetap ditolak bila UAS belum dijadwalkan", ditolak(await mulai(U2), "P0001"));
+  const d = await mulai(IN);
+  cek("dosen bisa memulai UAS walau belum ada jadwal", !d.error && !!d.rows[0].s.sesi, d.error);
+  const dur = d.rows ? (Date.parse(d.rows[0].s.sesi.batas_tahap1) - Date.parse(d.rows[0].s.sesi.mulai_pada)) / 60000 : 0;
+  cek("durasi dosen dari parameter (90 menit)", Math.abs(dur - 90) < 0.01, String(dur));
+  cek("keterangan jadwal tetap null bagi dosen tanpa jadwal", d.rows[0].s.jadwal === null && d.rows[0].s.buka === false);
+  await q("insert into public.ujian_jadwal (matakuliah_id, ujian_id, kelas, buka, tutup) values ($1, 'uas', '*', now() + interval '1 day', now() + interval '2 days')", [MK]);
+  cek("peserta tetap ditolak sebelum jadwal buka", ditolak(await mulai(U2), "P0001"));
+  const st = await rpc(IN, "select public.ujian_status($1, 'uas') as s", MK);
+  cek("dosen tetap melihat keterangan jadwal (belum buka)", !st.error && st.rows[0].s.buka === false && st.rows[0].s.jadwal.kelas === "*");
+  cek("dosen mengulang UAS (tanpa boleh_ulang)", !(await rpc(IN, "select public.ujian_ulang($1, 'uas')", MK)).error && (await q("select count(*)::int as n from public.ujian_sesi where user_id = $1 and ujian_id = 'uas'", [IN])).rows[0].n === 0);
+  cek("peserta tetap tidak bisa mengulang UAS", ditolak(await rpc(U2, "select public.ujian_ulang($1, 'uas')", MK), RLS));
+  await q("delete from public.ujian_jadwal where ujian_id = 'uas'");
+}
+
 console.log("\n== Tahap K: skrip pemeriksa migrasi ==");
 {
   const periksa = readFileSync(join(root, "supabase", "periksa_migrasi.sql"), "utf8");
   const r = await q(periksa);
   const baris = r.rows && r.rows[0];
   const kolom = baris ? Object.keys(baris) : [];
-  cek("periksa_migrasi.sql berjalan dan memuat sembilan kolom", !r.error && kolom.length === 9, r.error || JSON.stringify(kolom));
-  cek("semua migrasi 0001 sampai 0009 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
+  cek("periksa_migrasi.sql berjalan dan memuat tiga belas kolom", !r.error && kolom.length === 13, r.error || JSON.stringify(kolom));
+  cek("semua migrasi 0001 sampai 0013 terbaca terpasang", !!baris && kolom.every((k) => baris[k] === true), JSON.stringify(baris));
 }
 
 console.log(gagal ? `\n${gagal} dari ${total} uji GAGAL.` : `\nSemua ${total} uji lulus.`);

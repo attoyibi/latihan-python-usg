@@ -1,0 +1,48 @@
+{
+  "version": "tpl-pbo-2026.2",
+  "trace": {
+    "label": "Tebak keluaran programmu sendiri (pilihan ganda + keyakinan)",
+    "text": "Programmu untuk {tugas} dijalankan dengan masukan di bawah ini. Keluaran manakah yang dicetak?",
+    "grading": "Otomatis (kunci = hasil menjalankan kode peserta)"
+  },
+  "bugline": {
+    "label": "Temukan baris yang salah di kodemu (pilihan ganda + keyakinan)",
+    "text": "Di kodemu untuk {tugas}, SATU baris diubah sehingga programnya jadi salah (gagal di sebagian tes). Baris mana yang diubah?",
+    "grading": "Otomatis (kunci = baris hasil mutasi)"
+  },
+  "concept": {
+    "label": "Konsep teori (pilihan ganda + keyakinan)",
+    "text": "{stem}",
+    "grading": "Otomatis (kunci = pernyataan yang benar)"
+  },
+  "transfer": {
+    "label": "Ketentuan berubah: keluaran yang benar (pilihan ganda + keyakinan)",
+    "text": "Ketentuan {tugas} berubah: {perubahan} Untuk masukan di bawah ini, keluaran manakah yang BENAR menurut ketentuan baru?",
+    "grading": "Otomatis (kunci = keluaran kunci dosen untuk ketentuan baru)"
+  },
+  "deferred": [
+    {
+      "label": "Jelaskan jalannya programmu",
+      "note": "Fase 2: jawaban teks, perlu penilai (dosen atau LLM)."
+    },
+    {
+      "label": "Ubah kodemu untuk ketentuan baru",
+      "note": "Fase 2: soal koding dinilai tes. Tes perubahan sudah ada di tasks.json (changes); ditunda karena mengetik di HP dengan batas waktu berat."
+    }
+  ],
+  "probe": {
+    "label": "Pertanyaan konsep (jawab satu kalimat)",
+    "text": "{pertanyaan}",
+    "grading": "Tidak dinilai otomatis; dibandingkan dengan jawaban teori Tahap 1 oleh dosen/AI"
+  },
+  "line": {
+    "label": "Jelaskan satu baris kodemu (jawab satu kalimat)",
+    "text": "Di kodemu untuk {tugas}, apa yang dikerjakan baris {baris}? Jawab dalam satu kalimat dengan kata-katamu sendiri.",
+    "grading": "Tidak dinilai otomatis; dibandingkan dengan kode Tahap 1 oleh dosen/AI"
+  },
+  "change": {
+    "label": "Ketentuan berubah (jawab satu kalimat)",
+    "text": "Ketentuan {tugas} berubah: {perubahan} Bagian mana di kodemu yang harus diubah, dan bagaimana? Jawab dalam satu atau dua kalimat.",
+    "grading": "Tidak dinilai otomatis; dibandingkan dengan kode Tahap 1 oleh dosen/AI"
+  }
+}

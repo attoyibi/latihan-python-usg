@@ -14,4 +14,6 @@ window.APP_CONFIG = {
   // "buka" (bawaan): peserta mendaftar sendiri (matikan "Confirm email" di Supabase agar tanpa batas email; lihat docs/PENDAFTARAN-MANDIRI.md).
   // "tutup": Daftar disembunyikan; peserta didaftarkan dosen dan hanya masuk.
   PENDAFTARAN: "buka",
+  // true: tombol "Masuk dengan Google" (nyalakan dulu provider Google di Supabase; lihat docs/MASUK-GOOGLE.md).
+  MASUK_GOOGLE: false,
 };

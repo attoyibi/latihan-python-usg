@@ -1,0 +1,24 @@
+{
+  "code": {
+    "S1": "import java.util.Scanner;\n\nclass Barang {\n    String nama;\n    int harga;\n    int jumlah;\n\n    Barang(String nama, int harga, int jumlah) {\n        this.nama = nama;\n        this.harga = harga;\n        this.jumlah = jumlah;\n    }\n\n    int total() {\n        return harga * jumlah;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        String nama = in.nextLine();\n        int harga = Integer.parseInt(in.nextLine().trim());\n        int jumlah = Integer.parseInt(in.nextLine().trim());\n        Barang b = new Barang(nama, harga, jumlah);\n        System.out.println(\"Barang: \" + b.nama);\n        System.out.println(\"Harga: Rp \" + b.harga);\n        System.out.println(\"Jumlah: \" + b.jumlah);\n        System.out.println(\"Total: Rp \" + b.total());\n    }\n}\n",
+    "S2": "import java.util.Scanner;\n\nclass Dompet {\n    private int saldo;\n\n    int getSaldo() {\n        return saldo;\n    }\n\n    boolean isi(int jumlah) {\n        if (jumlah <= 0) {\n            return false;\n        }\n        saldo += jumlah;\n        return true;\n    }\n\n    boolean tarik(int jumlah) {\n        if (jumlah <= 0 || jumlah > saldo) {\n            return false;\n        }\n        saldo -= jumlah;\n        return true;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        Dompet d = new Dompet();\n        while (in.hasNextLine()) {\n            String[] p = in.nextLine().trim().split(\" \");\n            if (p[0].equals(\"SELESAI\")) {\n                break;\n            }\n            int n = Integer.parseInt(p[1]);\n            boolean ok = p[0].equals(\"ISI\") ? d.isi(n) : d.tarik(n);\n            if (ok) {\n                System.out.println(\"Saldo: \" + d.getSaldo());\n            } else {\n                System.out.println(\"Ditolak\");\n            }\n        }\n        System.out.println(\"Saldo akhir: \" + d.getSaldo());\n    }\n}\n"
+  },
+  "theory": {
+    "SQ1": "Kelas adalah cetak biru atau rancangan, sedangkan objek adalah wujud nyata (instance) yang dibuat dari kelas itu dengan new. Atribut adalah data yang disimpan objek, misalnya nama dan harga, sedangkan method adalah perilaku yang bisa dilakukan objek. Constructor dijalankan saat objek dibuat dan dipakai untuk memberi nilai awal pada atribut.",
+    "SQ2": "Enkapsulasi berarti menyembunyikan data di dalam kelas, jadi atribut dibuat private agar tidak bisa diakses langsung dari luar. Getter dipakai untuk membaca nilai atribut dan setter untuk mengubahnya, biasanya dengan validasi supaya data tetap valid dan aman. Di diagram UML tanda - berarti private dan tanda + berarti public."
+  },
+  "changes": {
+    "S1": [
+      {
+        "id": "CS1a",
+        "text": "Pembelian 10 barang atau lebih mendapat potongan 10% dari total (pakai pembagian bilangan bulat: total dikurangi total / 10). Di bawah 10 barang tidak ada potongan. Bentuk keluaran tidak berubah; Total: Rp ... adalah total setelah potongan."
+      }
+    ],
+    "S2": [
+      {
+        "id": "CS2a",
+        "text": "Setiap penarikan yang berhasil dikenai biaya admin Rp 500 yang ikut mengurangi saldo. Penarikan hanya diterima bila saldo cukup untuk jumlah ditambah 500 (dan jumlahnya lebih dari 0). Pengisian tidak berubah."
+      }
+    ]
+  }
+}

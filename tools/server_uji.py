@@ -57,7 +57,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if jalur.startswith("/__kunci/"):
             # Hanya untuk uji lokal: membaca kunci dari folder kunci/ (tidak pernah ikut terbit).
             bagian = jalur.split("/")
-            berkas = ROOT / "kunci" / bagian[2] / bagian[3] if len(bagian) == 4 and ".." not in jalur else None
+            # /__kunci/ujian/<id>.json (algoritma-python) atau /__kunci/ujian/<mk>/<id>.json (mata kuliah lain; berkas dalam folder ujian juga boleh dibaca)
+            berkas = ROOT / "kunci" / Path(*bagian[2:]) if 4 <= len(bagian) <= 6 and ".." not in jalur else None
             if berkas is not None and berkas.is_file():
                 self.kirim_skrip(berkas.read_text(encoding="utf8"))
             else:
@@ -93,8 +94,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().do_GET()
 
 
-class Server(socketserver.TCPServer):
+# Berulir: satu koneksi browser yang menggantung (mis. preconnect) tidak boleh menahan permintaan lain.
+class Server(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
+    daemon_threads = True
 
 
 if __name__ == "__main__":

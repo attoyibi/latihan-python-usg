@@ -1,0 +1,106 @@
+{
+  "id": "AP-SIMULASI-2026",
+  "title": "Simulasi ujian Algoritma dan Pemrograman",
+  "course": "Algoritma dan Pemrograman (Python)",
+  "intro": "Simulasi untuk mencoba alur UTS dan UAS dengan soal yang lebih mudah (Bab 1–4). Tahap 1: 2 soal teori + 2 soal praktik. Tahap 2: pertanyaan singkat yang dijawab satu kalimat, mulai otomatis. Nilainya tidak dihitung dan simulasi boleh diulang.",
+  "aiDeclarationOptions": [
+    {
+      "id": "none",
+      "label": "Saya tidak memakai AI"
+    },
+    {
+      "id": "language",
+      "label": "Hanya untuk bahasa, penjelasan error, atau menulis ulang kalimat"
+    },
+    {
+      "id": "ideas",
+      "label": "Untuk mencari ide atau contoh kode, lalu saya tulis dan ubah sendiri"
+    },
+    {
+      "id": "major",
+      "label": "Sebagian besar kode berasal dari AI"
+    }
+  ],
+  "config": {
+    "stage2": {
+      "itemsPerType": {
+        "trace": 2,
+        "bugline": 1,
+        "concept": 1,
+        "transfer": 1
+      },
+      "optionsPerItem": 4,
+      "limitSec": {
+        "probe": 90,
+        "line": 90,
+        "change": 120
+      },
+      "beginDelaySec": 10,
+      "maxAttempts": 2,
+      "seedSalt": "DCE-AP-SIMULASI-2026",
+      "mode": "open",
+      "minWords": 3
+    },
+    "runner": {
+      "timeoutMs": 5000,
+      "loadTimeoutMs": 60000
+    },
+    "cbm": {
+      "correct": {
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "wrong": {
+        "1": 0,
+        "2": -2,
+        "3": -6
+      }
+    },
+    "weights": {
+      "trace": 0.25,
+      "bugline": 0.25,
+      "concept": 0.2,
+      "transfer": 0.3
+    },
+    "flag": {
+      "gap": 0.3,
+      "pass": 0.6,
+      "highS1": 0.7,
+      "ciZ": 1.28
+    },
+    "activeTasks": [
+      "S1",
+      "S2"
+    ],
+    "tahap1Order": [
+      "SQ1",
+      "S1",
+      "SQ2",
+      "S2"
+    ],
+    "s1": {
+      "practice": 0.5,
+      "theory": 0.5
+    },
+    "theory": {
+      "minWords": 35,
+      "wordRange": [
+        50,
+        120
+      ]
+    },
+    "tahap1Minutes": 30,
+    "accommodations": [],
+    "accommodationFactor": 1.5,
+    "grade": {
+      "w": 0.4,
+      "tolerance": 0.1,
+      "delta": 0.25,
+      "maxCut": 0.4
+    },
+    "audit": {
+      "samplePercent": 10
+    }
+  }
+}

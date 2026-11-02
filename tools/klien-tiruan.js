@@ -30,6 +30,8 @@
   const TANPA_0008 = /[?&]tanpa0008=1/.test(location.search);
   // ?tanpa0009=1: meniru database tanpa tabel kunci_jawaban. Bila ada, kunci dibaca dari folder kunci/ lewat server_uji.py (lokal saja).
   const TANPA_0009 = /[?&]tanpa0009=1/.test(location.search);
+  // ?tanpa0010=1 meniru proyek yang belum menjalankan migrasi 0010 (ujian).
+  const TANPA_0010 = /[?&]tanpa0010=1/.test(location.search);
   const TERBUKA = /[?&]terbuka=1/.test(location.search);
   // ?tanpakonfirmasi=1: meniru Supabase dengan "Confirm email" dimatikan (pendaftaran langsung masuk, tanpa email). Menyertakan terbuka=1.
   const TANPA_KONFIRMASI = /[?&]tanpakonfirmasi=1/.test(location.search);
@@ -307,6 +309,138 @@
     return instruktur() || (nama === "profiles" ? r.id === uidSaya() : r.user_id === uidSaya());
   };
 
+  // ---------- Ujian (migrasi 0010) ditiru secukupnya: jadwal per kelas, akomodasi, sesi dengan "jam server", kunci ----------
+  // Kunci diambil dari kunci/ujian/<id>.json lewat server uji (/__kunci/...), seperti tabel ujian_kunci yang tak terbaca API.
+  const ujianTabel = (n) => (db[n] = db[n] || []);
+  // Simulasi dibuka untuk semua kelas (seperti seed 0010 untuk algoritma-python); pbo-java diberi jadwal yang sama hanya di server uji.
+  for (const mk of ["algoritma-python", "pbo-java"]) {
+    if (ujianTabel("ujian_jadwal").some((j) => j.matakuliah_id === mk && j.ujian_id === "simulasi")) continue;
+    ujianTabel("ujian_jadwal").push({ matakuliah_id: mk, ujian_id: "simulasi", kelas: "*", buka: new Date().toISOString(), tutup: new Date(Date.now() + 365 * 86400000).toISOString(), menit: null, boleh_ulang: true, diperbarui_pada: new Date().toISOString() });
+    save();
+  }
+  const rombelDari = (kelas) => { const m = /^[A-Z]+-\d{4}-([A-Z])$/.exec(kelas || ""); return m ? m[1] : null; };
+  function jadwalSaya(mk, uj) {
+    const p = db.profiles[uidSaya()] || {};
+    const cocok = ujianTabel("ujian_jadwal").filter((j) => j.matakuliah_id === mk && j.ujian_id === uj && (j.kelas === "*" || j.kelas === p.kelas || j.kelas === rombelDari(p.kelas)));
+    cocok.sort((a, b) => (a.kelas === "*") - (b.kelas === "*") || Date.parse(b.buka) - Date.parse(a.buka));
+    return cocok[0] || null;
+  }
+  function statusUjian(mk, uj) {
+    const j = jadwalSaya(mk, uj);
+    const s = ujianTabel("ujian_sesi").find((x) => x.user_id === uidSaya() && x.matakuliah_id === mk && x.ujian_id === uj);
+    const t = Date.now();
+    return {
+      sekarang: new Date().toISOString(),
+      jadwal: j ? { kelas: j.kelas, buka: j.buka, tutup: j.tutup, menit: j.menit, boleh_ulang: j.boleh_ulang } : null,
+      buka: !!j && t >= Date.parse(j.buka) && t < Date.parse(j.tutup),
+      sesi: s ? JSON.parse(JSON.stringify(s)) : null,
+    };
+  }
+  async function rpcUjian(nama, a) {
+    if (TANPA_0010) return { data: null, error: { code: "PGRST202", message: "Could not find the function public." + nama + " in the schema cache" } };
+    if (!db.session) return { data: null, error: { code: "42501", message: "harus masuk dulu" } };
+    const uid = uidSaya();
+    const sesi = () => ujianTabel("ujian_sesi").find((x) => x.user_id === uid && x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian);
+    const kunciUjian = async () => { const r = await fetch("/__kunci/ujian/" + (a.p_mk === "algoritma-python" ? "" : a.p_mk + "/") + a.p_ujian + ".json"); return r.ok ? r.json() : null; };
+    if (nama === "ujian_status") return { data: statusUjian(a.p_mk, a.p_ujian), error: null };
+    if (nama === "ujian_mulai") {
+      if (!sesi()) {
+        const st = statusUjian(a.p_mk, a.p_ujian);
+        if (!st.buka && !instruktur()) return { data: null, error: { code: "P0001", message: "ujian belum dibuka untuk kelasmu", hint: "jadwal" } };
+        const m = (st.jadwal || {}).menit || a.p_menit;
+        if (!(m >= 5 && m <= 600)) return { data: null, error: { code: "22023", message: "durasi tidak sah" } };
+        const ak = ujianTabel("ujian_akomodasi").find((x) => x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian && x.user_id === uid);
+        const f = ak ? Number(ak.faktor) : 1;
+        const t = Date.now();
+        ujianTabel("ujian_sesi").push({ user_id: uid, matakuliah_id: a.p_mk, ujian_id: a.p_ujian, kelas: (db.profiles[uid] || {}).kelas, mulai_pada: new Date(t).toISOString(), batas_tahap1: new Date(t + Math.round(m * 60 * f) * 1000).toISOString(), faktor: f, terkunci_pada: null, terlambat: false, snapshot: null, hash: null, keadaan: {}, hasil: {}, ulang: 0, diperbarui_pada: new Date(t).toISOString() });
+        save();
+      }
+      return { data: statusUjian(a.p_mk, a.p_ujian), error: null };
+    }
+    if (nama === "ujian_kunci_tahap1") {
+      const s = sesi();
+      if (!s) return { data: null, error: { code: "P0001", message: "ujian belum dimulai" } };
+      const k = await kunciUjian();
+      if (!k) return { data: null, error: { code: "P0001", message: "kunci ujian belum dipasang oleh pengajar", hint: "kunci" } };
+      if (!s.terkunci_pada) {
+        s.terkunci_pada = new Date().toISOString();
+        s.snapshot = a.p_snapshot;
+        s.hash = a.p_hash;
+        s.terlambat = Date.now() > Date.parse(s.batas_tahap1) + 120000;
+        save();
+      }
+      return { data: { kunci: k, sekarang: new Date().toISOString() }, error: null };
+    }
+    if (nama === "ujian_ambil_kunci") {
+      const s = sesi();
+      if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci" } };
+      return { data: await kunciUjian(), error: null };
+    }
+    if (nama === "ujian_contoh_dosen") {
+      if (!instruktur()) return { data: null, error: { code: "42501", message: "hanya instruktur" } };
+      const r = await fetch("/__kunci/ujian/" + (a.p_mk === "algoritma-python" ? "" : a.p_mk + "/") + a.p_ujian + ".contoh.json");
+      return { data: r.ok ? await r.json() : null, error: null };
+    }
+    if (nama === "ujian_selesai") {
+      const s = sesi();
+      if (!s || !s.terkunci_pada) return { data: null, error: { code: "42501", message: "Tahap 1 belum dikunci atau ujian belum dimulai" } };
+      s.selesai_pada = s.selesai_pada || new Date().toISOString();
+      save();
+      return { data: s.selesai_pada, error: null };
+    }
+    if (nama === "ujian_analisis_simpan") {
+      if (!instruktur()) return { data: null, error: { code: "42501", message: "hanya instruktur" } };
+      const s = ujianTabel("ujian_sesi").find((x) => x.user_id === a.p_user && x.matakuliah_id === a.p_mk && x.ujian_id === a.p_ujian);
+      if (!s) return { data: null, error: { code: "P0002", message: "sesi peserta tidak ditemukan" } };
+      s.analisis = a.p_analisis || {};
+      save();
+      return { data: null, error: null };
+    }
+    if (nama === "ujian_ulang") {
+      const j = jadwalSaya(a.p_mk, a.p_ujian);
+      if (!instruktur() && (!j || !j.boleh_ulang)) return { data: null, error: { code: "42501", message: "ujian ini tidak bisa diulang" } };
+      const lama = sesi();
+      db.ujian_sesi = ujianTabel("ujian_sesi").filter((x) => x !== lama);
+      save();
+      return { data: { ulang: (lama ? lama.ulang : 0) + 1 }, error: null };
+    }
+    return null;
+  }
+  async function tabelUjian(nama, q) {
+    if (TANPA_0010) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public." + nama + "' in the schema cache" } };
+    const t = ujianTabel(nama);
+    const cocok = (r) => Object.keys(q.f).every((k) => String(r[k]) === String(q.f[k]));
+    const boleh = (r) => nama === "ujian_jadwal" || instruktur() || r.user_id === uidSaya();
+    if (q.op === "select") return { data: JSON.parse(JSON.stringify(t.filter((r) => cocok(r) && boleh(r)))), error: null };
+    if (q.op === "delete") {
+      if (!instruktur()) return { data: null, error: null };
+      db[nama] = t.filter((r) => !cocok(r));
+      save();
+      return { data: null, error: null };
+    }
+    if (q.op === "update") {
+      if (nama !== "ujian_sesi") return { data: null, error: { code: "42501", message: "permission denied" } };
+      if (Object.keys(q.vals).some((k) => k !== "keadaan" && k !== "hasil")) return { data: null, error: { code: "42501", message: "permission denied for table ujian_sesi" } };
+      if (t.some((r) => cocok(r) && r.user_id === uidSaya() && r.selesai_pada)) return { data: null, error: { code: "42501", message: "jawaban sudah dikumpulkan dan dikunci" } };
+      for (const r of t.filter((r) => cocok(r) && r.user_id === uidSaya())) Object.assign(r, q.vals, { diperbarui_pada: new Date().toISOString() });
+      save();
+      return { data: null, error: null };
+    }
+    if (nama === "ujian_sesi") return { data: null, error: { code: "42501", message: "permission denied for table ujian_sesi" } };
+    if (!instruktur()) return { data: null, error: { code: "42501", message: "new row violates row-level security policy" } };
+    const kunciUj = nama === "ujian_jadwal" ? ["matakuliah_id", "ujian_id", "kelas"] : ["matakuliah_id", "ujian_id", "user_id"];
+    for (const r of Array.isArray(q.rows) ? q.rows : [q.rows]) {
+      if (nama === "ujian_jadwal" && !(Date.parse(r.tutup) > Date.parse(r.buka))) return { data: null, error: { code: "23514", message: "new row violates check constraint ujian_jadwal_check" } };
+      if (nama === "ujian_akomodasi" && !(Number(r.faktor) >= 1 && Number(r.faktor) <= 3)) return { data: null, error: { code: "23514", message: "check constraint faktor" } };
+      const i = t.findIndex((x) => kunciUj.every((k) => x[k] === r[k]));
+      const baris = Object.assign({}, i >= 0 ? t[i] : {}, JSON.parse(JSON.stringify(r)), { diperbarui_pada: new Date().toISOString() });
+      if (i >= 0) t[i] = baris;
+      else t.push(baris);
+    }
+    save();
+    return { data: null, error: null };
+  }
+
   const query = (nama) => {
     const q = { f: {}, op: "select", rows: null, urut: [], dari: null, sampai: null, opsi: {} };
     const chain = {
@@ -371,6 +505,7 @@
         if (nama === "percobaan" && q.op === "select" && /hasil|galat|petunjuk|cocok/.test(q.kolom || "")) return kolomHilang("percobaan.hasil");
         if (nama === "percobaan" && q.op === "insert" && (Array.isArray(q.rows) ? q.rows : [q.rows]).some((r) => "hasil" in r)) return { data: null, error: { code: "PGRST204", message: "Could not find the 'hasil' column of 'percobaan' in the schema cache" } };
       }
+      if (nama.startsWith("ujian_")) return tabelUjian(nama, q);
       if (nama === "kunci_jawaban") {
         if (TANPA_0009) return { data: null, error: { code: "PGRST205", message: "Could not find the table 'public.kunci_jawaban' in the schema cache" } };
         if (q.op !== "select") return { data: null, error: { code: "42501", message: "permission denied for table kunci_jawaban" } };
@@ -543,6 +678,8 @@
 
   window.APP_CONFIG = {
     PENDAFTARAN: TERBUKA || TANPA_KONFIRMASI ? "buka" : "tutup",
+    // Tombol Google tiruan (tampil bila pendaftaran terbuka, mis. ?terbuka=1). ?googlebatal=1 meniru pembatalan di halaman Google.
+    MASUK_GOOGLE: true,
     // ?muatmaks=4000 memperpendek batas waktu muat penjalan (untuk menguji gagal muat bersama /__gagal/... di server uji).
     MUAT_MAKS_MS: Number((/[?&]muatmaks=(\d+)/.exec(location.search) || [])[1]) || 0,
     client: {
@@ -558,6 +695,22 @@
           if (!u.confirmed) return { data: {}, error: { message: "Email not confirmed", code: "email_not_confirmed" } };
           setSession(mkSession(email), "SIGNED_IN");
           return { data: { session: db.session }, error: null };
+        },
+        // Meniru alur OAuth implicit: "kembali dari Google" ke redirectTo dengan token di bagian #.
+        signInWithOAuth: async ({ provider, options }) => {
+          if (provider !== "google") return { data: {}, error: { message: "Unsupported provider", code: "validation_failed" } };
+          if (/[?&]googlebatal=1/.test(location.search)) {
+            location.assign(options.redirectTo + location.search + "#error=access_denied&error_code=access_denied&error_description=User+cancelled");
+            location.reload(); // hanya bagian # yang berubah; peramban tidak memuat ulang sendiri
+            return { data: {}, error: null };
+          }
+          const email = "gani.google@gmail.com";
+          db.users[email] = db.users[email] || { id: idDari(email), password: null, confirmed: true, meta: { full_name: "Gani Pratama", provider: "google" } };
+          db.session = mkSession(email);
+          save();
+          location.assign(options.redirectTo + location.search + "#access_token=tiruan&token_type=bearer&expires_in=3600");
+            location.reload(); // hanya bagian # yang berubah; peramban tidak memuat ulang sendiri
+          return { data: {}, error: null };
         },
         signUp: async ({ email, password }) => {
           if (!TERBUKA && !TANPA_KONFIRMASI) return { data: { user: null, session: null }, error: { message: "Signups not allowed for this instance", code: "signup_disabled" } };
@@ -619,6 +772,7 @@
         },
       },
       rpc: async (nama, args) => {
+        if (nama.startsWith("ujian_")) return (await rpcUjian(nama, args)) || { data: null, error: { code: "42883", message: "function does not exist" } };
         if (nama === "catat_denyut") {
           if (!db.session) return { data: null, error: { code: "42501", message: "harus masuk dulu" } };
           const uid = uidSaya();

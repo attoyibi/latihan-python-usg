@@ -7,6 +7,7 @@
 //   SUPABASE_URL        alamat proyek, mis. https://abcdxyz.supabase.co
 //   SUPABASE_ANON_KEY   kunci "anon" (atau "publishable") dari Project Settings > API
 //   MODE_LOKAL          opsional, "true" hanya untuk uji tampilan tanpa akun
+//   MASUK_GOOGLE        opsional, "ya" menampilkan tombol "Masuk dengan Google" (nyalakan dulu provider Google di Supabase)
 //   PENDAFTARAN         opsional, "buka" (bawaan: peserta mendaftar sendiri) atau "tutup" (Daftar disembunyikan, peserta didaftarkan dosen)
 //
 // Bila kedua variabel kosong, config.js dibiarkan apa adanya dan situs menampilkan
@@ -29,6 +30,7 @@ const url = (process.env.SUPABASE_URL || "").trim();
 const key = (process.env.SUPABASE_ANON_KEY || "").trim();
 const lokal = (process.env.MODE_LOKAL || "").trim().toLowerCase() === "true";
 const pendaftaran = (process.env.PENDAFTARAN || "buka").trim().toLowerCase();
+const google = (process.env.MASUK_GOOGLE || "").trim().toLowerCase();
 
 function gagal(pesan) {
   console.error("[buat_config] GAGAL: " + pesan);
@@ -36,6 +38,7 @@ function gagal(pesan) {
 }
 
 if (pendaftaran !== "buka" && pendaftaran !== "tutup") gagal('PENDAFTARAN harus "buka" atau "tutup".');
+if (google && google !== "ya" && google !== "tidak") gagal('MASUK_GOOGLE harus "ya" atau "tidak".');
 
 if (!url && !key && !lokal) {
   console.warn("[buat_config] SUPABASE_URL dan SUPABASE_ANON_KEY belum diisi. config.js tidak diubah; situs akan menampilkan layar pemasangan.");
@@ -82,9 +85,10 @@ const isi = {
   SUPABASE_ANON_KEY: cleanKey,
   MODE_LOKAL: lokal,
   PENDAFTARAN: pendaftaran,
+  MASUK_GOOGLE: google === "ya",
 };
 const teks =
   "// Dibuat otomatis oleh tools/buat_config.mjs saat penayangan. Jangan diedit dan jangan di-commit.\n" +
   "window.APP_CONFIG = " + JSON.stringify(isi, null, 2) + ";\n";
 writeFileSync(out, teks, "utf8");
-console.log("[buat_config] config.js dibuat" + (cleanUrl ? " untuk " + cleanUrl : "") + (lokal ? " (MODE_LOKAL aktif)" : "") + (pendaftaran === "tutup" ? " (pendaftaran ditutup)" : "") + ".");
+console.log("[buat_config] config.js dibuat" + (cleanUrl ? " untuk " + cleanUrl : "") + (lokal ? " (MODE_LOKAL aktif)" : "") + (pendaftaran === "tutup" ? " (pendaftaran ditutup)" : "") + (google === "ya" ? " (masuk dengan Google)" : "") + ".");

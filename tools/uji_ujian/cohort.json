@@ -1,0 +1,2931 @@
+{
+ "note": "Data dummy. M01-M14 sudah menjalani ujian; M15-M16 belum menjalani Tahap 2. ID hanya pseudonim.",
+ "students": [
+  {
+   "id": "M01",
+   "s1": 0.88,
+   "ai": "language",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 23
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 48
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 29
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 26
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 32
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 11
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 49
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 43
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 47
+     }
+    ]
+   }
+  },
+  {
+   "id": "M02",
+   "s1": 0.84,
+   "ai": "language",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 32
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 30
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 12
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 37
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 23
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 35
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 13
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 21
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 27
+     }
+    ]
+   }
+  },
+  {
+   "id": "M03",
+   "s1": 0.79,
+   "ai": "language",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 24
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 17
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 36
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 49
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 41
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 23
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 43
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 23
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 26
+     }
+    ]
+   }
+  },
+  {
+   "id": "M04",
+   "s1": 0.91,
+   "ai": "none",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 45
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 35
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 30
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 45
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 42
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 47
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 37
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 31
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 42
+     }
+    ]
+   }
+  },
+  {
+   "id": "M05",
+   "s1": 0.52,
+   "ai": "none",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 20
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 20
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 20
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 15
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 14
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 46
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 17
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 49
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 22
+     }
+    ]
+   }
+  },
+  {
+   "id": "M06",
+   "s1": 0.58,
+   "ai": "none",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 37
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 26
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 14
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 42
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 18
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 13
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 20
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 41
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 25
+     }
+    ]
+   }
+  },
+  {
+   "id": "M07",
+   "s1": 0.9,
+   "ai": "major",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 18
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 45
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 49
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 47
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 49
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 22
+     },
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 47
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 30
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 33
+     }
+    ]
+   }
+  },
+  {
+   "id": "M08",
+   "s1": 0.86,
+   "ai": "major",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 24
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 26
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 17
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 31
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 38
+     },
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 32
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 33
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 16
+     }
+    ]
+   }
+  },
+  {
+   "id": "M09",
+   "s1": 0.83,
+   "ai": "ideas",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 18
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 41
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 33
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 23
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 27
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 15
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 35
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 16
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 36
+     }
+    ]
+   }
+  },
+  {
+   "id": "M10",
+   "s1": 0.84,
+   "ai": "ideas",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 16
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 12
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 16
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 21
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 34
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 30
+     },
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 23
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 46
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 35
+     }
+    ]
+   }
+  },
+  {
+   "id": "M11",
+   "s1": 0.46,
+   "ai": "ideas",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 18
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 47
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 30
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 29
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 31
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 26
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 28
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 15
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 38
+     }
+    ]
+   }
+  },
+  {
+   "id": "M12",
+   "s1": 0.55,
+   "ai": "ideas",
+   "group": "selesai",
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 1,
+      "latencySec": 16
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 33
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 39
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 48
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 15
+     },
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 1,
+      "latencySec": 47
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 23
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 37
+     }
+    ]
+   }
+  },
+  {
+   "id": "M13",
+   "s1Practice": 0.8125,
+   "ai": "language",
+   "group": "selesai",
+   "code": {
+    "T1": "jumlah = int(input())\njenis = input()\nHARGA = 25000\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * HARGA\n    if jumlah >= 50:\n        diskon = subtotal * 10 // 100\n    elif jumlah >= 20:\n        diskon = subtotal * 5 // 100\n    else:\n        diskon = 0\n    if jenis == \"reseller\":\n        diskon += subtotal * 2 // 100\n    print(\"Subtotal: Rp\", subtotal)\n    print(\"Diskon: Rp\", diskon)\n    print(\"Total bayar: Rp\", subtotal - diskon)\n",
+    "T2": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total += boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+    "T3": "n = int(input())\ndata = []\nfor i in range(n):\n    nama, jml = input().split(\":\")\n    data.append([nama, int(jml)])\nterlaris = data[0]\nfor item in data:\n    if item[1] >= terlaris[1]:\n        terlaris = item\ntotal = 0\nfor item in data:\n    total += item[1]\nnama_urut = sorted([item[0] for item in data])\nprint(f\"Produk terlaris: {terlaris[0]} ({terlaris[1]} boks)\")\nprint(f\"Total terjual: {total}\")\ndaftar = []\nfor nm in nama_urut:\n    daftar.append(nm.upper())\nprint(\"Daftar produk: \" + \", \".join(daftar))\n"
+   },
+   "theory": {
+    "Q1": "Algoritma adalah urutan langkah yang jelas untuk menyelesaikan suatu masalah. Lima syaratnya: ada masukan, ada keluaran, setiap langkah pasti maknanya sehingga tidak menimbulkan tafsir ganda, prosesnya berhenti pada suatu titik, dan setiap langkah benar-benar bisa dikerjakan pelaksananya. Flowchart menggambarkan alur dengan simbol baku seperti oval, kotak, dan belah ketupat sehingga mudah dibaca secara visual, sedangkan pseudocode ditulis sebagai teks tanpa terikat sintaks bahasa pemrograman tertentu dan lebih cepat ditulis untuk logika yang panjang.",
+    "Q2": "Perulangan for dengan range() dipakai bila jumlah pengulangan sudah pasti sejak awal, misalnya memproses 10 pesanan. While dipakai bila pengulangan berlangsung sampai syarat tertentu berubah dan jumlahnya belum diketahui, misalnya membaca angka sampai pengguna mengetik 0. List bersifat mutable sehingga isinya bisa diubah, misalnya nilai[0] = 5 atau append(). String bersifat immutable, jadi mengubah string sebenarnya membuat string baru, dan teks[0] = \"A\" akan menimbulkan error."
+   },
+   "traceCandidates": {
+    "T2": [
+     {
+      "input": [
+       "8",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 8"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       }
+      ]
+     },
+     {
+      "input": [
+       "6",
+       "-3",
+       "9",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.50\nTerbesar: 9",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 4\nTotal boks: 15\nRata-rata: 3.75\nTerbesar: 9"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.00\nTerbesar: 9"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 9"
+       }
+      ]
+     },
+     {
+      "input": [
+       "10",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 10"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       }
+      ]
+     },
+     {
+      "input": [
+       "5",
+       "5",
+       "7",
+       "7",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 5\nTotal boks: 24\nRata-rata: 4.80\nTerbesar: 7"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       }
+      ]
+     },
+     {
+      "input": [
+       "-4",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 0"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: -4\nRata-rata: -4.00\nTerbesar: 0"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "4",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 4\nTotal boks: 11\nRata-rata: 2.75\nTerbesar: 4"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.00\nTerbesar: 4"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4"
+       }
+      ]
+     }
+    ],
+    "T3": [
+     {
+      "input": [
+       "3",
+       "roti:4",
+       "kue:9",
+       "dodol:2"
+      ],
+      "key": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: ROTI, KUE, DODOL"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 11\nDaftar produk: DODOL, KUE, ROTI"
+       }
+      ]
+     },
+     {
+      "input": [
+       "2",
+       "stik:5",
+       "emping:5"
+      ],
+      "key": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: STIK, EMPING"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 5\nDaftar produk: EMPING, STIK"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "lapis:7",
+       "bika:3",
+       "kue:7",
+       "ote:1"
+      ],
+      "key": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: LAPIS, BIKA, KUE, OTE"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 11\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       }
+      ]
+     },
+     {
+      "input": [
+       "1",
+       "wingko:9"
+      ],
+      "key": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 0\nDaftar produk: WINGKO"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "b:1",
+       "a:2",
+       "c:3"
+      ],
+      "key": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: B, A, C"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 5\nDaftar produk: A, B, C"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "mawar:10",
+       "melati:20",
+       "anggrek:15",
+       "dahlia:20"
+      ],
+      "key": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: MAWAR, MELATI, ANGGREK, DAHLIA"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 55\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       }
+      ]
+     }
+    ]
+   },
+   "changeCandidates": {
+    "T2": {
+     "C2a": [
+      {
+       "input": [
+        "10",
+        "20",
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "5",
+        "0",
+        "15",
+        "selesai"
+       ],
+       "own": "Jumlah pesanan: 1\nTotal boks: 5\nRata-rata: 5.00\nTerbesar: 5",
+       "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+      },
+      {
+       "input": [
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Tidak ada pesanan"
+      },
+      {
+       "input": [
+        "-1",
+        "selesai"
+       ],
+       "own": "Jumlah tidak valid, dilewati\n[Galat: ValueError]",
+       "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+      }
+     ],
+     "C2b": [
+      {
+       "input": [
+        "10",
+        "-4",
+        "20",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20",
+       "expected": "Jumlah pesanan: 3\nTotal boks: 26\nRata-rata: 8.67\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "-3",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+       "expected": "Jumlah pesanan: 1\nTotal boks: -3\nRata-rata: -3.00\nTerbesar: 0"
+      },
+      {
+       "input": [
+        "10",
+        "-10",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 10"
+      },
+      {
+       "input": [
+        "7",
+        "-2",
+        "9",
+        "-1",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 16\nRata-rata: 8.00\nTerbesar: 9",
+       "expected": "Jumlah pesanan: 4\nTotal boks: 13\nRata-rata: 3.25\nTerbesar: 9"
+      }
+     ]
+    },
+    "T3": {
+     "C3a": [
+      {
+       "input": [
+        "3",
+        "keripik:12:5000",
+        "stik:7:3000",
+        "emping:9:4000"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK\nTotal pendapatan: 117000"
+      },
+      {
+       "input": [
+        "2",
+        "bandeng:5:20000",
+        "otak:5:15000"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK\nTotal pendapatan: 175000"
+      },
+      {
+       "input": [
+        "1",
+        "wingko:4:2500"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO\nTotal pendapatan: 10000"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3:10000",
+        "dodol:8:6000",
+        "jenang:8:7000",
+        "kue:1:500"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS\nTotal pendapatan: 134500"
+      }
+     ],
+     "C3b": [
+      {
+       "input": [
+        "2",
+        "bandeng:5",
+        "otak:5"
+       ],
+       "own": "Produk terlaris: otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng, otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3",
+        "dodol:8",
+        "jenang:8",
+        "kue:1"
+       ],
+       "own": "Produk terlaris: jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol, jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+      },
+      {
+       "input": [
+        "3",
+        "x:6",
+        "y:6",
+        "z:6"
+       ],
+       "own": "Produk terlaris: z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z",
+       "expected": "Produk terlaris: x, y, z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+      },
+      {
+       "input": [
+        "4",
+        "a:2",
+        "b:9",
+        "c:1",
+        "d:9"
+       ],
+       "own": "Produk terlaris: d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D",
+       "expected": "Produk terlaris: b, d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D"
+      }
+     ]
+    }
+   },
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 25
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 25
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 25
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 3,
+      "latencySec": 25
+     }
+    ]
+   },
+   "debugCandidates": {
+    "T2": [
+     {
+      "code": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total -= boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+      "line": 10,
+      "rule": "plus-minus",
+      "note": "+= diganti -=",
+      "before": "total += boks",
+      "after": "total -= boks",
+      "failing": 6,
+      "wrongOutput": true
+     },
+     {
+      "code": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total += boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 1:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+      "line": 14,
+      "rule": "boundary",
+      "note": "batas 0 menjadi 1",
+      "before": "if banyak == 0:",
+      "after": "if banyak == 1:",
+      "failing": 4,
+      "wrongOutput": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "M14",
+   "s1Practice": 1,
+   "ai": "major",
+   "group": "selesai",
+   "code": {
+    "T1": "jumlah = int(input())\njenis = input()\nsubtotal = jumlah * 25000\ndiskon = None\nif jenis == \"reguler\":\n    if jumlah >= 50:\n        diskon = subtotal * 10 // 100\n    elif jumlah >= 20:\n        diskon = subtotal * 5 // 100\n    else:\n        diskon = 0\nelif jenis == \"reseller\":\n    if jumlah >= 50:\n        diskon = subtotal * 10 // 100 + subtotal * 2 // 100\n    elif jumlah >= 20:\n        diskon = subtotal * 5 // 100 + subtotal * 2 // 100\n    else:\n        diskon = subtotal * 2 // 100\nelse:\n    print(\"Jenis pelanggan tidak dikenal\")\nif diskon is not None:\n    print(f\"Subtotal: Rp {subtotal}\")\n    print(f\"Diskon: Rp {diskon}\")\n    print(f\"Total bayar: Rp {subtotal - diskon}\")\n",
+    "T2": "banyak = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    banyak = banyak + 1\n    total = total + boks\n    if boks > terbesar:\n        terbesar = boks\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {banyak}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / banyak:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+    "T3": "n = int(input())\ncatatan = []\nfor i in range(n):\n    catatan.append(input())\nterbanyak = -1\nnama_terlaris = \"\"\ntotal = 0\nnama_semua = []\nfor c in catatan:\n    p = c.split(\":\")\n    jumlah = int(p[1])\n    total += jumlah\n    nama_semua.append(p[0])\n    if jumlah > terbanyak:\n        terbanyak = jumlah\n        nama_terlaris = p[0]\nnama_semua.sort()\nfor i in range(len(nama_semua)):\n    nama_semua[i] = nama_semua[i].upper()\nprint(f\"Produk terlaris: {nama_terlaris} ({terbanyak} boks)\")\nprint(f\"Total terjual: {total}\")\nprint(\"Daftar produk: \" + \", \".join(nama_semua))\n"
+   },
+   "theory": {
+    "Q1": "Algoritma merupakan serangkaian langkah sistematis yang digunakan untuk memecahkan suatu permasalahan secara efisien dan efektif dalam bidang ilmu komputer. Flowchart dan pseudocode merupakan dua metode representasi algoritma yang sama-sama penting dalam proses pengembangan perangkat lunak dan membantu programmer memahami alur. Setiap algoritma memerlukan masukan dan menghasilkan keluaran tertentu.",
+    "Q2": "Perulangan for dan while sama-sama digunakan untuk melakukan proses berulang dalam program, dengan for lebih cocok untuk kasus tertentu dan while untuk kasus lainnya. List dan string adalah tipe data yang dapat digunakan untuk menyimpan data dan memiliki perbedaan dalam karakteristiknya masing-masing sesuai kebutuhan program."
+   },
+   "traceCandidates": {
+    "T2": [
+     {
+      "input": [
+       "8",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 8"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       }
+      ]
+     },
+     {
+      "input": [
+       "6",
+       "-3",
+       "9",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.50\nTerbesar: 9",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 4\nTotal boks: 15\nRata-rata: 3.75\nTerbesar: 9"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.00\nTerbesar: 9"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 9"
+       }
+      ]
+     },
+     {
+      "input": [
+       "10",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 10"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       }
+      ]
+     },
+     {
+      "input": [
+       "5",
+       "5",
+       "7",
+       "7",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 5\nTotal boks: 24\nRata-rata: 4.80\nTerbesar: 7"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       }
+      ]
+     },
+     {
+      "input": [
+       "-4",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 0"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: -4\nRata-rata: -4.00\nTerbesar: 0"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "4",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 4\nTotal boks: 11\nRata-rata: 2.75\nTerbesar: 4"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.00\nTerbesar: 4"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4"
+       }
+      ]
+     }
+    ],
+    "T3": [
+     {
+      "input": [
+       "3",
+       "roti:4",
+       "kue:9",
+       "dodol:2"
+      ],
+      "key": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: ROTI, KUE, DODOL"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 11\nDaftar produk: DODOL, KUE, ROTI"
+       }
+      ]
+     },
+     {
+      "input": [
+       "2",
+       "stik:5",
+       "emping:5"
+      ],
+      "key": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: STIK, EMPING"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 5\nDaftar produk: EMPING, STIK"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "lapis:7",
+       "bika:3",
+       "kue:7",
+       "ote:1"
+      ],
+      "key": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: LAPIS, BIKA, KUE, OTE"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 11\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       }
+      ]
+     },
+     {
+      "input": [
+       "1",
+       "wingko:9"
+      ],
+      "key": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 0\nDaftar produk: WINGKO"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "b:1",
+       "a:2",
+       "c:3"
+      ],
+      "key": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: B, A, C"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 5\nDaftar produk: A, B, C"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "mawar:10",
+       "melati:20",
+       "anggrek:15",
+       "dahlia:20"
+      ],
+      "key": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: MAWAR, MELATI, ANGGREK, DAHLIA"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 55\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       }
+      ]
+     }
+    ]
+   },
+   "changeCandidates": {
+    "T2": {
+     "C2a": [
+      {
+       "input": [
+        "10",
+        "20",
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "5",
+        "0",
+        "15",
+        "selesai"
+       ],
+       "own": "Jumlah pesanan: 1\nTotal boks: 5\nRata-rata: 5.00\nTerbesar: 5",
+       "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+      },
+      {
+       "input": [
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Tidak ada pesanan"
+      },
+      {
+       "input": [
+        "-1",
+        "selesai"
+       ],
+       "own": "Jumlah tidak valid, dilewati\n[Galat: ValueError]",
+       "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+      }
+     ],
+     "C2b": [
+      {
+       "input": [
+        "10",
+        "-4",
+        "20",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20",
+       "expected": "Jumlah pesanan: 3\nTotal boks: 26\nRata-rata: 8.67\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "-3",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+       "expected": "Jumlah pesanan: 1\nTotal boks: -3\nRata-rata: -3.00\nTerbesar: 0"
+      },
+      {
+       "input": [
+        "10",
+        "-10",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 10"
+      },
+      {
+       "input": [
+        "7",
+        "-2",
+        "9",
+        "-1",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 16\nRata-rata: 8.00\nTerbesar: 9",
+       "expected": "Jumlah pesanan: 4\nTotal boks: 13\nRata-rata: 3.25\nTerbesar: 9"
+      }
+     ]
+    },
+    "T3": {
+     "C3a": [
+      {
+       "input": [
+        "3",
+        "keripik:12:5000",
+        "stik:7:3000",
+        "emping:9:4000"
+       ],
+       "own": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK",
+       "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK\nTotal pendapatan: 117000"
+      },
+      {
+       "input": [
+        "2",
+        "bandeng:5:20000",
+        "otak:5:15000"
+       ],
+       "own": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK\nTotal pendapatan: 175000"
+      },
+      {
+       "input": [
+        "1",
+        "wingko:4:2500"
+       ],
+       "own": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO",
+       "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO\nTotal pendapatan: 10000"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3:10000",
+        "dodol:8:6000",
+        "jenang:8:7000",
+        "kue:1:500"
+       ],
+       "own": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS\nTotal pendapatan: 134500"
+      }
+     ],
+     "C3b": [
+      {
+       "input": [
+        "2",
+        "bandeng:5",
+        "otak:5"
+       ],
+       "own": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng, otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3",
+        "dodol:8",
+        "jenang:8",
+        "kue:1"
+       ],
+       "own": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol, jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+      },
+      {
+       "input": [
+        "3",
+        "x:6",
+        "y:6",
+        "z:6"
+       ],
+       "own": "Produk terlaris: x (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z",
+       "expected": "Produk terlaris: x, y, z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+      },
+      {
+       "input": [
+        "4",
+        "a:2",
+        "b:9",
+        "c:1",
+        "d:9"
+       ],
+       "own": "Produk terlaris: b (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D",
+       "expected": "Produk terlaris: b, d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D"
+      }
+     ]
+    }
+   },
+   "stage2": {
+    "trace": [
+     {
+      "taskId": "T2",
+      "correct": true,
+      "confidence": 2,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 25
+     }
+    ],
+    "bugline": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": true,
+      "confidence": 1,
+      "latencySec": 25
+     }
+    ],
+    "concept": [
+     {
+      "taskId": null,
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": null,
+      "correct": true,
+      "confidence": 1,
+      "latencySec": 25
+     }
+    ],
+    "transfer": [
+     {
+      "taskId": "T2",
+      "correct": false,
+      "confidence": 3,
+      "latencySec": 25
+     },
+     {
+      "taskId": "T3",
+      "correct": false,
+      "confidence": 2,
+      "latencySec": 25
+     }
+    ]
+   },
+   "debugCandidates": {
+    "T2": [
+     {
+      "code": "banyak = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    banyak = banyak + 1\n    total = total - boks\n    if boks > terbesar:\n        terbesar = boks\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {banyak}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / banyak:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+      "line": 12,
+      "rule": "plus-minus",
+      "note": "+ diganti -",
+      "before": "total = total + boks",
+      "after": "total = total - boks",
+      "failing": 6,
+      "wrongOutput": true
+     },
+     {
+      "code": "banyak = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    banyak = banyak + 1\n    total = total + boks\n    if boks > terbesar:\n        terbesar = boks\nif banyak == 1:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {banyak}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / banyak:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+      "line": 15,
+      "rule": "boundary",
+      "note": "batas 0 menjadi 1",
+      "before": "if banyak == 0:",
+      "after": "if banyak == 1:",
+      "failing": 4,
+      "wrongOutput": true
+     }
+    ],
+    "T3": [
+     {
+      "code": "n = int(input())\ncatatan = []\nfor i in range(n):\n    catatan.append(input())\nterbanyak = -1\nnama_terlaris = \"\"\ntotal = 0\nnama_semua = []\nfor c in catatan:\n    p = c.split(\":\")\n    jumlah = int(p[1])\n    total += jumlah\n    nama_semua.append(p[0])\n    if jumlah >= terbanyak:\n        terbanyak = jumlah\n        nama_terlaris = p[0]\nnama_semua.sort()\nfor i in range(len(nama_semua)):\n    nama_semua[i] = nama_semua[i].upper()\nprint(f\"Produk terlaris: {nama_terlaris} ({terbanyak} boks)\")\nprint(f\"Total terjual: {total}\")\nprint(\"Daftar produk: \" + \", \".join(nama_semua))\n",
+      "line": 14,
+      "rule": "compare",
+      "note": "> diganti >=",
+      "before": "if jumlah > terbanyak:",
+      "after": "if jumlah >= terbanyak:",
+      "failing": 3,
+      "wrongOutput": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "M15",
+   "s1Practice": 1,
+   "ai": "none",
+   "group": "akan-ujian",
+   "code": {
+    "T1": "jumlah = int(input())\njenis = input()\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * 25000\n    if jumlah >= 50:\n        persen = 10\n    elif jumlah >= 20:\n        persen = 5\n    else:\n        persen = 0\n    diskon = subtotal * persen // 100\n    if jenis == \"reseller\":\n        diskon = diskon + subtotal * 2 // 100\n    print(f\"Subtotal: Rp {subtotal}\")\n    print(f\"Diskon: Rp {diskon}\")\n    print(f\"Total bayar: Rp {subtotal - diskon}\")\n",
+    "T2": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    jumlah_pesanan += 1\n    total += boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+    "T3": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 0\nfor i in range(1, n):\n    if jumlah[i] > jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah)}\")\nurut = sorted(nama)\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n"
+   },
+   "theory": {
+    "Q1": "Algoritma adalah urutan langkah untuk menyelesaikan masalah. Syaratnya harus ada masukan dan keluaran, tiap langkah jelas dan pasti, serta prosesnya harus berhenti. Flowchart berbentuk gambar dengan simbol, sedangkan pseudocode berbentuk tulisan yang mirip kode tetapi tidak harus mengikuti sintaks.",
+    "Q2": "For dipakai kalau jumlah pengulangannya sudah pasti, sedangkan while dipakai selama kondisinya masih benar. List bisa diubah isinya, misalnya dengan append, sedangkan string tidak bisa diubah karena immutable."
+   },
+   "traceCandidates": {
+    "T2": [
+     {
+      "input": [
+       "8",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 8"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       }
+      ]
+     },
+     {
+      "input": [
+       "6",
+       "-3",
+       "9",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.50\nTerbesar: 9",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 4\nTotal boks: 15\nRata-rata: 3.75\nTerbesar: 9"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.00\nTerbesar: 9"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 9"
+       }
+      ]
+     },
+     {
+      "input": [
+       "10",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 10"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       }
+      ]
+     },
+     {
+      "input": [
+       "5",
+       "5",
+       "7",
+       "7",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 5\nTotal boks: 24\nRata-rata: 4.80\nTerbesar: 7"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       }
+      ]
+     },
+     {
+      "input": [
+       "-4",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 0"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: -4\nRata-rata: -4.00\nTerbesar: 0"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "4",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 4\nTotal boks: 11\nRata-rata: 2.75\nTerbesar: 4"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.00\nTerbesar: 4"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4"
+       }
+      ]
+     }
+    ],
+    "T3": [
+     {
+      "input": [
+       "3",
+       "roti:4",
+       "kue:9",
+       "dodol:2"
+      ],
+      "key": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: ROTI, KUE, DODOL"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 11\nDaftar produk: DODOL, KUE, ROTI"
+       }
+      ]
+     },
+     {
+      "input": [
+       "2",
+       "stik:5",
+       "emping:5"
+      ],
+      "key": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: STIK, EMPING"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 5\nDaftar produk: EMPING, STIK"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "lapis:7",
+       "bika:3",
+       "kue:7",
+       "ote:1"
+      ],
+      "key": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: LAPIS, BIKA, KUE, OTE"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 11\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       }
+      ]
+     },
+     {
+      "input": [
+       "1",
+       "wingko:9"
+      ],
+      "key": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 0\nDaftar produk: WINGKO"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "b:1",
+       "a:2",
+       "c:3"
+      ],
+      "key": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: B, A, C"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 5\nDaftar produk: A, B, C"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "mawar:10",
+       "melati:20",
+       "anggrek:15",
+       "dahlia:20"
+      ],
+      "key": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: MAWAR, MELATI, ANGGREK, DAHLIA"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 55\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       }
+      ]
+     }
+    ]
+   },
+   "changeCandidates": {
+    "T2": {
+     "C2a": [
+      {
+       "input": [
+        "10",
+        "20",
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "5",
+        "0",
+        "15",
+        "selesai"
+       ],
+       "own": "Jumlah pesanan: 1\nTotal boks: 5\nRata-rata: 5.00\nTerbesar: 5",
+       "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+      },
+      {
+       "input": [
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Tidak ada pesanan"
+      },
+      {
+       "input": [
+        "-1",
+        "selesai"
+       ],
+       "own": "Jumlah tidak valid, dilewati\n[Galat: ValueError]",
+       "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+      }
+     ],
+     "C2b": [
+      {
+       "input": [
+        "10",
+        "-4",
+        "20",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20",
+       "expected": "Jumlah pesanan: 3\nTotal boks: 26\nRata-rata: 8.67\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "-3",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+       "expected": "Jumlah pesanan: 1\nTotal boks: -3\nRata-rata: -3.00\nTerbesar: 0"
+      },
+      {
+       "input": [
+        "10",
+        "-10",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 10"
+      },
+      {
+       "input": [
+        "7",
+        "-2",
+        "9",
+        "-1",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 16\nRata-rata: 8.00\nTerbesar: 9",
+       "expected": "Jumlah pesanan: 4\nTotal boks: 13\nRata-rata: 3.25\nTerbesar: 9"
+      }
+     ]
+    },
+    "T3": {
+     "C3a": [
+      {
+       "input": [
+        "3",
+        "keripik:12:5000",
+        "stik:7:3000",
+        "emping:9:4000"
+       ],
+       "own": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK",
+       "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK\nTotal pendapatan: 117000"
+      },
+      {
+       "input": [
+        "2",
+        "bandeng:5:20000",
+        "otak:5:15000"
+       ],
+       "own": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK\nTotal pendapatan: 175000"
+      },
+      {
+       "input": [
+        "1",
+        "wingko:4:2500"
+       ],
+       "own": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO",
+       "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO\nTotal pendapatan: 10000"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3:10000",
+        "dodol:8:6000",
+        "jenang:8:7000",
+        "kue:1:500"
+       ],
+       "own": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS\nTotal pendapatan: 134500"
+      }
+     ],
+     "C3b": [
+      {
+       "input": [
+        "2",
+        "bandeng:5",
+        "otak:5"
+       ],
+       "own": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng, otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3",
+        "dodol:8",
+        "jenang:8",
+        "kue:1"
+       ],
+       "own": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol, jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+      },
+      {
+       "input": [
+        "3",
+        "x:6",
+        "y:6",
+        "z:6"
+       ],
+       "own": "Produk terlaris: x (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z",
+       "expected": "Produk terlaris: x, y, z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+      },
+      {
+       "input": [
+        "4",
+        "a:2",
+        "b:9",
+        "c:1",
+        "d:9"
+       ],
+       "own": "Produk terlaris: b (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D",
+       "expected": "Produk terlaris: b, d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D"
+      }
+     ]
+    }
+   },
+   "debugCandidates": {
+    "T2": [
+     {
+      "code": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        break\n    jumlah_pesanan += 1\n    total += boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+      "line": 10,
+      "rule": "loop-flow",
+      "note": "continue diganti break",
+      "before": "continue",
+      "after": "break",
+      "failing": 2,
+      "wrongOutput": true
+     },
+     {
+      "code": "jumlah_pesanan = 0\ntotal = 0\nterbesar = 0\nwhile True:\n    boks = int(input())\n    if boks == 0:\n        break\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n        continue\n    jumlah_pesanan += 1\n    total -= boks\n    if boks > terbesar:\n        terbesar = boks\nif jumlah_pesanan == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(f\"Jumlah pesanan: {jumlah_pesanan}\")\n    print(f\"Total boks: {total}\")\n    print(f\"Rata-rata: {total / jumlah_pesanan:.2f}\")\n    print(f\"Terbesar: {terbesar}\")\n",
+      "line": 12,
+      "rule": "plus-minus",
+      "note": "+= diganti -=",
+      "before": "total += boks",
+      "after": "total -= boks",
+      "failing": 6,
+      "wrongOutput": true
+     }
+    ],
+    "T3": [
+     {
+      "code": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 1\nfor i in range(1, n):\n    if jumlah[i] > jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah)}\")\nurut = sorted(nama)\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n",
+      "line": 8,
+      "rule": "init",
+      "note": "nilai awal 0 menjadi 1",
+      "before": "idx = 0",
+      "after": "idx = 1",
+      "failing": 5,
+      "wrongOutput": true
+     },
+     {
+      "code": "n = int(input())\nnama = []\njumlah = []\nfor i in range(n):\n    bagian = input().split(\":\")\n    nama.append(bagian[0])\n    jumlah.append(int(bagian[1]))\nidx = 0\nfor i in range(1, n):\n    if jumlah[i] >= jumlah[idx]:\n        idx = i\nprint(f\"Produk terlaris: {nama[idx]} ({jumlah[idx]} boks)\")\nprint(f\"Total terjual: {sum(jumlah)}\")\nurut = sorted(nama)\nprint(\"Daftar produk: \" + \", \".join(p.upper() for p in urut))\n",
+      "line": 10,
+      "rule": "compare",
+      "note": "> diganti >=",
+      "before": "if jumlah[i] > jumlah[idx]:",
+      "after": "if jumlah[i] >= jumlah[idx]:",
+      "failing": 3,
+      "wrongOutput": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "M16",
+   "s1Practice": 0.8125,
+   "ai": "ideas",
+   "group": "akan-ujian",
+   "code": {
+    "T1": "jumlah = int(input())\njenis = input()\nHARGA = 25000\nif jenis != \"reguler\" and jenis != \"reseller\":\n    print(\"Jenis pelanggan tidak dikenal\")\nelse:\n    subtotal = jumlah * HARGA\n    if jumlah >= 50:\n        diskon = subtotal * 10 // 100\n    elif jumlah >= 20:\n        diskon = subtotal * 5 // 100\n    else:\n        diskon = 0\n    if jenis == \"reseller\":\n        diskon += subtotal * 2 // 100\n    print(\"Subtotal: Rp\", subtotal)\n    print(\"Diskon: Rp\", diskon)\n    print(\"Total bayar: Rp\", subtotal - diskon)\n",
+    "T2": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total += boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+    "T3": "n = int(input())\ndata = []\nfor i in range(n):\n    nama, jml = input().split(\":\")\n    data.append([nama, int(jml)])\nterlaris = data[0]\nfor item in data:\n    if item[1] >= terlaris[1]:\n        terlaris = item\ntotal = 0\nfor item in data:\n    total += item[1]\nnama_urut = sorted([item[0] for item in data])\nprint(f\"Produk terlaris: {terlaris[0]} ({terlaris[1]} boks)\")\nprint(f\"Total terjual: {total}\")\ndaftar = []\nfor nm in nama_urut:\n    daftar.append(nm.upper())\nprint(\"Daftar produk: \" + \", \".join(daftar))\n"
+   },
+   "theory": {
+    "Q1": "Algoritma adalah urutan langkah yang jelas untuk menyelesaikan suatu masalah. Lima syaratnya: ada masukan, ada keluaran, setiap langkah pasti maknanya sehingga tidak menimbulkan tafsir ganda, prosesnya berhenti pada suatu titik, dan setiap langkah benar-benar bisa dikerjakan pelaksananya. Flowchart menggambarkan alur dengan simbol baku seperti oval, kotak, dan belah ketupat sehingga mudah dibaca secara visual, sedangkan pseudocode ditulis sebagai teks tanpa terikat sintaks bahasa pemrograman tertentu dan lebih cepat ditulis untuk logika yang panjang.",
+    "Q2": "Perulangan for dengan range() dipakai bila jumlah pengulangan sudah pasti sejak awal, misalnya memproses 10 pesanan. While dipakai bila pengulangan berlangsung sampai syarat tertentu berubah dan jumlahnya belum diketahui, misalnya membaca angka sampai pengguna mengetik 0. List bersifat mutable sehingga isinya bisa diubah, misalnya nilai[0] = 5 atau append(). String bersifat immutable, jadi mengubah string sebenarnya membuat string baru, dan teks[0] = \"A\" akan menimbulkan error."
+   },
+   "traceCandidates": {
+    "T2": [
+     {
+      "input": [
+       "8",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 8"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 2\nTotal boks: 12\nRata-rata: 6.00\nTerbesar: 8"
+       }
+      ]
+     },
+     {
+      "input": [
+       "6",
+       "-3",
+       "9",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.50\nTerbesar: 9",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 4\nTotal boks: 15\nRata-rata: 3.75\nTerbesar: 9"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 15\nRata-rata: 7.00\nTerbesar: 9"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 3\nTotal boks: 12\nRata-rata: 4.00\nTerbesar: 9"
+       }
+      ]
+     },
+     {
+      "input": [
+       "10",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 2\nTotal boks: 10\nRata-rata: 5.00\nTerbesar: 10"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10"
+       }
+      ]
+     },
+     {
+      "input": [
+       "5",
+       "5",
+       "7",
+       "7",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 5\nTotal boks: 24\nRata-rata: 4.80\nTerbesar: 7"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 4\nTotal boks: 24\nRata-rata: 6.00\nTerbesar: 7"
+       }
+      ]
+     },
+     {
+      "input": [
+       "-4",
+       "0"
+      ],
+      "key": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 0"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: -4\nRata-rata: -4.00\nTerbesar: 0"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "4",
+       "4",
+       "0"
+      ],
+      "key": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Jumlah pesanan: 4\nTotal boks: 11\nRata-rata: 2.75\nTerbesar: 4"
+       },
+       {
+        "id": "v2",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.00\nTerbesar: 4"
+       },
+       {
+        "id": "v3",
+        "out": "Jumlah pesanan: 3\nTotal boks: 11\nRata-rata: 3.67\nTerbesar: 4"
+       }
+      ]
+     }
+    ],
+    "T3": [
+     {
+      "input": [
+       "3",
+       "roti:4",
+       "kue:9",
+       "dodol:2"
+      ],
+      "key": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: DODOL, KUE, ROTI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 15\nDaftar produk: ROTI, KUE, DODOL"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: kue (9 boks)\nTotal terjual: 11\nDaftar produk: DODOL, KUE, ROTI"
+       }
+      ]
+     },
+     {
+      "input": [
+       "2",
+       "stik:5",
+       "emping:5"
+      ],
+      "key": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: emping (5 boks)\nTotal terjual: 10\nDaftar produk: EMPING, STIK"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 10\nDaftar produk: STIK, EMPING"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: stik (5 boks)\nTotal terjual: 5\nDaftar produk: EMPING, STIK"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "lapis:7",
+       "bika:3",
+       "kue:7",
+       "ote:1"
+      ],
+      "key": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: kue (7 boks)\nTotal terjual: 18\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 18\nDaftar produk: LAPIS, BIKA, KUE, OTE"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: lapis (7 boks)\nTotal terjual: 11\nDaftar produk: BIKA, KUE, LAPIS, OTE"
+       }
+      ]
+     },
+     {
+      "input": [
+       "1",
+       "wingko:9"
+      ],
+      "key": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 9\nDaftar produk: WINGKO"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: wingko (9 boks)\nTotal terjual: 0\nDaftar produk: WINGKO"
+       }
+      ]
+     },
+     {
+      "input": [
+       "3",
+       "b:1",
+       "a:2",
+       "c:3"
+      ],
+      "key": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: A, B, C"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 6\nDaftar produk: B, A, C"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: c (3 boks)\nTotal terjual: 5\nDaftar produk: A, B, C"
+       }
+      ]
+     },
+     {
+      "input": [
+       "4",
+       "mawar:10",
+       "melati:20",
+       "anggrek:15",
+       "dahlia:20"
+      ],
+      "key": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI",
+      "variants": [
+       {
+        "id": "v1",
+        "out": "Produk terlaris: dahlia (20 boks)\nTotal terjual: 65\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       },
+       {
+        "id": "v2",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 65\nDaftar produk: MAWAR, MELATI, ANGGREK, DAHLIA"
+       },
+       {
+        "id": "v3",
+        "out": "Produk terlaris: melati (20 boks)\nTotal terjual: 55\nDaftar produk: ANGGREK, DAHLIA, MAWAR, MELATI"
+       }
+      ]
+     }
+    ]
+   },
+   "changeCandidates": {
+    "T2": {
+     "C2a": [
+      {
+       "input": [
+        "10",
+        "20",
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "5",
+        "0",
+        "15",
+        "selesai"
+       ],
+       "own": "Jumlah pesanan: 1\nTotal boks: 5\nRata-rata: 5.00\nTerbesar: 5",
+       "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+      },
+      {
+       "input": [
+        "selesai"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Tidak ada pesanan"
+      },
+      {
+       "input": [
+        "-1",
+        "selesai"
+       ],
+       "own": "Jumlah tidak valid, dilewati\n[Galat: ValueError]",
+       "expected": "Jumlah tidak valid, dilewati\nTidak ada pesanan"
+      }
+     ],
+     "C2b": [
+      {
+       "input": [
+        "10",
+        "-4",
+        "20",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20",
+       "expected": "Jumlah pesanan: 3\nTotal boks: 26\nRata-rata: 8.67\nTerbesar: 20"
+      },
+      {
+       "input": [
+        "-3",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nTidak ada pesanan",
+       "expected": "Jumlah pesanan: 1\nTotal boks: -3\nRata-rata: -3.00\nTerbesar: 0"
+      },
+      {
+       "input": [
+        "10",
+        "-10",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah pesanan: 1\nTotal boks: 10\nRata-rata: 10.00\nTerbesar: 10",
+       "expected": "Jumlah pesanan: 2\nTotal boks: 0\nRata-rata: 0.00\nTerbesar: 10"
+      },
+      {
+       "input": [
+        "7",
+        "-2",
+        "9",
+        "-1",
+        "0"
+       ],
+       "own": "Jumlah tidak valid, dilewati\nJumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 16\nRata-rata: 8.00\nTerbesar: 9",
+       "expected": "Jumlah pesanan: 4\nTotal boks: 13\nRata-rata: 3.25\nTerbesar: 9"
+      }
+     ]
+    },
+    "T3": {
+     "C3a": [
+      {
+       "input": [
+        "3",
+        "keripik:12:5000",
+        "stik:7:3000",
+        "emping:9:4000"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK\nTotal pendapatan: 117000"
+      },
+      {
+       "input": [
+        "2",
+        "bandeng:5:20000",
+        "otak:5:15000"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK\nTotal pendapatan: 175000"
+      },
+      {
+       "input": [
+        "1",
+        "wingko:4:2500"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: wingko (4 boks)\nTotal terjual: 4\nDaftar produk: WINGKO\nTotal pendapatan: 10000"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3:10000",
+        "dodol:8:6000",
+        "jenang:8:7000",
+        "kue:1:500"
+       ],
+       "own": "[Galat: ValueError]",
+       "expected": "Produk terlaris: dodol (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS\nTotal pendapatan: 134500"
+      }
+     ],
+     "C3b": [
+      {
+       "input": [
+        "2",
+        "bandeng:5",
+        "otak:5"
+       ],
+       "own": "Produk terlaris: otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK",
+       "expected": "Produk terlaris: bandeng, otak (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+      },
+      {
+       "input": [
+        "4",
+        "lapis:3",
+        "dodol:8",
+        "jenang:8",
+        "kue:1"
+       ],
+       "own": "Produk terlaris: jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS",
+       "expected": "Produk terlaris: dodol, jenang (8 boks)\nTotal terjual: 20\nDaftar produk: DODOL, JENANG, KUE, LAPIS"
+      },
+      {
+       "input": [
+        "3",
+        "x:6",
+        "y:6",
+        "z:6"
+       ],
+       "own": "Produk terlaris: z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z",
+       "expected": "Produk terlaris: x, y, z (6 boks)\nTotal terjual: 18\nDaftar produk: X, Y, Z"
+      },
+      {
+       "input": [
+        "4",
+        "a:2",
+        "b:9",
+        "c:1",
+        "d:9"
+       ],
+       "own": "Produk terlaris: d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D",
+       "expected": "Produk terlaris: b, d (9 boks)\nTotal terjual: 21\nDaftar produk: A, B, C, D"
+      }
+     ]
+    }
+   },
+   "debugCandidates": {
+    "T2": [
+     {
+      "code": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total -= boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 0:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+      "line": 10,
+      "rule": "plus-minus",
+      "note": "+= diganti -=",
+      "before": "total += boks",
+      "after": "total -= boks",
+      "failing": 6,
+      "wrongOutput": true
+     },
+     {
+      "code": "total = 0\nbanyak = 0\nterbesar = 0\nboks = int(input())\nwhile boks != 0:\n    if boks < 0:\n        print(\"Jumlah tidak valid, dilewati\")\n    else:\n        banyak += 1\n        total += boks\n        if boks > terbesar:\n            terbesar = boks\n    boks = int(input())\nif banyak == 1:\n    print(\"Tidak ada pesanan\")\nelse:\n    print(\"Jumlah pesanan:\", banyak)\n    print(\"Total boks:\", total)\n    print(\"Rata-rata:\", f\"{total / banyak:.2f}\")\n    print(\"Terbesar:\", terbesar)\n",
+      "line": 14,
+      "rule": "boundary",
+      "note": "batas 0 menjadi 1",
+      "before": "if banyak == 0:",
+      "after": "if banyak == 1:",
+      "failing": 4,
+      "wrongOutput": true
+     }
+    ]
+   }
+  }
+ ]
+}

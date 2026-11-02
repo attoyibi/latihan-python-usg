@@ -18,3 +18,7 @@ peserta*.csv
 data-peserta/
 # Kata sandi awal peserta (rahasia)
 sandi-awal*.csv
+
+# Definisi soal ujian berisi kunci jawaban (REF dan varian bug): jangan terbit. Simulasi boleh publik.
+tools/ujian/*_def.py
+!tools/ujian/simulasi_def.py

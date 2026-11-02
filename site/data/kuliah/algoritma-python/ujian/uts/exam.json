@@ -1,0 +1,106 @@
+{
+  "id": "AP-UTS-2026",
+  "title": "UTS Algoritma dan Pemrograman (pilot)",
+  "course": "Algoritma dan Pemrograman (Python)",
+  "intro": "Satu kali jalan: Tahap 1 (60 menit, 4 soal: 2 teori + 2 praktik, Bab 1–7) lalu Tahap 2 (pertanyaan singkat yang dijawab satu kalimat) dimulai otomatis begitu Tahap 1 selesai. Kedua tahap berbatas waktu. Soal praktik dinilai tes, soal teori dinilai dari poin kunci, Tahap 2 dinilai otomatis. Boleh lewat HP.",
+  "aiDeclarationOptions": [
+    {
+      "id": "none",
+      "label": "Saya tidak memakai AI"
+    },
+    {
+      "id": "language",
+      "label": "Hanya untuk bahasa, penjelasan error, atau menulis ulang kalimat"
+    },
+    {
+      "id": "ideas",
+      "label": "Untuk mencari ide atau contoh kode, lalu saya tulis dan ubah sendiri"
+    },
+    {
+      "id": "major",
+      "label": "Sebagian besar kode berasal dari AI"
+    }
+  ],
+  "config": {
+    "stage2": {
+      "itemsPerType": {
+        "trace": 3,
+        "bugline": 2,
+        "concept": 2,
+        "transfer": 2
+      },
+      "optionsPerItem": 4,
+      "limitSec": {
+        "probe": 90,
+        "line": 90,
+        "change": 120
+      },
+      "beginDelaySec": 15,
+      "maxAttempts": 2,
+      "seedSalt": "DCE-AP-2026-01",
+      "mode": "open",
+      "minWords": 3
+    },
+    "runner": {
+      "timeoutMs": 5000,
+      "loadTimeoutMs": 60000
+    },
+    "cbm": {
+      "correct": {
+        "1": 1,
+        "2": 2,
+        "3": 3
+      },
+      "wrong": {
+        "1": 0,
+        "2": -2,
+        "3": -6
+      }
+    },
+    "weights": {
+      "trace": 0.25,
+      "bugline": 0.25,
+      "concept": 0.2,
+      "transfer": 0.3
+    },
+    "flag": {
+      "gap": 0.3,
+      "pass": 0.6,
+      "highS1": 0.7,
+      "ciZ": 1.28
+    },
+    "activeTasks": [
+      "T2",
+      "T3"
+    ],
+    "tahap1Order": [
+      "Q1",
+      "T2",
+      "Q2",
+      "T3"
+    ],
+    "s1": {
+      "practice": 0.5,
+      "theory": 0.5
+    },
+    "theory": {
+      "minWords": 60,
+      "wordRange": [
+        80,
+        200
+      ]
+    },
+    "tahap1Minutes": 60,
+    "accommodations": [],
+    "accommodationFactor": 1.5,
+    "grade": {
+      "w": 0.4,
+      "tolerance": 0.1,
+      "delta": 0.25,
+      "maxCut": 0.4
+    },
+    "audit": {
+      "samplePercent": 10
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "tasks": [
+    {
+      "id": "U1",
+      "title": "Praktik 1 · Peringkat nilai",
+      "topic": "Fungsi dan sorting (Bab 8, 13)",
+      "statement": [
+        "Baris pertama berisi n (bilangan bulat, minimal 1). Setiap n baris berikutnya berisi nama peserta (satu kata) dan nilainya (bilangan bulat), dipisah spasi.",
+        "Cetak peringkat dari nilai tertinggi ke terendah dengan bentuk 1. NAMA NILAI, 2. NAMA NILAI, dan seterusnya. Bila nilainya sama, yang lebih dulu dimasukkan tetap di atas. Baris terakhir: Rata-rata: ... dengan satu angka di belakang titik.",
+        "Pakai minimal satu fungsi buatanmu sendiri (def). Boleh memakai sorted() atau menulis algoritma pengurutan sendiri."
+      ],
+      "starter": "# Baca n, lalu n baris \"nama nilai\"\nn = int(input())\n\n",
+      "visible": [
+        {
+          "input": [
+            "3",
+            "Ani 80",
+            "Budi 95",
+            "Citra 70"
+          ],
+          "expected": "1. Budi 95\n2. Ani 80\n3. Citra 70\nRata-rata: 81.7"
+        },
+        {
+          "input": [
+            "2",
+            "Dewi 60",
+            "Eko 75"
+          ],
+          "expected": "1. Eko 75\n2. Dewi 60\nRata-rata: 67.5"
+        }
+      ]
+    },
+    {
+      "id": "U2",
+      "title": "Praktik 2 · Stok gudang",
+      "topic": "Kelas dan CRUD (Bab 9, 11)",
+      "statement": [
+        "Buat kelas Gudang yang menyimpan stok barang, lalu baca perintah baris demi baris sampai bertemu SELESAI. Setiap perintah dipisah spasi:",
+        "TAMBAH NAMA JUMLAH: tambahkan stok, lalu cetak OK NAMA STOK_BARU. JUAL NAMA JUMLAH: bila stok cukup, kurangi dan cetak Terjual NAMA, sisa STOK; bila tidak cukup, stok tidak berubah dan cetak Stok NAMA kurang. CEK NAMA: cetak NAMA: STOK. Barang yang belum pernah ditambah stoknya 0."
+      ],
+      "starter": "class Gudang:\n    def __init__(self):\n        self.stok = {}\n\n\ng = Gudang()\n",
+      "visible": [
+        {
+          "input": [
+            "TAMBAH kue 5",
+            "JUAL kue 2",
+            "CEK kue",
+            "SELESAI"
+          ],
+          "expected": "OK kue 5\nTerjual kue, sisa 3\nkue: 3"
+        },
+        {
+          "input": [
+            "JUAL roti 1",
+            "TAMBAH roti 3",
+            "TAMBAH roti 2",
+            "SELESAI"
+          ],
+          "expected": "Stok roti kurang\nOK roti 3\nOK roti 5"
+        }
+      ]
+    }
+  ]
+}

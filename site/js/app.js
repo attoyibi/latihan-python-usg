@@ -20,6 +20,7 @@ import * as PraktikData from "./praktik-data.js";
 import * as Kunci from "./kunci.js";
 import * as LaporanAkhirUI from "./laporan-akhir-ui.js";
 import * as Promo from "./promo.js";
+import * as UjianUI from "./ujian/index.js";
 
 // Penyimpanan di browser, dipisah per pengguna (supaya komputer bersama tidak bercampur).
 // Progres ditulis ke sini lebih dulu, lalu disusulkan ke Supabase oleh sinkron.js.
@@ -956,6 +957,9 @@ function renderKuliah(publik) {
   );
 }
 
+// Kartu Laporan akhir disembunyikan sementara (fokus ke Ujian). Kode dan data tetap ada; ubah ke true untuk menampilkan lagi.
+const LAPORAN_AKHIR_TAMPIL = false;
+
 function renderCourse(c) {
   const { total, done } = courseProgress(c);
   const ready = c.aktif && total > 0;
@@ -974,7 +978,8 @@ function renderCourse(c) {
     ready ? h("div", { class: "section-title" }, h("h2", {}, "Daftar bab")) : null,
     ready ? h("p", { class: "free-note" }, "Pilih bab mana saja. Penanda menunjukkan mana yang belum, sedang, atau sudah selesai.") : null,
     ready ? babGrid() : null,
-    ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
+    ready && c.ujian === true && (Auth.getUserId() || Auth.localMode()) ? UjianUI.kartuUjian(c, Auth.getUserId()) : null,
+    LAPORAN_AKHIR_TAMPIL && ready && Auth.getUserId() ? LaporanAkhirUI.kartuLaporanAkhir({ store, kuliah: c, instruktur: () => !!Auth.getProfile() && Auth.getProfile().peran === "instruktur" }) : null
   ].filter(Boolean));
 }
 
@@ -1078,6 +1083,23 @@ function kirimUlangBtn(kirim, pesanEl, galatEl, label) {
   return { btn, jeda };
 }
 
+// Tombol "Masuk dengan Google" beserta pemisah "atau"; null bila fitur tidak dinyalakan.
+function tombolGoogle(errEl) {
+  if (!Auth.masukGoogleAktif()) return null;
+  const btn = h("button", { type: "button", class: "btn btn-google" }, h("span", { class: "g-logo", "aria-hidden": "true" }, "G"), "Masuk dengan Google");
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    errEl.textContent = "";
+    try {
+      await Auth.signInGoogle();
+    } catch (e) {
+      errEl.textContent = e.message;
+      btn.disabled = false;
+    }
+  });
+  return h("div", { class: "masuk-google" }, h("p", { class: "atau" }, h("span", {}, "atau")), btn, errEl);
+}
+
 function renderMasuk(konteks) {
   const terbuka = Auth.pendaftaranTerbuka();
   // div (bukan p): bisa memuat tombol kirim ulang dan paragraf info saat email belum dikonfirmasi.
@@ -1131,7 +1153,8 @@ function renderMasuk(konteks) {
       btn.disabled = false;
     }
   });
-  $("#main").replaceChildren(gateCard(konteks ? "Masuk untuk membuka " + konteks : "Masuk", lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form, bawah));
+  const google = tombolGoogle(h("p", { class: "field-err", role: "alert" }));
+  $("#main").replaceChildren(gateCard(konteks ? "Masuk untuk membuka " + konteks : "Masuk", lead, galat ? h("p", { class: "field-err", role: "alert" }, galat) : null, form, google, bawah));
   fe.input.focus();
 }
 
@@ -1147,7 +1170,7 @@ function renderDaftar(konteks) {
   const btn = h("button", { type: "submit", class: "btn btn-primary" }, "Daftar");
   const form = h("form", { novalidate: "" }, fe.node, fs.node, h("p", { class: "muted" }, "Minimal " + Auth.MIN_SANDI + " karakter, memuat huruf dan angka."), fu.node, h("div", { class: "actions" }, btn), msg);
   const bawah = h("p", { class: "alt-link" }, "Sudah punya akun? ", h("a", { href: "#masuk" }, "Masuk"));
-  const card = gateCard(konteks ? "Daftar untuk membuka " + konteks : "Daftar", "Buat akun dengan email dan kata sandi. Setelah itu kamu mengisi nama, NIM, dan kelas satu kali.", form, bawah);
+  const card = gateCard(konteks ? "Daftar untuk membuka " + konteks : "Daftar", "Buat akun dengan email dan kata sandi. Setelah itu kamu mengisi nama, NIM, dan kelas satu kali.", form, tombolGoogle(h("p", { class: "field-err", role: "alert" })), bawah);
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     fe.err.textContent = "";
@@ -1320,7 +1343,7 @@ function renderProfilForm() {
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { inputmode: "text", autocomplete: "off", maxlength: "30", required: "" }, "Tulis seperti di kartu mahasiswa.");
   const fk = kelasField(p.kelas);
-  fn.input.value = p.nama || "";
+  fn.input.value = p.nama || Auth.namaAkun();
   fi.input.value = p.nim || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan dan mulai");
@@ -1394,7 +1417,7 @@ function renderProfil() {
   const fn = field("nama", "Nama lengkap", { autocomplete: "name", maxlength: "100", required: "" });
   const fi = field("nim", "NIM", { autocomplete: "off", maxlength: "30", required: "" });
   const fk = kelasField(p.kelas);
-  fn.input.value = p.nama || "";
+  fn.input.value = p.nama || Auth.namaAkun();
   fi.input.value = p.nim || "";
   const msg = h("p", { class: "form-msg", role: "status", "aria-live": "polite" });
   const saveBtn = h("button", { type: "submit", class: "btn btn-primary" }, "Simpan perubahan");
@@ -1523,7 +1546,7 @@ function setPage(kind) {
   document.body.classList.toggle("gate", gate);
   document.body.classList.toggle("home", kind !== "bab");
   $("#navHome").classList.toggle("on", kind === "beranda");
-  $("#navMateri").classList.toggle("on", kind === "kuliah" || kind === "course" || kind === "bab");
+  $("#navMateri").classList.toggle("on", kind === "kuliah" || kind === "course" || kind === "bab" || kind === "ujian");
   $("#navPanduan").classList.toggle("on", kind === "panduan");
   $("#navInstruktur").classList.toggle("on", kind === "instruktur");
   $("#navProfil").classList.toggle("on", kind === "profil");
@@ -1584,6 +1607,7 @@ async function keluar() {
 
 async function route() {
   Tata.bersihkan();
+  UjianUI.tinggalkan();
   const tok = ++routeTok;
   const stale = () => tok !== routeTok;
   const hash = location.hash;
@@ -1671,6 +1695,22 @@ async function route() {
     await renderBab(n);
     return;
   }
+  // Ujian (UTS/UAS): halaman fokus tanpa sidebar. Tahap ditentukan dari keadaan ujian, bukan dari alamat.
+  if ((m = /^#k\/([a-z0-9-]+)\/ujian\/([a-z0-9-]+)$/.exec(hash))) {
+    const c = await loadCourse(m[1]);
+    if (stale()) return;
+    if (!c || !c.aktif || c.ujian !== true || (c.bahasa !== "python" && c.bahasa !== "java")) {
+      setPage("kuliah");
+      renderTidakAda();
+      return;
+    }
+    useCourse(c, true);
+    setPage("ujian");
+    window.scrollTo(0, 0);
+    const p = Auth.getProfile() || {};
+    await UjianUI.renderUjian($("#main"), c, m[2], { id: Auth.getUserId() || "lokal", nama: p.nama || "Peserta", nim: p.nim || "-", kelas: p.kelas || "-", peran: p.peran || "peserta" });
+    return;
+  }
   if ((m = /^#k\/([a-z0-9-]+)$/.exec(hash))) {
     const c = await loadCourse(m[1]);
     if (stale()) return;
@@ -1723,6 +1763,11 @@ async function init() {
     document.title = CFG.namaSitus || "Latihan";
   } catch (e) {}
   window.addEventListener("hashchange", route);
+  // Tinggi kepala halaman (berubah di tablet/ponsel karena menu turun ke baris kedua) untuk sidebar dan bilah waktu ujian.
+  const kepala = document.querySelector("header.top");
+  const ukurKepala = () => document.documentElement.style.setProperty("--top-h", kepala.offsetHeight + "px");
+  ukurKepala();
+  if (window.ResizeObserver) new ResizeObserver(ukurKepala).observe(kepala);
   Promo.mulai();
   $("#logoutBtn").addEventListener("click", keluar);
   $("#menuBtn").addEventListener("click", () => {

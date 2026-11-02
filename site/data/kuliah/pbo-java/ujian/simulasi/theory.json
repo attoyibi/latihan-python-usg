@@ -1,0 +1,27 @@
+{
+  "note": "Soal teori SIMULASI PBO Java (Bab 1-4, lebih mudah). Dinilai otomatis dari poin kunci: poin tertangkap bila setiap kelompok kata punya minimal satu kata yang muncul. Skor = poin tertangkap / need.",
+  "questions": [
+    {
+      "id": "SQ1",
+      "title": "Teori 1 · Kelas dan objek",
+      "topic": "Bab 1–2",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa beda kelas dan objek; (b) apa itu atribut dan method; (c) apa fungsi constructor.",
+        "Tulis satu paragraf (sekitar 50–120 kata) dengan KALIMATMU SENDIRI: jangan menyalin definisi dari buku, catatan, atau AI. Jelaskan seperti menerangkan ke teman, boleh dengan contohmu sendiri."
+      ],
+      "need": 4,
+      "probe": "Dalam satu kalimat: apa beda kelas dan objek?"
+    },
+    {
+      "id": "SQ2",
+      "title": "Teori 2 · Enkapsulasi",
+      "topic": "Bab 3–4",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa itu enkapsulasi dan kenapa atribut dibuat private; (b) apa fungsi getter dan setter; (c) apa arti tanda - dan + pada diagram kelas UML.",
+        "Tulis satu paragraf (sekitar 50–120 kata) dengan KALIMATMU SENDIRI: jangan menyalin definisi dari buku, catatan, atau AI. Jelaskan seperti menerangkan ke teman, boleh dengan contohmu sendiri."
+      ],
+      "need": 4,
+      "probe": "Dalam satu kalimat: kenapa atribut sebuah kelas dibuat private?"
+    }
+  ]
+}

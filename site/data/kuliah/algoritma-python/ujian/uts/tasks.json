@@ -1,0 +1,91 @@
+{
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Praktik cadangan · Tagihan pesanan",
+      "topic": "Percabangan (Bab 4)",
+      "statement": [
+        "UD Rasa Gresik menjual kue dalam boks. Harga satu boks Rp 25.000. Tulis program yang membaca jumlah boks (bilangan bulat) pada baris pertama dan jenis pelanggan pada baris kedua, yaitu reguler atau reseller, lalu mencetak tagihan.",
+        "Diskon volume: 50 boks atau lebih mendapat 10%, 20 sampai 49 boks mendapat 5%, kurang dari 20 boks tidak ada diskon. Pelanggan reseller mendapat tambahan diskon 2% dari subtotal. Semua perhitungan memakai bilangan bulat (gunakan //).",
+        "Cetak tiga baris: Subtotal: Rp ..., Diskon: Rp ... (total diskon), dan Total bayar: Rp .... Jika jenis pelanggan bukan reguler atau reseller, cetak hanya: Jenis pelanggan tidak dikenal"
+      ],
+      "starter": "# Baca jumlah boks dan jenis pelanggan\njumlah = int(input())\njenis = input()\n\n# Tulis aturan diskon dan cetak tagihan di bawah ini\n",
+      "visible": [
+        {
+          "input": [
+            "12",
+            "reguler"
+          ],
+          "expected": "Subtotal: Rp 300000\nDiskon: Rp 0\nTotal bayar: Rp 300000"
+        },
+        {
+          "input": [
+            "25",
+            "reseller"
+          ],
+          "expected": "Subtotal: Rp 625000\nDiskon: Rp 43750\nTotal bayar: Rp 581250"
+        }
+      ]
+    },
+    {
+      "id": "T2",
+      "title": "Praktik 1 · Rekap pesanan",
+      "topic": "Perulangan (Bab 5)",
+      "statement": [
+        "UD Rasa Gresik mencatat jumlah boks per pesanan. Tulis program yang membaca jumlah boks satu per satu sampai pengguna mengetik 0. Angka 0 hanya penanda selesai, bukan pesanan.",
+        "Jumlah negatif dianggap salah ketik: cetak Jumlah tidak valid, dilewati lalu abaikan angka itu. Setelah selesai cetak empat baris: Jumlah pesanan: ..., Total boks: ..., Rata-rata: ... (dua angka di belakang koma), dan Terbesar: ....",
+        "Jika tidak ada pesanan yang sah, cetak hanya: Tidak ada pesanan"
+      ],
+      "starter": "# Baca jumlah boks sampai pengguna mengetik 0\n\n",
+      "visible": [
+        {
+          "input": [
+            "10",
+            "20",
+            "0"
+          ],
+          "expected": "Jumlah pesanan: 2\nTotal boks: 30\nRata-rata: 15.00\nTerbesar: 20"
+        },
+        {
+          "input": [
+            "5",
+            "-2",
+            "15",
+            "0"
+          ],
+          "expected": "Jumlah tidak valid, dilewati\nJumlah pesanan: 2\nTotal boks: 20\nRata-rata: 10.00\nTerbesar: 15"
+        }
+      ]
+    },
+    {
+      "id": "T3",
+      "title": "Praktik 2 · Rekap produk",
+      "topic": "List dan string (Bab 6–7)",
+      "statement": [
+        "Setiap hari UD Rasa Gresik mencatat penjualan produk. Baris pertama masukan adalah n (banyak catatan, minimal 1). Berikutnya n baris berformat nama:jumlah, misalnya keripik:12. Nama produk tidak ada yang kembar dan ditulis huruf kecil.",
+        "Cetak tiga baris: Produk terlaris: NAMA (JUMLAH boks), lalu Total terjual: ..., lalu Daftar produk: diikuti semua nama dengan huruf kapital, dipisah koma dan spasi, urut abjad.",
+        "Bila ada beberapa produk dengan jumlah terbanyak yang sama, pilih yang muncul lebih dulu di masukan. Nama pada baris Produk terlaris tetap huruf kecil seperti di masukan."
+      ],
+      "starter": "# Baca n lalu n baris nama:jumlah\nn = int(input())\n\n",
+      "visible": [
+        {
+          "input": [
+            "3",
+            "keripik:12",
+            "stik:7",
+            "emping:9"
+          ],
+          "expected": "Produk terlaris: keripik (12 boks)\nTotal terjual: 28\nDaftar produk: EMPING, KERIPIK, STIK"
+        },
+        {
+          "input": [
+            "2",
+            "bandeng:5",
+            "otak:5"
+          ],
+          "expected": "Produk terlaris: bandeng (5 boks)\nTotal terjual: 10\nDaftar produk: BANDENG, OTAK"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "note": "Soal teori Tahap 1 (Bab 1–7, sebelum UAS). Dinilai otomatis dari poin kunci: sebuah poin tertangkap bila SETIAP kelompok kata punya minimal satu kata yang muncul. Skor = poin tertangkap / need (maksimal 1). Dosen bisa menimpa. 'sample' khusus demo.",
+  "questions": [
+    {
+      "id": "Q1",
+      "title": "Teori 1 · Algoritma dan alat merancangnya",
+      "topic": "Bab 1–3",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) apa yang dimaksud algoritma dan lima syarat agar sebuah urutan langkah layak disebut algoritma; (b) perbedaan flowchart dan pseudocode sebagai alat merancang algoritma.",
+        "Tulis satu sampai dua paragraf (sekitar 80–200 kata) dengan KALIMATMU SENDIRI (parafrase): jangan menyalin definisi dari buku, catatan, atau AI, dan sertakan contohmu sendiri. Jawaban yang disalin tanpa dipahami akan terlihat di Tahap 2."
+      ],
+      "need": 5,
+      "probe": "Dalam satu kalimat: apa beda flowchart dan pseudocode sebagai alat merancang algoritma?"
+    },
+    {
+      "id": "Q2",
+      "title": "Teori 2 · Perulangan, list, dan string",
+      "topic": "Bab 4–7",
+      "prompt": [
+        "Jelaskan dengan kata-katamu sendiri: (a) perbedaan perulangan for dan while serta kapan memakai masing-masing; (b) perbedaan list dan string dalam hal bisa tidaknya isinya diubah. Sertakan satu contoh singkat.",
+        "Tulis satu sampai dua paragraf (sekitar 80–200 kata) dengan KALIMATMU SENDIRI (parafrase): jangan menyalin definisi dari buku, catatan, atau AI, dan sertakan contohmu sendiri. Jawaban yang disalin tanpa dipahami akan terlihat di Tahap 2."
+      ],
+      "need": 4,
+      "probe": "Dalam satu kalimat: kapan kamu memilih while dan bukan for?"
+    }
+  ]
+}
