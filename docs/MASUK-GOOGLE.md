@@ -20,7 +20,7 @@ ditutup tombol disembunyikan, karena masuk dengan Google bisa membuat akun baru.
    - Redirect URLs: setiap alamat situs diikuti `/**`, mis. `https://latihan-usg.vercel.app/**`,
      `https://latihan-usg-pratinjau.vercel.app/**`, dan untuk pratinjau Vercel
      `https://latihan-usg-pratinjau-*-attoyibis-projects.vercel.app/**`. Alamat yang tidak terdaftar dikembalikan ke Site URL.
-4. **Vercel > Settings > Environment Variables**: `MASUK_GOOGLE` = `ya`, lalu deploy ulang.
+4. Tombol menyala secara bawaan saat penayangan. Untuk menyembunyikannya, isi `MASUK_GOOGLE` = `tidak` di Vercel > Settings > Environment Variables, lalu deploy ulang.
 
 ## Mencoba di komputer sendiri
 `python tools/server_uji.py`, buka `http://localhost:8124/?terbuka=1#masuk`. Klien tiruan meniru Google (akun

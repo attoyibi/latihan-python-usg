@@ -7,7 +7,7 @@
 //   SUPABASE_URL        alamat proyek, mis. https://abcdxyz.supabase.co
 //   SUPABASE_ANON_KEY   kunci "anon" (atau "publishable") dari Project Settings > API
 //   MODE_LOKAL          opsional, "true" hanya untuk uji tampilan tanpa akun
-//   MASUK_GOOGLE        opsional, "ya" menampilkan tombol "Masuk dengan Google" (nyalakan dulu provider Google di Supabase)
+//   MASUK_GOOGLE        opsional, bawaan "ya" (tombol tampil); isi "tidak" untuk menyembunyikan. Tombol "Masuk dengan Google" (nyalakan dulu provider Google di Supabase)
 //   PENDAFTARAN         opsional, "buka" (bawaan: peserta mendaftar sendiri) atau "tutup" (Daftar disembunyikan, peserta didaftarkan dosen)
 //
 // Bila kedua variabel kosong, config.js dibiarkan apa adanya dan situs menampilkan
@@ -30,7 +30,7 @@ const url = (process.env.SUPABASE_URL || "").trim();
 const key = (process.env.SUPABASE_ANON_KEY || "").trim();
 const lokal = (process.env.MODE_LOKAL || "").trim().toLowerCase() === "true";
 const pendaftaran = (process.env.PENDAFTARAN || "buka").trim().toLowerCase();
-const google = (process.env.MASUK_GOOGLE || "").trim().toLowerCase();
+const google = (process.env.MASUK_GOOGLE || "ya").trim().toLowerCase();
 
 function gagal(pesan) {
   console.error("[buat_config] GAGAL: " + pesan);
