@@ -88,6 +88,39 @@ export function gripTinggi(tata, ambilEditor) {
 }
 
 let penangkapEsc = null;
+let escLayarPenuh = null;
+
+// Alat untuk editor di luar halaman bab (mis. Praktik): tombol "Layar penuh" dan pegangan tinggi. `ambilPenuh()` memberi
+// elemen yang memuat editor beserta tombol Jalankan dan keluarannya, jadi di layar penuh semuanya tetap terjangkau.
+// Tinggi editor memakai pilihan yang sama dengan halaman bab (satu pilihan untuk semua editor).
+export function alatEditor(tata, ambilEditor, ambilPenuh) {
+  setTinggi(tata.get("tinggi"));
+  const grip = gripTinggi(tata, ambilEditor);
+  const tombol = h("button", { type: "button", class: "btn btn-sm", "aria-pressed": "false", title: "Editor memenuhi layar bersama tombol Jalankan (tekan Esc untuk keluar)" }, "Layar penuh");
+  let nyala = false;
+  const atur = (v) => {
+    nyala = v;
+    const penuhEl = ambilPenuh();
+    penuhEl.classList.toggle("ed-penuh", v);
+    document.body.classList.toggle("ed-kunci", v);
+    tombol.textContent = v ? "Keluar layar penuh" : "Layar penuh";
+    tombol.setAttribute("aria-pressed", String(v));
+    if (escLayarPenuh) document.removeEventListener("keydown", escLayarPenuh);
+    escLayarPenuh = null;
+    if (v) {
+      penuhEl.scrollTop = 0;
+      escLayarPenuh = (e) => {
+        if (e.key === "Escape") atur(false);
+      };
+      document.addEventListener("keydown", escLayarPenuh);
+    }
+    const ed = ambilEditor();
+    if (ed) setTimeout(() => ed.refresh(), 0);
+  };
+  tombol.addEventListener("click", () => atur(!nyala));
+  const bar = h("div", { class: "tata-bar", role: "toolbar", "aria-label": "Atur ukuran editor" }, tombol);
+  return { bar, grip };
+}
 
 /**
  * Memasang tata letak pada `.cols` (video | pegangan | soal) dan mengembalikan bilah alat.
@@ -191,6 +224,9 @@ export function pasang(cols, vc, tata, opsi) {
 export function bersihkan() {
   document.body.classList.remove("fokus");
   document.body.classList.remove("menyeret");
+  document.body.classList.remove("ed-kunci");
+  if (escLayarPenuh) document.removeEventListener("keydown", escLayarPenuh);
+  escLayarPenuh = null;
   if (penangkapEsc) document.removeEventListener("keydown", penangkapEsc);
   penangkapEsc = null;
 }

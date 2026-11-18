@@ -12,6 +12,7 @@ import { runProyekJava } from "./javarunner.js";
 import { ambilKunci } from "./kunci.js";
 import * as P from "./praktik.js";
 import * as D from "./praktik-data.js";
+import * as Tata from "./tata.js";
 
 export const NAMA_STATUS = P.STATUS;
 export const statusLokal = D.statusLokal;
@@ -118,6 +119,9 @@ function bangunBagian(ctx, def, bagian, d, saatStatus) {
   gambarHint();
 
   const holder = h("div", { class: "pk-editor" });
+  // Pegangan tinggi dan layar penuh; `el` (elemen bagian ini) dibuat di bawah, sebelum tombolnya bisa diklik.
+  let el = null;
+  const alat = Tata.alatEditor(Tata.baru(ctx.store), () => (ed ? { refresh: () => ed.segarkan() } : null), () => el);
   const stdin = h("textarea", { class: "input pk-masukan", id: "pk-masukan-" + sfx, rows: "2", "aria-label": "Masukan untuk program", spellcheck: "false", placeholder: java ? "Masukan untuk Scanner, satu baris per pertanyaan (boleh kosong)" : "Masukan untuk input(), satu baris per pertanyaan" });
   stdin.value = d.masukanContoh || "";
   const keluaran = h("pre", { class: "pk-keluaran", "aria-live": "polite", tabindex: "0" }, "Keluaran program akan tampil di sini.");
@@ -238,7 +242,7 @@ function bangunBagian(ctx, def, bagian, d, saatStatus) {
       periksaBtn.click();
     });
 
-  const el = h(
+  el = h(
     "div",
     { class: "praktik-bagian", "data-bagian": bagian },
     bagian === "B" || def.bagianB ? h("div", { class: "praktik-bagian-kepala" }, h("h4", {}, bagian === "B" ? "Bagian B: " + d.judul : "Bagian A: terbimbing"), statusChip) : null,
@@ -246,10 +250,12 @@ function bangunBagian(ctx, def, bagian, d, saatStatus) {
     h("h4", {}, "Langkah"),
     langkah,
     h("p", { class: "muted" }, "Berkas: " + d.berkas),
+    alat.bar,
     holder,
+    alat.grip,
     bisaJalan ? h("label", { for: "pk-masukan-" + sfx, class: "muted" }, java ? "Masukan untuk tombol Jalankan (satu baris untuk setiap pembacaan Scanner)" : "Masukan untuk tombol Jalankan (satu baris untuk setiap input)") : null,
     bisaJalan ? stdin : null,
-    h("div", { class: "actions" }, jalanBtn, periksaBtn, kembaliBtn, kunciBtn),
+    h("div", { class: "actions pk-aksi" }, jalanBtn, periksaBtn, kembaliBtn, kunciBtn),
     keluaran,
     pesan,
     hasilBox,

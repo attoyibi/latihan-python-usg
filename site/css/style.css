@@ -262,6 +262,13 @@ td.sel.belum,td.sel.unggah{color:var(--muted);font-weight:400}
 .grip-v{height:14px;display:flex;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;margin-bottom:6px}
 .grip-v span{width:44px;height:4px;border-radius:4px;background:var(--line)}
 .grip-v:hover span,.grip-v:focus-visible span,.grip-v.menyeret span{background:var(--brand)}
+/* Layar penuh untuk editor di luar halaman bab (Praktik): bagian itu menutup layar, isinya tetap bisa digulir */
+body.ed-kunci{overflow:hidden}
+.ed-penuh{position:fixed;inset:0;z-index:80;overflow:auto;background:var(--bg);padding:14px max(16px,4vw) 40px;margin:0!important;border:0!important;border-radius:0!important}
+.ed-penuh .pk-editor .CodeMirror{height:max(300px,calc(100vh - 300px))}
+.ed-penuh .pk-aksi{position:sticky;bottom:0;z-index:2;background:var(--bg);padding:10px 0;margin:0;border-top:1px solid var(--line)}
+.ed-penuh .grip-v{display:none}
+@media (max-width:760px){.ed-penuh .pk-aksi{position:static;border-top:0}}
 body.menyeret{user-select:none;cursor:grabbing}
 body.menyeret iframe{pointer-events:none}
 .cols.tanpa-video{grid-template-columns:minmax(0,1fr)}
@@ -550,7 +557,7 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 .pk-langkah{padding-left:22px}
 .pk-langkah li{margin:6px 0}
 .pk-editor{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:8px 0}
-.pk-editor .CodeMirror{height:300px;font-size:14px}
+.pk-editor .CodeMirror{height:min(var(--tinggi-editor,380px),80vh);font-size:14px}
 .pk-teks{width:100%;font-family:var(--mono);border:0}
 .pk-masukan{width:100%;font-family:var(--mono)}
 .pk-keluaran{background:var(--code-bg);color:#d9f3f1;padding:12px 14px;border-radius:12px;white-space:pre-wrap;word-break:break-word;min-height:70px;font-size:13px;margin:10px 0}
@@ -570,7 +577,6 @@ dialog.putar select,.field select{padding:8px 10px;border:1px solid var(--line);
 @media (max-width:760px){
   .praktik-isi{padding:2px 12px 14px}
   .praktik-kepala{padding:12px}
-  .pk-editor .CodeMirror{height:260px}
 }
 
 /* Praktikum Java: latihan per bab, tugas akhir, unggah, penanda kelengkapan */
